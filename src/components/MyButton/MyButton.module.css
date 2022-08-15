@@ -1,0 +1,22 @@
+.root {
+  cursor: pointer;
+  border: 5px solid;
+  padding: 10px 20px;
+  margin-right: 5px;
+  background-color: white;
+  outline: none;
+  color: #42b983;
+  border-color: #42b983;
+}
+
+.root:hover {
+  background-color: #dddddd;
+}
+
+.root[data-rounded='true'] {
+  border-radius: 20px !important;
+}
+
+.root[data-variant='secondary'] {
+  border-color: #3498db;
+}

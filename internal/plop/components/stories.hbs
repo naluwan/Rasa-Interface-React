@@ -1,0 +1,23 @@
+// import * as React from 'react';
+import { actions } from '@storybook/addon-actions';
+
+import {{ properCase name }} from '.';
+
+const action = actions();
+
+export default {
+  title: '{{ properCase name }}',
+  component: {{ properCase name }},
+};
+
+const Template = (args) => {
+  return (
+    <{{ properCase name }}
+      {...args}
+      {...action}
+    />
+  );
+};
+
+export const Basic = Template.bind({});
+Basic.args = {};

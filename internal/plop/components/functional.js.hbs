@@ -1,0 +1,14 @@
+import * as React from 'react';
+import style from './{{ properCase name }}.module.css';
+
+type {{ properCase name }}Props = {};
+
+const {{ properCase name }}: React.FC<{{ properCase name }}Props> = (props) => {
+  return (
+    <div className={style.root}>
+      <h1>{{ properCase this.name }}</h1>
+    </div>
+  )
+};
+
+export default React.memo({{ properCase name }});
