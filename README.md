@@ -2,7 +2,7 @@
 ## Getting Started
 Clone respository to your local computer
 ```
-$ git clone 
+$ git clone https://github.com/naluwan/Rasa-Interface-React.git
 ```
 Install by npm
 ```
