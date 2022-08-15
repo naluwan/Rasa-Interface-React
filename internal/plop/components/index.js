@@ -40,7 +40,7 @@ module.exports = {
       },
       {
         type: 'add',
-        path: '../../src/components/{{properCase name}}/{{properCase name}}.module.css',
+        path: '../../src/components/{{properCase name}}/{{properCase name}}.module.scss',
         templateFile: 'components/style.hbs',
         abortOnFail: true,
       },
