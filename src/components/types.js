@@ -1,4 +1,5 @@
-export type Title = {
-  id: string,
+export type NavItemType = {
+  id: number,
   name: string,
+  link: string,
 };

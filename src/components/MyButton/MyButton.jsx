@@ -1,6 +1,6 @@
 import * as React from 'react';
 import cx from 'classnames';
-import style from './MyButton.module.css';
+import style from './MyButton.module.scss';
 
 type MyButtonProps = {
   onClick?: () => void,

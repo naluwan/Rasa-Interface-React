@@ -1,13 +1,24 @@
 import * as React from 'react';
+import { NavItemType } from 'components/types';
+import shallow from 'zustand/shallow';
+import { NavLink } from 'react-router-dom';
 import NavItem from './NavItem';
-// import style from './NavBar.module.css';
+// import style from './NavBar.module.scss';
+import Authenticate from '../../containers/Authenticate';
+import useStore from '../../store';
 
 type NavBarProps = {
-  titles: object[],
+  navItems: NavItemType[],
 };
 
 const NavBar: React.FC<NavBarProps> = (props) => {
-  const { titles } = props;
+  const { navItems } = props;
+  const { user, onLogout } = useStore((state) => {
+    return {
+      user: state.user,
+      onLogout: state.onLogout,
+    };
+  }, shallow);
   return (
     <nav className="navbar navbar-expand-lg bg-light">
       <div className="container-fluid">
@@ -27,9 +38,28 @@ const NavBar: React.FC<NavBarProps> = (props) => {
         </button>
         <div className="collapse navbar-collapse" id="navbarNavAltMarkup">
           <div className="navbar-nav">
-            {titles.map((title) => {
-              return <NavItem key={title.id} id={title.id} name={title.name} />;
-            })}
+            <Authenticate>
+              {navItems.map((navItem) => {
+                return (
+                  <NavItem
+                    key={navItem.id}
+                    id={navItem.id}
+                    name={navItem.name}
+                    link={navItem.link}
+                  />
+                );
+              })}
+            </Authenticate>
+            {user ? (
+              <button
+                className="btn btn-outline-secondary"
+                onClick={() => onLogout()}
+              >
+                登出
+              </button>
+            ) : (
+              <NavLink className="btn btn-outline-secondary">登入</NavLink>
+            )}
           </div>
         </div>
       </div>
