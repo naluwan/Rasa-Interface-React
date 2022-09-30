@@ -2,7 +2,7 @@ import axios from 'axios';
 import Cookies from 'js-cookie';
 
 const JWT_TOKEN = 'JWT_TOKEN';
-const API_URL = 'http://192.168.10.127:3333/api';
+const API_URL = 'http://192.168.0.144:3333/api';
 
 const axiosInstance = axios.create();
 
@@ -60,15 +60,17 @@ export const fetchLogin = (
   email: string,
   password: string,
 ): Promise<LoginResponseType> => {
-  return axios(`${API_URL}/sigin`, {
-    method: 'POST',
-    body: {
+  return axios
+    .post(`${API_URL}/signin`, {
       email,
       password,
-    },
-  }).then(({ data }) => {
-    console.log('login res:', data);
-    setToken(data.token);
-    return data;
-  });
+    })
+    .then(({ data }) => {
+      console.log('login res:', data);
+      setToken(data.token);
+      return data;
+    })
+    .catch(({ response: { data } }) => {
+      return data;
+    });
 };

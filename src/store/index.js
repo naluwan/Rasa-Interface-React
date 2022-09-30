@@ -28,13 +28,15 @@ const useUserStore = create((set) => {
     },
     onLogin(email: string, password: string) {
       set({ loading: true });
-      fetchLogin(email, password)
+      return fetchLogin(email, password)
         .then((res) => {
           console.log('Login res:', res);
           set({ user: res.user });
+          return res;
         })
-        .finally(() => {
+        .finally((res) => {
           set({ loading: false });
+          return res;
         });
     },
     onLogout() {

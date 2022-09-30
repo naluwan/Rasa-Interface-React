@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { Navigate } from 'react-router-dom';
 import shallow from 'zustand/shallow';
-// import Swal from 'sweetalert2';
+import Swal from 'sweetalert2';
 // import withReactContent from 'sweetalert2-react-content';
 import style from './Login.module.scss';
 import MyInput from '../MyInput';
@@ -30,10 +30,30 @@ const Login: React.FC<LoginProps> = () => {
     });
   };
   const atLogin = (email, password) => {
-    const LoginInfo = onLogin(email, password);
-    LoginInfo.then((data) => {
-      console.log(data);
-    });
+    const loginInfo = onLogin(email, password);
+    console.log('loginInfo', loginInfo);
+    loginInfo
+      .then((data) => {
+        console.log('loginInfo:', data);
+        if (data.status === 'success') {
+          Swal.fire({
+            position: 'top-end',
+            icon: 'success',
+            title: '登入成功',
+            showConfirmButton: false,
+            timer: 1500,
+          });
+        } else {
+          Swal.fire({
+            icon: 'error',
+            title: '登入失敗',
+            text: `${data.message}`,
+            showConfirmButton: false,
+            timer: 1500,
+          });
+        }
+      })
+      .catch((err) => console.log(err));
   };
 
   if (user) {

@@ -11,7 +11,7 @@ type MyInputProps = {
 
 // eslint-disable-next-line no-unused-vars, consistent-return
 const MyInput: React.FC<MyInputProps> = (props) => {
-  const { variant, className, placeholder, required } = props;
+  const { variant, className, placeholder, required, onChange } = props;
   if (variant === 'password') {
     return (
       <input
@@ -22,6 +22,7 @@ const MyInput: React.FC<MyInputProps> = (props) => {
         className={cx(style.root, className)}
         data-variant={variant}
         required={required}
+        onChange={onChange}
       />
     );
   }
@@ -35,6 +36,7 @@ const MyInput: React.FC<MyInputProps> = (props) => {
         className={cx(style.root, className)}
         data-variant={variant}
         required={required}
+        onChange={onChange}
       />
     );
   }

@@ -58,7 +58,9 @@ const NavBar: React.FC<NavBarProps> = (props) => {
                 登出
               </button>
             ) : (
-              <NavLink className="btn btn-outline-secondary">登入</NavLink>
+              <NavLink className="btn btn-outline-secondary" to="/login">
+                登入
+              </NavLink>
             )}
           </div>
         </div>
