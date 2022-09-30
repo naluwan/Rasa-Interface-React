@@ -28,11 +28,9 @@ export const verifyToken = (token: string) => {
     },
   })
     .then(({ data }) => {
-      console.log('驗證TOKEN:', data);
       return data;
     })
     .catch(() => {
-      console.log('TOKEN 驗證失敗');
       cleanToken();
       return Promise.reject();
     });
@@ -66,7 +64,6 @@ export const fetchLogin = (
       password,
     })
     .then(({ data }) => {
-      console.log('login res:', data);
       setToken(data.token);
       return data;
     })

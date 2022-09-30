@@ -31,10 +31,8 @@ const Login: React.FC<LoginProps> = () => {
   };
   const atLogin = (email, password) => {
     const loginInfo = onLogin(email, password);
-    console.log('loginInfo', loginInfo);
     loginInfo
       .then((data) => {
-        console.log('loginInfo:', data);
         if (data.status === 'success') {
           Swal.fire({
             position: 'top-end',

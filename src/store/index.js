@@ -30,7 +30,6 @@ const useUserStore = create((set) => {
       set({ loading: true });
       return fetchLogin(email, password)
         .then((res) => {
-          console.log('Login res:', res);
           set({ user: res.user });
           return res;
         })
