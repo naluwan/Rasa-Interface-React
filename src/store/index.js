@@ -1,5 +1,11 @@
 import create from 'zustand';
-import { getJWTToken, verifyToken, fetchLogin, cleanToken } from 'services/api';
+import {
+  getJWTToken,
+  verifyToken,
+  cleanToken,
+  fetchLogin,
+  fetchRegister,
+} from 'services/api';
 
 const initialState = {
   isAppInitializedComplete: false,
@@ -12,6 +18,7 @@ const useUserStore = create((set) => {
     ...initialState,
     // --------------------------- Action
     init() {
+      console.log('init');
       const token = getJWTToken();
       if (token) {
         verifyToken(token)
@@ -41,6 +48,30 @@ const useUserStore = create((set) => {
     onLogout() {
       cleanToken();
       window.location.reload();
+    },
+    onRegister(
+      cpnyId: string,
+      cpnyName: string,
+      chatbotName: string,
+      email: string,
+      password: string,
+      passwordCheck: string,
+      image: file,
+    ) {
+      set({ loading: true });
+      return fetchRegister(
+        cpnyId,
+        cpnyName,
+        chatbotName,
+        email,
+        password,
+        passwordCheck,
+        image,
+      )
+        .then((res) => {
+          console.log('onRegister:', res);
+        })
+        .catch((err) => console.log(err));
     },
   };
 });

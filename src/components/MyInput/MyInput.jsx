@@ -42,8 +42,8 @@ const MyInput: React.FC<MyInputProps> = (props) => {
   }
   <input
     type="text"
-    id="email"
-    name="email"
+    id={variant}
+    name={variant}
     placeholder={placeholder}
     className={cx(style.root, className)}
     data-variant={variant}
