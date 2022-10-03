@@ -2,8 +2,9 @@ import * as React from 'react';
 import { NavItemType } from 'components/types';
 import shallow from 'zustand/shallow';
 import { NavLink } from 'react-router-dom';
+import cx from 'classnames';
 import NavItem from './NavItem';
-// import style from './NavBar.module.scss';
+import style from './NavBar.module.scss';
 import Authenticate from '../../containers/Authenticate';
 import useStore from '../../store';
 
@@ -20,11 +21,9 @@ const NavBar: React.FC<NavBarProps> = (props) => {
     };
   }, shallow);
   return (
-    <nav className="navbar navbar-expand-lg bg-light">
+    <nav className={cx('navbar navbar-expand-lg navbar-dark', style.navbar)}>
       <div className="container-fluid">
-        <a className="navbar-brand" href="/">
-          InterInfo 聊天機器人設定
-        </a>
+        <NavLink className={cx('navbar-brand', style.logo)} to="/" />
         <button
           className="navbar-toggler"
           type="button"

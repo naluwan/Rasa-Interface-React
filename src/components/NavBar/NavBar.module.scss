@@ -1,3 +1,19 @@
 .root {
-  
+  background: #2d304c;
+}
+.logo {
+  text-decoration: none;
+  font-family: 'Poiret', 'Poiret Ie', 微軟正黑體;
+  color: #fff;
+  font-size: 42px;
+  margin: 0 20px;
+  display: inline-block;
+  height: 52px;
+  vertical-align: middle;
+  width: 160px;
+  background: url(../../images/logo.png) no-repeat center bottom;
+}
+.navbar {
+  background: #2d304c;
+  color: #fff;
 }

@@ -33,6 +33,22 @@ const Register = () => {
   // 註冊事件
   const atRegister = React.useCallback(
     (data: RegisterUserInfoType) => {
+      const Toast = swal.mixin({
+        toast: true,
+        position: 'top-end',
+        showConfirmButton: false,
+        timer: 3000,
+        timerProgressBar: true,
+        didOpen: (toast) => {
+          toast.addEventListener('mouseenter', swal.stopTimer);
+          toast.addEventListener('mouseleave', swal.resumeTimer);
+        },
+      });
+
+      Toast.fire({
+        icon: 'info',
+        title: '註冊中，請稍後....',
+      });
       return onRegister(data)
         .then((res) => {
           if (res.status === 'success') {
@@ -102,11 +118,11 @@ const Register = () => {
             <div className={style.inputBlock}>
               <input
                 type="email"
-                placeholder="登入帳號"
+                placeholder="登入帳號 - Email"
                 {...register('email', {
                   required: true,
                   validate: (value) =>
-                    emailPattern.test(value) || 'email格式錯誤',
+                    emailPattern.test(value) || 'Email格式錯誤',
                 })}
               />
               {errors.email && (

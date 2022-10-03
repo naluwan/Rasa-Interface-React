@@ -1,3 +1,4 @@
+/* eslint-disable react/jsx-props-no-spreading */
 import * as React from 'react';
 import { Link, Navigate } from 'react-router-dom';
 import shallow from 'zustand/shallow';
@@ -16,6 +17,7 @@ const Login = () => {
     return {
       user: state.user,
       onLogin: state.onLogin,
+      loading: state.loading,
     };
   }, shallow);
 
@@ -34,21 +36,28 @@ const Login = () => {
       const loginInfo = onLogin(email, password);
       loginInfo
         .then((data) => {
+          const Toast = swal.mixin({
+            toast: true,
+            position: 'top-end',
+            showConfirmButton: false,
+            timer: 5000,
+            timerProgressBar: true,
+            didOpen: (toast) => {
+              toast.addEventListener('mouseenter', swal.stopTimer);
+              toast.addEventListener('mouseleave', swal.resumeTimer);
+            },
+          });
+
           if (data.status === 'success') {
-            swal.fire({
-              position: 'top-end',
+            Toast.fire({
               icon: 'success',
               title: '登入成功',
-              showConfirmButton: false,
-              timer: 1500,
             });
           } else {
-            swal.fire({
+            Toast.fire({
               icon: 'error',
               title: '登入失敗',
               text: `${data.message}`,
-              showConfirmButton: false,
-              timer: 1500,
             });
           }
         })

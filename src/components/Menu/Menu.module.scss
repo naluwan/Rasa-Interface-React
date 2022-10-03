@@ -1,0 +1,22 @@
+.itemLi {
+  padding: 15px 0;
+  border-bottom: 1px solid #747474;
+  display: inline-block;
+  width: 100%;
+  span {
+    float: left;
+    padding: 5px;
+    border-radius: 8px;
+    margin: 0 0 0 5px;
+
+    &.btnSet {
+      float: right;
+      color: #fff;
+      background: #55a2fc;
+      color: #fff;
+      padding: 5px 15px;
+      border-radius: 8px;
+      margin: 0 0 0 12px;
+    }
+  }
+}

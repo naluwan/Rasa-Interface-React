@@ -124,3 +124,16 @@ export const fetchRegister = (
     })
     .catch(({ response: { data } }) => data);
 };
+
+export const fetchStories = () => {
+  return axiosInstance
+    .get(`${API_URL}/stories`, {
+      headers: {
+        authorization: `Bearer ${getJWTToken()}`,
+      },
+    })
+    .then(({ data }) => {
+      return data;
+    })
+    .catch((err) => err.response);
+};

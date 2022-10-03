@@ -1,0 +1,21 @@
+.storiesSelector {
+  padding: 0 10px;
+  border: 1px solid #ccc;
+  margin: 0 10px 0 0;
+  font-size: 16px;
+  height: 36px;
+  vertical-align: middle;
+  background: #f9f9f9;
+  display: inline-block;
+  width: 100%;
+  border-radius: 5px;
+}
+.senderId {
+  display: flex;
+  word-break: keep-all;
+  font-size: 16px;
+  align-items: center;
+}
+.center {
+  margin: 0 auto;
+}
