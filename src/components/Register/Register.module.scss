@@ -21,6 +21,11 @@
   }
   .inputBlock {
     margin: 20px 0;
+    display: flex;
+    flex-direction: column;
+    .textRed {
+      color: red;
+    }
   }
   .account {
     display: flex;

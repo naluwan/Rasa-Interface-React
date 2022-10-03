@@ -1,8 +1,9 @@
 import axios from 'axios';
 import Cookies from 'js-cookie';
+import { RegisterUserInfoType } from 'components/types';
 
 const JWT_TOKEN = 'JWT_TOKEN';
-const API_URL = 'http://192.168.0.144:3333/api';
+const API_URL = 'http://192.168.10.127:3333/api';
 
 const axiosInstance = axios.create();
 
@@ -71,7 +72,6 @@ export const fetchLogin = (
       password,
     })
     .then(({ data }) => {
-      console.log(data);
       setToken(data.token);
       return data;
     })
@@ -99,27 +99,28 @@ export type RegisterResponse = {
 
 // 註冊
 export const fetchRegister = (
-  cpnyId: string,
-  cpnyName: string,
-  chatbotName: string,
-  email: string,
-  password: string,
-  passwordCheck: string,
-  image: file,
+  userInfo: RegisterUserInfoType,
 ): Promise<RegisterResponse> => {
+  const formData = new FormData();
+  /*
+    將資料塞進formData中
+    由於image是檔案，需要塞進的是檔案內容，所以需要用value[0]來抓取檔案內容
+  */
+  Object.entries(userInfo).forEach(([key, value]) => {
+    if (key === 'image') {
+      return formData.append(key, value[0]);
+    }
+    return formData.append(key, value);
+  });
+
   return axios
-    .post(`${API_URL}/signup`, {
-      cpnyId,
-      cpnyName,
-      chatbotName,
-      email,
-      password,
-      passwordCheck,
-      image,
+    .post(`${API_URL}/signup`, formData, {
+      headers: {
+        'Content-type': 'multipart/form-data',
+      },
     })
-    .then((data) => {
-      console.log('fetch register:', data);
+    .then(({ data }) => {
       return data;
     })
-    .catch((err) => console.log(err));
+    .catch(({ response: { data } }) => data);
 };

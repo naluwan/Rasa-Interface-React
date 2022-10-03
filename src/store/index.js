@@ -6,6 +6,7 @@ import {
   fetchLogin,
   fetchRegister,
 } from 'services/api';
+import { RegisterUserInfoType } from 'components/types';
 
 const initialState = {
   isAppInitializedComplete: false,
@@ -49,27 +50,15 @@ const useUserStore = create((set) => {
       cleanToken();
       window.location.reload();
     },
-    onRegister(
-      cpnyId: string,
-      cpnyName: string,
-      chatbotName: string,
-      email: string,
-      password: string,
-      passwordCheck: string,
-      image: file,
-    ) {
+    onRegister(data: RegisterUserInfoType) {
       set({ loading: true });
-      return fetchRegister(
-        cpnyId,
-        cpnyName,
-        chatbotName,
-        email,
-        password,
-        passwordCheck,
-        image,
-      )
+      return fetchRegister(data)
         .then((res) => {
-          console.log('onRegister:', res);
+          return res;
+        })
+        .finally((res) => {
+          set({ loading: false });
+          return res;
         })
         .catch((err) => console.log(err));
     },

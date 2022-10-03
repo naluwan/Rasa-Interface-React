@@ -1,15 +1,13 @@
 import * as React from 'react';
 import { Link, Navigate } from 'react-router-dom';
 import shallow from 'zustand/shallow';
-import Swal from 'sweetalert2';
-// import withReactContent from 'sweetalert2-react-content';
+import swal from 'sweetalert2';
 import style from './Login.module.scss';
 import MyInput from '../MyInput';
 import MyButton from '../MyButton';
 import useStore from '../../store';
 
 const Login = () => {
-  // const MySwal = withReactContent(Swal);
   const [accountInfo, setAccountInfo] = React.useState({
     email: '',
     password: '',
@@ -37,7 +35,7 @@ const Login = () => {
       loginInfo
         .then((data) => {
           if (data.status === 'success') {
-            Swal.fire({
+            swal.fire({
               position: 'top-end',
               icon: 'success',
               title: '登入成功',
@@ -45,7 +43,7 @@ const Login = () => {
               timer: 1500,
             });
           } else {
-            Swal.fire({
+            swal.fire({
               icon: 'error',
               title: '登入失敗',
               text: `${data.message}`,
