@@ -1,6 +1,6 @@
 import axios from 'axios';
 import Cookies from 'js-cookie';
-import { RegisterUserInfoType } from 'components/types';
+import { RegisterUserInfoType, StoryType } from 'components/types';
 
 const JWT_TOKEN = 'JWT_TOKEN';
 const API_URL = 'http://192.168.10.127:3333/api';
@@ -125,7 +125,7 @@ export const fetchRegister = (
     .catch(({ response: { data } }) => data);
 };
 
-export const fetchStories = () => {
+export const fetchStories = (): Promise<StoryType[]> => {
   return axiosInstance
     .get(`${API_URL}/stories`, {
       headers: {

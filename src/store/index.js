@@ -7,11 +7,15 @@ import {
   fetchRegister,
 } from 'services/api';
 import { RegisterUserInfoType } from 'components/types';
+// import { computed } from 'zustand-middleware-computed-state';
+import type { StoryType } from 'components/types';
 
 const initialState = {
   isAppInitializedComplete: false,
   user: null,
   loading: false,
+  stories: [],
+  story: {},
 };
 
 const useUserStore = create((set) => {
@@ -50,6 +54,10 @@ const useUserStore = create((set) => {
           return res;
         })
         .catch((err) => console.log(err));
+    },
+    setStory(stories: StoryType[], storyName: string) {
+      const story = stories.filter((item) => item.story === storyName)[0];
+      set({ story });
     },
   };
 });

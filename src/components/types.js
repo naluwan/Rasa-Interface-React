@@ -13,3 +13,21 @@ export type RegisterUserInfoType = {
   passwordCheck: string,
   image: fileList,
 };
+
+export type EntitiesType = {
+  entitiesKey: string,
+};
+
+export type StepsType =
+  | {
+      intent: string,
+      user: string,
+      entities: array | null,
+      examples: array | null,
+    }
+  | { action: string, response: string };
+
+export type StoryType = {
+  story: string,
+  steps: StepsType[],
+};
