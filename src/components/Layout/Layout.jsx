@@ -7,6 +7,7 @@ import cx from 'classnames';
 import Authenticate from 'containers/Authenticate';
 import Menu from 'components/Menu';
 import Stories from 'components/Stories';
+import WebChatWidget from 'components/WebChatWidget';
 import style from './Layout.module.scss';
 import Login from '../Login';
 
@@ -41,6 +42,9 @@ const Layout = () => {
             />
           </Routes>
         </div>
+        <Authenticate>
+          <WebChatWidget />
+        </Authenticate>
       </div>
     </div>
   );
