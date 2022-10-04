@@ -32,7 +32,7 @@ export const verifyToken = (token: string) => {
       authorization: `Bearer ${token}`,
     },
   })
-    .then(({ data }) => {
+    .then(({ data: { data } }) => {
       return data;
     })
     .catch(() => {
@@ -132,7 +132,7 @@ export const fetchStories = () => {
         authorization: `Bearer ${getJWTToken()}`,
       },
     })
-    .then(({ data }) => {
+    .then(({ data: { data } }) => {
       return data;
     })
     .catch((err) => err.response);
