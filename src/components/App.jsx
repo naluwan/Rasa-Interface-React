@@ -2,11 +2,12 @@ import * as React from 'react';
 import shallow from 'zustand/shallow';
 import NavBar from './NavBar';
 import { NAVITEMS } from './config';
-import useStore from '../store';
+import useStoryStore from '../store/useStoryStore';
 import Layout from './Layout';
+import type { State } from './types';
 
 const App = () => {
-  const { init } = useStore((state) => {
+  const { init } = useStoryStore((state: State) => {
     return { init: state.init };
   }, shallow);
 

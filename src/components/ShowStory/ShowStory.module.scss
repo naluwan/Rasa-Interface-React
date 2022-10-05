@@ -1,3 +1,19 @@
 .root {
-  
+  // transform: translate(-50%, -50%);
+  background: #fff;
+  display: block;
+  width: 100%;
+  padding: 20px;
+  // text-align: center;
+  box-shadow: 0px 5px 9px 4px #44444445;
+  border-radius: 10px;
+  height: 350px;
+  .title {
+    font-weight: bold;
+  }
+  .stepsPanel {
+    padding-top: 10px;
+    overflow-y: scroll;
+    height: 250px;
+  }
 }

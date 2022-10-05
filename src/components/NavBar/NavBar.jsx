@@ -1,12 +1,13 @@
 import * as React from 'react';
 import { NavItemType } from 'components/types';
 import shallow from 'zustand/shallow';
-import { NavLink } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import cx from 'classnames';
 import NavItem from './NavItem';
 import style from './NavBar.module.scss';
 import Authenticate from '../../containers/Authenticate';
-import useStore from '../../store';
+import useStoryStore from '../../store/useStoryStore';
+import type { State } from '../types';
 
 type NavBarProps = {
   navItems: NavItemType[],
@@ -14,7 +15,7 @@ type NavBarProps = {
 
 const NavBar: React.FC<NavBarProps> = (props) => {
   const { navItems } = props;
-  const { user, onLogout } = useStore((state) => {
+  const { user, onLogout } = useStoryStore((state: State) => {
     return {
       user: state.user,
       onLogout: state.onLogout,
@@ -23,20 +24,20 @@ const NavBar: React.FC<NavBarProps> = (props) => {
   return (
     <nav className={cx('navbar navbar-expand-lg navbar-dark', style.navbar)}>
       <div className="container-fluid">
-        <NavLink className={cx('navbar-brand', style.logo)} to="/" />
+        <Link className={cx('navbar-brand', style.logo)} to="/" />
         <button
           className="navbar-toggler"
           type="button"
           data-bs-toggle="collapse"
-          data-bs-target="#navbarNavAltMarkup"
-          aria-controls="navbarNavAltMarkup"
+          data-bs-target="#navbarCollapse"
+          aria-controls="navbarCollapse"
           aria-expanded="false"
           aria-label="Toggle navigation"
         >
           <span className="navbar-toggler-icon" />
         </button>
-        <div className="collapse navbar-collapse" id="navbarNavAltMarkup">
-          <div className="navbar-nav">
+        <div className="collapse navbar-collapse" id="navbarCollapse">
+          <ul className="navbar-nav me-auto mb-2 mb-lg-0">
             <Authenticate>
               {navItems.map((navItem) => {
                 return (
@@ -49,19 +50,19 @@ const NavBar: React.FC<NavBarProps> = (props) => {
                 );
               })}
             </Authenticate>
-            {user ? (
-              <button
-                className="btn btn-outline-secondary"
-                onClick={() => onLogout()}
-              >
-                登出
-              </button>
-            ) : (
-              <NavLink className="btn btn-outline-secondary" to="/login">
-                登入
-              </NavLink>
-            )}
-          </div>
+          </ul>
+          {user ? (
+            <button
+              className="btn btn-outline-light"
+              onClick={() => onLogout()}
+            >
+              登出
+            </button>
+          ) : (
+            <Link className="btn btn-outline-light" to="/login">
+              登入
+            </Link>
+          )}
         </div>
       </div>
     </nav>

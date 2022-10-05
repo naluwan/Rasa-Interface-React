@@ -4,9 +4,9 @@ import shallow from 'zustand/shallow';
 import { Link, useNavigate } from 'react-router-dom';
 import swal from 'sweetalert2';
 import { useForm } from 'react-hook-form';
-import { RegisterUserInfoType } from 'components/types';
+import { RegisterUserInfoType, State } from 'components/types';
 import style from './Register.module.scss';
-import useStore from '../../store';
+import useStoryStore from '../../store/useStoryStore';
 
 // 信箱和密碼的驗證 Regex
 const emailPattern = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/;
@@ -24,7 +24,7 @@ const Register = () => {
   } = useForm();
 
   // 從store導入onRegister
-  const { onRegister } = useStore((state) => {
+  const { onRegister } = useStoryStore((state: State) => {
     return {
       onRegister: state.onRegister,
     };
@@ -32,7 +32,7 @@ const Register = () => {
 
   // 註冊事件
   const atRegister = React.useCallback(
-    (data: RegisterUserInfoType) => {
+    (userInfo: RegisterUserInfoType) => {
       const Toast = swal.mixin({
         toast: true,
         position: 'top-end',
@@ -49,7 +49,7 @@ const Register = () => {
         icon: 'info',
         title: '註冊中，請稍後....',
       });
-      return onRegister(data)
+      return onRegister(userInfo)
         .then((res) => {
           if (res.status === 'success') {
             swal
