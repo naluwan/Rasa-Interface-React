@@ -12,7 +12,7 @@ const WebChatWidget = () => {
   return (
     <Widget
       interval={2000}
-      initPayload="/get_start"
+      initPayload="/get_started"
       socketUrl="http://192.168.10.105:5005"
       socketPath="/socket.io/"
       customData={{ language: 'zh', userId: user.cpnyId }}
