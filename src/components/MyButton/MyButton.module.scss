@@ -1,22 +1,77 @@
 .root {
   cursor: pointer;
-  border: 5px solid;
-  padding: 10px 20px;
-  margin-right: 5px;
-  background-color: white;
+  border: none;
+  padding: 8px 20px;
+  font-size: 16px;
+  background: #0d6efd;
   outline: none;
-  color: #42b983;
-  border-color: #42b983;
+  width: 100%;
+  color: #fff;
+  border-radius: 5px;
 }
 
 .root:hover {
-  background-color: #dddddd;
+  background-color: #876dfc;
 }
 
 .root[data-rounded='true'] {
   border-radius: 20px !important;
 }
 
+.root[data-variant='primary'] {
+  color: #fff;
+  background: #5CA7FF;
+}
+
+.root[data-variant='primary']:hover {
+  color: #fff;
+  background: #5CA7FF;
+}
+
+
 .root[data-variant='secondary'] {
-  border-color: #3498db;
+  color: #0f0e0f;
+  background: #E0E0E0;
+}
+
+.root[data-variant='secondary']:hover {
+  color: #0f0e0f;
+  background: #E0E0E0;
+}
+
+.root[data-variant='third'] {
+  color: #fff;
+  background-color: #f0ad4e;
+  border-color: #f0ad4e;
+}
+
+.root[data-variant='third']:hover {
+  color: #fff;
+  background-color: #ed9d2b;
+  border-color: #ec971f;
+}
+
+.root[data-variant='nostyle'] {
+  background: #E0E0E0;
+  cursor: pointer;
+  border: none;
+  padding: 0;
+  font-size: 16px;
+  background: none;
+  outline: none;
+  width: 0;
+  color: #fff;
+  border-radius: 0;
+}
+
+.root[data-variant='nostyle']:hover {
+  background: #E0E0E0;
+  cursor: pointer;
+  border: none;
+  padding: 0;
+  font-size: 16px;
+  background: none;
+  outline: none;
+  width: 0;
+  border-radius: 0;
 }

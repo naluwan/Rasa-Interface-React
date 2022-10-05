@@ -3,7 +3,7 @@ import cx from 'classnames';
 import style from './MyInput.module.scss';
 
 type MyInputProps = {
-  variant: 'password' | 'secondary',
+  variant: 'password' | 'secondary' | 'text',
   className?: string,
   placeholder: string,
   required: string,
@@ -12,6 +12,7 @@ type MyInputProps = {
 // eslint-disable-next-line no-unused-vars, consistent-return
 const MyInput: React.FC<MyInputProps> = (props) => {
   const { variant, className, placeholder, required, onChange } = props;
+  console.log(required);
   if (variant === 'password') {
     return (
       <input
@@ -19,6 +20,18 @@ const MyInput: React.FC<MyInputProps> = (props) => {
         id="password"
         name="password"
         placeholder="請輸入密碼"
+        className={cx(style.root, className)}
+        data-variant={variant}
+        required={required}
+        onChange={onChange}
+      />
+    );
+  }
+  if (variant === 'text') {
+    return (
+      <input
+        type="text"
+        placeholder={placeholder}
         className={cx(style.root, className)}
         data-variant={variant}
         required={required}

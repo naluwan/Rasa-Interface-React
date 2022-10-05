@@ -1,13 +1,49 @@
 /* eslint-disable react/jsx-props-no-spreading */
 import * as React from 'react';
-import { Link, Navigate } from 'react-router-dom';
+import { NavLink, Navigate } from 'react-router-dom';
 import shallow from 'zustand/shallow';
 import swal from 'sweetalert2';
 import style from './Login.module.scss';
 import MyInput from '../MyInput';
 import MyButton from '../MyButton';
 import useStore from '../../store';
-
+// 忘記密碼
+const forgetButton = () => {
+  swal
+    .fire({
+      title: '忘記密碼',
+      input: 'text',
+      inputAttributes: {
+        autocapitalize: 'off',
+      },
+      showCancelButton: true,
+      confirmButtonText: '送出',
+      cancelButtonText: '取消',
+      inputPlaceholder: '請輸入申請帳號時所填的E-mail',
+      showLoaderOnConfirm: true,
+      preConfirm: (login) => {
+        return fetch(`//api.github.com/users/${login}`)
+          .then((response) => {
+            if (!response.ok) {
+              throw new Error(response.statusText);
+            }
+            return response.json();
+          })
+          .catch((error) => {
+            swal.showValidationMessage(`Request failed: ${error}`);
+          });
+      },
+      allowOutsideClick: () => !swal.isLoading(),
+    })
+    .then((result) => {
+      if (result.isConfirmed) {
+        swal.fire({
+          title: `${result.value.login}'s avatar`,
+          imageUrl: result.value.avatar_url,
+        });
+      }
+    });
+};
 const Login = () => {
   const [accountInfo, setAccountInfo] = React.useState({
     email: '',
@@ -107,15 +143,19 @@ const Login = () => {
             </MyButton>
           </div>
           <div className={style.inputBlock}>
-            <MyButton className="btn" variant="secondary">
+            <MyButton
+              className="btn"
+              variant="secondary"
+              onClick={forgetButton}
+            >
               忘記密碼
             </MyButton>
           </div>
           <div className={style.account}>
             還沒有帳號?
-            <Link to="/register" className="btn" variant="primary">
+            <NavLink to="/register" variant="nostyle" className="btn">
               註冊
-            </Link>
+            </NavLink>
           </div>
         </div>
       </div>

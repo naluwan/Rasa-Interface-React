@@ -7,6 +7,8 @@ html {
   background-size: cover;
   background-attachment: fixed;
   .layout {
+    background: #ccc;
+    position: relative;
     overflow: hidden;
     .layoutSide {
       height: calc(100vh - 68px);
@@ -15,7 +17,7 @@ html {
     }
     .layoutBlock {
       height: calc(100vh - 68px);
-      background: #fff;
+     
       padding: 30px;
     }
   }
