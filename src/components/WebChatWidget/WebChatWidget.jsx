@@ -1,10 +1,11 @@
 import * as React from 'react';
 import Widget from 'rasa-webchat';
 // import style from './WebChatWidget.module.scss';
-import useStore from '../../store';
+import type { State } from 'components/types';
+import useStoryStore from '../../store/useStoryStore';
 
 const WebChatWidget = () => {
-  const { user } = useStore((state) => {
+  const { user } = useStoryStore((state: State) => {
     return {
       user: state.user,
     };

@@ -3,10 +3,12 @@ import * as React from 'react';
 import { NavLink, Navigate } from 'react-router-dom';
 import shallow from 'zustand/shallow';
 import swal from 'sweetalert2';
+import type { State } from 'components/types';
 import style from './Login.module.scss';
 import MyInput from '../MyInput';
 import MyButton from '../MyButton';
-import useStore from '../../store';
+import useStoryStore from '../../store/useStoryStore';
+
 // 忘記密碼
 const forgetButton = () => {
   swal
@@ -44,12 +46,13 @@ const forgetButton = () => {
       }
     });
 };
+
 const Login = () => {
   const [accountInfo, setAccountInfo] = React.useState({
     email: '',
     password: '',
   });
-  const { user, onLogin, loading } = useStore((state) => {
+  const { user, onLogin, loading } = useStoryStore((state: State) => {
     return {
       user: state.user,
       onLogin: state.onLogin,

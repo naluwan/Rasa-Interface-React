@@ -1,6 +1,6 @@
 import axios from 'axios';
 import Cookies from 'js-cookie';
-import { RegisterUserInfoType, StoryType } from 'components/types';
+import { RegisterUserInfoType, StoryType, UserInfo } from 'components/types';
 
 const JWT_TOKEN = 'JWT_TOKEN';
 const API_URL = 'http://192.168.10.127:3333/api';
@@ -41,24 +41,11 @@ export const verifyToken = (token: string) => {
     });
 };
 
-export type LoginUserType = {
-  id: number,
-  cpnyId: string,
-  cpnyName: string,
-  chatbotName: string,
-  image: string,
-  email: string,
-  isAdmin: number,
-  role: object,
-  createdAt: string,
-  updatedAt: string,
-};
-
 export type LoginResponseType = {
   status: string,
   message: string | null,
   token: string,
-  user: LoginUserType,
+  user: UserInfo,
 };
 
 // 登入
