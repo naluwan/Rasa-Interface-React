@@ -8,7 +8,7 @@ import type { StoryType } from 'components/types';
 import style from './Stories.module.scss';
 import useStore from '../../store';
 
-const Stories: React.FC<StoriesProps> = () => {
+const Stories = () => {
   const { story, setStory } = useStore((state) => {
     return {
       story: state.story,
@@ -25,7 +25,6 @@ const Stories: React.FC<StoriesProps> = () => {
     },
     [setStory],
   );
-  console.log(story);
 
   return (
     <div>
