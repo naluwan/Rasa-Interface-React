@@ -52,13 +52,12 @@ const NavBar: React.FC<NavBarProps> = (props) => {
             </Authenticate>
           </ul>
           {user ? (
-            <Link
+            <button
               className="btn btn-outline-light"
-              to="/login"
               onClick={() => onLogout()}
             >
               登出
-            </Link>
+            </button>
           ) : (
             <Link className="btn btn-outline-light" to="/login">
               登入
