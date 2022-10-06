@@ -3,50 +3,49 @@ import { Routes, Route } from 'react-router-dom';
 import ProtectedRoute from 'containers/ProtectedRoute';
 import Home from 'components/Home';
 import Register from 'components/Register';
-import cx from 'classnames';
+// import cx from 'classnames';
 import Authenticate from 'containers/Authenticate';
 // import Menu from 'components/Menu';
 import Stories from 'components/Stories';
 import WebChatWidget from 'components/WebChatWidget';
 import style from './Layout.module.scss';
 import Login from '../Login';
+import NavBar from '../NavBar';
+import { NAVITEMS } from '../config';
 
 const Layout = () => {
   return (
     <div className={style.layout}>
-      <div className="row">
-        <div className={cx('col-sm-12  col-md-10 ', style.layoutBlock)}>
-          <Routes>
-            <Route>
-              <Route
-                path="/"
-                element={
-                  <ProtectedRoute>
-                    <Home />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/stories"
-                element={
-                  <ProtectedRoute>
-                    <Stories />
-                  </ProtectedRoute>
-                }
-              />
-            </Route>
-          </Routes>
-        </div>
-        <div className={style.loginBlock}>
-          <Routes>
-            <Route path="/login" element={<Login />} />
-            <Route path="/register" element={<Register />} />
-          </Routes>
-        </div>
-        <Authenticate>
-          <WebChatWidget />
-        </Authenticate>
-      </div>
+      <Authenticate>
+        <NavBar navItems={NAVITEMS} />
+      </Authenticate>
+      <Routes>
+        <Route
+          path="/"
+          element={
+            <ProtectedRoute>
+              <div className={style.layoutBlock}>
+                <Home />
+              </div>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/stories"
+          element={
+            <ProtectedRoute>
+              <div className={style.layoutBlock}>
+                <Stories />
+              </div>
+            </ProtectedRoute>
+          }
+        />
+        <Route path="/login" element={<Login />} />
+        <Route path="/register" element={<Register />} />
+      </Routes>
+      <Authenticate>
+        <WebChatWidget />
+      </Authenticate>
     </div>
   );
 };

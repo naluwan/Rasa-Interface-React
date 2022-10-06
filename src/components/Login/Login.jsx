@@ -79,7 +79,7 @@ const Login = () => {
             toast: true,
             position: 'top-end',
             showConfirmButton: false,
-            timer: 5000,
+            timer: 1000,
             timerProgressBar: true,
             didOpen: (toast) => {
               toast.addEventListener('mouseenter', swal.stopTimer);
@@ -114,52 +114,46 @@ const Login = () => {
   }
 
   return (
-    <div className="container">
+    <div className={style.login}>
       {loading && <div className="my-spinner" />}
-      <div className={style.login}>
-        <div className={style.signin}>
-          {/* login.hbs */}
-          <h1 className={style.title}>Chat Bot</h1>
-          <div className={style.inputBlock}>
-            <MyInput
-              required=""
-              variant="email"
-              className="form-control"
-              onChange={atInput}
-            />
-          </div>
-          <div className={style.inputBlock}>
-            <MyInput
-              required=""
-              variant="password"
-              className="form-control"
-              onChange={atInput}
-            />
-          </div>
-          <div className={style.inputBlock}>
-            <MyButton
-              className="btn"
-              variant="primary"
-              onClick={() => atLogin(accountInfo.email, accountInfo.password)}
-            >
-              登入
-            </MyButton>
-          </div>
-          <div className={style.inputBlock}>
-            <MyButton
-              className="btn"
-              variant="secondary"
-              onClick={forgetButton}
-            >
-              忘記密碼
-            </MyButton>
-          </div>
-          <div className={style.account}>
-            還沒有帳號?
-            <NavLink to="/register" variant="nostyle" className="btn">
-              註冊
-            </NavLink>
-          </div>
+      <div className={style.signin}>
+        {/* login.hbs */}
+        <h1 className={style.title}>Chat Bot</h1>
+        <div className={style.inputBlock}>
+          <MyInput
+            required=""
+            variant="email"
+            className="form-control"
+            onChange={atInput}
+          />
+        </div>
+        <div className={style.inputBlock}>
+          <MyInput
+            required=""
+            variant="password"
+            className="form-control"
+            onChange={atInput}
+          />
+        </div>
+        <div className={style.inputBlock}>
+          <MyButton
+            className="btn"
+            variant="primary"
+            onClick={() => atLogin(accountInfo.email, accountInfo.password)}
+          >
+            登入
+          </MyButton>
+        </div>
+        <div className={style.inputBlock}>
+          <MyButton className="btn" variant="secondary" onClick={forgetButton}>
+            忘記密碼
+          </MyButton>
+        </div>
+        <div className={style.account}>
+          還沒有帳號?
+          <NavLink to="/register" variant="nostyle" className="btn">
+            註冊
+          </NavLink>
         </div>
       </div>
     </div>

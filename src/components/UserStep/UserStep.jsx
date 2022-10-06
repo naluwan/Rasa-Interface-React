@@ -16,6 +16,7 @@ const UserStep: React.FC<UserStepProps> = (props) => {
     swalInput('新增例句', 'textarea', '請輸入例句', examples, true).then(
       (value) => {
         if (!value) return;
+        // eslint-disable-next-line no-alert
         alert(value);
       },
     );
