@@ -50,20 +50,20 @@ const NavBar: React.FC<NavBarProps> = (props) => {
                 );
               })}
             </Authenticate>
-            {user ? (
-              <Link
-                className="btn btn-outline-secondary"
-                to="/login"
-                onClick={() => onLogout()}
-              >
-                登出
-              </Link>
-            ) : (
-              <Link className="btn btn-outline-secondary" to="/login">
-                登入
-              </Link>
-            )}
-          </div>
+          </ul>
+          {user ? (
+            <Link
+              className="btn btn-outline-light"
+              to="/login"
+              onClick={() => onLogout()}
+            >
+              登出
+            </Link>
+          ) : (
+            <Link className="btn btn-outline-light" to="/login">
+              登入
+            </Link>
+          )}
         </div>
       </div>
     </nav>
