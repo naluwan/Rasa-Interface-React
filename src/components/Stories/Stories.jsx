@@ -4,58 +4,69 @@ import MyButton from 'components/MyButton';
 import useSWR from 'swr';
 import { fetchStories } from 'services/api';
 import shallow from 'zustand/shallow';
-import type { StoryType } from 'components/types';
+import type { State } from 'components/types';
+import ShowStory from 'components/ShowStory';
 import style from './Stories.module.scss';
-import useStore from '../../store';
+import useStoryStore from '../../store/useStoryStore';
 
 const Stories = () => {
-  const { story, setStory } = useStore((state) => {
-    return {
-      story: state.story,
-      setStory: state.setStory,
-    };
-  }, shallow);
+  const { story, stories, setStory, setStories } = useStoryStore(
+    (state: State) => {
+      return {
+        story: state.story,
+        stories: state.stories,
+        setStory: state.setStory,
+        setStories: state.setStories,
+      };
+    },
+    shallow,
+  );
   const { data } = useSWR('/api/stories', fetchStories);
 
   const storiesData = data?.stories;
 
-  const atSelect = React.useCallback(
-    (stories: StoryType[], e: Event) => {
-      setStory(stories, e.target.value);
-    },
-    [setStory],
-  );
+  React.useEffect(() => {
+    setStories(storiesData);
+  }, [storiesData, setStories]);
+  // const atSelect = React.useCallback(
+  //   (stories: StoryType[], e: Event) => {
+  //     setStory(stories, e.target.value);
+  //   },
+  //   [setStory],
+  // );
+  console.log(stories);
 
   return (
     <div>
       <div>
         <h1>故事流程</h1>
-        <div className="row">
-          <div className="col-4">
-            <div className={style.senderId}>
-              <div>故事名稱：</div>
-              <select
-                id="stories"
-                className={style.storiesSelector}
-                onChange={(e) => atSelect(storiesData, e)}
-                defaultValue=""
-              >
-                <option value="" disabled hidden>
-                  請選擇
-                </option>
-                {storiesData &&
-                  storiesData.map((item) => (
-                    <option key={item.story} value={item.story}>
-                      {item.story}
-                    </option>
-                  ))}
-              </select>
-            </div>
+
+        <div className="col-4">
+          <div className={style.senderId}>
+            <div>故事名稱：</div>
+            <select
+              id="stories"
+              className={style.storiesSelector}
+              onChange={(e) => setStory(e.target.value)}
+              defaultValue=""
+            >
+              <option value="" disabled hidden>
+                請選擇
+              </option>
+              {storiesData &&
+                storiesData.map((item) => (
+                  <option key={item.story} value={item.story}>
+                    {item.story}
+                  </option>
+                ))}
+            </select>
           </div>
         </div>
+
         <div id="data-panel" />
         <br />
-        {Object.keys(story).length !== 0 && (
+        {Object.keys(story).length !== 0 && <ShowStory currentStory={story} />}
+        {/* {Object.keys(story).length !== 0 && (
           <>
             <hr />
             <div>{story.story}</div>
@@ -83,7 +94,7 @@ const Stories = () => {
               );
             })}
           </>
-        )}
+        )} */}
         <hr />
         <div className={cx(style.center, 'col-2')}>
           <MyButton className="btn" variant="third">

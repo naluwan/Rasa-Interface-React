@@ -1,10 +1,11 @@
 import { memo } from 'react';
 
-import store from '../../store';
+import type { State } from 'components/types';
+import useStoryStore from '../../store/useStoryStore';
 
 const Authenticate = (props) => {
   const { children } = props;
-  const user = store((state) => state.user);
+  const user = useStoryStore((state: State) => state.user);
 
   if (!user) {
     return null;

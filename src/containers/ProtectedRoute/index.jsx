@@ -2,13 +2,14 @@
 /* eslint-disable max-len */
 import { RouteProps, Navigate } from 'react-router-dom';
 import shallow from 'zustand/shallow';
-import useStore from '../../store';
+import useStoryStore from '../../store/useStoryStore';
+import type { State } from '../../components/types';
 
 type ProtectedRouteProps = RouteProps & {};
 const ProtectedRoute = (props: ProtectedRouteProps) => {
   const { children } = props;
 
-  const { user, isAppInitializedComplete } = useStore((state) => {
+  const { user, isAppInitializedComplete } = useStoryStore((state: State) => {
     return {
       user: state.user,
       isAppInitializedComplete: state.isAppInitializedComplete,

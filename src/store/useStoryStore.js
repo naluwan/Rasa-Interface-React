@@ -18,7 +18,7 @@ const initialState = {
   story: {},
 };
 
-const useUserStore = create((set) => {
+const useStoryStore = create((set, get) => {
   return {
     ...initialState,
     // --------------------------- Action
@@ -46,20 +46,23 @@ const useUserStore = create((set) => {
       cleanToken();
       window.location.reload();
     },
-    onRegister(data: RegisterUserInfoType) {
+    onRegister(userInfo: RegisterUserInfoType) {
       set({ loading: true });
-      return fetchRegister(data)
+      return fetchRegister(userInfo)
         .then((res) => {
           set({ loading: false });
           return res;
         })
         .catch((err) => console.log(err));
     },
-    setStory(stories: StoryType[], storyName: string) {
-      const story = stories.filter((item) => item.story === storyName)[0];
+    setStory(storyName: string) {
+      const story = get().stories.filter((item) => item.story === storyName)[0];
       set({ story });
+    },
+    setStories(stories: StoryType[]) {
+      set({ stories });
     },
   };
 });
 
-export default useUserStore;
+export default useStoryStore;
