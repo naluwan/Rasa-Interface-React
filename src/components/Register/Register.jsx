@@ -160,12 +160,7 @@ const Register = () => {
                   />
                   {errors.password && (
                     <small className={style.textRed}>
-                      <ul>
-                        <li>密碼最少八個字符</li>
-                        <li>密碼最少一個數字</li>
-                        <li>密碼最少一個大寫字母</li>
-                        <li>密碼最少一個小寫字母</li>
-                      </ul>
+                      密碼最少八個字符，並且混合大小寫英文字母
                     </small>
                   )}
                 </div>

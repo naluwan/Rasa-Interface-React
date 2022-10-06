@@ -23,9 +23,9 @@
     margin: 20px 0;
   }
   .account {
-    display: flex;
+    display: inline-flex;
+    margin: 0 auto;
     word-break: keep-all;
-    text-align: left;
     align-items: center;
     color: #7a7a7acc;
     button {

@@ -16,30 +16,36 @@ const Layout = () => {
     <div className={style.layout}>
       <div className="row">
         <Authenticate>
-          <div className={cx('menu col-2 ', style.layoutSide)}>
+          <div className={cx('menu col-sm-12  col-md-2', style.layoutSide)}>
             <Menu />
           </div>
+          <div className={cx('col-sm-12  col-md-10 ', style.layoutBlock)}>
+            <Routes>
+              <Route>
+                <Route
+                  path="/"
+                  element={
+                    <ProtectedRoute>
+                      <Home />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/stories"
+                  element={
+                    <ProtectedRoute>
+                      <Stories />
+                    </ProtectedRoute>
+                  }
+                />
+              </Route>
+            </Routes>
+          </div>
         </Authenticate>
-        <div className={cx('col-10 ', style.layoutBlock)}>
+        <div className={style.loginBlock}>
           <Routes>
-            <Route
-              path="/"
-              element={
-                <ProtectedRoute>
-                  <Home />
-                </ProtectedRoute>
-              }
-            />
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
-            <Route
-              path="/stories"
-              element={
-                <ProtectedRoute>
-                  <Stories />
-                </ProtectedRoute>
-              }
-            />
           </Routes>
         </div>
         <Authenticate>

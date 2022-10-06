@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { NavItemType } from 'components/types';
 import shallow from 'zustand/shallow';
-import { NavLink } from 'react-router-dom';
+import { NavLink, Link } from 'react-router-dom';
 import cx from 'classnames';
 import NavItem from './NavItem';
 import style from './NavBar.module.scss';
@@ -50,16 +50,17 @@ const NavBar: React.FC<NavBarProps> = (props) => {
               })}
             </Authenticate>
             {user ? (
-              <button
+              <Link
                 className="btn btn-outline-secondary"
+                to="/login"
                 onClick={() => onLogout()}
               >
                 登出
-              </button>
+              </Link>
             ) : (
-              <NavLink className="btn btn-outline-secondary" to="/login">
+              <Link className="btn btn-outline-secondary" to="/login">
                 登入
-              </NavLink>
+              </Link>
             )}
           </div>
         </div>

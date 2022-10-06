@@ -6,6 +6,7 @@ html {
   -webkit-background-size: cover;
   background-size: cover;
   background-attachment: fixed;
+
   .layout {
     background: #ccc;
     position: relative;
@@ -17,8 +18,13 @@ html {
     }
     .layoutBlock {
       height: calc(100vh - 68px);
-     
+      background: #fff;
       padding: 30px;
+    }
+    .loginBlock{
+      height: calc(100vh - 68px);
+        background: #ccc;
+        padding: 30px;
     }
   }
 }
