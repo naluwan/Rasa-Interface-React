@@ -26,35 +26,39 @@ const UserStep: React.FC<UserStepProps> = (props) => {
   };
 
   return (
-    <>
-      <div className="d-flex align-items-center pt-3">
-        <div className={style.userTitle}>使用者:</div>
-        <div className={style.userText}>
-          {step.user ? step.user : showIntent}
+    <div className="row">
+      <div className="col-6">
+        <div className="d-flex align-items-center pt-3">
+          <div className={style.userTitle}>使用者:</div>
+          <div className={style.userText}>
+            {step.user ? step.user : showIntent}
+          </div>
+        </div>
+        <div className="pt-2">
+          <button
+            type="button"
+            className="btn btn-info mx-2"
+            onClick={() => atEditUserSay(step.user)}
+          >
+            編輯
+          </button>
+          <button
+            type="button"
+            className="btn btn-primary mx-2"
+            onClick={() => atAddExamples(step.examples.toString())}
+          >
+            例句
+          </button>
+          <button
+            type="button"
+            className="btn btn-danger mx-2"
+            // onClick={() => atAddExamples(step.examples.toString())}
+          >
+            刪除
+          </button>
         </div>
       </div>
-      <button
-        type="button"
-        className="btn btn-info mx-2"
-        onClick={() => atEditUserSay(step.user)}
-      >
-        編輯
-      </button>
-      <button
-        type="button"
-        className="btn btn-primary mx-2"
-        onClick={() => atAddExamples(step.examples.toString())}
-      >
-        例句
-      </button>
-      <button
-        type="button"
-        className="btn btn-danger mx-2"
-        // onClick={() => atAddExamples(step.examples.toString())}
-      >
-        刪除
-      </button>
-    </>
+    </div>
   );
 };
 
