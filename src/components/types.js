@@ -45,17 +45,53 @@ export type StoryType = {
   steps: StepsType[],
 };
 
+export type ResponseType = {
+  [action_key: string]: [{ text: string }],
+};
+
+export type DomainType = {
+  actions: string[],
+  entities: string[],
+  form: object,
+  intents: string[],
+  responses: ResponseType,
+};
+
+export type ExampleEntitiesType = {
+  entity: string,
+  value: string,
+  start: number,
+  end: number,
+};
+export type ExampleType = {
+  text: string,
+  intent: sting,
+  entities: ExampleEntitiesType[],
+};
+
+export type NluType = {
+  rasa_nlu_data: { common_examples: ExampleType[] },
+};
+
+export type TrainDataType = {
+  stories: StoryType[],
+  nlu: NluType,
+  domain: DomainType,
+};
+
 export type State = {
   isAppInitializedComplete: boolean,
   user: UserInfo,
   loading: boolean,
   stories: StoryType[],
+  domain: DomainType,
+  nlu: NluType,
   story: StoryType,
   // actions
   init: () => void,
   onLogin: (email: string, password: string) => void,
   onLogout: () => void,
   onRegister: (userInfo: RegisterUserInfoType) => void,
-  setStory: (storyName: string) => void,
-  setStories: (stories: StoryType[]) => void,
+  onSetAllTrainData: (data: TrainDataType) => void,
+  onSetStory: (storyName: string) => void,
 };
