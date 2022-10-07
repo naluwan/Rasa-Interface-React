@@ -3,11 +3,8 @@ import { Routes, Route } from 'react-router-dom';
 import ProtectedRoute from 'containers/ProtectedRoute';
 import Home from 'components/Home';
 import Register from 'components/Register';
-// import cx from 'classnames';
 import Authenticate from 'containers/Authenticate';
-// import Menu from 'components/Menu';
 import Stories from 'components/Stories';
-import WebChatWidget from 'components/WebChatWidget';
 import style from './Layout.module.scss';
 import Login from '../Login';
 import NavBar from '../NavBar';
@@ -43,9 +40,6 @@ const Layout = () => {
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
       </Routes>
-      <Authenticate>
-        <WebChatWidget />
-      </Authenticate>
     </div>
   );
 };

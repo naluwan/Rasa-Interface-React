@@ -2,6 +2,7 @@ import * as React from 'react';
 import Widget from 'rasa-webchat';
 // import style from './WebChatWidget.module.scss';
 import type { State } from 'components/types';
+import shallow from 'zustand/shallow';
 import useStoryStore from '../../store/useStoryStore';
 
 const WebChatWidget = () => {
@@ -9,7 +10,7 @@ const WebChatWidget = () => {
     return {
       user: state.user,
     };
-  });
+  }, shallow);
   return (
     <Widget
       interval={2000}
