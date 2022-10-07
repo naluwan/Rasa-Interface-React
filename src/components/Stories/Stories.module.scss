@@ -1,12 +1,22 @@
-.searchBar{
-  padding:10px 30px ;
+.searchBar {
+  padding: 10px 30px;
   justify-content: center;
   align-items: center;
   background: #fff;
 }
-.searchTitle{
+
+.searchTitle {
   font-weight: 900;
+  margin: 0 40px 0 0;
 }
+
+.senderId {
+  display: inline-flex;
+  word-break: keep-all;
+  font-size: 16px;
+  align-items: center;
+}
+
 .storiesSelector {
   padding: 0 10px;
   border: 1px solid #ccc;
@@ -19,12 +29,7 @@
   width: 100%;
   border-radius: 5px;
 }
-.senderId {
-  display: flex;
-  word-break: keep-all;
-  font-size: 16px;
-  align-items: center;
-}
+
 .center {
   margin: 0 auto;
 }

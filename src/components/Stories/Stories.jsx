@@ -40,35 +40,33 @@ const Stories = () => {
     <div>
       <div>
         <div className={style.searchBar}>
-          <div className="row">
-            <div className="col-2">
+          <div>
+            <div className={style.senderId}>
               <h4 className={style.searchTitle}>故事流程</h4>
-            </div>
-            <div className="col-4">
-              <div className={style.senderId}>
-                <div>故事名稱：</div>
-                <select
-                  id="stories"
-                  className={style.storiesSelector}
-                  onChange={(e) => setStory(e.target.value)}
-                  defaultValue=""
-                >
-                  <option value="" disabled hidden>
-                    請選擇
-                  </option>
-                  {storiesData &&
-                    storiesData.map((item) => (
-                      <option key={item.story} value={item.story}>
-                        {item.story}
-                      </option>
-                    ))}
-                </select>
+              <div>故事名稱：</div>
+              <select
+                id="stories"
+                className={style.storiesSelector}
+                onChange={(e) => setStory(e.target.value)}
+                defaultValue=""
+              >
+                <option value="" disabled hidden>
+                  請選擇
+                </option>
+                {storiesData &&
+                  storiesData.map((item) => (
+                    <option key={item.story} value={item.story}>
+                      {item.story}
+                    </option>
+                  ))}
+              </select>
+              <div className={cx('btn', style.navbar)}>
+                <MyButton variant="third">新增故事流程</MyButton>
               </div>
             </div>
           </div>
         </div>
         <div id="data-panel" />
-        <br />
         {Object.keys(story).length !== 0 && <ShowStory currentStory={story} />}
         {/* {Object.keys(story).length !== 0 && (
           <>
@@ -100,11 +98,6 @@ const Stories = () => {
           </>
         )} */}
         <hr />
-        <div className={cx(style.center, 'col-2')}>
-          <MyButton className="btn" variant="third">
-            新增故事流程
-          </MyButton>
-        </div>
       </div>
     </div>
   );
