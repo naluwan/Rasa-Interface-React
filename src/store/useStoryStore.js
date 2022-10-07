@@ -6,9 +6,15 @@ import {
   fetchLogin,
   fetchRegister,
 } from 'services/api';
-import { RegisterUserInfoType } from 'components/types';
+import type {
+  RegisterUserInfoType,
+  TrainDataType,
+  State,
+} from 'components/types';
+
+import type { Action } from 'actions';
+import { actionSetAllData, actionSetStory } from 'actions';
 // import { computed } from 'zustand-middleware-computed-state';
-import type { StoryType } from 'components/types';
 
 const initialState = {
   isAppInitializedComplete: false,
@@ -16,14 +22,67 @@ const initialState = {
   loading: false,
   stories: [],
   story: {},
+  nlu: {},
+  domain: {},
+};
+const reducer = (state: State, action: Action): State => {
+  switch (action.type) {
+    case 'SET_ALL_TRAIN_DATA': {
+      if (action.payload) {
+        return {
+          ...state,
+          ...action.payload,
+        };
+      }
+      return {
+        ...state,
+      };
+    }
+    case 'SET_STORY': {
+      const story = state.stories.filter(
+        (item) => item.story === action.payload,
+      )[0];
+      story.steps.map((step) => {
+        if (step.action) {
+          step.response = JSON.parse(
+            JSON.stringify(state.domain.responses[step.action][0].text).replace(
+              / \\n/g,
+              '\\r',
+            ),
+          );
+        }
+        if (step.intent) {
+          const examples = state.nlu.rasa_nlu_data.common_examples.filter(
+            (nluItem) =>
+              nluItem.intent === step.intent && nluItem.text !== step.intent,
+          );
+
+          const currentExample = examples.map((example) => example.text);
+          step.examples = currentExample;
+        }
+        return step;
+      });
+      return {
+        ...state,
+        story,
+      };
+    }
+    default:
+      return state;
+  }
 };
 
-const useStoryStore = create((set, get) => {
+const useStoryStore = create((set) => {
+  const dispatch = (action: Action) => {
+    set((state) => {
+      return reducer(state, action);
+    });
+  };
   return {
     ...initialState,
+    dispatch,
     // --------------------------- Action
     init() {
-      console.log('init');
       const token = getJWTToken();
       if (token) {
         verifyToken(token)
@@ -55,12 +114,11 @@ const useStoryStore = create((set, get) => {
         })
         .catch((err) => console.log(err));
     },
-    setStory(storyName: string) {
-      const story = get().stories.filter((item) => item.story === storyName)[0];
-      set({ story });
+    onSetAllTrainData(data: TrainDataType) {
+      dispatch(actionSetAllData(data));
     },
-    setStories(stories: StoryType[]) {
-      set({ stories });
+    onSetStory(storyName: string) {
+      dispatch(actionSetStory(storyName));
     },
   };
 });

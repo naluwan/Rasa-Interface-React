@@ -14,18 +14,22 @@ const atEditBotResponse = (response: string) => {
 const BotStep: React.FC<BotStepProps> = (props) => {
   const { step } = props;
   return (
-    <div className="d-flex flex-column">
-      <div className="d-flex align-items-center justify-content-end px-5 pt-3">
-        <div className={style.botTitle}>機器人:</div>
-        <div className={style.botResponse}>{step.response}</div>
+    <div className="row justify-content-end">
+      <div className="col-6">
+        <div className="d-flex align-items-center justify-content-end">
+          <div className={style.botTitle}>機器人:</div>
+          <div className={style.botResponse}>{step.response}</div>
+        </div>
+        <div className="pt-2">
+          <button
+            type="button"
+            className="btn btn-info mx-2"
+            onClick={() => atEditBotResponse(step.response)}
+          >
+            編輯
+          </button>
+        </div>
       </div>
-      <button
-        type="button"
-        className="btn btn-info mx-2"
-        onClick={() => atEditBotResponse(step.response)}
-      >
-        編輯
-      </button>
     </div>
   );
 };
