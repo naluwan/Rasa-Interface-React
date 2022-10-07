@@ -1,6 +1,10 @@
 import axios from 'axios';
 import Cookies from 'js-cookie';
-import { RegisterUserInfoType, StoryType, UserInfo } from 'components/types';
+import {
+  RegisterUserInfoType,
+  UserInfo,
+  TrainDataType,
+} from 'components/types';
 
 const JWT_TOKEN = 'JWT_TOKEN';
 const API_URL = 'http://192.168.10.127:3333/api';
@@ -112,15 +116,15 @@ export const fetchRegister = (
     .catch(({ response: { data } }) => data);
 };
 
-export const fetchStories = (): Promise<StoryType[]> => {
+export const fetchAllData = (): Promise<TrainDataType> => {
   return axiosInstance
-    .get(`${API_URL}/stories`, {
+    .get(`${API_URL}/train/allTrainData`, {
       headers: {
         authorization: `Bearer ${getJWTToken()}`,
       },
     })
-    .then(({ data: { data } }) => {
+    .then(({ data }) => {
       return data;
     })
-    .catch((err) => err.response);
+    .catch((err) => console.log(err));
 };
