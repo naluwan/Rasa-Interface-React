@@ -2,7 +2,7 @@ import * as React from 'react';
 import cx from 'classnames';
 import MyButton from 'components/MyButton';
 import useSWR from 'swr';
-import { fetchStories } from 'services/api';
+import { fetchAllData } from 'services/api';
 import shallow from 'zustand/shallow';
 import type { State } from 'components/types';
 import ShowStory from 'components/ShowStory';
@@ -10,31 +10,23 @@ import style from './Stories.module.scss';
 import useStoryStore from '../../store/useStoryStore';
 
 const Stories = () => {
-  const { story, stories, setStory, setStories } = useStoryStore(
+  const { story, stories, onSetStory, onSetAllTrainData } = useStoryStore(
     (state: State) => {
       return {
         story: state.story,
         stories: state.stories,
-        setStory: state.setStory,
-        setStories: state.setStories,
+        onSetStory: state.onSetStory,
+        onSetAllTrainData: state.onSetAllTrainData,
       };
     },
     shallow,
   );
-  const { data } = useSWR('/api/stories', fetchStories);
 
-  const storiesData = data?.stories;
+  const { data } = useSWR('/api/train/allTrainData', fetchAllData);
 
   React.useEffect(() => {
-    setStories(storiesData);
-  }, [storiesData, setStories]);
-  // const atSelect = React.useCallback(
-  //   (stories: StoryType[], e: Event) => {
-  //     setStory(stories, e.target.value);
-  //   },
-  //   [setStory],
-  // );
-  console.log(stories);
+    onSetAllTrainData(data);
+  }, [data, onSetAllTrainData]);
 
   return (
     <div>
@@ -47,14 +39,14 @@ const Stories = () => {
             <select
               id="stories"
               className={style.storiesSelector}
-              onChange={(e) => setStory(e.target.value)}
+              onChange={(e) => onSetStory(e.target.value)}
               defaultValue=""
             >
               <option value="" disabled hidden>
                 請選擇
               </option>
-              {storiesData &&
-                storiesData.map((item) => (
+              {stories &&
+                stories.map((item) => (
                   <option key={item.story} value={item.story}>
                     {item.story}
                   </option>
@@ -66,35 +58,6 @@ const Stories = () => {
         <div id="data-panel" />
         <br />
         {Object.keys(story).length !== 0 && <ShowStory currentStory={story} />}
-        {/* {Object.keys(story).length !== 0 && (
-          <>
-            <hr />
-            <div>{story.story}</div>
-            {story.steps.map((step) => {
-              return step.intent ? (
-                <React.Fragment key={step.intent}>
-                  <h5>user</h5>
-                  <div>{step.user}</div>
-                  <div>intent:{step.intent}</div>
-                  {step.examples.length && (
-                    <div>
-                      examples:
-                      {step.examples.map((example) => (
-                        <p key={example}>{example}</p>
-                      ))}
-                    </div>
-                  )}
-                </React.Fragment>
-              ) : (
-                <React.Fragment key={step.action}>
-                  <h5>bot</h5>
-                  <div>{step.action}</div>
-                  <div>{step.response}</div>
-                </React.Fragment>
-              );
-            })}
-          </>
-        )} */}
         <hr />
         <div className={cx(style.center, 'col-2')}>
           <MyButton className="btn" variant="third">
