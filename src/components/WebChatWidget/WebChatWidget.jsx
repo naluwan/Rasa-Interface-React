@@ -11,6 +11,7 @@ const WebChatWidget = () => {
       user: state.user,
     };
   }, shallow);
+
   return (
     <Widget
       interval={2000}
@@ -22,7 +23,6 @@ const WebChatWidget = () => {
       inputTextFieldHint="請輸入內容...."
       title={user.chatbotName}
       params={{ storage: 'session' }}
-      onWidgetEvent={{ onChatClose: () => sessionStorage.clear() }}
       showFullScreenButton
       showCloseButton
       showMessageDate

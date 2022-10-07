@@ -19,6 +19,7 @@ export const getJWTToken = () => {
 // 清除Token
 export const cleanToken = () => {
   Cookies.remove(JWT_TOKEN);
+  window.sessionStorage.clear();
   delete axiosInstance.defaults.headers.authorization;
 };
 

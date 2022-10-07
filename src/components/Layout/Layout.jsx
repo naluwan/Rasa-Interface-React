@@ -5,6 +5,7 @@ import Home from 'components/Home';
 import Register from 'components/Register';
 import Authenticate from 'containers/Authenticate';
 import Stories from 'components/Stories';
+import WebChatWidget from 'components/WebChatWidget';
 import style from './Layout.module.scss';
 import Login from '../Login';
 import NavBar from '../NavBar';
@@ -40,6 +41,9 @@ const Layout = () => {
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
       </Routes>
+      <Authenticate>
+        <WebChatWidget />
+      </Authenticate>
     </div>
   );
 };
