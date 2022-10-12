@@ -169,14 +169,20 @@ export const putUserSay = (
     })
     .catch(({ response: { data } }) => data);
 };
+
+export const putBotResponse = (
+  oriBotRes: string,
+  botRes: string,
+  storyName: string,
+  action: string,
+) => {
   return axiosInstance
-    .get(`${API_URL}/train/allTrainData`, {
-      headers: {
-        authorization: `Bearer ${getJWTToken()}`,
-      },
+    .put(`${API_URL}/stories/response/${storyName}/${action}`, {
+      oriBotRes,
+      botRes,
     })
     .then(({ data }) => {
       return data;
     })
-    .catch((err) => console.log(err));
+    .catch(({ response: { data } }) => data);
 };

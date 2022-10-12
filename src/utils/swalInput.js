@@ -7,20 +7,20 @@ export const swalInput = async (
   inputValue: string,
   showCancelButton: boolean,
 ) => {
-  if (title === '編輯使用者對話') {
+  if (title === '編輯使用者對話' || title === '編輯機器人回覆') {
     const { value: formValue } = await Swal.fire({
       title,
       html: `
-      <input id="oriUserSay" class="swal2-input" style="display:none" value="${inputValue}">
-      <textarea id="userSay" class="swal2-textarea col-9">${inputValue}</textarea>
+      <input id="oriSay" class="swal2-input" style="display:none" value="${inputValue}">
+      <textarea id="newSay" class="swal2-textarea col-9">${inputValue}</textarea>
       `,
       inputPlaceholder,
       inputValue,
       showCancelButton,
       preConfirm: () => {
         return {
-          oriUserSay: document.querySelector('#oriUserSay').value,
-          userSay: document.querySelector('#userSay').value,
+          oriSay: document.querySelector('#oriSay').value,
+          newSay: document.querySelector('#newSay').value,
         };
       },
     });
