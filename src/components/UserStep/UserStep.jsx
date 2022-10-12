@@ -36,12 +36,16 @@ const UserStep: React.FC<UserStepProps> = (props) => {
   };
 
   const atEditUserSay = (userSay: string) => {
-    swalInput('編輯使用者對話', 'text', '請輸入使用者對話', userSay, true).then(
-      (data) => {
-        if (!data || !data.userSay || userSay === data.userSay) return;
-        onEditUserSay(data.oriUserSay, data.userSay, storyName);
-      },
-    );
+    swalInput(
+      '編輯使用者對話',
+      'textarea',
+      '請輸入使用者對話',
+      userSay,
+      true,
+    ).then((data) => {
+      if (!data || !data.newSay || userSay === data.newSay) return;
+      onEditUserSay(data.oriSay, data.newSay, storyName);
+    });
   };
 
   return (
