@@ -72,35 +72,7 @@ const Login = () => {
 
   const atLogin = React.useCallback(
     (email: string, password: string) => {
-      const loginInfo = onLogin(email, password);
-      loginInfo
-        .then((data) => {
-          const Toast = swal.mixin({
-            toast: true,
-            position: 'top-end',
-            showConfirmButton: false,
-            timer: 1000,
-            timerProgressBar: true,
-            didOpen: (toast) => {
-              toast.addEventListener('mouseenter', swal.stopTimer);
-              toast.addEventListener('mouseleave', swal.resumeTimer);
-            },
-          });
-
-          if (data.status === 'success') {
-            Toast.fire({
-              icon: 'success',
-              title: '登入成功',
-            });
-          } else {
-            Toast.fire({
-              icon: 'error',
-              title: '登入失敗',
-              text: `${data.message}`,
-            });
-          }
-        })
-        .catch((err) => console.log(err));
+      onLogin(email, password);
     },
     [onLogin],
   );

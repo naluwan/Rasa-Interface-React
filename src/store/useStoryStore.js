@@ -13,9 +13,9 @@ import type {
 } from 'components/types';
 
 import type { Action } from 'actions';
-import { actionSetAllData, actionSetStory, actionEditExamples } from 'actions';
+import { actionSetAllData, actionSetStory } from 'actions';
 // import { computed } from 'zustand-middleware-computed-state';
-import swal from 'sweetalert2';
+import { Toast } from 'utils/swalInput';
 
 const initialState = {
   isAppInitializedComplete: false,
@@ -69,51 +69,6 @@ const reducer = (state: State, action: Action): State => {
         story,
       };
     }
-    case 'EDIT_EXAMPLES': {
-      const { intent, examples } = action.payload;
-      const currentExamples = examples
-        .split(',')
-        .map((example) => example.trimStart())
-        .map((example) => example.trimEnd())
-        .filter((example) => example !== '');
-      const nlu = { rasa_nlu_data: { common_examples: [] } };
-      nlu.rasa_nlu_data.common_examples =
-        state.nlu.rasa_nlu_data.common_examples.filter(
-          (nluItem) => nluItem.intent !== intent || nluItem.text === intent,
-        );
-      const repeat = [];
-      currentExamples.map((example) => {
-        return nlu.rasa_nlu_data.common_examples.map((nluItem) => {
-          if (example === nluItem.text) {
-            repeat.push(example);
-          }
-          return nluItem;
-        });
-      });
-      if (repeat.length) {
-        return swal.fire({
-          icon: 'warning',
-          title: '例句重複，請重新嘗試',
-        });
-      }
-      currentExamples.map((example) => {
-        return nlu.rasa_nlu_data.common_examples.push({
-          text: example,
-          intent,
-          entities: [],
-        });
-      });
-      const stepIdx = state.story.steps
-        .map((step) => step.intent)
-        .indexOf(intent);
-      const { story } = state;
-      story.steps[stepIdx].examples = currentExamples.toString();
-      return {
-        ...state,
-        nlu,
-        story,
-      };
-    }
     default:
       return state;
   }
@@ -143,9 +98,19 @@ const useStoryStore = create((set) => {
     },
     onLogin(email: string, password: string) {
       set({ loading: true });
-      return fetchLogin(email, password).then((res) => {
-        set({ user: res.user, loading: false });
-        return res;
+      fetchLogin(email, password).then((res) => {
+        if (res.status === 'success') {
+          set({ user: res.user, loading: false });
+          return Toast.fire({
+            icon: 'success',
+            title: '登入成功',
+          });
+        }
+        return Toast.fire({
+          icon: 'error',
+          title: '登入失敗',
+          text: res.message,
+        });
       });
     },
     onLogout() {
@@ -166,9 +131,6 @@ const useStoryStore = create((set) => {
     },
     onSetStory(storyName: string) {
       dispatch(actionSetStory(storyName));
-    },
-    onEditExamples(intent: string, examples: string) {
-      dispatch(actionEditExamples(intent, examples));
     },
   };
 });

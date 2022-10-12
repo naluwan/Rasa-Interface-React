@@ -94,5 +94,4 @@ export type State = {
   onRegister: (userInfo: RegisterUserInfoType) => void,
   onSetAllTrainData: (data: TrainDataType) => void,
   onSetStory: (storyName: string) => void,
-  onEditExamples: (intent: string, exmaples: string, step: StepsType) => void,
 };

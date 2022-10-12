@@ -1,4 +1,4 @@
-import swal from 'sweetalert2';
+import Swal from 'sweetalert2';
 
 export const swalInput = async (
   title: string,
@@ -7,7 +7,26 @@ export const swalInput = async (
   inputValue: string,
   showCancelButton: boolean,
 ) => {
-  const { value: newInput } = await swal.fire({
+  if (title === '編輯使用者對話') {
+    const { value: formValue } = await Swal.fire({
+      title,
+      html: `
+      <input id="oriUserSay" class="swal2-input" style="display:none" value="${inputValue}">
+      <textarea id="userSay" class="swal2-textarea col-9">${inputValue}</textarea>
+      `,
+      inputPlaceholder,
+      inputValue,
+      showCancelButton,
+      preConfirm: () => {
+        return {
+          oriUserSay: document.querySelector('#oriUserSay').value,
+          userSay: document.querySelector('#userSay').value,
+        };
+      },
+    });
+    return formValue;
+  }
+  const { value: newInput } = await Swal.fire({
     title,
     input,
     inputPlaceholder,
@@ -16,3 +35,10 @@ export const swalInput = async (
   });
   return newInput;
 };
+
+export const Toast = Swal.mixin({
+  toast: true,
+  position: 'top-end',
+  showConfirmButton: false,
+  timer: 3000,
+});
