@@ -42,3 +42,26 @@ export const Toast = Swal.mixin({
   showConfirmButton: false,
   timer: 3000,
 });
+
+export const confirmWidget = (storyName: string) => {
+  const swalWithBootstrapButtons = Swal.mixin({
+    customClass: {
+      confirmButton: 'btn btn-danger mx-1',
+      cancelButton: 'btn btn-secondary mx-1',
+    },
+    buttonsStyling: false,
+  });
+
+  return swalWithBootstrapButtons
+    .fire({
+      title: `確認要刪除『${storyName}』`,
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: '確認',
+      cancelButtonText: '取消',
+      reverseButtons: false,
+    })
+    .then((result) => {
+      return result;
+    });
+};

@@ -5,13 +5,14 @@ import {
   putExamples,
   putUserSay,
   putBotResponse,
+  deleteStory,
 } from 'services/api';
 import shallow from 'zustand/shallow';
 import type { State } from 'components/types';
 import ShowStory from 'components/ShowStory';
 import cx from 'classnames';
 import MyButton from 'components/MyButton';
-import { Toast } from 'utils/swalInput';
+import { Toast, confirmWidget } from 'utils/swalInput';
 import style from './Stories.module.scss';
 import useStoryStore from '../../store/useStoryStore';
 
@@ -34,7 +35,7 @@ const Stories = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // 更改使用者例句
+  // 編輯使用者例句
   const atEditExamples = React.useCallback(
     (intent: string, examples: string, storyName: string) => {
       putExamples(intent, examples, storyName).then((res) => {
@@ -59,7 +60,7 @@ const Stories = () => {
     [onSetStory, onSetAllTrainData],
   );
 
-  // 更改使用者對話
+  // 編輯使用者對話
   const atEditUserSay = React.useCallback(
     (oriUserSay: string, userSay: string, storyName: string) => {
       putUserSay(oriUserSay, userSay, storyName).then((res) => {
@@ -84,6 +85,7 @@ const Stories = () => {
     [onSetAllTrainData, onSetStory],
   );
 
+  // 編輯機器人回覆
   const atEditBotRes = React.useCallback(
     (oriBotRes: string, botRes: string, storyName: string, action: string) => {
       putBotResponse(oriBotRes, botRes, storyName, action).then((res) => {
@@ -102,6 +104,33 @@ const Stories = () => {
           icon: 'error',
           title: '編輯失敗',
           text: res.message,
+        });
+      });
+    },
+    [onSetAllTrainData, onSetStory],
+  );
+
+  const atDeleteStory = React.useCallback(
+    (storyName: string) => {
+      confirmWidget(storyName).then((result) => {
+        if (!result.isConfirmed) return;
+        deleteStory(storyName).then((res) => {
+          if (res.status === 'success') {
+            fetchAllData()
+              .then((data) => onSetAllTrainData(data))
+              .then(() => {
+                onSetStory('');
+                return Toast.fire({
+                  icon: 'success',
+                  title: '故事刪除成功',
+                });
+              });
+          }
+          Toast.fire({
+            icon: 'error',
+            title: '故事刪除失敗',
+            text: res.message,
+          });
         });
       });
     },
@@ -145,6 +174,7 @@ const Stories = () => {
             onEditExamples={atEditExamples}
             onEditUserSay={atEditUserSay}
             onEditBotRes={atEditBotRes}
+            onDeleteStory={atDeleteStory}
           />
         )}
         <hr />

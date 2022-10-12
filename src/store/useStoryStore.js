@@ -41,6 +41,12 @@ const reducer = (state: State, action: Action): State => {
       };
     }
     case 'SET_STORY': {
+      if (!action.payload) {
+        return {
+          ...state,
+          story: {},
+        };
+      }
       const story = state.stories.filter(
         (item) => item.story === action.payload,
       )[0];

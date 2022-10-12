@@ -33,7 +33,7 @@ const BotStep: React.FC<BotStepProps> = (props) => {
   return (
     <div className="row justify-content-end">
       <div className="col-6">
-        <div className="d-flex align-items-center justify-content-end">
+        <div className="d-flex align-items-center">
           <div className={style.botTitle}>機器人:</div>
           <div className={style.botResponse}>{step.response}</div>
         </div>

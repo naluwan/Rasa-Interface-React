@@ -124,6 +124,7 @@ export const fetchRegister = (
     });
 };
 
+// 獲取全部資料
 export const fetchAllData = (): Promise<TrainDataType> => {
   return axiosInstance
     .get(`${API_URL}/train/allTrainData`)
@@ -138,6 +139,7 @@ export const fetchAllData = (): Promise<TrainDataType> => {
     });
 };
 
+// 編輯或新增例句
 export const putExamples = (
   intent: string,
   addExamples: string,
@@ -154,6 +156,7 @@ export const putExamples = (
     .catch(({ response: { data } }) => data);
 };
 
+// 編輯使用者對話
 export const putUserSay = (
   oriUserSay: string,
   userSay: String,
@@ -170,6 +173,7 @@ export const putUserSay = (
     .catch(({ response: { data } }) => data);
 };
 
+// 編輯機器人回覆
 export const putBotResponse = (
   oriBotRes: string,
   botRes: string,
@@ -181,6 +185,16 @@ export const putBotResponse = (
       oriBotRes,
       botRes,
     })
+    .then(({ data }) => {
+      return data;
+    })
+    .catch(({ response: { data } }) => data);
+};
+
+// 刪除故事
+export const deleteStory = (storyName: string) => {
+  return axiosInstance
+    .delete(`${API_URL}/stories/${storyName}`)
     .then(({ data }) => {
       return data;
     })

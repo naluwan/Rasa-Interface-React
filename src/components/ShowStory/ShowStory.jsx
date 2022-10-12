@@ -22,14 +22,23 @@ type ShowStoryProps = {
     storyName: string,
     action: string,
   ) => void,
+  onDeleteStory: (storyName: string) => void,
 };
 
 const ShowStory: React.FC<ShowStoryProps> = (props) => {
-  const { story, onEditExamples, onEditUserSay, onEditBotRes } = props;
+  const { story, onEditExamples, onEditUserSay, onEditBotRes, onDeleteStory } =
+    props;
 
   return (
     <div className={style.root}>
       <h3 className={style.title}>{story.story}</h3>
+      <button
+        type="button"
+        className="btn btn-danger"
+        onClick={() => onDeleteStory(story.story)}
+      >
+        刪除故事
+      </button>
       <div className={style.stepsPanel}>
         {story.steps.map((step) => {
           return step.intent ? (
