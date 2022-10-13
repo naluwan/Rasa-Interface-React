@@ -1,5 +1,4 @@
 import * as React from 'react';
-// import shallow from 'zustand';
 import cx from 'classnames';
 import style from './UserStep.module.scss';
 import type { StepsType } from '../types';
@@ -13,7 +12,7 @@ type UserStepProps = {
   onEditUserSay: (
     oriUserSay: string,
     userSay: string,
-    storyName: string,
+    storyName: string | null,
   ) => void,
 };
 
@@ -37,21 +36,24 @@ const UserStep: React.FC<UserStepProps> = (props) => {
   };
 
   // 編輯使用者對話
-  const atEditUserSay = (userSay: string) => {
-    swalInput(
-      '編輯使用者對話',
-      'textarea',
-      '請輸入使用者對話',
-      userSay,
-      true,
-    ).then((data) => {
-      if (!data || !data.newSay || userSay === data.newSay) return;
-      onEditUserSay(data.oriSay, data.newSay, storyName);
-    });
-  };
+  const atEditUserSay = React.useCallback(
+    (userSay: string) => {
+      swalInput(
+        '編輯使用者對話',
+        'textarea',
+        '請輸入使用者對話',
+        userSay,
+        true,
+      ).then((data) => {
+        if (!data || !data.newSay || userSay === data.newSay) return;
+        onEditUserSay(data.oriSay, data.newSay, storyName);
+      });
+    },
+    [onEditUserSay, storyName],
+  );
 
   return (
-    <div className="row">
+    <div className="row" id="userStep">
       <div className="col-6">
         <div className="d-flex align-items-center pt-3">
           <div className={style.userTitle}>使用者:</div>
@@ -75,13 +77,6 @@ const UserStep: React.FC<UserStepProps> = (props) => {
             }
           >
             例句
-          </button>
-          <button
-            type="button"
-            className="btn btn-danger mx-2"
-            // onClick={() => atAddExamples(step.examples.toString())}
-          >
-            刪除
           </button>
         </div>
       </div>

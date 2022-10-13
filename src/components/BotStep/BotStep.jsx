@@ -16,6 +16,14 @@ type BotStepProps = {
 
 const BotStep: React.FC<BotStepProps> = (props) => {
   const { step, storyName, onEditBotRes } = props;
+  const textAreaRef = React.useRef();
+
+  // textarea 自適應高度
+  React.useEffect(() => {
+    textAreaRef.current.style = 'height:0px';
+    textAreaRef.current.value = step.response;
+    textAreaRef.current.style = `height: ${textAreaRef.current.scrollHeight}px`;
+  });
 
   // 編輯機器人回覆
   const atEditBotResponse = (response: string, action: string) => {
@@ -32,11 +40,16 @@ const BotStep: React.FC<BotStepProps> = (props) => {
     });
   };
   return (
-    <div className="row justify-content-end">
+    <div className="row justify-content-end" id="botStep">
       <div className="col-6">
         <div className="d-flex align-items-center">
           <div className={style.botTitle}>機器人:</div>
-          <div className={style.botResponse}>{step.response}</div>
+          <textarea
+            className={style.botResponse}
+            ref={textAreaRef}
+            rows={1}
+            readOnly
+          />
         </div>
         <div className="pt-2">
           <button

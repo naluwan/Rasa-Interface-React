@@ -167,9 +167,6 @@ export const putUserSay = (
       oriUserSay,
       userSay,
     })
-    .then(({ data }) => {
-      return data;
-    })
     .catch(({ response: { data } }) => data);
 };
 
@@ -199,4 +196,19 @@ export const deleteStory = (storyName: string) => {
       return data;
     })
     .catch(({ response: { data } }) => data);
+};
+
+export const fetchAllAction = () => {
+  return axiosInstance
+    .get(`${API_URL}/stories/actions`)
+    .then(({ data: { data } }) => {
+      return data;
+    })
+    .catch(({ response: { data } }) => {
+      Toast.fire({
+        icon: 'warning',
+        title: '資料發生錯誤',
+        text: data.message,
+      });
+    });
 };

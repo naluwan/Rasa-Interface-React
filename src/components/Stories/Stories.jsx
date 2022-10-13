@@ -8,16 +8,34 @@ import {
   deleteStory,
 } from 'services/api';
 import shallow from 'zustand/shallow';
-import type { State } from 'components/types';
+// eslint-disable-next-line no-unused-vars
+import type { State, StoryType } from 'components/types';
 import ShowStory from 'components/ShowStory';
 import cx from 'classnames';
 // import MyButton from 'components/MyButton';
-import { Toast, confirmWidget } from 'utils/swalInput';
-import { Link } from 'react-router-dom';
+import { Toast, confirmWidget, swalInput } from 'utils/swalInput';
+import MyButton from 'components/MyButton';
+import CreateStory from 'components/CreateStory';
 import style from './Stories.module.scss';
 import useStoryStore from '../../store/useStoryStore';
 
 const Stories = () => {
+  /**
+   * @type {[boolean, Function]}
+   */
+  const [create, setCreate] = React.useState(false);
+  /**
+   * @type {[string, Function]}
+   */
+  const [defaultValue, setDefaultValue] = React.useState('');
+  /**
+   * @type {[string, Function]}
+   */
+  // const [newStoryName, setNewStoryName] = React.useState('');
+  /**
+   * @type {[StoryType, Function]}
+   */
+  const [newStory, setNewStory] = React.useState({});
   const { story, stories, onSetStory, onSetAllTrainData } = useStoryStore(
     (state: State) => {
       return {
@@ -119,7 +137,7 @@ const Stories = () => {
   // 刪除故事
   const atDeleteStory = React.useCallback(
     (storyName: string) => {
-      confirmWidget(storyName).then((result) => {
+      confirmWidget(storyName, 'delete').then((result) => {
         if (!result.isConfirmed) return;
         deleteStory(storyName).then((res) => {
           if (res.status === 'success') {
@@ -127,6 +145,7 @@ const Stories = () => {
               .then((data) => onSetAllTrainData(data))
               .then(() => {
                 onSetStory('');
+                setDefaultValue('');
                 return Toast.fire({
                   icon: 'success',
                   title: '故事刪除成功',
@@ -144,6 +163,66 @@ const Stories = () => {
     [onSetAllTrainData, onSetStory],
   );
 
+  // 選擇故事
+  const atSelectStory = React.useCallback(
+    (storyName: string) => {
+      onSetStory(storyName);
+      setCreate(false);
+      setDefaultValue(storyName);
+      setNewStory({});
+    },
+    [onSetStory],
+  );
+
+  // 新增故事
+  const atClickCreateStoryBtn = React.useCallback(() => {
+    if (Object.keys(newStory).length !== 0) {
+      return confirmWidget(newStory.story, null).then((result) => {
+        if (!result.isConfirmed) return;
+        swalInput('設定故事名稱', 'text', '請輸入故事名稱', '', true).then(
+          (createStoryName) => {
+            if (!createStoryName) return;
+            const repeat = [];
+            stories.map((item) => {
+              return item.story === createStoryName ? repeat.push(item) : item;
+            });
+            if (repeat.length) {
+              Toast.fire({
+                icon: 'warning',
+                title: '故事名稱重複',
+              });
+              return;
+            }
+            setNewStory({ story: createStoryName, steps: [] });
+            onSetStory('');
+            setCreate(true);
+            setDefaultValue('');
+          },
+        );
+      });
+    }
+    return swalInput('設定故事名稱', 'text', '請輸入故事名稱', '', true).then(
+      (createStoryName) => {
+        if (!createStoryName) return;
+        const repeat = [];
+        stories.map((item) => {
+          return item.story === createStoryName ? repeat.push(item) : item;
+        });
+        if (repeat.length) {
+          Toast.fire({
+            icon: 'warning',
+            title: '故事名稱重複',
+          });
+          return;
+        }
+        setNewStory({ story: createStoryName, steps: [] });
+        onSetStory('');
+        setCreate(true);
+        setDefaultValue('');
+      },
+    );
+  }, [newStory, onSetStory, stories]);
+
   return (
     <div>
       <div>
@@ -155,8 +234,8 @@ const Stories = () => {
               <select
                 id="stories"
                 className={style.storiesSelector}
-                onChange={(e) => onSetStory(e.target.value)}
-                defaultValue=""
+                onChange={(e) => atSelectStory(e.target.value)}
+                value={defaultValue}
               >
                 <option value="" disabled hidden>
                   請選擇
@@ -169,9 +248,9 @@ const Stories = () => {
                   ))}
               </select>
               <div className={cx('btn', style.navbar)}>
-                <Link to="/stories/create" className="btn btn-warning">
+                <MyButton variant="third" onClick={atClickCreateStoryBtn}>
                   新增故事流程
-                </Link>
+                </MyButton>
               </div>
             </div>
           </div>
@@ -186,7 +265,9 @@ const Stories = () => {
             onDeleteStory={atDeleteStory}
           />
         )}
-        <hr />
+        {create && (
+          <CreateStory newStory={newStory} onSetNewStory={setNewStory} />
+        )}
       </div>
     </div>
   );
