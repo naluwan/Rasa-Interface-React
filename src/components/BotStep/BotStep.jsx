@@ -2,7 +2,6 @@ import * as React from 'react';
 import style from './BotStep.module.scss';
 import type { StepsType } from '../types';
 import { swalInput } from '../../utils/swalInput';
-// import useAutosizeTextArea from '../../hooks/useAutosizeTextArea';
 
 type BotStepProps = {
   step: StepsType,
@@ -17,11 +16,10 @@ type BotStepProps = {
 
 const BotStep: React.FC<BotStepProps> = (props) => {
   const { step, storyName, onEditBotRes } = props;
-  // const [scrollH, setScrollH] = React.useState(0);
   const textAreaRef = React.useRef();
 
   // textarea 自適應高度
-  React.useLayoutEffect(() => {
+  React.useEffect(() => {
     textAreaRef.current.style = 'height:0px';
     textAreaRef.current.value = step.response;
     textAreaRef.current.style = `height: ${textAreaRef.current.scrollHeight}px`;
@@ -42,7 +40,7 @@ const BotStep: React.FC<BotStepProps> = (props) => {
     });
   };
   return (
-    <div className="row justify-content-end">
+    <div className="row justify-content-end" id="botStep">
       <div className="col-6">
         <div className="d-flex align-items-center">
           <div className={style.botTitle}>機器人:</div>
@@ -50,7 +48,6 @@ const BotStep: React.FC<BotStepProps> = (props) => {
             className={style.botResponse}
             ref={textAreaRef}
             rows={1}
-            // value={step.response}
             readOnly
           />
         </div>

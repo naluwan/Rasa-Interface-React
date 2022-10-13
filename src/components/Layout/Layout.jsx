@@ -6,7 +6,6 @@ import Register from 'components/Register';
 import Authenticate from 'containers/Authenticate';
 import Stories from 'components/Stories';
 import WebChatWidget from 'components/WebChatWidget';
-import CreateStory from 'components/CreateStory';
 import style from './Layout.module.scss';
 import Login from '../Login';
 import NavBar from '../NavBar';
@@ -35,16 +34,6 @@ const Layout = () => {
             <ProtectedRoute>
               <div className={style.layoutBlock}>
                 <Stories />
-              </div>
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/stories/create"
-          element={
-            <ProtectedRoute>
-              <div className={style.layoutBlock}>
-                <CreateStory />
               </div>
             </ProtectedRoute>
           }
