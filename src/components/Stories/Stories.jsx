@@ -11,8 +11,9 @@ import shallow from 'zustand/shallow';
 import type { State } from 'components/types';
 import ShowStory from 'components/ShowStory';
 import cx from 'classnames';
-import MyButton from 'components/MyButton';
+// import MyButton from 'components/MyButton';
 import { Toast, confirmWidget } from 'utils/swalInput';
+import { Link } from 'react-router-dom';
 import style from './Stories.module.scss';
 import useStoryStore from '../../store/useStoryStore';
 
@@ -32,6 +33,11 @@ const Stories = () => {
   // 進入頁面獲取設定資料
   React.useEffect(() => {
     fetchAllData().then((data) => onSetAllTrainData(data));
+
+    // 離開頁面將story設為空
+    return () => {
+      onSetStory('');
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -163,7 +169,9 @@ const Stories = () => {
                   ))}
               </select>
               <div className={cx('btn', style.navbar)}>
-                <MyButton variant="third">新增故事流程</MyButton>
+                <Link to="/stories/create" className="btn btn-warning">
+                  新增故事流程
+                </Link>
               </div>
             </div>
           </div>
