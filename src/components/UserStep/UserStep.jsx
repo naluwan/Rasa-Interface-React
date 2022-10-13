@@ -1,5 +1,6 @@
 import * as React from 'react';
 // import shallow from 'zustand';
+import cx from 'classnames';
 import style from './UserStep.module.scss';
 import type { StepsType } from '../types';
 import { swalInput } from '../../utils/swalInput';
@@ -18,10 +19,10 @@ type UserStepProps = {
 
 const UserStep: React.FC<UserStepProps> = (props) => {
   const { step, storyName, onEditExamples, onEditUserSay } = props;
-
   const showIntent =
     step.intent === 'get_started' ? '打開聊天室窗' : step.intent;
 
+  // 編輯例句
   const atAddExamples = (
     intent: string,
     examples: string,
@@ -35,6 +36,7 @@ const UserStep: React.FC<UserStepProps> = (props) => {
     );
   };
 
+  // 編輯使用者對話
   const atEditUserSay = (userSay: string) => {
     swalInput(
       '編輯使用者對話',
@@ -57,7 +59,7 @@ const UserStep: React.FC<UserStepProps> = (props) => {
             {step.user ? step.user : showIntent}
           </div>
         </div>
-        <div className="pt-2">
+        <div className={cx('pt-2')}>
           <button
             type="button"
             className="btn btn-info mx-2"

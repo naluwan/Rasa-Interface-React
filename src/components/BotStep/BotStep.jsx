@@ -17,6 +17,7 @@ type BotStepProps = {
 const BotStep: React.FC<BotStepProps> = (props) => {
   const { step, storyName, onEditBotRes } = props;
 
+  // 編輯機器人回覆
   const atEditBotResponse = (response: string, action: string) => {
     swalInput(
       '編輯機器人回覆',

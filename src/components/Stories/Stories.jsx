@@ -110,6 +110,7 @@ const Stories = () => {
     [onSetAllTrainData, onSetStory],
   );
 
+  // 刪除故事
   const atDeleteStory = React.useCallback(
     (storyName: string) => {
       confirmWidget(storyName).then((result) => {
