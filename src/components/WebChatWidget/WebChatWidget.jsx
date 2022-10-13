@@ -26,6 +26,7 @@ const WebChatWidget = () => {
       showFullScreenButton
       showCloseButton
       showMessageDate
+      mainColor="#2d304c"
     />
   );
 };

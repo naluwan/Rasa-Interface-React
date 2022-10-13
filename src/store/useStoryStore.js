@@ -15,6 +15,7 @@ import type {
 import type { Action } from 'actions';
 import { actionSetAllData, actionSetStory } from 'actions';
 // import { computed } from 'zustand-middleware-computed-state';
+import { Toast } from 'utils/swalInput';
 
 const initialState = {
   isAppInitializedComplete: false,
@@ -25,6 +26,7 @@ const initialState = {
   nlu: {},
   domain: {},
 };
+
 const reducer = (state: State, action: Action): State => {
   switch (action.type) {
     case 'SET_ALL_TRAIN_DATA': {
@@ -39,6 +41,12 @@ const reducer = (state: State, action: Action): State => {
       };
     }
     case 'SET_STORY': {
+      if (!action.payload) {
+        return {
+          ...state,
+          story: {},
+        };
+      }
       const story = state.stories.filter(
         (item) => item.story === action.payload,
       )[0];
@@ -96,9 +104,19 @@ const useStoryStore = create((set) => {
     },
     onLogin(email: string, password: string) {
       set({ loading: true });
-      return fetchLogin(email, password).then((res) => {
-        set({ user: res.user, loading: false });
-        return res;
+      fetchLogin(email, password).then((res) => {
+        if (res.status === 'success') {
+          set({ user: res.user, loading: false });
+          return Toast.fire({
+            icon: 'success',
+            title: '登入成功',
+          });
+        }
+        return Toast.fire({
+          icon: 'error',
+          title: '登入失敗',
+          text: res.message,
+        });
       });
     },
     onLogout() {

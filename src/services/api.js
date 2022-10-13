@@ -4,7 +4,9 @@ import {
   RegisterUserInfoType,
   UserInfo,
   TrainDataType,
+  StoryType,
 } from 'components/types';
+import { Toast } from 'utils/swalInput';
 
 const JWT_TOKEN = 'JWT_TOKEN';
 const API_URL = 'http://192.168.10.127:3333/api';
@@ -38,6 +40,7 @@ export const verifyToken = (token: string) => {
     },
   })
     .then(({ data: { data } }) => {
+      axiosInstance.defaults.headers.authorization = `Bearer ${token}`;
       return data;
     })
     .catch(() => {
@@ -67,9 +70,7 @@ export const fetchLogin = (
       setToken(data.token);
       return data;
     })
-    .catch(({ response: { data } }) => {
-      return data;
-    });
+    .catch(({ response: { data } }) => data);
 };
 
 export type RegisterUserType = {
@@ -114,18 +115,88 @@ export const fetchRegister = (
     .then(({ data }) => {
       return data;
     })
-    .catch(({ response: { data } }) => data);
+    .catch(({ response: { data } }) => {
+      Toast.fire({
+        icon: 'error',
+        title: '註冊失敗',
+        text: data.message,
+      });
+    });
 };
 
+// 獲取全部資料
 export const fetchAllData = (): Promise<TrainDataType> => {
   return axiosInstance
-    .get(`${API_URL}/train/allTrainData`, {
-      headers: {
-        authorization: `Bearer ${getJWTToken()}`,
-      },
+    .get(`${API_URL}/train/allTrainData`)
+    .then(({ data }) => {
+      return data;
+    })
+    .catch((err) => {
+      Toast.fire({
+        icon: 'error',
+        title: err.response.data.message,
+      });
+    });
+};
+
+// 編輯或新增例句
+export const putExamples = (
+  intent: string,
+  addExamples: string,
+  storyName: string,
+): Promise<StoryType> => {
+  return axiosInstance
+    .put(`${API_URL}/nlu/examples/${storyName}`, {
+      intent,
+      addExamples,
     })
     .then(({ data }) => {
       return data;
     })
-    .catch((err) => console.log(err));
+    .catch(({ response: { data } }) => data);
+};
+
+// 編輯使用者對話
+export const putUserSay = (
+  oriUserSay: string,
+  userSay: String,
+  storyName: string,
+) => {
+  return axiosInstance
+    .put(`${API_URL}/stories/userSay/${storyName}`, {
+      oriUserSay,
+      userSay,
+    })
+    .then(({ data }) => {
+      return data;
+    })
+    .catch(({ response: { data } }) => data);
+};
+
+// 編輯機器人回覆
+export const putBotResponse = (
+  oriBotRes: string,
+  botRes: string,
+  storyName: string,
+  action: string,
+) => {
+  return axiosInstance
+    .put(`${API_URL}/stories/response/${storyName}/${action}`, {
+      oriBotRes,
+      botRes,
+    })
+    .then(({ data }) => {
+      return data;
+    })
+    .catch(({ response: { data } }) => data);
+};
+
+// 刪除故事
+export const deleteStory = (storyName: string) => {
+  return axiosInstance
+    .delete(`${API_URL}/stories/${storyName}`)
+    .then(({ data }) => {
+      return data;
+    })
+    .catch(({ response: { data } }) => data);
 };

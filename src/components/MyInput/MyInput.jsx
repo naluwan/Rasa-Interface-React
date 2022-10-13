@@ -12,7 +12,6 @@ type MyInputProps = {
 // eslint-disable-next-line no-unused-vars, consistent-return
 const MyInput: React.FC<MyInputProps> = (props) => {
   const { variant, className, placeholder, required, onChange } = props;
-  console.log(required);
   if (variant === 'password') {
     return (
       <input
