@@ -33,13 +33,15 @@ const ShowStory: React.FC<ShowStoryProps> = (props) => {
     <div className={style.root}>
       <div className="col d-flex align-items-center">
         <div className={style.title}>{story.story}</div>
-        <button
-          type="button"
-          className="btn btn-danger mx-4"
-          onClick={() => onDeleteStory(story.story)}
-        >
-          刪除故事
-        </button>
+        {story.story !== '問候語' && (
+          <button
+            type="button"
+            className="btn btn-danger mx-4"
+            onClick={() => onDeleteStory(story.story)}
+          >
+            刪除故事
+          </button>
+        )}
       </div>
       <div className={style.stepsPanel}>
         {story.steps.map((step) => {
