@@ -11,16 +11,16 @@ export const swalInput = async (
     const { value: formValue } = await Swal.fire({
       title,
       html: `
-      <input id="oriSay" class="swal2-input" style="display:none" value="${inputValue}">
-      <textarea id="newSay" class="swal2-textarea col-9">${inputValue}</textarea>
+      <input id="ori" class="swal2-input" style="display:none" value="${inputValue}">
+      <textarea id="new" class="swal2-textarea col-9">${inputValue}</textarea>
       `,
       inputPlaceholder,
       inputValue,
       showCancelButton,
       preConfirm: () => {
         return {
-          oriSay: document.querySelector('#oriSay').value,
-          newSay: document.querySelector('#newSay').value,
+          ori: document.querySelector('#ori').value,
+          new: document.querySelector('#new').value,
         };
       },
     });

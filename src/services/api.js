@@ -201,10 +201,26 @@ export const deleteStory = (storyName: string) => {
     .catch(({ response: { data } }) => data);
 };
 
+// 抓取全部action
 export const fetchAllAction = () => {
   return axiosInstance
     .get(`${API_URL}/stories/actions`)
     .then(({ data: { data } }) => {
+      return data;
+    })
+    .catch(({ response: { data } }) => {
+      Toast.fire({
+        icon: 'warning',
+        title: '資料發生錯誤',
+        text: data.message,
+      });
+    });
+};
+
+export const postStory = (trainData: TrainDataType): Promise<TrainDataType> => {
+  return axiosInstance
+    .post(`${API_URL}/stories/newStory`, trainData)
+    .then(({ data }) => {
       return data;
     })
     .catch(({ response: { data } }) => {
