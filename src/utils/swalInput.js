@@ -11,16 +11,16 @@ export const swalInput = async (
     const { value: formValue } = await Swal.fire({
       title,
       html: `
-      <input id="oriSay" class="swal2-input" style="display:none" value="${inputValue}">
-      <textarea id="newSay" class="swal2-textarea col-9">${inputValue}</textarea>
+      <input id="ori" class="swal2-input" style="display:none" value="${inputValue}">
+      <textarea id="new" class="swal2-textarea col-9">${inputValue}</textarea>
       `,
       inputPlaceholder,
       inputValue,
       showCancelButton,
       preConfirm: () => {
         return {
-          oriSay: document.querySelector('#oriSay').value,
-          newSay: document.querySelector('#newSay').value,
+          ori: document.querySelector('#ori').value,
+          new: document.querySelector('#new').value,
         };
       },
     });
@@ -43,7 +43,18 @@ export const Toast = Swal.mixin({
   timer: 3000,
 });
 
-export const confirmWidget = (storyName: string) => {
+export const confirmWidget = (storyName: string, type: string) => {
+  let currentTitle = '';
+  let currentText = '';
+  switch (type) {
+    case 'delete':
+      currentTitle = `刪除`;
+      currentText = `確認要刪除『${storyName}』?`;
+      break;
+    default:
+      currentTitle = '離開';
+      currentText = `故事『${storyName}』尚未儲存，確定要離開?`;
+  }
   const swalWithBootstrapButtons = Swal.mixin({
     customClass: {
       confirmButton: 'btn btn-danger mx-1',
@@ -54,7 +65,8 @@ export const confirmWidget = (storyName: string) => {
 
   return swalWithBootstrapButtons
     .fire({
-      title: `確認要刪除『${storyName}』`,
+      title: currentTitle,
+      text: currentText,
       icon: 'warning',
       showCancelButton: true,
       confirmButtonText: '確認',

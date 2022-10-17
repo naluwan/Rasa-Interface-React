@@ -1,5 +1,4 @@
 import * as React from 'react';
-// import shallow from 'zustand';
 import cx from 'classnames';
 import style from './UserStep.module.scss';
 import type { StepsType } from '../types';
@@ -9,11 +8,15 @@ import { swalInput } from '../../utils/swalInput';
 type UserStepProps = {
   step: StepsType,
   storyName: string,
-  onEditExamples: (intent: string, examples: string, storyName: string) => void,
+  onEditExamples: (
+    intent: string,
+    examples: string,
+    storyName?: string,
+  ) => void,
   onEditUserSay: (
     oriUserSay: string,
     userSay: string,
-    storyName: string,
+    storyName?: string,
   ) => void,
 };
 
@@ -23,35 +26,37 @@ const UserStep: React.FC<UserStepProps> = (props) => {
     step.intent === 'get_started' ? '打開聊天室窗' : step.intent;
 
   // 編輯例句
-  const atAddExamples = (
-    intent: string,
-    examples: string,
-    currentStoryName: string,
-  ) => {
-    swalInput('新增例句', 'textarea', '請輸入例句', examples, true).then(
-      (newExamples) => {
-        if (!newExamples || newExamples === examples) return;
-        onEditExamples(intent, newExamples, currentStoryName);
-      },
-    );
-  };
+  const atAddExamples = React.useCallback(
+    (intent: string, examples: string, currentStoryName: string | null) => {
+      swalInput('新增例句', 'textarea', '請輸入例句', examples, true).then(
+        (newExamples) => {
+          if (newExamples === undefined || newExamples === examples) return;
+          onEditExamples(intent, newExamples, currentStoryName);
+        },
+      );
+    },
+    [onEditExamples],
+  );
 
   // 編輯使用者對話
-  const atEditUserSay = (userSay: string) => {
-    swalInput(
-      '編輯使用者對話',
-      'textarea',
-      '請輸入使用者對話',
-      userSay,
-      true,
-    ).then((data) => {
-      if (!data || !data.newSay || userSay === data.newSay) return;
-      onEditUserSay(data.oriSay, data.newSay, storyName);
-    });
-  };
+  const atEditUserSay = React.useCallback(
+    (userSay: string) => {
+      swalInput(
+        '編輯使用者對話',
+        'textarea',
+        '請輸入使用者對話',
+        userSay,
+        true,
+      ).then((data) => {
+        if (!data || !data.new || userSay === data.new) return;
+        onEditUserSay(data.ori, data.new, storyName);
+      });
+    },
+    [onEditUserSay, storyName],
+  );
 
   return (
-    <div className="row">
+    <div className="row" id="userStep">
       <div className="col-6">
         <div className="d-flex align-items-center pt-3">
           <div className={style.userTitle}>使用者:</div>
@@ -75,13 +80,6 @@ const UserStep: React.FC<UserStepProps> = (props) => {
             }
           >
             例句
-          </button>
-          <button
-            type="button"
-            className="btn btn-danger mx-2"
-            // onClick={() => atAddExamples(step.examples.toString())}
-          >
-            刪除
           </button>
         </div>
       </div>

@@ -1,12 +1,10 @@
 import * as React from 'react';
-// import shallow from 'zustand/shallow';
-// import type { State } from 'components/types';
+import shallow from 'zustand/shallow';
 import UserStep from 'components/UserStep';
 import BotStep from 'components/BotStep';
-// import cx from 'classnames';
 import style from './ShowStory.module.scss';
-// import useStoryStore from '../../store/useStoryStore';
-import { StoryType } from '../types';
+import type { StoryType, State } from '../types';
+import useStoryStore from '../../store/useStoryStore';
 
 type ShowStoryProps = {
   story: StoryType,
@@ -26,8 +24,17 @@ type ShowStoryProps = {
 };
 
 const ShowStory: React.FC<ShowStoryProps> = (props) => {
-  const { story, onEditExamples, onEditUserSay, onEditBotRes, onDeleteStory } =
-    props;
+  const { story, onDeleteStory } = props;
+  const { onEditBotRes, onEditUserSay, onEditExamples } = useStoryStore(
+    (state: State) => {
+      return {
+        onEditBotRes: state.onEditBotRes,
+        onEditUserSay: state.onEditUserSay,
+        onEditExamples: state.onEditExamples,
+      };
+    },
+    shallow,
+  );
 
   return (
     <div className={style.root}>
@@ -45,10 +52,11 @@ const ShowStory: React.FC<ShowStoryProps> = (props) => {
       </div>
       <div className={style.stepsPanel}>
         {story.steps.map((step) => {
+          const { intent, user, entities, examples, action, response } = step;
           return step.intent ? (
             <UserStep
               key={step.intent}
-              step={step}
+              step={{ intent, user, entities, examples }}
               storyName={story.story}
               onEditExamples={onEditExamples}
               onEditUserSay={onEditUserSay}
@@ -56,7 +64,7 @@ const ShowStory: React.FC<ShowStoryProps> = (props) => {
           ) : (
             <BotStep
               key={step.action}
-              step={step}
+              step={{ action, response }}
               storyName={story.story}
               onEditBotRes={onEditBotRes}
             />

@@ -4,7 +4,6 @@ import {
   RegisterUserInfoType,
   UserInfo,
   TrainDataType,
-  StoryType,
 } from 'components/types';
 import { Toast } from 'utils/swalInput';
 
@@ -128,7 +127,7 @@ export const fetchRegister = (
 export const fetchAllData = (): Promise<TrainDataType> => {
   return axiosInstance
     .get(`${API_URL}/train/allTrainData`)
-    .then(({ data }) => {
+    .then(({ data: { data } }) => {
       return data;
     })
     .catch((err) => {
@@ -139,58 +138,6 @@ export const fetchAllData = (): Promise<TrainDataType> => {
     });
 };
 
-// 編輯或新增例句
-export const putExamples = (
-  intent: string,
-  addExamples: string,
-  storyName: string,
-): Promise<StoryType> => {
-  return axiosInstance
-    .put(`${API_URL}/nlu/examples/${storyName}`, {
-      intent,
-      addExamples,
-    })
-    .then(({ data }) => {
-      return data;
-    })
-    .catch(({ response: { data } }) => data);
-};
-
-// 編輯使用者對話
-export const putUserSay = (
-  oriUserSay: string,
-  userSay: String,
-  storyName: string,
-) => {
-  return axiosInstance
-    .put(`${API_URL}/stories/userSay/${storyName}`, {
-      oriUserSay,
-      userSay,
-    })
-    .then(({ data }) => {
-      return data;
-    })
-    .catch(({ response: { data } }) => data);
-};
-
-// 編輯機器人回覆
-export const putBotResponse = (
-  oriBotRes: string,
-  botRes: string,
-  storyName: string,
-  action: string,
-) => {
-  return axiosInstance
-    .put(`${API_URL}/stories/response/${storyName}/${action}`, {
-      oriBotRes,
-      botRes,
-    })
-    .then(({ data }) => {
-      return data;
-    })
-    .catch(({ response: { data } }) => data);
-};
-
 // 刪除故事
 export const deleteStory = (storyName: string) => {
   return axiosInstance
@@ -199,4 +146,38 @@ export const deleteStory = (storyName: string) => {
       return data;
     })
     .catch(({ response: { data } }) => data);
+};
+
+// 抓取全部action
+export const fetchAllAction = () => {
+  return axiosInstance
+    .get(`${API_URL}/stories/actions`)
+    .then(({ data: { data } }) => {
+      return data;
+    })
+    .catch(({ response: { data } }) => {
+      Toast.fire({
+        icon: 'warning',
+        title: '資料發生錯誤',
+        text: data.message,
+      });
+    });
+};
+
+// 將訓練檔送回資料庫更新
+export const postAllTrainData = (
+  trainData: TrainDataType,
+): Promise<TrainDataType> => {
+  return axiosInstance
+    .post(`${API_URL}/train/allTrainData`, trainData)
+    .then(({ data }) => {
+      return data;
+    })
+    .catch(({ response: { data } }) => {
+      Toast.fire({
+        icon: 'warning',
+        title: '資料發生錯誤',
+        text: data.message,
+      });
+    });
 };
