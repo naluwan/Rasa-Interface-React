@@ -34,6 +34,7 @@ const initialState = {
   nlu: {},
   domain: {},
   cloneData: { stories: {}, nlu: {}, domain: {} },
+  deleteStory: {},
 };
 
 const reducer = (state: State, action: Action): State => {
