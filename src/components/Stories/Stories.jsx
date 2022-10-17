@@ -8,13 +8,14 @@ import {
   postTrainData,
 } from 'services/api';
 import shallow from 'zustand/shallow';
-
+// eslint-disable-next-line no-unused-vars
 import type { State, StoryType } from 'components/types';
 import ShowStory from 'components/ShowStory';
 import cx from 'classnames';
 import { Toast, confirmWidget, swalInput } from 'utils/swalInput';
 import MyButton from 'components/MyButton';
 import CreateStory from 'components/CreateStory';
+import { cloneDeep } from 'lodash-es';
 import style from './Stories.module.scss';
 import useStoryStore from '../../store/useStoryStore';
 
@@ -31,26 +32,18 @@ const Stories = () => {
    * @type {[StoryType, Function]}
    */
   const [newStory, setNewStory] = React.useState({});
-  const {
-    story,
-    stories,
-    nlu,
-    cloneData,
-    onSetStory,
-    onSetAllTrainData,
-    onCreateNewStory,
-  } = useStoryStore((state: State) => {
-    return {
-      story: state.story,
-      stories: state.stories,
-      nlu: state.nlu,
-      domain: state.domain,
-      cloneData: state.cloneData,
-      onSetStory: state.onSetStory,
-      onSetAllTrainData: state.onSetAllTrainData,
-      onCreateNewStory: state.onCreateNewStory,
-    };
-  }, shallow);
+  const { story, stories, nlu, cloneData, onSetStory, onSetAllTrainData } =
+    useStoryStore((state: State) => {
+      return {
+        story: state.story,
+        stories: state.stories,
+        nlu: state.nlu,
+        domain: state.domain,
+        cloneData: state.cloneData,
+        onSetStory: state.onSetStory,
+        onSetAllTrainData: state.onSetAllTrainData,
+      };
+    }, shallow);
 
   // 進入頁面打API要所有訓練資料
   const { data } = useSWR('/api/getAllTrainData', fetchAllData);
@@ -193,30 +186,108 @@ const Stories = () => {
   }, [newStory, onSetStory, stories]);
 
   // 新增故事點擊儲存按鈕
-  const atClickSaveBtn = React.useCallback(
-    (createStory: StoryType) => {
-      // 資料更新
-      onCreateNewStory(createStory);
-
-      // 將修改過的cloneData打進API回資料庫
-      postTrainData(cloneData).then((res) => {
-        if (res.status !== 'success') {
-          return Toast.fire({
-            icon: 'error',
-            title: '新增資料異常',
-            text: res.message,
-          });
-        }
-        // 導回故事瀏覽頁面
-        onSetAllTrainData(res.data);
-        setCreate(false);
-        setNewStory({});
-        setDefaultValue(createStory.story);
-        return onSetStory(createStory.story);
+  const atClickSaveBtn = React.useCallback(() => {
+    // 資料更新
+    const userStep = [];
+    const botStep = [];
+    // 驗證步驟是否正確
+    newStory.steps.map((step) =>
+      step.intent ? userStep.push(step) : botStep.push(step),
+    );
+    if (userStep.length === 0) {
+      return Toast.fire({
+        icon: 'warning',
+        title: '使用者對話是必填的',
       });
-    },
-    [onSetStory, cloneData, onCreateNewStory, onSetAllTrainData],
-  );
+    }
+    if (botStep.length === 0) {
+      return Toast.fire({
+        icon: 'warning',
+        title: '機器人回覆是必填的',
+      });
+    }
+    // 組成例句的訓練檔格式
+    const currentExamples = newStory.steps
+      .filter((step) => step.examples)
+      .map((step) => ({ intent: step.intent, examples: step.examples }));
+
+    // 將例句訓練檔放進nlu訓練檔中
+    // 將意圖放進domain訓練檔的intents中
+    currentExamples.map((exampleItem) => {
+      return exampleItem.examples.map((example) => {
+        return cloneData.nlu.rasa_nlu_data.common_examples.push({
+          text: example,
+          intent: exampleItem.intent,
+          entities: [],
+        });
+      });
+    });
+
+    // 組成機器人回覆的訓練檔格式
+    const currentAction = newStory.steps
+      .filter((step) => step.action)
+      .map((step) => ({
+        action: step.action,
+        text: step.response,
+      }));
+
+    // 將機器人回覆放進domain訓練檔中
+    currentAction.map((actionItem) => {
+      cloneData.domain.responses[actionItem.action] = [
+        { text: actionItem.text },
+      ];
+      return cloneData.domain.actions.push(actionItem.action);
+    });
+
+    // 在完成儲存動作之前還需要newStory，所以需要深層複製，否則後面某些物件資料後，會有問題
+    const cloneNewStory = cloneDeep(newStory);
+
+    // 組成故事流程的訓練檔格式
+    cloneNewStory.steps = cloneNewStory.steps.map((step) => {
+      if (step.intent) {
+        delete step.examples;
+      }
+      if (step.action) {
+        delete step.response;
+      }
+      return step;
+    });
+
+    cloneData.stories.push(cloneNewStory);
+
+    // 將使用者對話加入nlu和domain訓練檔中
+    cloneNewStory.steps.map((step) => {
+      if (step.intent) {
+        cloneData.nlu.rasa_nlu_data.common_examples.push({
+          text: step.user,
+          intent: step.intent,
+          entities: [],
+        });
+        cloneData.domain.intents.push(step.intent);
+      }
+      return step;
+    });
+
+    return postTrainData(cloneData).then((res) => {
+      if (res.status !== 'success') {
+        return Toast.fire({
+          icon: 'error',
+          title: '新增資料異常',
+          text: res.message,
+        });
+      }
+      // 導回故事瀏覽頁面
+      Toast.fire({
+        icon: 'success',
+        title: '新增故事成功',
+      });
+      onSetAllTrainData(res.data);
+      setCreate(false);
+      setNewStory({});
+      setDefaultValue(newStory.story);
+      return onSetStory(newStory.story);
+    });
+  }, [onSetStory, onSetAllTrainData, cloneData, newStory]);
 
   return (
     <div>
