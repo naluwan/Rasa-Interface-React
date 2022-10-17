@@ -4,11 +4,9 @@ import style from './CreateStory.module.scss';
 import StepControl from './StepControl';
 import UserStep from '../UserStep';
 import BotStep from '../BotStep';
-// eslint-disable-next-line no-unused-vars
-import { StoryType, ExampleType } from '../types';
+import type { StoryType, ExampleType } from '../types';
 
 type CreateStoryProps = {
-  storyName: string,
   newStory: StoryType,
   nlu: ExampleType[],
   onSetNewStory: (story: StoryType) => void,
@@ -16,7 +14,7 @@ type CreateStoryProps = {
 };
 
 const CreateStory: React.FC<CreateStoryProps> = (props) => {
-  const { storyName, newStory, nlu, onSetNewStory, onClickSaveBtn } = props;
+  const { newStory, nlu, onSetNewStory, onClickSaveBtn } = props;
   const [isUser, setIsUser] = React.useState(false);
 
   React.useEffect(() => {
@@ -141,7 +139,7 @@ const CreateStory: React.FC<CreateStoryProps> = (props) => {
   return (
     <div className={style.root}>
       <div className="col d-flex align-items-center">
-        <div className={style.title}>{storyName}</div>
+        <div className={style.title}>{newStory.story}</div>
         <button
           type="button"
           className="btn btn-secondary mx-4"
@@ -159,7 +157,7 @@ const CreateStory: React.FC<CreateStoryProps> = (props) => {
               <UserStep
                 key={step.intent}
                 step={{ intent, user, entities, examples }}
-                storyName={storyName}
+                storyName={newStory.story}
                 onEditUserSay={atEditUserSay}
                 onEditExamples={atEditExamples}
               />
@@ -167,7 +165,7 @@ const CreateStory: React.FC<CreateStoryProps> = (props) => {
               <BotStep
                 key={step.action}
                 step={{ action, response }}
-                storyName={storyName}
+                storyName={newStory.story}
                 onEditBotRes={atEditBotRes}
               />
             );

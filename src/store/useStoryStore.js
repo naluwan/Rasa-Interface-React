@@ -5,6 +5,7 @@ import {
   cleanToken,
   fetchLogin,
   fetchRegister,
+  postTrainData,
 } from 'services/api';
 import type {
   RegisterUserInfoType,
@@ -19,6 +20,7 @@ import {
   actionSetStory,
   actionCreateNewStory,
   actionEditUserSay,
+  actionEditBotRes,
 } from 'actions';
 // import { computed } from 'zustand-middleware-computed-state';
 import { Toast } from 'utils/swalInput';
@@ -174,7 +176,7 @@ const reducer = (state: State, action: Action): State => {
     case 'EDIT_USER_SAY': {
       const repeat = [];
       const { oriWord, newWord, storyName } = action.payload;
-      state.nlu.rasa_nlu_data.common_examples.map((nluItem) =>
+      state.cloneData.nlu.rasa_nlu_data.common_examples.map((nluItem) =>
         nluItem.text === newWord ? repeat.push(newWord) : nluItem,
       );
 
@@ -230,6 +232,39 @@ const reducer = (state: State, action: Action): State => {
         ...state,
         cloneData,
       };
+    }
+    case 'EDIT_BOT_RESPONSE': {
+      const { oriWord, newWord, actionName, storyName } = action.payload;
+      const { onSetStory, onSetAllTrainData } = state;
+      const { domain } = state.cloneData;
+      if (
+        state.cloneData.domain.responses[actionName] &&
+        state.cloneData.domain.responses[actionName][0].text === oriWord
+      ) {
+        domain.responses[actionName][0].text = newWord;
+      }
+      const cloneData = {
+        ...state.cloneData,
+        domain,
+      };
+      return postTrainData(cloneData).then((res) => {
+        if (res.status !== 'success') {
+          return Toast.fire({
+            icon: 'error',
+            title: '編輯失敗',
+            text: res.message,
+          });
+        }
+        Toast.fire({
+          icon: 'success',
+          title: '編輯機器人回覆成功',
+        });
+        onSetAllTrainData(res.data);
+        onSetStory(storyName);
+        return {
+          ...state,
+        };
+      });
     }
     default:
       return state;
@@ -299,6 +334,14 @@ const useStoryStore = create((set) => {
     },
     onEditUserSay(oriWord: string, newWord: string, storyName: string) {
       dispatch(actionEditUserSay(oriWord, newWord, storyName));
+    },
+    onEditBotRes(
+      oreWord: string,
+      newWord: string,
+      actionName: string,
+      storyName: string,
+    ) {
+      dispatch(actionEditBotRes(oreWord, newWord, actionName, storyName));
     },
   };
 });

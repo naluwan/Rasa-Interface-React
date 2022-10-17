@@ -1,16 +1,13 @@
-/* eslint-disable no-shadow */
 import * as React from 'react';
 import useSWR from 'swr';
 import {
   fetchAllData,
   putExamples,
-  // putUserSay,
-  putBotResponse,
   deleteStory,
   postTrainData,
 } from 'services/api';
 import shallow from 'zustand/shallow';
-// eslint-disable-next-line no-unused-vars
+
 import type { State, StoryType } from 'components/types';
 import ShowStory from 'components/ShowStory';
 import cx from 'classnames';
@@ -118,31 +115,6 @@ const Stories = () => {
     [onEditUserSay, cloneData, onSetStory, onSetAllTrainData],
   );
 
-  // 編輯機器人回覆
-  const atEditBotRes = React.useCallback(
-    (oriBotRes: string, botRes: string, action: string, storyName: string) => {
-      putBotResponse(oriBotRes, botRes, storyName, action).then((res) => {
-        if (res.status === 'success') {
-          fetchAllData()
-            .then((data) => onSetAllTrainData(data))
-            .then(() => {
-              onSetStory(storyName);
-              return Toast.fire({
-                icon: 'success',
-                title: '編輯成功',
-              });
-            });
-        }
-        Toast.fire({
-          icon: 'error',
-          title: '編輯失敗',
-          text: res.message,
-        });
-      });
-    },
-    [onSetAllTrainData, onSetStory],
-  );
-
   // 刪除故事
   const atDeleteStory = React.useCallback(
     (storyName: string) => {
@@ -243,9 +215,9 @@ const Stories = () => {
 
   // 新增故事點擊儲存按鈕
   const atClickSaveBtn = React.useCallback(
-    (story: StoryType) => {
+    (createStory: StoryType) => {
       // 資料更新
-      onCreateNewStory(story);
+      onCreateNewStory(createStory);
 
       // 將修改過的cloneData打進API回資料庫
       postTrainData(cloneData).then((res) => {
@@ -260,8 +232,8 @@ const Stories = () => {
         onSetAllTrainData(res.data);
         setCreate(false);
         setNewStory({});
-        setDefaultValue(story.story);
-        return onSetStory(story.story);
+        setDefaultValue(createStory.story);
+        return onSetStory(createStory.story);
       });
     },
     [onSetStory, cloneData, onCreateNewStory, onSetAllTrainData],
@@ -305,13 +277,11 @@ const Stories = () => {
             story={story}
             onEditExamples={atEditExamples}
             onEditUserSay={atEditUserSay}
-            onEditBotRes={atEditBotRes}
             onDeleteStory={atDeleteStory}
           />
         )}
         {create && (
           <CreateStory
-            storyName={newStory.story}
             newStory={newStory}
             onSetNewStory={setNewStory}
             nlu={nlu.rasa_nlu_data.common_examples}

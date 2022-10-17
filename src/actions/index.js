@@ -7,9 +7,18 @@ export type Action =
   | {
       type: 'EDIT_USER_SAY',
       payload: { oriWord: string, newWord: string, storyName: string },
+    }
+  | {
+      type: 'EDIT_BOT_RESPONSE',
+      payload: {
+        oriWord: string,
+        newWord: string,
+        actionName: string,
+        storyName: string,
+      },
     };
 
-export const actionSetAllData = (data: TrainDataType) => ({
+export const actionSetAllData = (data: TrainDataType): Action => ({
   type: 'SET_ALL_TRAIN_DATA',
   payload: data,
 });
@@ -19,7 +28,7 @@ export const actionSetStory = (storyName: string): Action => ({
   payload: storyName,
 });
 
-export const actionCreateNewStory = (newStory: StoryType) => ({
+export const actionCreateNewStory = (newStory: StoryType): Action => ({
   type: 'CREATE_NEW_STORY',
   payload: newStory,
 });
@@ -28,7 +37,17 @@ export const actionEditUserSay = (
   oriWord: string,
   newWord: string,
   storyName: string,
-) => ({
+): Action => ({
   type: 'EDIT_USER_SAY',
   payload: { oriWord, newWord, storyName },
+});
+
+export const actionEditBotRes = (
+  oriWord: string,
+  newWord: string,
+  actionName: string,
+  storyName: string,
+): Action => ({
+  type: 'EDIT_BOT_RESPONSE',
+  payload: { oriWord, newWord, actionName, storyName },
 });
