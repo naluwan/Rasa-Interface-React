@@ -8,11 +8,15 @@ import { swalInput } from '../../utils/swalInput';
 type UserStepProps = {
   step: StepsType,
   storyName: string,
-  onEditExamples: (intent: string, examples: string, storyName: string) => void,
+  onEditExamples: (
+    intent: string,
+    examples: string,
+    storyName?: string,
+  ) => void,
   onEditUserSay: (
     oriUserSay: string,
     userSay: string,
-    storyName: string | null,
+    storyName?: string,
   ) => void,
 };
 
@@ -22,18 +26,17 @@ const UserStep: React.FC<UserStepProps> = (props) => {
     step.intent === 'get_started' ? '打開聊天室窗' : step.intent;
 
   // 編輯例句
-  const atAddExamples = (
-    intent: string,
-    examples: string,
-    currentStoryName: string,
-  ) => {
-    swalInput('新增例句', 'textarea', '請輸入例句', examples, true).then(
-      (newExamples) => {
-        if (!newExamples || newExamples === examples) return;
-        onEditExamples(intent, newExamples, currentStoryName);
-      },
-    );
-  };
+  const atAddExamples = React.useCallback(
+    (intent: string, examples: string, currentStoryName: string | null) => {
+      swalInput('新增例句', 'textarea', '請輸入例句', examples, true).then(
+        (newExamples) => {
+          if (newExamples === undefined || newExamples === examples) return;
+          onEditExamples(intent, newExamples, currentStoryName);
+        },
+      );
+    },
+    [onEditExamples],
+  );
 
   // 編輯使用者對話
   const atEditUserSay = React.useCallback(
@@ -45,8 +48,8 @@ const UserStep: React.FC<UserStepProps> = (props) => {
         userSay,
         true,
       ).then((data) => {
-        if (!data || !data.newSay || userSay === data.newSay) return;
-        onEditUserSay(data.oriSay, data.newSay, storyName);
+        if (!data || !data.new || userSay === data.new) return;
+        onEditUserSay(data.ori, data.new, storyName);
       });
     },
     [onEditUserSay, storyName],

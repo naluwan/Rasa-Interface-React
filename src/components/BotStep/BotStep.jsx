@@ -9,8 +9,8 @@ type BotStepProps = {
   onEditBotRes: (
     oriBotRes: string,
     botRes: string,
-    storyName: string,
     action: string,
+    storyName?: string,
   ) => void,
 };
 
@@ -23,22 +23,24 @@ const BotStep: React.FC<BotStepProps> = (props) => {
     textAreaRef.current.style = 'height:0px';
     textAreaRef.current.value = step.response;
     textAreaRef.current.style = `height: ${textAreaRef.current.scrollHeight}px`;
-  });
+  }, [step.response]);
 
   // 編輯機器人回覆
-  const atEditBotResponse = (response: string, action: string) => {
-    swalInput(
-      '編輯機器人回覆',
-      'textarea',
-      '請輸入機器人回覆',
-      response,
-      true,
-    ).then((data) => {
-      console.log(data);
-      if (!data || !data.newSay || response === data.newSay) return;
-      onEditBotRes(data.oriBotRes, data.newSay, storyName, action);
-    });
-  };
+  const atEditBotResponse = React.useCallback(
+    (response: string, action: string, currentStoryName) => {
+      return swalInput(
+        '編輯機器人回覆',
+        'textarea',
+        '請輸入機器人回覆',
+        response,
+        true,
+      ).then((data) => {
+        if (!data || !data.new || response === data.new) return;
+        onEditBotRes(data.ori, data.new, action, currentStoryName);
+      });
+    },
+    [onEditBotRes],
+  );
   return (
     <div className="row justify-content-end" id="botStep">
       <div className="col-6">
@@ -55,7 +57,9 @@ const BotStep: React.FC<BotStepProps> = (props) => {
           <button
             type="button"
             className="btn btn-info mx-2"
-            onClick={() => atEditBotResponse(step.response, step.action)}
+            onClick={() =>
+              atEditBotResponse(step.response, step.action, storyName)
+            }
           >
             編輯
           </button>

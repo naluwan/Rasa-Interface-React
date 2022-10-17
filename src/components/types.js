@@ -36,9 +36,9 @@ export type StepsType =
       intent: string,
       user: string,
       entities: EntitiesType[] | [],
-      examples: string[] | [],
+      examples?: string[] | [],
     }
-  | { action: string, response: string };
+  | { action: string, response?: string };
 
 export type StoryType = {
   story: string,
