@@ -5,7 +5,7 @@ import {
   cleanToken,
   fetchLogin,
   fetchRegister,
-  postTrainData,
+  postAllTrainData,
 } from 'services/api';
 import type {
   RegisterUserInfoType,
@@ -19,6 +19,7 @@ import {
   actionSetStory,
   actionEditUserSay,
   actionEditBotRes,
+  actionEditExamples,
 } from 'actions';
 // import { computed } from 'zustand-middleware-computed-state';
 import { Toast } from 'utils/swalInput';
@@ -144,11 +145,11 @@ const reducer = (state: State, action: Action): State => {
         stories,
       };
 
-      return postTrainData(cloneData).then((res) => {
+      return postAllTrainData(cloneData).then((res) => {
         if (res.status !== 'success') {
           return Toast.fire({
             icon: 'error',
-            title: '編輯失敗',
+            title: '編輯使用者對話失敗',
             text: res.message,
           });
         }
@@ -178,17 +179,80 @@ const reducer = (state: State, action: Action): State => {
         ...state.cloneData,
         domain,
       };
-      return postTrainData(cloneData).then((res) => {
+      return postAllTrainData(cloneData).then((res) => {
         if (res.status !== 'success') {
           return Toast.fire({
             icon: 'error',
-            title: '編輯失敗',
+            title: '編輯機器人回覆失敗',
             text: res.message,
           });
         }
         Toast.fire({
           icon: 'success',
           title: '編輯機器人回覆成功',
+        });
+        onSetAllTrainData(res.data);
+        onSetStory(storyName);
+        return {
+          ...state,
+        };
+      });
+    }
+    case 'EDIT_EXAMPLES': {
+      const { intent, examples, storyName } = action.payload;
+      const { onSetStory, onSetAllTrainData } = state;
+      const currentExamples = examples
+        .split(',')
+        .map((example) => example.trimStart())
+        .map((example) => example.trimEnd())
+        .filter((example) => example !== '');
+      const repeat = [];
+
+      const nlu = state.cloneData.nlu.rasa_nlu_data.common_examples.filter(
+        (nluItem) => nluItem.intent !== intent || nluItem.text === intent,
+      );
+
+      currentExamples.map((example) => {
+        return nlu.map((nluItem) => {
+          if (nluItem.text === example) {
+            repeat.push(example);
+          }
+          return nluItem;
+        });
+      });
+
+      if (repeat.length) {
+        return Toast.fire({
+          title: '以下例句重複',
+          text: `${repeat.toString()}`,
+          icon: 'warning',
+        });
+      }
+
+      currentExamples.map((example) =>
+        nlu.push({
+          text: example,
+          intent,
+          entities: [],
+        }),
+      );
+
+      const cloneData = {
+        ...state.cloneData,
+        nlu: { rasa_nlu_data: { common_examples: nlu } },
+      };
+
+      return postAllTrainData(cloneData).then((res) => {
+        if (res.status !== 'success') {
+          return Toast.fire({
+            icon: 'error',
+            title: '編輯使用者例句失敗',
+            text: res.message,
+          });
+        }
+        Toast.fire({
+          icon: 'success',
+          title: '編輯使用者例句成功',
         });
         onSetAllTrainData(res.data);
         onSetStory(storyName);
@@ -270,6 +334,9 @@ const useStoryStore = create((set) => {
       storyName: string,
     ) {
       dispatch(actionEditBotRes(oreWord, newWord, actionName, storyName));
+    },
+    onEditExamples(intent: string, examples: string, storyName: string) {
+      dispatch(actionEditExamples(intent, examples, storyName));
     },
   };
 });

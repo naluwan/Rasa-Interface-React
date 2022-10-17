@@ -15,6 +15,10 @@ export type Action =
         actionName: string,
         storyName: string,
       },
+    }
+  | {
+      type: 'EDIT_EXAMPLES',
+      payload: { intent: string, examples: string, storyName: string },
     };
 
 export const actionSetAllData = (data: TrainDataType): Action => ({
@@ -44,4 +48,13 @@ export const actionEditBotRes = (
 ): Action => ({
   type: 'EDIT_BOT_RESPONSE',
   payload: { oriWord, newWord, actionName, storyName },
+});
+
+export const actionEditExamples = (
+  intent: string,
+  examples: string,
+  storyName: string,
+): Action => ({
+  type: 'EDIT_EXAMPLES',
+  payload: { intent, examples, storyName },
 });

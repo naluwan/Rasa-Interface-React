@@ -1,12 +1,7 @@
 /* eslint-disable no-shadow */
 import * as React from 'react';
 import useSWR from 'swr';
-import {
-  fetchAllData,
-  putExamples,
-  deleteStory,
-  postTrainData,
-} from 'services/api';
+import { fetchAllData, deleteStory, postAllTrainData } from 'services/api';
 import shallow from 'zustand/shallow';
 // eslint-disable-next-line no-unused-vars
 import type { State, StoryType } from 'components/types';
@@ -61,31 +56,6 @@ const Stories = () => {
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-
-  // 編輯使用者例句
-  const atEditExamples = React.useCallback(
-    (intent: string, examples: string, storyName: string) => {
-      putExamples(intent, examples, storyName).then((res) => {
-        if (res.status === 'success') {
-          fetchAllData()
-            .then((data) => onSetAllTrainData(data))
-            .then(() => {
-              onSetStory(storyName);
-              return Toast.fire({
-                icon: 'success',
-                title: '編輯成功',
-              });
-            });
-        }
-        Toast.fire({
-          icon: 'error',
-          title: '編輯失敗',
-          text: res.message,
-        });
-      });
-    },
-    [onSetStory, onSetAllTrainData],
-  );
 
   // 刪除故事
   const atDeleteStory = React.useCallback(
@@ -268,7 +238,7 @@ const Stories = () => {
       return step;
     });
 
-    return postTrainData(cloneData).then((res) => {
+    return postAllTrainData(cloneData).then((res) => {
       if (res.status !== 'success') {
         return Toast.fire({
           icon: 'error',
@@ -323,11 +293,7 @@ const Stories = () => {
         </div>
         <div id="data-panel" />
         {Object.keys(story).length !== 0 && (
-          <ShowStory
-            story={story}
-            onEditExamples={atEditExamples}
-            onDeleteStory={atDeleteStory}
-          />
+          <ShowStory story={story} onDeleteStory={atDeleteStory} />
         )}
         {create && (
           <CreateStory
