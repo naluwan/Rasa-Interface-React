@@ -1,3 +1,4 @@
+/* eslint-disable no-shadow */
 import * as React from 'react';
 import useSWR from 'swr';
 import {
@@ -38,7 +39,6 @@ const Stories = () => {
     onSetStory,
     onSetAllTrainData,
     onCreateNewStory,
-    onEditUserSay,
   } = useStoryStore((state: State) => {
     return {
       story: state.story,
@@ -49,7 +49,6 @@ const Stories = () => {
       onSetStory: state.onSetStory,
       onSetAllTrainData: state.onSetAllTrainData,
       onCreateNewStory: state.onCreateNewStory,
-      onEditUserSay: state.onEditUserSay,
     };
   }, shallow);
 
@@ -93,26 +92,6 @@ const Stories = () => {
       });
     },
     [onSetStory, onSetAllTrainData],
-  );
-
-  // 編輯使用者對話
-  const atEditUserSay = React.useCallback(
-    (oriUserSay: string, userSay: string, storyName: string) => {
-      onEditUserSay(oriUserSay, userSay, storyName);
-
-      postTrainData(cloneData).then((res) => {
-        if (res.status !== 'success') {
-          return Toast.fire({
-            icon: 'error',
-            title: '編輯失敗',
-            text: res.message,
-          });
-        }
-        onSetAllTrainData(res.data);
-        return onSetStory(storyName);
-      });
-    },
-    [onEditUserSay, cloneData, onSetStory, onSetAllTrainData],
   );
 
   // 刪除故事
@@ -276,7 +255,6 @@ const Stories = () => {
           <ShowStory
             story={story}
             onEditExamples={atEditExamples}
-            onEditUserSay={atEditUserSay}
             onDeleteStory={atDeleteStory}
           />
         )}

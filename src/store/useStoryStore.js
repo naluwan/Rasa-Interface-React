@@ -175,6 +175,7 @@ const reducer = (state: State, action: Action): State => {
     }
     case 'EDIT_USER_SAY': {
       const repeat = [];
+      const { onSetAllTrainData, onSetStory } = state;
       const { oriWord, newWord, storyName } = action.payload;
       state.cloneData.nlu.rasa_nlu_data.common_examples.map((nluItem) =>
         nluItem.text === newWord ? repeat.push(newWord) : nluItem,
@@ -202,18 +203,21 @@ const reducer = (state: State, action: Action): State => {
       });
 
       // 更改nlu訓練檔中所有意圖與原意圖相同的例句
-      const nlu = state.cloneData.nlu.rasa_nlu_data.common_examples.map(
-        (nluItem) => {
-          if (nluItem.text === oriWord) {
-            nluItem.text = newWord;
-            nluItem.intent = newWord;
-          }
-          if (nluItem.intent === oriWord && nluItem.text !== oriWord) {
-            nluItem.intent = newWord;
-          }
-          return nluItem;
+      const nlu = {
+        rasa_nlu_data: {
+          common_examples:
+            state.cloneData.nlu.rasa_nlu_data.common_examples.map((nluItem) => {
+              if (nluItem.text === oriWord) {
+                nluItem.text = newWord;
+                nluItem.intent = newWord;
+              }
+              if (nluItem.intent === oriWord && nluItem.text !== oriWord) {
+                nluItem.intent = newWord;
+              }
+              return nluItem;
+            }),
         },
-      );
+      };
 
       // 更改domain訓練檔中的意圖
       const intentIdx = state.cloneData.domain.intents.indexOf(oriWord);
@@ -228,10 +232,25 @@ const reducer = (state: State, action: Action): State => {
         nlu,
         stories,
       };
-      return {
-        ...state,
-        cloneData,
-      };
+
+      return postTrainData(cloneData).then((res) => {
+        if (res.status !== 'success') {
+          return Toast.fire({
+            icon: 'error',
+            title: '編輯失敗',
+            text: res.message,
+          });
+        }
+        Toast.fire({
+          icon: 'success',
+          title: '編輯使用者對話成功',
+        });
+        onSetAllTrainData(res.data);
+        onSetStory(storyName);
+        return {
+          ...state,
+        };
+      });
     }
     case 'EDIT_BOT_RESPONSE': {
       const { oriWord, newWord, actionName, storyName } = action.payload;
@@ -243,6 +262,7 @@ const reducer = (state: State, action: Action): State => {
       ) {
         domain.responses[actionName][0].text = newWord;
       }
+
       const cloneData = {
         ...state.cloneData,
         domain,
