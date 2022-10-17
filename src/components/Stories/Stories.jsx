@@ -1,12 +1,13 @@
+/* eslint-disable no-shadow */
 import * as React from 'react';
-// import useSWR from 'swr';
+import useSWR from 'swr';
 import {
   fetchAllData,
   putExamples,
-  putUserSay,
+  // putUserSay,
   putBotResponse,
   deleteStory,
-  postStory,
+  postTrainData,
 } from 'services/api';
 import shallow from 'zustand/shallow';
 // eslint-disable-next-line no-unused-vars
@@ -29,29 +30,42 @@ const Stories = () => {
    */
   const [defaultValue, setDefaultValue] = React.useState('');
   /**
-   * @type {[string, Function]}
-   */
-  // const [newStoryName, setNewStoryName] = React.useState('');
-  /**
    * @type {[StoryType, Function]}
    */
   const [newStory, setNewStory] = React.useState({});
-  const { story, stories, nlu, domain, onSetStory, onSetAllTrainData } =
-    useStoryStore((state: State) => {
-      return {
-        story: state.story,
-        stories: state.stories,
-        nlu: state.nlu,
-        domain: state.domain,
-        onSetStory: state.onSetStory,
-        onSetAllTrainData: state.onSetAllTrainData,
-      };
-    }, shallow);
+  const {
+    story,
+    stories,
+    nlu,
+    cloneData,
+    onSetStory,
+    onSetAllTrainData,
+    onCreateNewStory,
+    onEditUserSay,
+  } = useStoryStore((state: State) => {
+    return {
+      story: state.story,
+      stories: state.stories,
+      nlu: state.nlu,
+      domain: state.domain,
+      cloneData: state.cloneData,
+      onSetStory: state.onSetStory,
+      onSetAllTrainData: state.onSetAllTrainData,
+      onCreateNewStory: state.onCreateNewStory,
+      onEditUserSay: state.onEditUserSay,
+    };
+  }, shallow);
 
+  // 進入頁面打API要所有訓練資料
+  const { data } = useSWR('/api/getAllTrainData', fetchAllData);
   // 進入頁面獲取設定資料
   React.useEffect(() => {
-    fetchAllData().then((data) => onSetAllTrainData(data));
+    onSetAllTrainData(data);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [data]);
 
+  // 離開頁面將顯示故事刪除
+  React.useEffect(() => {
     // 離開頁面將story設為空
     return () => {
       onSetStory('');
@@ -87,26 +101,21 @@ const Stories = () => {
   // 編輯使用者對話
   const atEditUserSay = React.useCallback(
     (oriUserSay: string, userSay: string, storyName: string) => {
-      putUserSay(oriUserSay, userSay, storyName).then((res) => {
-        if (res.status === 'success') {
-          fetchAllData()
-            .then((data) => onSetAllTrainData(data))
-            .then(() => {
-              onSetStory(storyName);
-              return Toast.fire({
-                icon: 'success',
-                title: '編輯成功',
-              });
-            });
+      onEditUserSay(oriUserSay, userSay, storyName);
+
+      postTrainData(cloneData).then((res) => {
+        if (res.status !== 'success') {
+          return Toast.fire({
+            icon: 'error',
+            title: '編輯失敗',
+            text: res.message,
+          });
         }
-        Toast.fire({
-          icon: 'error',
-          title: '編輯失敗',
-          text: res.message,
-        });
+        onSetAllTrainData(res.data);
+        return onSetStory(storyName);
       });
     },
-    [onSetAllTrainData, onSetStory],
+    [onEditUserSay, cloneData, onSetStory, onSetAllTrainData],
   );
 
   // 編輯機器人回覆
@@ -166,12 +175,21 @@ const Stories = () => {
   // 選擇故事
   const atSelectStory = React.useCallback(
     (storyName: string) => {
+      if (Object.keys(newStory).length !== 0) {
+        return confirmWidget(newStory.story, null).then((result) => {
+          if (!result.isConfirmed) return;
+          onSetStory(storyName);
+          setCreate(false);
+          setDefaultValue(storyName);
+          setNewStory({});
+        });
+      }
       onSetStory(storyName);
       setCreate(false);
       setDefaultValue(storyName);
-      setNewStory({});
+      return setNewStory({});
     },
-    [onSetStory],
+    [onSetStory, newStory],
   );
 
   // 新增故事
@@ -224,97 +242,30 @@ const Stories = () => {
   }, [newStory, onSetStory, stories]);
 
   // 新增故事點擊儲存按鈕
-  const atClickSaveBtn = React.useCallback(() => {
-    const userStep = [];
-    const botStep = [];
-    // 驗證步驟是否正確
-    newStory.steps.map((step) =>
-      step.intent ? userStep.push(step) : botStep.push(step),
-    );
-    if (userStep.length === 0) {
-      return Toast.fire({
-        icon: 'warning',
-        title: '使用者對話是必填的',
+  const atClickSaveBtn = React.useCallback(
+    (story: StoryType) => {
+      // 資料更新
+      onCreateNewStory(story);
+
+      // 將修改過的cloneData打進API回資料庫
+      postTrainData(cloneData).then((res) => {
+        if (res.status !== 'success') {
+          return Toast.fire({
+            icon: 'error',
+            title: '新增資料異常',
+            text: res.message,
+          });
+        }
+        // 導回故事瀏覽頁面
+        onSetAllTrainData(res.data);
+        setCreate(false);
+        setNewStory({});
+        setDefaultValue(story.story);
+        return onSetStory(story.story);
       });
-    }
-    if (botStep.length === 0) {
-      return Toast.fire({
-        icon: 'warning',
-        title: '機器人回覆是必填的',
-      });
-    }
-
-    // 組成例句的訓練檔格式
-    const currentExamples = newStory.steps
-      .filter((step) => step.examples)
-      .map((step) => ({ intent: step.intent, examples: step.examples }));
-
-    // 將例句訓練檔放進nlu訓練檔中
-    // 將意圖放進domain訓練檔的intents中
-    currentExamples.map((exampleItem) => {
-      return exampleItem.examples.map((example) => {
-        return nlu.rasa_nlu_data.common_examples.push({
-          text: example,
-          intent: exampleItem.intent,
-          entities: [],
-        });
-      });
-    });
-
-    // 組成機器人回覆的訓練檔格式
-    const currentAction = newStory.steps
-      .filter((step) => step.action)
-      .map((step) => ({
-        action: step.action,
-        text: step.response,
-      }));
-
-    // 將機器人回覆放進domain訓練檔中
-    currentAction.map((actionItem) => {
-      domain.responses[actionItem.action] = [{ text: actionItem.text }];
-      return domain.actions.push(actionItem.action);
-    });
-
-    // 在完成儲存動作之前還需要newStory，所以需要深層複製，否則後面某些物件資料後，會有問題
-    const currentStory = JSON.parse(JSON.stringify(newStory));
-
-    // 組成故事流程的訓練檔格式
-    currentStory.steps = currentStory.steps.map((step) => {
-      if (step.intent) {
-        delete step.examples;
-      }
-      if (step.action) {
-        delete step.response;
-      }
-      return step;
-    });
-
-    // 將新增的故事放進stories訓練檔中
-    stories.push(currentStory);
-
-    currentStory.steps.map((step) => {
-      if (step.intent) {
-        nlu.rasa_nlu_data.common_examples.push({
-          text: step.user,
-          intent: step.intent,
-          entities: [],
-        });
-        domain.intents.push(step.intent);
-      }
-      return step;
-    });
-
-    // TODO:API接收後做接下來的回應
-    postStory({ stories, nlu, domain }).then((data) => {
-      console.log('stories post:', data);
-    });
-
-    // 導回故事瀏覽頁面
-    setCreate(false);
-    setNewStory({});
-    setDefaultValue(currentStory.story);
-    return onSetStory(currentStory.story);
-  }, [newStory, nlu, domain, stories, onSetStory]);
+    },
+    [onSetStory, cloneData, onCreateNewStory, onSetAllTrainData],
+  );
 
   return (
     <div>
@@ -361,7 +312,7 @@ const Stories = () => {
         {create && (
           <CreateStory
             storyName={newStory.story}
-            steps={newStory.steps}
+            newStory={newStory}
             onSetNewStory={setNewStory}
             nlu={nlu.rasa_nlu_data.common_examples}
             onClickSaveBtn={atClickSaveBtn}

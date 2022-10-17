@@ -5,24 +5,28 @@ import StepControl from './StepControl';
 import UserStep from '../UserStep';
 import BotStep from '../BotStep';
 // eslint-disable-next-line no-unused-vars
-import { StepsType, ExampleType } from '../types';
+import { StoryType, ExampleType } from '../types';
 
 type CreateStoryProps = {
   storyName: string,
-  steps: StepsType,
+  newStory: StoryType,
   nlu: ExampleType[],
   onSetNewStory: (story: StoryType) => void,
-  onClickSaveBtn: () => void,
+  onClickSaveBtn: (story: StoryType) => void,
 };
 
 const CreateStory: React.FC<CreateStoryProps> = (props) => {
-  const { storyName, steps, nlu, onSetNewStory, onClickSaveBtn } = props;
+  const { storyName, newStory, nlu, onSetNewStory, onClickSaveBtn } = props;
   const [isUser, setIsUser] = React.useState(false);
 
   React.useEffect(() => {
     // 雙驚嘆號為判斷是否存在，只返回boolean
-    setIsUser(steps.length ? !!steps[steps.length - 1].intent : false);
-  }, [setIsUser, steps]);
+    setIsUser(
+      newStory.steps.length
+        ? !!newStory.steps[newStory.steps.length - 1].intent
+        : false,
+    );
+  }, [setIsUser, newStory]);
 
   // 編輯使用者對話;
   const atEditUserSay = React.useCallback(
@@ -32,7 +36,7 @@ const CreateStory: React.FC<CreateStoryProps> = (props) => {
       nlu.map((nluItem) =>
         nluItem.text === userSay ? repeat.push(userSay) : nluItem,
       );
-      steps.map((step) =>
+      newStory.steps.map((step) =>
         step.user === userSay ? repeat.push(userSay) : step,
       );
       if (repeat.length) {
@@ -54,7 +58,7 @@ const CreateStory: React.FC<CreateStoryProps> = (props) => {
         };
       });
     },
-    [onSetNewStory, nlu, steps],
+    [onSetNewStory, nlu, newStory],
   );
 
   // 編輯例句
@@ -74,7 +78,7 @@ const CreateStory: React.FC<CreateStoryProps> = (props) => {
         );
 
         // 驗證目前新增故事
-        steps.map((step) => {
+        newStory.steps.map((step) => {
           if (step.user === example) {
             repeat.push(example);
           } else if (step.intent !== intent) {
@@ -109,7 +113,7 @@ const CreateStory: React.FC<CreateStoryProps> = (props) => {
         };
       });
     },
-    [onSetNewStory, nlu, steps],
+    [onSetNewStory, nlu, newStory],
   );
 
   // 編輯機器人回覆
@@ -141,14 +145,14 @@ const CreateStory: React.FC<CreateStoryProps> = (props) => {
         <button
           type="button"
           className="btn btn-secondary mx-4"
-          onClick={onClickSaveBtn}
+          onClick={() => onClickSaveBtn(newStory)}
         >
           儲存
         </button>
       </div>
       <div className={style.stepsPanel} id="stepsPanel">
-        {steps.length !== 0 &&
-          steps.map((step) => {
+        {newStory.steps.length !== 0 &&
+          newStory.steps.map((step) => {
             // 要先將值取出來，再當作props傳進去，React才會檢查到有改變需要重新render
             const { intent, user, entities, examples, action, response } = step;
             return step.intent ? (
@@ -173,7 +177,7 @@ const CreateStory: React.FC<CreateStoryProps> = (props) => {
         onSetNewStory={onSetNewStory}
         isUser={isUser}
         nlu={nlu}
-        steps={steps}
+        steps={newStory.steps}
       />
     </div>
   );

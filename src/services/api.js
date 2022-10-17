@@ -217,7 +217,10 @@ export const fetchAllAction = () => {
     });
 };
 
-export const postStory = (trainData: TrainDataType): Promise<TrainDataType> => {
+// 將訓練檔送回資料庫更新
+export const postTrainData = (
+  trainData: TrainDataType,
+): Promise<TrainDataType> => {
   return axiosInstance
     .post(`${API_URL}/stories/newStory`, trainData)
     .then(({ data }) => {

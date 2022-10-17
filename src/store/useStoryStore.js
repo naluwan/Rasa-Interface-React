@@ -10,12 +10,19 @@ import type {
   RegisterUserInfoType,
   TrainDataType,
   State,
+  StoryType,
 } from 'components/types';
 
 import type { Action } from 'actions';
-import { actionSetAllData, actionSetStory } from 'actions';
+import {
+  actionSetAllData,
+  actionSetStory,
+  actionCreateNewStory,
+  actionEditUserSay,
+} from 'actions';
 // import { computed } from 'zustand-middleware-computed-state';
 import { Toast } from 'utils/swalInput';
+import { cloneDeep } from 'lodash-es';
 
 const initialState = {
   isAppInitializedComplete: false,
@@ -25,6 +32,7 @@ const initialState = {
   story: {},
   nlu: {},
   domain: {},
+  cloneData: { stories: {}, nlu: {}, domain: {} },
 };
 
 const reducer = (state: State, action: Action): State => {
@@ -34,6 +42,7 @@ const reducer = (state: State, action: Action): State => {
         return {
           ...state,
           ...action.payload,
+          cloneData: cloneDeep(action.payload),
         };
       }
       return {
@@ -73,6 +82,153 @@ const reducer = (state: State, action: Action): State => {
       return {
         ...state,
         story,
+      };
+    }
+    case 'CREATE_NEW_STORY': {
+      const newStory = action.payload;
+      const userStep = [];
+      const botStep = [];
+      const { cloneData } = state;
+      // 驗證步驟是否正確
+      newStory.steps.map((step) =>
+        step.intent ? userStep.push(step) : botStep.push(step),
+      );
+      if (userStep.length === 0) {
+        return Toast.fire({
+          icon: 'warning',
+          title: '使用者對話是必填的',
+        });
+      }
+      if (botStep.length === 0) {
+        return Toast.fire({
+          icon: 'warning',
+          title: '機器人回覆是必填的',
+        });
+      }
+      // 組成例句的訓練檔格式
+      const currentExamples = newStory.steps
+        .filter((step) => step.examples)
+        .map((step) => ({ intent: step.intent, examples: step.examples }));
+
+      // 將例句訓練檔放進nlu訓練檔中
+      // 將意圖放進domain訓練檔的intents中
+      currentExamples.map((exampleItem) => {
+        return exampleItem.examples.map((example) => {
+          return cloneData.nlu.rasa_nlu_data.common_examples.push({
+            text: example,
+            intent: exampleItem.intent,
+            entities: [],
+          });
+        });
+      });
+
+      // 組成機器人回覆的訓練檔格式
+      const currentAction = newStory.steps
+        .filter((step) => step.action)
+        .map((step) => ({
+          action: step.action,
+          text: step.response,
+        }));
+
+      // 將機器人回覆放進domain訓練檔中
+      currentAction.map((actionItem) => {
+        cloneData.domain.responses[actionItem.action] = [
+          { text: actionItem.text },
+        ];
+        return cloneData.domain.actions.push(actionItem.action);
+      });
+
+      // 在完成儲存動作之前還需要newStory，所以需要深層複製，否則後面某些物件資料後，會有問題
+      const cloneNewStory = cloneDeep(newStory);
+
+      // 組成故事流程的訓練檔格式
+      cloneNewStory.steps = cloneNewStory.steps.map((step) => {
+        if (step.intent) {
+          delete step.examples;
+        }
+        if (step.action) {
+          delete step.response;
+        }
+        return step;
+      });
+
+      cloneData.stories.push(cloneNewStory);
+
+      // 將使用者對話加入nlu和domain訓練檔中
+      cloneNewStory.steps.map((step) => {
+        if (step.intent) {
+          cloneData.nlu.rasa_nlu_data.common_examples.push({
+            text: step.user,
+            intent: step.intent,
+            entities: [],
+          });
+          cloneData.domain.intents.push(step.intent);
+        }
+        return step;
+      });
+      return {
+        ...state,
+        cloneData,
+      };
+    }
+    case 'EDIT_USER_SAY': {
+      const repeat = [];
+      const { oriWord, newWord, storyName } = action.payload;
+      state.nlu.rasa_nlu_data.common_examples.map((nluItem) =>
+        nluItem.text === newWord ? repeat.push(newWord) : nluItem,
+      );
+
+      if (repeat.length) {
+        return Toast.fire({
+          icon: 'warning',
+          title: `使用者對話『${newWord}』重複`,
+        });
+      }
+
+      // 更改stories訓練檔的使用者對話
+      const stories = state.cloneData.stories.map((item) => {
+        if (item.story === storyName) {
+          item.steps.map((step) => {
+            if (step.user === oriWord) {
+              step.user = newWord;
+              step.intent = newWord;
+            }
+            return step;
+          });
+        }
+        return item;
+      });
+
+      // 更改nlu訓練檔中所有意圖與原意圖相同的例句
+      const nlu = state.cloneData.nlu.rasa_nlu_data.common_examples.map(
+        (nluItem) => {
+          if (nluItem.text === oriWord) {
+            nluItem.text = newWord;
+            nluItem.intent = newWord;
+          }
+          if (nluItem.intent === oriWord && nluItem.text !== oriWord) {
+            nluItem.intent = newWord;
+          }
+          return nluItem;
+        },
+      );
+
+      // 更改domain訓練檔中的意圖
+      const intentIdx = state.cloneData.domain.intents.indexOf(oriWord);
+      const domain = {
+        ...state.cloneData.domain,
+        intents: state.cloneData.domain.intents.splice(intentIdx, 1, newWord),
+      };
+
+      const cloneData = {
+        ...state.cloneData,
+        domain,
+        nlu,
+        stories,
+      };
+      return {
+        ...state,
+        cloneData,
       };
     }
     default:
@@ -137,6 +293,12 @@ const useStoryStore = create((set) => {
     },
     onSetStory(storyName: string) {
       dispatch(actionSetStory(storyName));
+    },
+    onCreateNewStory(newStory: StoryType) {
+      dispatch(actionCreateNewStory(newStory));
+    },
+    onEditUserSay(oriWord: string, newWord: string, storyName: string) {
+      dispatch(actionEditUserSay(oriWord, newWord, storyName));
     },
   };
 });
