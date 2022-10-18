@@ -11,6 +11,7 @@ import type {
   RegisterUserInfoType,
   TrainDataType,
   State,
+  StoryType,
 } from 'components/types';
 
 import type { Action } from 'actions';
@@ -20,6 +21,7 @@ import {
   actionEditUserSay,
   actionEditBotRes,
   actionEditExamples,
+  actionSetDeleteStory,
 } from 'actions';
 // import { computed } from 'zustand-middleware-computed-state';
 import { Toast } from 'utils/swalInput';
@@ -34,7 +36,7 @@ const initialState = {
   nlu: {},
   domain: {},
   cloneData: { stories: {}, nlu: {}, domain: {} },
-  deleteStory: {},
+  deletedStory: {},
 };
 
 const reducer = (state: State, action: Action): State => {
@@ -262,6 +264,12 @@ const reducer = (state: State, action: Action): State => {
         };
       });
     }
+    case 'SET_DELETE_STORY': {
+      return {
+        ...state,
+        deletedStory: action.payload,
+      };
+    }
     default:
       return state;
   }
@@ -338,6 +346,9 @@ const useStoryStore = create((set) => {
     },
     onEditExamples(intent: string, examples: string, storyName: string) {
       dispatch(actionEditExamples(intent, examples, storyName));
+    },
+    onSetDeleteStory(deleteStory: StoryType) {
+      dispatch(actionSetDeleteStory(deleteStory));
     },
   };
 });

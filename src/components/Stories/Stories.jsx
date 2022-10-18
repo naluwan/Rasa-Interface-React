@@ -27,18 +27,28 @@ const Stories = () => {
    * @type {[StoryType, Function]}
    */
   const [newStory, setNewStory] = React.useState({});
-  const { story, stories, nlu, cloneData, onSetStory, onSetAllTrainData } =
-    useStoryStore((state: State) => {
-      return {
-        story: state.story,
-        stories: state.stories,
-        nlu: state.nlu,
-        domain: state.domain,
-        cloneData: state.cloneData,
-        onSetStory: state.onSetStory,
-        onSetAllTrainData: state.onSetAllTrainData,
-      };
-    }, shallow);
+  const {
+    story,
+    stories,
+    nlu,
+    cloneData,
+    deletedStory,
+    onSetStory,
+    onSetDeleteStory,
+    onSetAllTrainData,
+  } = useStoryStore((state: State) => {
+    return {
+      story: state.story,
+      stories: state.stories,
+      nlu: state.nlu,
+      domain: state.domain,
+      cloneData: state.cloneData,
+      deletedStory: state.deletedStory,
+      onSetStory: state.onSetStory,
+      onSetDeleteStory: state.onSetDeleteStory,
+      onSetAllTrainData: state.onSetAllTrainData,
+    };
+  }, shallow);
 
   // 進入頁面打API要所有訓練資料
   const { data } = useSWR('/api/getAllTrainData', fetchAllData);
@@ -60,19 +70,23 @@ const Stories = () => {
   // 刪除故事
   const atDeleteStory = React.useCallback(
     (storyName: string) => {
-      console.log('before:', cloneData);
+      // 詢問確認刪除
       confirmWidget(storyName, 'delete').then((result) => {
         if (!result.isConfirmed) return;
 
+        // 將刪除的故事取出來
         const deleteStory = cloneData.stories.filter(
           (item) => item.story === storyName,
         )[0];
 
+        // 篩選出不是要刪除的故事
         const deleteIdx = cloneData.stories.indexOf(deleteStory);
         cloneData.stories.splice(deleteIdx, 1);
 
         const intentArr = [];
         const actionArr = [];
+
+        // 將要刪除故事的使用者例句和機器人回覆組回去，並將要刪除故事的action和意圖取出
         deleteStory.steps.map((step) => {
           if (step.action) {
             step.response = cloneData.domain.responses[
@@ -93,6 +107,7 @@ const Stories = () => {
           return step;
         });
 
+        // 刪除nlu訓練檔中的例句
         intentArr.map((intent) => {
           for (
             let i = 0;
@@ -115,6 +130,7 @@ const Stories = () => {
           return intent;
         });
 
+        // 刪除domain訓練檔中的actions和機器人回覆
         actionArr.map((deleteAction) => {
           return cloneData.domain.actions.map((domainAction, idx) => {
             if (domainAction === deleteAction) {
@@ -124,6 +140,7 @@ const Stories = () => {
           });
         });
 
+        // 發送API更新資料庫資料
         postAllTrainData(cloneData).then((res) => {
           if (res.status !== 'success') {
             return Toast.fire({
@@ -139,11 +156,12 @@ const Stories = () => {
           });
           onSetAllTrainData(res.data);
           setDefaultValue('');
-          return onSetStory('');
+          onSetStory('');
+          return onSetDeleteStory(deleteStory);
         });
       });
     },
-    [onSetAllTrainData, onSetStory, cloneData],
+    [onSetAllTrainData, onSetStory, onSetDeleteStory, cloneData],
   );
 
   // 選擇故事
@@ -322,6 +340,15 @@ const Stories = () => {
     [onSetStory, onSetAllTrainData, cloneData],
   );
 
+  // 恢復刪除故事(只能恢復最後一筆資料)
+  const atRecoverDeletedStory = React.useCallback(
+    (deleteStory: StoryType) => {
+      atClickSaveBtn(deleteStory);
+      onSetDeleteStory({});
+    },
+    [onSetDeleteStory, atClickSaveBtn],
+  );
+
   return (
     <div>
       <div>
@@ -351,12 +378,26 @@ const Stories = () => {
                   新增故事流程
                 </MyButton>
               </div>
+              {Object.keys(deletedStory).length > 0 && (
+                <div className={cx('btn', style.navbar)}>
+                  <MyButton
+                    variant="primary"
+                    onClick={() => atRecoverDeletedStory(deletedStory)}
+                  >
+                    恢復刪除
+                  </MyButton>
+                </div>
+              )}
             </div>
           </div>
         </div>
         <div id="data-panel" />
-        {Object.keys(story).length !== 0 && (
-          <ShowStory story={story} onDeleteStory={atDeleteStory} />
+        {Object.keys(story).length > 0 && (
+          <ShowStory
+            story={story}
+            onDeleteStory={atDeleteStory}
+            onRecoverDeletedStory={atClickSaveBtn}
+          />
         )}
         {create && (
           <CreateStory

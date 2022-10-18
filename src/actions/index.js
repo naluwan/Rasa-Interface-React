@@ -1,4 +1,4 @@
-import type { TrainDataType } from 'components/types';
+import type { TrainDataType, StoryType } from 'components/types';
 
 export type Action =
   | { type: 'SET_STORY', payload: string }
@@ -19,6 +19,10 @@ export type Action =
   | {
       type: 'EDIT_EXAMPLES',
       payload: { intent: string, examples: string, storyName: string },
+    }
+  | {
+      type: 'SET_DELETE_STORY',
+      payload: StoryType,
     };
 
 export const actionSetAllData = (data: TrainDataType): Action => ({
@@ -57,4 +61,9 @@ export const actionEditExamples = (
 ): Action => ({
   type: 'EDIT_EXAMPLES',
   payload: { intent, examples, storyName },
+});
+
+export const actionSetDeleteStory = (deleteStory: StoryType): Action => ({
+  type: 'SET_DELETE_STORY',
+  payload: deleteStory,
 });
