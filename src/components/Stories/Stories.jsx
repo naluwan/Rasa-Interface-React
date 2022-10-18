@@ -401,6 +401,7 @@ const Stories = () => {
         )}
         {create && (
           <CreateStory
+            isCreate={create}
             newStory={newStory}
             onSetNewStory={setNewStory}
             nlu={nlu.rasa_nlu_data.common_examples}

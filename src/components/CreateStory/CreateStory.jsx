@@ -7,6 +7,7 @@ import BotStep from '../BotStep';
 import type { StoryType, ExampleType } from '../types';
 
 type CreateStoryProps = {
+  isCreate: boolean,
   newStory: StoryType,
   nlu: ExampleType[],
   onSetNewStory: (story: StoryType) => void,
@@ -14,7 +15,7 @@ type CreateStoryProps = {
 };
 
 const CreateStory: React.FC<CreateStoryProps> = (props) => {
-  const { newStory, nlu, onSetNewStory, onClickSaveBtn } = props;
+  const { isCreate, newStory, nlu, onSetNewStory, onClickSaveBtn } = props;
   const [isUser, setIsUser] = React.useState(false);
 
   React.useEffect(() => {
@@ -136,6 +137,34 @@ const CreateStory: React.FC<CreateStoryProps> = (props) => {
     [onSetNewStory],
   );
 
+  // 刪除使用者步驟
+  const atRemoveUserStep = React.useCallback(
+    (intent: string, userSay: string) => {
+      return onSetNewStory((prev) => {
+        return {
+          ...prev,
+          steps: prev.steps.filter(
+            (step) => step.intent !== intent && step.user !== userSay,
+          ),
+        };
+      });
+    },
+    [onSetNewStory],
+  );
+
+  // 刪除機器人步驟
+  const atRemoveBotStep = React.useCallback(
+    (action: string) => {
+      return onSetNewStory((prev) => {
+        return {
+          ...prev,
+          steps: prev.steps.filter((step) => step.action !== action),
+        };
+      });
+    },
+    [onSetNewStory],
+  );
+
   return (
     <div className={style.root}>
       <div className="col d-flex align-items-center">
@@ -156,17 +185,21 @@ const CreateStory: React.FC<CreateStoryProps> = (props) => {
             return step.intent ? (
               <UserStep
                 key={step.intent}
+                isCreate={isCreate}
                 step={{ intent, user, entities, examples }}
                 storyName={newStory.story}
                 onEditUserSay={atEditUserSay}
                 onEditExamples={atEditExamples}
+                onRemoveUserStep={atRemoveUserStep}
               />
             ) : (
               <BotStep
                 key={step.action}
+                isCreate={isCreate}
                 step={{ action, response }}
                 storyName={newStory.story}
                 onEditBotRes={atEditBotRes}
+                onRemoveBotStep={atRemoveBotStep}
               />
             );
           })}

@@ -5,6 +5,7 @@ import type { StepsType } from '../types';
 import { swalInput } from '../../utils/swalInput';
 
 type UserStepProps = {
+  isCreate: boolean,
   step: StepsType,
   storyName: string,
   onEditExamples: (
@@ -17,10 +18,18 @@ type UserStepProps = {
     userSay: string,
     storyName?: string,
   ) => void,
+  onRemoveUserStep: (intent: string, userSay: string) => void,
 };
 
 const UserStep: React.FC<UserStepProps> = (props) => {
-  const { step, storyName, onEditExamples, onEditUserSay } = props;
+  const {
+    isCreate,
+    step,
+    storyName,
+    onEditExamples,
+    onEditUserSay,
+    onRemoveUserStep,
+  } = props;
   const showIntent =
     step.intent === 'get_started' ? '打開聊天室窗' : step.intent;
 
@@ -80,6 +89,15 @@ const UserStep: React.FC<UserStepProps> = (props) => {
           >
             例句
           </button>
+          {isCreate && (
+            <button
+              type="button"
+              className="btn btn-danger mx-2"
+              onClick={() => onRemoveUserStep(step.intent, step.user)}
+            >
+              刪除
+            </button>
+          )}
         </div>
       </div>
     </div>

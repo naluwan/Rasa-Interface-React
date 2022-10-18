@@ -6,16 +6,18 @@ import { swalInput } from '../../utils/swalInput';
 type BotStepProps = {
   step: StepsType,
   storyName: string,
+  isCreate: boolean,
   onEditBotRes: (
     oriBotRes: string,
     botRes: string,
     action: string,
     storyName?: string,
   ) => void,
+  onRemoveBotStep: (action: string) => void,
 };
 
 const BotStep: React.FC<BotStepProps> = (props) => {
-  const { step, storyName, onEditBotRes } = props;
+  const { isCreate, step, storyName, onEditBotRes, onRemoveBotStep } = props;
   const textAreaRef = React.useRef();
 
   // textarea 自適應高度
@@ -63,6 +65,15 @@ const BotStep: React.FC<BotStepProps> = (props) => {
           >
             編輯
           </button>
+          {isCreate && (
+            <button
+              type="button"
+              className="btn btn-danger mx-2"
+              onClick={() => onRemoveBotStep(step.action)}
+            >
+              刪除
+            </button>
+          )}
         </div>
       </div>
     </div>
