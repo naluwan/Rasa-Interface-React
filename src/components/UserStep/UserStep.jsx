@@ -3,6 +3,7 @@ import cx from 'classnames';
 import style from './UserStep.module.scss';
 import type { StepsType } from '../types';
 import { swalInput } from '../../utils/swalInput';
+// import useStoryStore from '../../store/useStoryStore';
 
 type UserStepProps = {
   isCreate: boolean,
