@@ -79,6 +79,58 @@ const reducer = (state: State, action: Action): State => {
               '\\r',
             ),
           );
+
+          // 獲取回覆資料
+          const botRes = state.cloneData.domain.responses[step.action][0];
+
+          // 判斷是否有按鈕
+          if (botRes.buttons) {
+            const buttons = [];
+            const buttonStory = [];
+            let intent = '';
+
+            // 將按鈕故事篩選出來
+            botRes.buttons.map((button) => {
+              intent = button.payload.replace(/\//g, '');
+              return state.cloneData.stories.map((item) =>
+                item.story === `button_${intent}`
+                  ? buttonStory.push(item)
+                  : item,
+              );
+            });
+
+            // 假使按鈕是回覆另外一段故事
+            state.cloneData.stories.map((item) =>
+              item.story === intent ? buttonStory.push(item) : item,
+            );
+
+            // 重組按鈕資料
+            buttonStory.map((item) => {
+              const button = {};
+              item.steps.map((itemStep) => {
+                if (itemStep.action) {
+                  button.buttonAction = itemStep.action;
+                }
+                if (itemStep.intent) {
+                  button.title = itemStep.intent;
+                  button.payload = itemStep.intent;
+                }
+                return itemStep;
+              });
+              return buttons.push(button);
+            });
+
+            // 獲取按鈕回覆文字
+            buttons.map((curButton) => {
+              curButton.reply =
+                state.cloneData.domain.responses[
+                  curButton.buttonAction
+                ][0].text;
+              return curButton;
+            });
+
+            step.buttons = buttons;
+          }
         }
         if (step.intent) {
           const examples = state.nlu.rasa_nlu_data.common_examples.filter(
