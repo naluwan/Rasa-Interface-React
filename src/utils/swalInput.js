@@ -77,3 +77,28 @@ export const confirmWidget = (storyName: string, type: string) => {
       return result;
     });
 };
+
+export const swalMultipleInput = async (
+  title: string,
+  oriTitle: string,
+  oriReply: string,
+  showCancelButton: boolean,
+) => {
+  const { value: formValue } = await Swal.fire({
+    title,
+    html: `
+      <input id="title" class="swal2-input col-9" value="${oriTitle}" placeholder="請輸入選項名稱">
+      <input id="payload" class="swal2-input col-9" style="display:none;" value="${`/${oriTitle}`}" placeholder="">
+      <textarea id="reply" class="swal2-textarea col-9" placeholder="請輸入選項回覆">${oriReply}</textarea>
+      `,
+    showCancelButton,
+    preConfirm: () => {
+      return {
+        title: document.querySelector('#title').value,
+        reply: document.querySelector('#reply').value,
+        oriPayload: document.querySelector('#payload').value,
+      };
+    },
+  });
+  return formValue;
+};

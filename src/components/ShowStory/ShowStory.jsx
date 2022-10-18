@@ -40,7 +40,15 @@ const ShowStory: React.FC<ShowStoryProps> = (props) => {
       </div>
       <div className={style.stepsPanel}>
         {story.steps.map((step) => {
-          const { intent, user, entities, examples, action, response } = step;
+          const {
+            intent,
+            user,
+            entities,
+            examples,
+            action,
+            response,
+            buttons,
+          } = step;
           return step.intent ? (
             <UserStep
               key={step.intent}
@@ -52,7 +60,7 @@ const ShowStory: React.FC<ShowStoryProps> = (props) => {
           ) : (
             <BotStep
               key={step.action}
-              step={{ action, response }}
+              step={{ action, response, buttons }}
               storyName={story.story}
               onEditBotRes={onEditBotRes}
             />

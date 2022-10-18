@@ -66,13 +66,7 @@ const UserStep: React.FC<UserStepProps> = (props) => {
   return (
     <div className="row" id="userStep">
       <div className="col-6">
-        <div className="d-flex align-items-center pt-3">
-          <div className={style.userTitle}>使用者:</div>
-          <div className={style.userText}>
-            {step.user ? step.user : showIntent}
-          </div>
-        </div>
-        <div className={cx('pt-2')}>
+        <div className={cx('py-2')}>
           <button
             type="button"
             className="btn btn-info mx-2"
@@ -98,6 +92,12 @@ const UserStep: React.FC<UserStepProps> = (props) => {
               刪除
             </button>
           )}
+        </div>
+        <div className="d-flex align-items-center pt-2">
+          <div className={style.userTitle}>使用者:</div>
+          <div className={style.userText}>
+            {step.user ? step.user : showIntent}
+          </div>
         </div>
       </div>
     </div>
