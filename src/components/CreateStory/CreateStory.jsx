@@ -10,12 +10,14 @@ type CreateStoryProps = {
   isCreate: boolean,
   newStory: StoryType,
   nlu: ExampleType[],
+  actions: string[],
   onSetNewStory: (story: StoryType) => void,
   onClickSaveBtn: (story: StoryType) => void,
 };
 
 const CreateStory: React.FC<CreateStoryProps> = (props) => {
-  const { isCreate, newStory, nlu, onSetNewStory, onClickSaveBtn } = props;
+  const { isCreate, newStory, nlu, actions, onSetNewStory, onClickSaveBtn } =
+    props;
   /**
    * @type {[boolean, Function]}
    */
@@ -299,6 +301,7 @@ const CreateStory: React.FC<CreateStoryProps> = (props) => {
         isUser={isUser}
         nlu={nlu}
         steps={newStory.steps}
+        actions={actions}
       />
     </div>
   );

@@ -22,6 +22,7 @@ import {
   actionEditBotRes,
   actionEditExamples,
   actionSetDeleteStory,
+  actionSetAllAction,
 } from 'actions';
 // import { computed } from 'zustand-middleware-computed-state';
 import { Toast } from 'utils/swalInput';
@@ -37,15 +38,22 @@ const initialState = {
   domain: {},
   cloneData: { stories: {}, nlu: {}, domain: {} },
   deletedStory: {},
+  actions: [],
+  storiesOptions: [],
 };
 
 const reducer = (state: State, action: Action): State => {
   switch (action.type) {
     case 'SET_ALL_TRAIN_DATA': {
       if (action.payload) {
+        const { stories } = action.payload;
+        const filteredStories = stories.filter(
+          (item) => !item.story.includes('button_'),
+        );
         return {
           ...state,
           ...action.payload,
+          storiesOptions: filteredStories,
           cloneData: cloneDeep(action.payload),
         };
       }
@@ -270,6 +278,12 @@ const reducer = (state: State, action: Action): State => {
         deletedStory: action.payload,
       };
     }
+    case 'SET_ALL_ACTION': {
+      return {
+        ...state,
+        actions: action.payload,
+      };
+    }
     default:
       return state;
   }
@@ -349,6 +363,9 @@ const useStoryStore = create((set) => {
     },
     onSetDeleteStory(deleteStory: StoryType) {
       dispatch(actionSetDeleteStory(deleteStory));
+    },
+    onSetAllAction(action: string[]) {
+      dispatch(actionSetAllAction(action));
     },
   };
 });

@@ -9,11 +9,12 @@ type StepControlType = {
   isUser: boolean,
   nlu: ExampleType[],
   steps: StepsType,
+  actions: string[],
   onSetNewStory: (story: StoryType) => void,
 };
 
 const StepControl: React.FC<StepControlType> = (props) => {
-  const { isUser, nlu, onSetNewStory, steps } = props;
+  const { isUser, nlu, onSetNewStory, steps, actions } = props;
   /**
    * @type {[string, Function]}
    */
@@ -63,19 +64,18 @@ const StepControl: React.FC<StepControlType> = (props) => {
   const atBotStep = React.useCallback(
     (botRes: string) => {
       if (!botRes) return;
-      randomBotResAction().then((actionName) => {
-        onSetNewStory((prev) => {
-          return {
-            ...prev,
-            steps: prev.steps.concat([
-              { action: actionName, response: botRes },
-            ]),
-          };
-        });
+      const actionName = randomBotResAction(actions);
+
+      onSetNewStory((prev) => {
+        return {
+          ...prev,
+          steps: prev.steps.concat([{ action: actionName, response: botRes }]),
+        };
       });
+
       setConversation('');
     },
-    [onSetNewStory],
+    [onSetNewStory, actions],
   );
 
   return (
@@ -91,6 +91,7 @@ const StepControl: React.FC<StepControlType> = (props) => {
         <button
           className="btn btn-primary mx-1"
           onClick={() => atBotStep(conversation)}
+          disabled={!isUser}
         >
           機器人
         </button>

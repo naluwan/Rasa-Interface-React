@@ -161,6 +161,7 @@ const BotStep: React.FC<BotStepProps> = (props) => {
             const { title, payload, reply } = button;
             return (
               <ButtonItems
+                key={payload}
                 title={title}
                 payload={payload}
                 reply={reply}

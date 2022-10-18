@@ -1,6 +1,6 @@
 import * as React from 'react';
 import useSWR from 'swr';
-import { fetchAllData, postAllTrainData } from 'services/api';
+import { fetchAllData, postAllTrainData, fetchAllAction } from 'services/api';
 import shallow from 'zustand/shallow';
 // eslint-disable-next-line no-unused-vars
 import type { State, StoryType } from 'components/types';
@@ -10,6 +10,7 @@ import { Toast, confirmWidget, swalInput } from 'utils/swalInput';
 import MyButton from 'components/MyButton';
 import CreateStory from 'components/CreateStory';
 import { cloneDeep } from 'lodash-es';
+import { randomBotResAction } from 'utils/randomBotResAction';
 import style from './Stories.module.scss';
 import useStoryStore from '../../store/useStoryStore';
 
@@ -32,9 +33,12 @@ const Stories = () => {
     nlu,
     cloneData,
     deletedStory,
+    actions,
+    storiesOptions,
     onSetStory,
     onSetDeleteStory,
     onSetAllTrainData,
+    onSetAllAction,
   } = useStoryStore((state: State) => {
     return {
       story: state.story,
@@ -43,9 +47,12 @@ const Stories = () => {
       domain: state.domain,
       cloneData: state.cloneData,
       deletedStory: state.deletedStory,
+      actions: state.actions,
+      storiesOptions: state.storiesOptions,
       onSetStory: state.onSetStory,
       onSetDeleteStory: state.onSetDeleteStory,
       onSetAllTrainData: state.onSetAllTrainData,
+      onSetAllAction: state.onSetAllAction,
     };
   }, shallow);
 
@@ -202,6 +209,7 @@ const Stories = () => {
               });
               return;
             }
+            fetchAllAction().then((actionData) => onSetAllAction(actionData));
             setNewStory({ story: createStoryName, steps: [] });
             onSetStory('');
             setCreate(true);
@@ -224,13 +232,14 @@ const Stories = () => {
           });
           return;
         }
+        fetchAllAction().then((actionData) => onSetAllAction(actionData));
         setNewStory({ story: createStoryName, steps: [] });
         onSetStory('');
         setCreate(true);
         setDefaultValue('');
       },
     );
-  }, [newStory, onSetStory, stories]);
+  }, [newStory, onSetStory, stories, onSetAllAction]);
 
   // 新增故事點擊儲存按鈕
   const atClickSaveBtn = React.useCallback(
@@ -239,8 +248,10 @@ const Stories = () => {
       const userStep = [];
       const botStep = [];
       // 驗證步驟是否正確
-      createStory.steps.map((step) =>
-        step.intent ? userStep.push(step) : botStep.push(step),
+      createStory.steps.map((step, idx) =>
+        step.intent
+          ? userStep.push({ step, idx })
+          : botStep.push({ step, idx }),
       );
       if (userStep.length === 0) {
         return Toast.fire({
@@ -252,6 +263,22 @@ const Stories = () => {
         return Toast.fire({
           icon: 'warning',
           title: '機器人回覆是必填的',
+        });
+      }
+
+      // 驗證故事流程順序
+      let curIdx = 0;
+      const isRightProcess = userStep.every((step) => {
+        if (step.idx !== curIdx) {
+          return false;
+        }
+        curIdx += 2;
+        return true;
+      });
+      if (!isRightProcess) {
+        return Toast.fire({
+          icon: 'error',
+          title: '無法同時有兩個使用者對話，請重新嘗試',
         });
       }
       // 組成例句的訓練檔格式
@@ -274,17 +301,83 @@ const Stories = () => {
       // 組成機器人回覆的訓練檔格式
       const currentAction = createStory.steps
         .filter((step) => step.action)
-        .map((step) => ({
-          action: step.action,
-          text: step.response,
-        }));
+        .map((step) => {
+          const buttons = [];
+          if (step.buttons) {
+            step.buttons.map((button) =>
+              buttons.push({
+                title: button.title,
+                payload: button.payload,
+                reply: button.reply,
+              }),
+            );
+          }
+          return {
+            action: step.action,
+            text: step.response,
+            buttons,
+          };
+        });
 
+      const cloneAction = cloneDeep(currentAction);
       // 將機器人回覆放進domain訓練檔中
-      currentAction.map((actionItem) => {
-        cloneData.domain.responses[actionItem.action] = [
-          { text: actionItem.text },
-        ];
+      cloneAction.map((actionItem) => {
+        if (actionItem.buttons.length) {
+          actionItem.buttons.map((button) => delete button.reply);
+          cloneData.domain.responses[actionItem.action] = [
+            { text: actionItem.text, buttons: actionItem.buttons },
+          ];
+        } else {
+          cloneData.domain.responses[actionItem.action] = [
+            { text: actionItem.text },
+          ];
+        }
         return cloneData.domain.actions.push(actionItem.action);
+      });
+
+      currentAction.map((actionItem) => {
+        console.log('currentAction button length:', actionItem.buttons.length);
+        if (actionItem.buttons.length) {
+          const repeat = [];
+          actionItem.buttons.map((button) => {
+            const intent = button.payload.replace(/\//g, '');
+            console.log('button intent:', intent);
+            console.log(
+              'cloneData.nlu.rasa_nlu_data.common_examples',
+              cloneData.nlu.rasa_nlu_data.common_examples,
+            );
+            cloneData.nlu.rasa_nlu_data.common_examples.map((nluItem) => {
+              if (nluItem.intent === intent) {
+                repeat.push(intent);
+              }
+              return nluItem;
+            });
+            if (!repeat.length) {
+              console.log('repeat length:', repeat.length);
+              const reply = JSON.parse(
+                JSON.stringify(button.reply).replace(/ \\n/g, '\\r'),
+              );
+              cloneData.nlu.rasa_nlu_data.common_examples.push({
+                text: button.title,
+                intent,
+                entities: [],
+              });
+              const actionName = randomBotResAction(actions);
+              console.log('actionName:', actionName);
+              cloneData.stories.push({
+                story: `button_${intent}`,
+                steps: [
+                  { user: button.title, intent, entities: [] },
+                  { action: actionName },
+                ],
+              });
+              cloneData.domain.actions.push(actionName);
+              cloneData.domain.responses[actionName] = [{ text: reply }];
+            }
+            return button;
+          });
+        }
+        return actionItem;
       });
 
       // 在完成儲存動作之前還需要newStory，所以需要深層複製，否則後面某些物件資料後，會有問題
@@ -297,6 +390,7 @@ const Stories = () => {
         }
         if (step.action) {
           delete step.response;
+          delete step.buttons;
         }
         return step;
       });
@@ -336,7 +430,7 @@ const Stories = () => {
         return onSetStory(createStory.story);
       });
     },
-    [onSetStory, onSetAllTrainData, cloneData],
+    [onSetStory, onSetAllTrainData, cloneData, actions],
   );
 
   // 恢復刪除故事(只能恢復最後一筆資料)
@@ -365,8 +459,8 @@ const Stories = () => {
                 <option value="" disabled hidden>
                   請選擇
                 </option>
-                {stories &&
-                  stories.map((item) => (
+                {storiesOptions &&
+                  storiesOptions.map((item) => (
                     <option key={item.story} value={item.story}>
                       {item.story}
                     </option>
@@ -402,8 +496,9 @@ const Stories = () => {
           <CreateStory
             isCreate={create}
             newStory={newStory}
-            onSetNewStory={setNewStory}
             nlu={nlu.rasa_nlu_data.common_examples}
+            actions={actions}
+            onSetNewStory={setNewStory}
             onClickSaveBtn={atClickSaveBtn}
           />
         )}

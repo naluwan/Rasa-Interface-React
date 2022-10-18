@@ -23,6 +23,10 @@ export type Action =
   | {
       type: 'SET_DELETE_STORY',
       payload: StoryType,
+    }
+  | {
+      type: 'SET_ALL_ACTION',
+      payload: string[],
     };
 
 export const actionSetAllData = (data: TrainDataType): Action => ({
@@ -66,4 +70,9 @@ export const actionEditExamples = (
 export const actionSetDeleteStory = (deleteStory: StoryType): Action => ({
   type: 'SET_DELETE_STORY',
   payload: deleteStory,
+});
+
+export const actionSetAllAction = (allAction: string[]): Action => ({
+  type: 'SET_ALL_ACTION',
+  payload: allAction,
 });

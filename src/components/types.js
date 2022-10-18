@@ -89,6 +89,7 @@ export type State = {
   story: StoryType,
   cloneData: TrainDataType,
   deletedStory: StoryType,
+  actions: string[],
   // actions
   init: () => void,
   onLogin: (email: string, password: string) => void,
@@ -105,4 +106,5 @@ export type State = {
     storyName: string,
   ) => void,
   onEditExamples: (intent: string, examples: string, storyName: string) => void,
+  onSetAllAction: (action: string[]) => void,
 };
