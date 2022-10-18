@@ -48,6 +48,9 @@ const forgetButton = () => {
 };
 
 const Login = () => {
+  /**
+   * @type {[{email:string,password:string}, Function]}
+   */
   const [accountInfo, setAccountInfo] = React.useState({
     email: '',
     password: '',

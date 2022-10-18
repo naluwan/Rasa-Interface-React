@@ -16,6 +16,9 @@ type CreateStoryProps = {
 
 const CreateStory: React.FC<CreateStoryProps> = (props) => {
   const { isCreate, newStory, nlu, onSetNewStory, onClickSaveBtn } = props;
+  /**
+   * @type {[boolean, Function]}
+   */
   const [isUser, setIsUser] = React.useState(false);
 
   React.useEffect(() => {

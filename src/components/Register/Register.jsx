@@ -188,9 +188,6 @@ const Register = () => {
             >
               註冊
             </MyButton>
-            {/* <button type="submit" className="btn">
-                註冊
-              </button> */}
           </div>
         </form>
         <div className={style.account}>

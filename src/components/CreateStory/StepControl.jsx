@@ -13,7 +13,6 @@ type StepControlType = {
 };
 
 const StepControl: React.FC<StepControlType> = (props) => {
-  // eslint-disable-next-line no-unused-vars
   const { isUser, nlu, onSetNewStory, steps } = props;
   /**
    * @type {[string, Function]}

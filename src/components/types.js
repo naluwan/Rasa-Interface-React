@@ -87,6 +87,8 @@ export type State = {
   domain: DomainType,
   nlu: NluType,
   story: StoryType,
+  cloneData: TrainDataType,
+  deletedStory: StoryType,
   // actions
   init: () => void,
   onLogin: (email: string, password: string) => void,
@@ -94,4 +96,13 @@ export type State = {
   onRegister: (userInfo: RegisterUserInfoType) => void,
   onSetAllTrainData: (data: TrainDataType) => void,
   onSetStory: (storyName: string) => void,
+  onSetDeleteStory: (deleteStory: StoryType) => void,
+  onEditUserSay: (oriWord: string, newWord: string, storyName: string) => void,
+  onEditBotRes: (
+    oreWord: string,
+    newWord: string,
+    actionName: string,
+    storyName: string,
+  ) => void,
+  onEditExamples: (intent: string, examples: string, storyName: string) => void,
 };

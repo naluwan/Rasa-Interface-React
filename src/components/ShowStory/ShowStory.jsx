@@ -8,18 +8,6 @@ import useStoryStore from '../../store/useStoryStore';
 
 type ShowStoryProps = {
   story: StoryType,
-  onEditExamples: (intent: string, examples: string, storyName: string) => void,
-  onEditUserSay: (
-    oriUserSay: string,
-    userSay: string,
-    storyName: string,
-  ) => void,
-  onEditBotRes: (
-    oriBotRes: string,
-    botRes: string,
-    storyName: string,
-    action: string,
-  ) => void,
   onDeleteStory: (storyName: string) => void,
 };
 
