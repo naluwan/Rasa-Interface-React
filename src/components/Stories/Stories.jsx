@@ -336,44 +336,32 @@ const Stories = () => {
       });
 
       currentAction.map((actionItem) => {
-        console.log('currentAction button length:', actionItem.buttons.length);
         if (actionItem.buttons.length) {
-          const repeat = [];
           actionItem.buttons.map((button) => {
             const intent = button.payload.replace(/\//g, '');
-            console.log('button intent:', intent);
-            console.log(
-              'cloneData.nlu.rasa_nlu_data.common_examples',
-              cloneData.nlu.rasa_nlu_data.common_examples,
-            );
             cloneData.nlu.rasa_nlu_data.common_examples.map((nluItem) => {
-              if (nluItem.intent === intent) {
-                repeat.push(intent);
+              if (nluItem.intent !== intent) {
+                const reply = JSON.parse(
+                  JSON.stringify(button.reply).replace(/ \\n/g, '\\r'),
+                );
+                cloneData.nlu.rasa_nlu_data.common_examples.push({
+                  text: button.title,
+                  intent,
+                  entities: [],
+                });
+                const actionName = randomBotResAction(actions);
+                cloneData.stories.push({
+                  story: `button_${intent}`,
+                  steps: [
+                    { user: button.title, intent, entities: [] },
+                    { action: actionName },
+                  ],
+                });
+                cloneData.domain.actions.push(actionName);
+                cloneData.domain.responses[actionName] = [{ text: reply }];
               }
               return nluItem;
             });
-            if (!repeat.length) {
-              console.log('repeat length:', repeat.length);
-              const reply = JSON.parse(
-                JSON.stringify(button.reply).replace(/ \\n/g, '\\r'),
-              );
-              cloneData.nlu.rasa_nlu_data.common_examples.push({
-                text: button.title,
-                intent,
-                entities: [],
-              });
-              const actionName = randomBotResAction(actions);
-              console.log('actionName:', actionName);
-              cloneData.stories.push({
-                story: `button_${intent}`,
-                steps: [
-                  { user: button.title, intent, entities: [] },
-                  { action: actionName },
-                ],
-              });
-              cloneData.domain.actions.push(actionName);
-              cloneData.domain.responses[actionName] = [{ text: reply }];
-            }
             return button;
           });
         }
