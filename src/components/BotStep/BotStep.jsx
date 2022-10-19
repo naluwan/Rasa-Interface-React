@@ -77,7 +77,7 @@ const BotStep: React.FC<BotStepProps> = (props) => {
     (action: string) => {
       return swalMultipleInput('新增機器人回覆選項', '', '', true).then(
         (data) => {
-          if (!data || !data.title || !data.reply) return;
+          if (!data || !data.title) return;
           const payload = `/${data.title}`;
           onAddResButtons(action, data.title, payload, data.reply);
         },
@@ -158,13 +158,14 @@ const BotStep: React.FC<BotStepProps> = (props) => {
         </div>
         {step.buttons?.length > 0 &&
           step.buttons.map((button) => {
-            const { title, payload, reply } = button;
+            const { title, payload, reply, disabled } = button;
             return (
               <ButtonItems
                 key={payload}
                 title={title}
                 payload={payload}
                 reply={reply}
+                disabled={disabled}
                 onEditResButtons={atEditResButtons}
                 onRemoveResButton={atRemoveResButton}
               />

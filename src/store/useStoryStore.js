@@ -92,22 +92,33 @@ const reducer = (state: State, action: Action): State => {
             // 將按鈕故事篩選出來
             botRes.buttons.map((button) => {
               intent = button.payload.replace(/\//g, '');
-              return state.cloneData.stories.map((item) =>
-                item.story === `button_${intent}`
-                  ? buttonStory.push(item)
-                  : item,
-              );
+              return state.cloneData.stories.map((item) => {
+                if (item.story === `button_${intent}`) {
+                  buttonStory.push(item);
+                } else {
+                  item.steps.map((buttonStep) => {
+                    if (buttonStep.intent) {
+                      if (buttonStep.intent === intent) {
+                        item.intentStory = true;
+                        buttonStory.push(item);
+                      }
+                    }
+                    return buttonStep;
+                  });
+                }
+                return item;
+              });
             });
 
-            // 假使按鈕是回覆另外一段故事
-            state.cloneData.stories.map((item) =>
-              item.story === intent ? buttonStory.push(item) : item,
-            );
+            console.log('stories button:', buttonStory);
 
             // 重組按鈕資料
             buttonStory.map((item) => {
               const button = {};
               item.steps.map((itemStep) => {
+                if (item.intentStory) {
+                  button.disabled = true;
+                }
                 if (itemStep.action) {
                   button.buttonAction = itemStep.action;
                 }

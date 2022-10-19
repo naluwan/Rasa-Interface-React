@@ -11,7 +11,14 @@ type ButtonItemsProps = {
 };
 
 const ButtonItems: React.FC<ButtonItemsProps> = (props) => {
-  const { title, payload, reply, onEditResButtons, onRemoveResButton } = props;
+  const {
+    title,
+    payload,
+    reply,
+    disabled,
+    onEditResButtons,
+    onRemoveResButton,
+  } = props;
 
   // textarea 自適應高度
   const buttonTextareaRef = React.useRef();
@@ -28,6 +35,7 @@ const ButtonItems: React.FC<ButtonItemsProps> = (props) => {
           <button
             className="btn btn-primary"
             onClick={() => onEditResButtons(title, reply)}
+            disabled={disabled}
           >
             {title}
           </button>
