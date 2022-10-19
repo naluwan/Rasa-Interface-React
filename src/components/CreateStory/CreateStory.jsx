@@ -177,7 +177,17 @@ const CreateStory: React.FC<CreateStoryProps> = (props) => {
         const steps = prev.steps.map((step) => {
           if (step.action === action) {
             if (step.buttons) {
-              step.buttons.push({ title, payload, reply });
+              const isExist = step.buttons.some(
+                (button) => button.title === title,
+              );
+              if (isExist) {
+                Toast.fire({
+                  icon: 'warning',
+                  title: '此選項已存在',
+                });
+              } else {
+                step.buttons.push({ title, payload, reply });
+              }
             } else {
               step.buttons = [{ title, payload, reply }];
             }
