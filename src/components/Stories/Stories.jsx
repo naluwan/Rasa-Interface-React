@@ -93,21 +93,37 @@ const Stories = () => {
         const actionArr = [];
 
         // 將要刪除故事的使用者例句和機器人回覆組回去，並將要刪除故事的action和意圖取出
-        deleteStory.steps.map((step) => {
+        story.steps.map((step) => {
           if (step.action) {
-            step.response = cloneData.domain.responses[
-              step.action
-            ][0].text.replace(/ {2}\\n/g, '\\r');
             actionArr.push(step.action);
+            /*
+            刪除按鈕資訊
+            1.刪除domain訓練檔中按鈕回覆的action和意圖
+            2.刪除nlu訓練檔中按鈕回覆的例句
+            3.刪除stories訓練檔中按鈕的story
+            */
+            if (step.buttons) {
+              step.buttons.map((button) => {
+                // 如果是自建的選項才需要此步驟，如果是選項是回覆現有故事流程中的故事就不用
+                if (!button.disabled) {
+                  actionArr.push(button.buttonAction);
+                  intentArr.push(button.payload);
+                }
+                const allStoryName = cloneData.stories.map(
+                  (item) => item.story,
+                );
+                const buttonStoryIdx = allStoryName.indexOf(
+                  `button_${button.title}`,
+                );
+                if (buttonStoryIdx !== -1) {
+                  cloneData.stories.splice(buttonStoryIdx, 1);
+                }
+                return button;
+              });
+            }
           }
 
           if (step.intent) {
-            const examples = cloneData.nlu.rasa_nlu_data.common_examples.filter(
-              (nluItem) =>
-                nluItem.intent === step.intent && nluItem.text !== step.intent,
-            );
-            const currentExamples = examples.map((example) => example.text);
-            step.examples = currentExamples;
             intentArr.push(step.intent);
           }
           return step;
@@ -162,12 +178,12 @@ const Stories = () => {
           });
           onSetAllTrainData(res.data);
           setDefaultValue('');
-          onSetStory('');
-          return onSetDeleteStory(deleteStory);
+          onSetDeleteStory(story);
+          return onSetStory('');
         });
       });
     },
-    [onSetAllTrainData, onSetStory, onSetDeleteStory, cloneData],
+    [onSetAllTrainData, onSetStory, onSetDeleteStory, cloneData, story],
   );
 
   // 選擇故事
