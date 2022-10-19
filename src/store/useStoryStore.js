@@ -364,8 +364,10 @@ const reducer = (state: State, action: Action): State => {
         ...state.cloneData,
       };
 
+      // 如果按鈕標題有更改
       if (title !== curOriPayload) {
         const stories = state.cloneData.stories.map((item) => {
+          // 將stories訓練檔中按鈕故事更改意圖與對話
           if (item.story === `button_${curOriPayload}`) {
             item.story = `button_${title}`;
             item.steps.map((step) => {
@@ -379,6 +381,7 @@ const reducer = (state: State, action: Action): State => {
           return item;
         });
 
+        // 將nlu訓練檔中的按鈕例句更改
         const nlu = {
           rasa_nlu_data: {
             common_examples:
@@ -394,6 +397,7 @@ const reducer = (state: State, action: Action): State => {
           },
         };
 
+        // 將domain訓練檔中responses的按鈕標題和payload更改
         const { domain } = state.cloneData;
 
         domain.responses[actionName][0].buttons.map((button) => {
@@ -404,6 +408,7 @@ const reducer = (state: State, action: Action): State => {
           return button;
         });
 
+        // 將domain訓練檔中intents的按鈕意圖更改
         const intentIdx = domain.intents.indexOf(curOriPayload);
         domain.intents.splice(intentIdx, 1, title);
 
@@ -416,6 +421,7 @@ const reducer = (state: State, action: Action): State => {
         JSON.stringify(reply).replace(/\\r\\n/g, '  \\n'),
       );
 
+      // 將domain訓練檔中responses的按鈕回覆做更改
       const { domain } = cloneData;
       if (domain.responses[buttonActionName][0].text !== currentReply) {
         domain.responses[buttonActionName][0].text = currentReply;
@@ -423,21 +429,30 @@ const reducer = (state: State, action: Action): State => {
 
       cloneData.domain = domain;
 
-      return postAllTrainData(cloneData).then((res) => {
-        if (res.status !== 'success') {
-          return Toast.fire({
-            icon: 'error',
-            title: '編輯按鈕選項失敗',
-            text: res.message,
+      // 如果有按鈕標題或回覆內容有更改才送API
+      if (
+        title !== curOriPayload ||
+        state.domain.responses[buttonActionName][0].text !== currentReply
+      ) {
+        return postAllTrainData(cloneData).then((res) => {
+          if (res.status !== 'success') {
+            return Toast.fire({
+              icon: 'error',
+              title: '編輯按鈕選項失敗',
+              text: res.message,
+            });
+          }
+          Toast.fire({
+            icon: 'success',
+            title: '編輯按鈕選項成功',
           });
-        }
-        Toast.fire({
-          icon: 'success',
-          title: '編輯按鈕選項成功',
+          onSetAllTrainData(res.data);
+          return onSetStory(storyName);
         });
-        onSetAllTrainData(res.data);
-        return onSetStory(storyName);
-      });
+      }
+      return {
+        ...state,
+      };
     }
     default:
       return state;
