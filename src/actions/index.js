@@ -39,6 +39,16 @@ export type Action =
         storyName: string,
         buttonActionName: string,
       },
+    }
+  | {
+      type: 'REMOVE_RES_BUTTON',
+      payload: {
+        actionName: string,
+        payload: string,
+        storyName: string,
+        buttonActionName: string,
+        disabled: boolean,
+      },
     };
 
 export const actionSetAllData = (data: TrainDataType): Action => ({
@@ -108,4 +118,15 @@ export const actionEditResButtons = (
     storyName,
     buttonActionName,
   },
+});
+
+export const actionRemoveResButton = (
+  actionName: string,
+  payload: string,
+  storyName: string,
+  buttonActionName: string,
+  disabled: boolean,
+): Action => ({
+  type: 'REMOVE_RES_BUTTON',
+  payload: { actionName, payload, storyName, buttonActionName, disabled },
 });

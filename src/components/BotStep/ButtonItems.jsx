@@ -8,8 +8,17 @@ type ButtonItemsProps = {
   reply: string,
   disabled: boolean,
   buttonAction: string,
-  onEditResButtons: (title: string, reply: string) => void,
-  onRemoveResButton: (title: string, payload: string) => void,
+  onEditResButtons: (
+    title: string,
+    reply: string,
+    buttonActionName?: string,
+  ) => void,
+  onRemoveResButton: (
+    title: string,
+    payload: string,
+    buttonActionName?: string,
+    disabled?: boolean,
+  ) => void,
 };
 
 const ButtonItems: React.FC<ButtonItemsProps> = (props) => {
@@ -44,7 +53,9 @@ const ButtonItems: React.FC<ButtonItemsProps> = (props) => {
           </button>
           <button
             className="btn btn-danger"
-            onClick={() => onRemoveResButton(title, payload)}
+            onClick={() =>
+              onRemoveResButton(title, payload, buttonAction, disabled)
+            }
           >
             刪除
           </button>

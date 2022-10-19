@@ -24,6 +24,7 @@ import {
   actionSetDeleteStory,
   actionSetAllAction,
   actionEditResButtons,
+  actionRemoveResButton,
 } from 'actions';
 // import { computed } from 'zustand-middleware-computed-state';
 import { Toast } from 'utils/swalInput';
@@ -127,6 +128,7 @@ const reducer = (state: State, action: Action): State => {
                 }
                 return itemStep;
               });
+              delete item.intentStory;
               return buttons.push(button);
             });
 
@@ -231,10 +233,7 @@ const reducer = (state: State, action: Action): State => {
           title: '編輯使用者對話成功',
         });
         onSetAllTrainData(res.data);
-        onSetStory(storyName);
-        return {
-          ...state,
-        };
+        return onSetStory(storyName);
       });
     }
     case 'EDIT_BOT_RESPONSE': {
@@ -265,10 +264,7 @@ const reducer = (state: State, action: Action): State => {
           title: '編輯機器人回覆成功',
         });
         onSetAllTrainData(res.data);
-        onSetStory(storyName);
-        return {
-          ...state,
-        };
+        return onSetStory(storyName);
       });
     }
     case 'EDIT_EXAMPLES': {
@@ -328,10 +324,7 @@ const reducer = (state: State, action: Action): State => {
           title: '編輯使用者例句成功',
         });
         onSetAllTrainData(res.data);
-        onSetStory(storyName);
-        return {
-          ...state,
-        };
+        return onSetStory(storyName);
       });
     }
     case 'SET_DELETE_STORY': {
@@ -454,6 +447,70 @@ const reducer = (state: State, action: Action): State => {
         ...state,
       };
     }
+    case 'REMOVE_RES_BUTTON': {
+      const { actionName, payload, storyName, buttonActionName, disabled } =
+        action.payload;
+
+      const { onSetAllTrainData, onSetStory } = state;
+
+      const cloneData = {
+        ...state.cloneData,
+      };
+
+      if (!disabled) {
+        const storyNames = cloneData.stories.map((item) => item.story);
+        cloneData.stories.splice(storyNames.indexOf(`button_${payload}`), 1);
+
+        const nluItems = cloneData.nlu.rasa_nlu_data.common_examples.map(
+          (nluItem) => nluItem.text,
+        );
+        cloneData.nlu.rasa_nlu_data.common_examples.splice(
+          nluItems.indexOf(payload),
+          1,
+        );
+
+        delete cloneData.domain.responses[buttonActionName];
+
+        const buttonTexts = cloneData.domain.responses[
+          actionName
+        ][0].buttons.map((button) => button.title);
+
+        cloneData.domain.responses[actionName][0].buttons.splice(
+          buttonTexts.indexOf(payload),
+          1,
+        );
+
+        cloneData.domain.intents.splice(
+          cloneData.domain.intents.indexOf(payload),
+          1,
+        );
+      } else {
+        const buttonTexts = cloneData.domain.responses[
+          actionName
+        ][0].buttons.map((button) => button.title);
+
+        cloneData.domain.responses[actionName][0].buttons.splice(
+          buttonTexts.indexOf(payload),
+          1,
+        );
+      }
+
+      return postAllTrainData(cloneData).then((res) => {
+        if (res.status !== 'success') {
+          return Toast.fire({
+            icon: 'error',
+            title: '刪除按鈕選項失敗',
+            text: res.message,
+          });
+        }
+        Toast.fire({
+          icon: 'success',
+          title: '刪除按鈕選項成功',
+        });
+        onSetAllTrainData(res.data);
+        return onSetStory(storyName);
+      });
+    }
     default:
       return state;
   }
@@ -555,6 +612,23 @@ const useStoryStore = create((set) => {
           reply,
           storyName,
           buttonActionName,
+        ),
+      );
+    },
+    onRemoveResButton(
+      actionName: string,
+      payload: string,
+      storyName: string,
+      buttonActionName: string,
+      disabled: boolean,
+    ) {
+      dispatch(
+        actionRemoveResButton(
+          actionName,
+          payload,
+          storyName,
+          buttonActionName,
+          disabled,
         ),
       );
     },

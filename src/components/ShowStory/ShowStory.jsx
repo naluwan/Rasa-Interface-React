@@ -13,15 +13,21 @@ type ShowStoryProps = {
 
 const ShowStory: React.FC<ShowStoryProps> = (props) => {
   const { story, onDeleteStory } = props;
-  const { onEditBotRes, onEditUserSay, onEditExamples, onEditResButtons } =
-    useStoryStore((state: State) => {
-      return {
-        onEditBotRes: state.onEditBotRes,
-        onEditUserSay: state.onEditUserSay,
-        onEditExamples: state.onEditExamples,
-        onEditResButtons: state.onEditResButtons,
-      };
-    }, shallow);
+  const {
+    onEditBotRes,
+    onEditUserSay,
+    onEditExamples,
+    onEditResButtons,
+    onRemoveResButton,
+  } = useStoryStore((state: State) => {
+    return {
+      onEditBotRes: state.onEditBotRes,
+      onEditUserSay: state.onEditUserSay,
+      onEditExamples: state.onEditExamples,
+      onEditResButtons: state.onEditResButtons,
+      onRemoveResButton: state.onRemoveResButton,
+    };
+  }, shallow);
 
   return (
     <div className={style.root}>
@@ -63,6 +69,7 @@ const ShowStory: React.FC<ShowStoryProps> = (props) => {
               storyName={story.story}
               onEditBotRes={onEditBotRes}
               onEditResButtons={onEditResButtons}
+              onRemoveResButton={onRemoveResButton}
             />
           );
         })}

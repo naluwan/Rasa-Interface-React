@@ -107,4 +107,20 @@ export type State = {
   ) => void,
   onEditExamples: (intent: string, examples: string, storyName: string) => void,
   onSetAllAction: (action: string[]) => void,
+  onEditResButtons: (
+    actionName: string,
+    title: string,
+    oriPayload: string,
+    payload: string,
+    reply: string,
+    storyName: string,
+    buttonActionName: string,
+  ) => void,
+  onRemoveResButton: (
+    actionName: string,
+    payload: string,
+    storyName: string,
+    buttonActionName: string,
+    disabled: boolean,
+  ) => void,
 };

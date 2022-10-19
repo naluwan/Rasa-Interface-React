@@ -112,13 +112,24 @@ const BotStep: React.FC<BotStepProps> = (props) => {
 
   // 刪除機器人選項
   const atRemoveResButton = React.useCallback(
-    (title: string, payload: string) => {
+    (
+      title: string,
+      payload: string,
+      buttonActionName: string,
+      disabled: boolean,
+    ) => {
       return confirmWidget(title, 'delete').then((result) => {
         if (!result.isConfirmed) return;
-        onRemoveResButton(step.action, payload);
+        onRemoveResButton(
+          step.action,
+          payload,
+          storyName,
+          buttonActionName,
+          disabled,
+        );
       });
     },
-    [onRemoveResButton, step.action],
+    [onRemoveResButton, step.action, storyName],
   );
 
   return (
