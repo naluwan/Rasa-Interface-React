@@ -281,6 +281,37 @@ const Stories = () => {
           title: '無法同時有兩個使用者對話，請重新嘗試',
         });
       }
+
+      // 在完成儲存動作之前還需要newStory，所以需要深層複製，否則後面某些物件資料後，會有問題
+      const cloneNewStory = cloneDeep(createStory);
+
+      // 組成故事流程的訓練檔格式
+      cloneNewStory.steps = cloneNewStory.steps.map((step) => {
+        if (step.intent) {
+          delete step.examples;
+        }
+        if (step.action) {
+          delete step.response;
+          delete step.buttons;
+        }
+        return step;
+      });
+
+      cloneData.stories.push(cloneNewStory);
+
+      // 將使用者對話加入nlu和domain訓練檔中
+      cloneNewStory.steps.map((step) => {
+        if (step.intent) {
+          cloneData.nlu.rasa_nlu_data.common_examples.push({
+            text: step.user,
+            intent: step.intent,
+            entities: [],
+          });
+          cloneData.domain.intents.push(step.intent);
+        }
+        return step;
+      });
+
       // 組成例句的訓練檔格式
       const currentExamples = createStory.steps
         .filter((step) => step.examples)
@@ -319,9 +350,12 @@ const Stories = () => {
           };
         });
 
+      // 需要操作currentAction，所以必須要深拷貝一份
       const cloneAction = cloneDeep(currentAction);
+
       // 將機器人回覆放進domain訓練檔中
       cloneAction.map((actionItem) => {
+        // 放進按鈕回覆
         if (actionItem.buttons.length) {
           actionItem.buttons.map((button) => delete button.reply);
           cloneData.domain.responses[actionItem.action] = [
@@ -335,67 +369,42 @@ const Stories = () => {
         return cloneData.domain.actions.push(actionItem.action);
       });
 
+      // 將按鈕意圖加入nlu訓練檔中
       currentAction.map((actionItem) => {
         if (actionItem.buttons.length) {
           actionItem.buttons.map((button) => {
             const intent = button.payload.replace(/\//g, '');
-            cloneData.nlu.rasa_nlu_data.common_examples.map((nluItem) => {
-              if (nluItem.intent !== intent) {
-                const reply = JSON.parse(
-                  JSON.stringify(button.reply).replace(/ \\n/g, '\\r'),
-                );
-                cloneData.nlu.rasa_nlu_data.common_examples.push({
-                  text: button.title,
-                  intent,
-                  entities: [],
-                });
-                const actionName = randomBotResAction(actions);
-                cloneData.stories.push({
-                  story: `button_${intent}`,
-                  steps: [
-                    { user: button.title, intent, entities: [] },
-                    { action: actionName },
-                  ],
-                });
-                cloneData.domain.actions.push(actionName);
-                cloneData.domain.responses[actionName] = [{ text: reply }];
-              }
-              return nluItem;
-            });
+
+            // 按鈕只需要新增沒有相同意圖的就好，因為同意圖，代表是要回答現有的故事流程回答
+            if (
+              cloneData.nlu.rasa_nlu_data.common_examples.some(
+                (nluItem) => nluItem.intent !== intent,
+              )
+            ) {
+              const reply = JSON.parse(
+                JSON.stringify(button.reply).replace(/ \\n/g, '\\r'),
+              );
+              cloneData.nlu.rasa_nlu_data.common_examples.push({
+                text: button.title,
+                intent,
+                entities: [],
+              });
+              const actionName = randomBotResAction(actions);
+              cloneData.stories.push({
+                story: `button_${intent}`,
+                steps: [
+                  { user: button.title, intent, entities: [] },
+                  { action: actionName },
+                ],
+              });
+              cloneData.domain.actions.push(actionName);
+              cloneData.domain.responses[actionName] = [{ text: reply }];
+              cloneData.domain.intents.push(button.intent);
+            }
             return button;
           });
         }
         return actionItem;
-      });
-
-      // 在完成儲存動作之前還需要newStory，所以需要深層複製，否則後面某些物件資料後，會有問題
-      const cloneNewStory = cloneDeep(createStory);
-
-      // 組成故事流程的訓練檔格式
-      cloneNewStory.steps = cloneNewStory.steps.map((step) => {
-        if (step.intent) {
-          delete step.examples;
-        }
-        if (step.action) {
-          delete step.response;
-          delete step.buttons;
-        }
-        return step;
-      });
-
-      cloneData.stories.push(cloneNewStory);
-
-      // 將使用者對話加入nlu和domain訓練檔中
-      cloneNewStory.steps.map((step) => {
-        if (step.intent) {
-          cloneData.nlu.rasa_nlu_data.common_examples.push({
-            text: step.user,
-            intent: step.intent,
-            entities: [],
-          });
-          cloneData.domain.intents.push(step.intent);
-        }
-        return step;
       });
 
       return postAllTrainData(cloneData).then((res) => {
