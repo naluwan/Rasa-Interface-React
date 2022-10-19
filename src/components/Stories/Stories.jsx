@@ -398,7 +398,7 @@ const Stories = () => {
               )
             ) {
               const reply = JSON.parse(
-                JSON.stringify(button.reply).replace(/ \\n/g, '\\r'),
+                JSON.stringify(button.reply).replace(/\\r\\n/g, '  \\n'),
               );
               cloneData.nlu.rasa_nlu_data.common_examples.push({
                 text: button.title,
@@ -415,7 +415,7 @@ const Stories = () => {
               });
               cloneData.domain.actions.push(actionName);
               cloneData.domain.responses[actionName] = [{ text: reply }];
-              cloneData.domain.intents.push(button.payload);
+              cloneData.domain.intents.push(intent);
             }
             return button;
           });

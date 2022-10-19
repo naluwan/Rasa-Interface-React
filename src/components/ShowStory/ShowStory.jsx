@@ -13,16 +13,15 @@ type ShowStoryProps = {
 
 const ShowStory: React.FC<ShowStoryProps> = (props) => {
   const { story, onDeleteStory } = props;
-  const { onEditBotRes, onEditUserSay, onEditExamples } = useStoryStore(
-    (state: State) => {
+  const { onEditBotRes, onEditUserSay, onEditExamples, onEditResButtons } =
+    useStoryStore((state: State) => {
       return {
         onEditBotRes: state.onEditBotRes,
         onEditUserSay: state.onEditUserSay,
         onEditExamples: state.onEditExamples,
+        onEditResButtons: state.onEditResButtons,
       };
-    },
-    shallow,
-  );
+    }, shallow);
 
   return (
     <div className={style.root}>
@@ -63,6 +62,7 @@ const ShowStory: React.FC<ShowStoryProps> = (props) => {
               step={{ action, response, buttons }}
               storyName={story.story}
               onEditBotRes={onEditBotRes}
+              onEditResButtons={onEditResButtons}
             />
           );
         })}

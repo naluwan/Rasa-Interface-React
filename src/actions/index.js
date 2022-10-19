@@ -27,6 +27,18 @@ export type Action =
   | {
       type: 'SET_ALL_ACTION',
       payload: string[],
+    }
+  | {
+      type: 'EDIT_RES_BUTTONS',
+      payload: {
+        actionName: string,
+        title: string,
+        oriPayload: string,
+        payload: string,
+        reply: string,
+        storyName: string,
+        buttonActionName: string,
+      },
     };
 
 export const actionSetAllData = (data: TrainDataType): Action => ({
@@ -75,4 +87,25 @@ export const actionSetDeleteStory = (deleteStory: StoryType): Action => ({
 export const actionSetAllAction = (allAction: string[]): Action => ({
   type: 'SET_ALL_ACTION',
   payload: allAction,
+});
+
+export const actionEditResButtons = (
+  actionName: string,
+  title: string,
+  oriPayload: string,
+  payload: string,
+  reply: string,
+  storyName: string,
+  buttonActionName: string,
+): Action => ({
+  type: 'EDIT_RES_BUTTONS',
+  payload: {
+    actionName,
+    title,
+    oriPayload,
+    payload,
+    reply,
+    storyName,
+    buttonActionName,
+  },
 });

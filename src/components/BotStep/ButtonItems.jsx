@@ -6,6 +6,8 @@ type ButtonItemsProps = {
   title: string,
   payload: string,
   reply: string,
+  disabled: boolean,
+  buttonAction: string,
   onEditResButtons: (title: string, reply: string) => void,
   onRemoveResButton: (title: string, payload: string) => void,
 };
@@ -16,6 +18,7 @@ const ButtonItems: React.FC<ButtonItemsProps> = (props) => {
     payload,
     reply,
     disabled,
+    buttonAction,
     onEditResButtons,
     onRemoveResButton,
   } = props;
@@ -34,7 +37,7 @@ const ButtonItems: React.FC<ButtonItemsProps> = (props) => {
         <h5 className="card-title d-flex justify-content-between">
           <button
             className="btn btn-primary"
-            onClick={() => onEditResButtons(title, reply)}
+            onClick={() => onEditResButtons(title, reply, buttonAction)}
             disabled={disabled}
           >
             {title}

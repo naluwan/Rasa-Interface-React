@@ -23,6 +23,7 @@ import {
   actionEditExamples,
   actionSetDeleteStory,
   actionSetAllAction,
+  actionEditResButtons,
 } from 'actions';
 // import { computed } from 'zustand-middleware-computed-state';
 import { Toast } from 'utils/swalInput';
@@ -109,8 +110,6 @@ const reducer = (state: State, action: Action): State => {
                 return item;
               });
             });
-
-            console.log('stories button:', buttonStory);
 
             // 重組按鈕資料
             buttonStory.map((item) => {
@@ -347,6 +346,99 @@ const reducer = (state: State, action: Action): State => {
         actions: action.payload,
       };
     }
+    case 'EDIT_RES_BUTTONS': {
+      const {
+        actionName,
+        title,
+        oriPayload,
+        payload,
+        reply,
+        storyName,
+        buttonActionName,
+      } = action.payload;
+
+      const { onSetAllTrainData, onSetStory } = state;
+      const curOriPayload = oriPayload.replace(/\//g, '');
+
+      const cloneData = {
+        ...state.cloneData,
+      };
+
+      if (title !== curOriPayload) {
+        const stories = state.cloneData.stories.map((item) => {
+          if (item.story === `button_${curOriPayload}`) {
+            item.story = `button_${title}`;
+            item.steps.map((step) => {
+              if (step.intent) {
+                step.user = title;
+                step.intent = title;
+              }
+              return step;
+            });
+          }
+          return item;
+        });
+
+        const nlu = {
+          rasa_nlu_data: {
+            common_examples:
+              state.cloneData.nlu.rasa_nlu_data.common_examples.map(
+                (nluItem) => {
+                  if (nluItem.intent === curOriPayload) {
+                    nluItem.text = title;
+                    nluItem.intent = title;
+                  }
+                  return nluItem;
+                },
+              ),
+          },
+        };
+
+        const { domain } = state.cloneData;
+
+        domain.responses[actionName][0].buttons.map((button) => {
+          if (button.payload === oriPayload) {
+            button.title = title;
+            button.payload = `${payload}`;
+          }
+          return button;
+        });
+
+        const intentIdx = domain.intents.indexOf(curOriPayload);
+        domain.intents.splice(intentIdx, 1, title);
+
+        cloneData.stories = stories;
+        cloneData.nlu = nlu;
+        cloneData.domain = domain;
+      }
+
+      const currentReply = JSON.parse(
+        JSON.stringify(reply).replace(/\\r\\n/g, '  \\n'),
+      );
+
+      const { domain } = cloneData;
+      if (domain.responses[buttonActionName][0].text !== currentReply) {
+        domain.responses[buttonActionName][0].text = currentReply;
+      }
+
+      cloneData.domain = domain;
+
+      return postAllTrainData(cloneData).then((res) => {
+        if (res.status !== 'success') {
+          return Toast.fire({
+            icon: 'error',
+            title: '編輯按鈕選項失敗',
+            text: res.message,
+          });
+        }
+        Toast.fire({
+          icon: 'success',
+          title: '編輯按鈕選項成功',
+        });
+        onSetAllTrainData(res.data);
+        return onSetStory(storyName);
+      });
+    }
     default:
       return state;
   }
@@ -429,6 +521,27 @@ const useStoryStore = create((set) => {
     },
     onSetAllAction(action: string[]) {
       dispatch(actionSetAllAction(action));
+    },
+    onEditResButtons(
+      actionName: string,
+      title: string,
+      oriPayload: string,
+      payload: string,
+      reply: string,
+      storyName: string,
+      buttonActionName: string,
+    ) {
+      dispatch(
+        actionEditResButtons(
+          actionName,
+          title,
+          oriPayload,
+          payload,
+          reply,
+          storyName,
+          buttonActionName,
+        ),
+      );
     },
   };
 });

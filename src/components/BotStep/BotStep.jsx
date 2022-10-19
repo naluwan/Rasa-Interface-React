@@ -31,6 +31,8 @@ type BotStepProps = {
     oriPayload: string,
     payload: string,
     reply: string,
+    storyName?: string,
+    buttonAction?: string,
   ) => void,
   onRemoveResButton: (action: string, payload: string) => void,
 };
@@ -88,7 +90,7 @@ const BotStep: React.FC<BotStepProps> = (props) => {
 
   // 編輯機器人選項
   const atEditResButtons = React.useCallback(
-    (title: string, reply: string) => {
+    (title: string, reply: string, buttonActionName: string) => {
       return swalMultipleInput(`編輯『${title}』選項`, title, reply, true).then(
         (data) => {
           if (!data || !data.title || !data.reply) return;
@@ -99,11 +101,13 @@ const BotStep: React.FC<BotStepProps> = (props) => {
             data.oriPayload,
             payload,
             data.reply,
+            storyName,
+            buttonActionName,
           );
         },
       );
     },
-    [onEditResButtons, step.action],
+    [onEditResButtons, step.action, storyName],
   );
 
   // 刪除機器人選項
@@ -158,7 +162,7 @@ const BotStep: React.FC<BotStepProps> = (props) => {
         </div>
         {step.buttons?.length > 0 &&
           step.buttons.map((button) => {
-            const { title, payload, reply, disabled } = button;
+            const { title, payload, reply, disabled, buttonAction } = button;
             return (
               <ButtonItems
                 key={payload}
@@ -166,6 +170,7 @@ const BotStep: React.FC<BotStepProps> = (props) => {
                 payload={payload}
                 reply={reply}
                 disabled={disabled}
+                buttonAction={buttonAction}
                 onEditResButtons={atEditResButtons}
                 onRemoveResButton={atRemoveResButton}
               />
