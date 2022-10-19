@@ -7,14 +7,20 @@ import BotStep from '../BotStep';
 import type { StoryType, ExampleType } from '../types';
 
 type CreateStoryProps = {
+  isCreate: boolean,
   newStory: StoryType,
   nlu: ExampleType[],
+  actions: string[],
   onSetNewStory: (story: StoryType) => void,
   onClickSaveBtn: (story: StoryType) => void,
 };
 
 const CreateStory: React.FC<CreateStoryProps> = (props) => {
-  const { newStory, nlu, onSetNewStory, onClickSaveBtn } = props;
+  const { isCreate, newStory, nlu, actions, onSetNewStory, onClickSaveBtn } =
+    props;
+  /**
+   * @type {[boolean, Function]}
+   */
   const [isUser, setIsUser] = React.useState(false);
 
   React.useEffect(() => {
@@ -136,6 +142,120 @@ const CreateStory: React.FC<CreateStoryProps> = (props) => {
     [onSetNewStory],
   );
 
+  // 刪除使用者步驟
+  const atRemoveUserStep = React.useCallback(
+    (intent: string, userSay: string) => {
+      return onSetNewStory((prev) => {
+        return {
+          ...prev,
+          steps: prev.steps.filter(
+            (step) => step.intent !== intent && step.user !== userSay,
+          ),
+        };
+      });
+    },
+    [onSetNewStory],
+  );
+
+  // 刪除機器人步驟
+  const atRemoveBotStep = React.useCallback(
+    (action: string) => {
+      return onSetNewStory((prev) => {
+        return {
+          ...prev,
+          steps: prev.steps.filter((step) => step.action !== action),
+        };
+      });
+    },
+    [onSetNewStory],
+  );
+
+  // 增加機器人回覆選項
+  const atAddResButtons = React.useCallback(
+    (action: string, title: string, payload: string, reply: string) => {
+      return onSetNewStory((prev) => {
+        const steps = prev.steps.map((step) => {
+          if (step.action === action) {
+            if (step.buttons) {
+              const isExist = step.buttons.some(
+                (button) => button.title === title,
+              );
+              if (isExist) {
+                Toast.fire({
+                  icon: 'warning',
+                  title: '此選項已存在',
+                });
+              } else {
+                step.buttons.push({ title, payload, reply });
+              }
+            } else {
+              step.buttons = [{ title, payload, reply }];
+            }
+          }
+          return step;
+        });
+        return {
+          ...prev,
+          steps,
+        };
+      });
+    },
+    [onSetNewStory],
+  );
+
+  // 編輯機器人選項
+  const atEditResButtons = React.useCallback(
+    (
+      action: string,
+      title: string,
+      oriPayload: string,
+      payload: string,
+      reply: string,
+    ) => {
+      return onSetNewStory((prev) => {
+        const steps = prev.steps.map((step) => {
+          if (step.action === action) {
+            step.buttons.map((button) => {
+              if (button.payload === oriPayload) {
+                button.title = title;
+                button.payload = payload;
+                button.reply = reply;
+              }
+              return button;
+            });
+          }
+          return step;
+        });
+        return {
+          ...prev,
+          steps,
+        };
+      });
+    },
+    [onSetNewStory],
+  );
+
+  // 刪除機器人選項
+  const atRemoveResButton = React.useCallback(
+    (action: string, payload: string) => {
+      return onSetNewStory((prev) => {
+        const steps = prev.steps.map((step) => {
+          if (step.action === action) {
+            step.buttons = step.buttons.filter(
+              (button) => button.payload !== payload,
+            );
+          }
+          return step;
+        });
+        return {
+          ...prev,
+          steps,
+        };
+      });
+    },
+    [onSetNewStory],
+  );
+
   return (
     <div className={style.root}>
       <div className="col d-flex align-items-center">
@@ -152,21 +272,36 @@ const CreateStory: React.FC<CreateStoryProps> = (props) => {
         {newStory.steps.length !== 0 &&
           newStory.steps.map((step) => {
             // 要先將值取出來，再當作props傳進去，React才會檢查到有改變需要重新render
-            const { intent, user, entities, examples, action, response } = step;
+            const {
+              intent,
+              user,
+              entities,
+              examples,
+              action,
+              response,
+              buttons,
+            } = step;
             return step.intent ? (
               <UserStep
                 key={step.intent}
+                isCreate={isCreate}
                 step={{ intent, user, entities, examples }}
                 storyName={newStory.story}
                 onEditUserSay={atEditUserSay}
                 onEditExamples={atEditExamples}
+                onRemoveUserStep={atRemoveUserStep}
               />
             ) : (
               <BotStep
                 key={step.action}
-                step={{ action, response }}
+                isCreate={isCreate}
+                step={{ action, response, buttons }}
                 storyName={newStory.story}
                 onEditBotRes={atEditBotRes}
+                onRemoveBotStep={atRemoveBotStep}
+                onAddResButtons={atAddResButtons}
+                onEditResButtons={atEditResButtons}
+                onRemoveResButton={atRemoveResButton}
               />
             );
           })}
@@ -176,6 +311,7 @@ const CreateStory: React.FC<CreateStoryProps> = (props) => {
         isUser={isUser}
         nlu={nlu}
         steps={newStory.steps}
+        actions={actions}
       />
     </div>
   );

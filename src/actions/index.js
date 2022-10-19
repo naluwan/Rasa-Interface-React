@@ -1,4 +1,4 @@
-import type { TrainDataType } from 'components/types';
+import type { TrainDataType, StoryType } from 'components/types';
 
 export type Action =
   | { type: 'SET_STORY', payload: string }
@@ -19,6 +19,36 @@ export type Action =
   | {
       type: 'EDIT_EXAMPLES',
       payload: { intent: string, examples: string, storyName: string },
+    }
+  | {
+      type: 'SET_DELETE_STORY',
+      payload: StoryType,
+    }
+  | {
+      type: 'SET_ALL_ACTION',
+      payload: string[],
+    }
+  | {
+      type: 'EDIT_RES_BUTTONS',
+      payload: {
+        actionName: string,
+        title: string,
+        oriPayload: string,
+        payload: string,
+        reply: string,
+        storyName: string,
+        buttonActionName: string,
+      },
+    }
+  | {
+      type: 'REMOVE_RES_BUTTON',
+      payload: {
+        actionName: string,
+        payload: string,
+        storyName: string,
+        buttonActionName: string,
+        disabled: boolean,
+      },
     };
 
 export const actionSetAllData = (data: TrainDataType): Action => ({
@@ -57,4 +87,46 @@ export const actionEditExamples = (
 ): Action => ({
   type: 'EDIT_EXAMPLES',
   payload: { intent, examples, storyName },
+});
+
+export const actionSetDeleteStory = (deleteStory: StoryType): Action => ({
+  type: 'SET_DELETE_STORY',
+  payload: deleteStory,
+});
+
+export const actionSetAllAction = (allAction: string[]): Action => ({
+  type: 'SET_ALL_ACTION',
+  payload: allAction,
+});
+
+export const actionEditResButtons = (
+  actionName: string,
+  title: string,
+  oriPayload: string,
+  payload: string,
+  reply: string,
+  storyName: string,
+  buttonActionName: string,
+): Action => ({
+  type: 'EDIT_RES_BUTTONS',
+  payload: {
+    actionName,
+    title,
+    oriPayload,
+    payload,
+    reply,
+    storyName,
+    buttonActionName,
+  },
+});
+
+export const actionRemoveResButton = (
+  actionName: string,
+  payload: string,
+  storyName: string,
+  buttonActionName: string,
+  disabled: boolean,
+): Action => ({
+  type: 'REMOVE_RES_BUTTON',
+  payload: { actionName, payload, storyName, buttonActionName, disabled },
 });

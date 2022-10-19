@@ -8,33 +8,26 @@ import useStoryStore from '../../store/useStoryStore';
 
 type ShowStoryProps = {
   story: StoryType,
-  onEditExamples: (intent: string, examples: string, storyName: string) => void,
-  onEditUserSay: (
-    oriUserSay: string,
-    userSay: string,
-    storyName: string,
-  ) => void,
-  onEditBotRes: (
-    oriBotRes: string,
-    botRes: string,
-    storyName: string,
-    action: string,
-  ) => void,
   onDeleteStory: (storyName: string) => void,
 };
 
 const ShowStory: React.FC<ShowStoryProps> = (props) => {
   const { story, onDeleteStory } = props;
-  const { onEditBotRes, onEditUserSay, onEditExamples } = useStoryStore(
-    (state: State) => {
-      return {
-        onEditBotRes: state.onEditBotRes,
-        onEditUserSay: state.onEditUserSay,
-        onEditExamples: state.onEditExamples,
-      };
-    },
-    shallow,
-  );
+  const {
+    onEditBotRes,
+    onEditUserSay,
+    onEditExamples,
+    onEditResButtons,
+    onRemoveResButton,
+  } = useStoryStore((state: State) => {
+    return {
+      onEditBotRes: state.onEditBotRes,
+      onEditUserSay: state.onEditUserSay,
+      onEditExamples: state.onEditExamples,
+      onEditResButtons: state.onEditResButtons,
+      onRemoveResButton: state.onRemoveResButton,
+    };
+  }, shallow);
 
   return (
     <div className={style.root}>
@@ -52,7 +45,15 @@ const ShowStory: React.FC<ShowStoryProps> = (props) => {
       </div>
       <div className={style.stepsPanel}>
         {story.steps.map((step) => {
-          const { intent, user, entities, examples, action, response } = step;
+          const {
+            intent,
+            user,
+            entities,
+            examples,
+            action,
+            response,
+            buttons,
+          } = step;
           return step.intent ? (
             <UserStep
               key={step.intent}
@@ -64,9 +65,11 @@ const ShowStory: React.FC<ShowStoryProps> = (props) => {
           ) : (
             <BotStep
               key={step.action}
-              step={{ action, response }}
+              step={{ action, response, buttons }}
               storyName={story.story}
               onEditBotRes={onEditBotRes}
+              onEditResButtons={onEditResButtons}
+              onRemoveResButton={onRemoveResButton}
             />
           );
         })}

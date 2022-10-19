@@ -6,6 +6,7 @@ import { swalInput } from '../../utils/swalInput';
 // import useStoryStore from '../../store/useStoryStore';
 
 type UserStepProps = {
+  isCreate: boolean,
   step: StepsType,
   storyName: string,
   onEditExamples: (
@@ -18,10 +19,18 @@ type UserStepProps = {
     userSay: string,
     storyName?: string,
   ) => void,
+  onRemoveUserStep: (intent: string, userSay: string) => void,
 };
 
 const UserStep: React.FC<UserStepProps> = (props) => {
-  const { step, storyName, onEditExamples, onEditUserSay } = props;
+  const {
+    isCreate,
+    step,
+    storyName,
+    onEditExamples,
+    onEditUserSay,
+    onRemoveUserStep,
+  } = props;
   const showIntent =
     step.intent === 'get_started' ? '打開聊天室窗' : step.intent;
 
@@ -58,13 +67,7 @@ const UserStep: React.FC<UserStepProps> = (props) => {
   return (
     <div className="row" id="userStep">
       <div className="col-6">
-        <div className="d-flex align-items-center pt-3">
-          <div className={style.userTitle}>使用者:</div>
-          <div className={style.userText}>
-            {step.user ? step.user : showIntent}
-          </div>
-        </div>
-        <div className={cx('pt-2')}>
+        <div className={cx('py-2')}>
           <button
             type="button"
             className="btn btn-info mx-2"
@@ -81,6 +84,21 @@ const UserStep: React.FC<UserStepProps> = (props) => {
           >
             例句
           </button>
+          {isCreate && (
+            <button
+              type="button"
+              className="btn btn-danger mx-2"
+              onClick={() => onRemoveUserStep(step.intent, step.user)}
+            >
+              刪除
+            </button>
+          )}
+        </div>
+        <div className="d-flex align-items-center pt-2">
+          <div className={style.userTitle}>使用者:</div>
+          <div className={style.userText}>
+            {step.user ? step.user : showIntent}
+          </div>
         </div>
       </div>
     </div>

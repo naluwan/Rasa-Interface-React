@@ -138,18 +138,8 @@ export const fetchAllData = (): Promise<TrainDataType> => {
     });
 };
 
-// 刪除故事
-export const deleteStory = (storyName: string) => {
-  return axiosInstance
-    .delete(`${API_URL}/stories/${storyName}`)
-    .then(({ data }) => {
-      return data;
-    })
-    .catch(({ response: { data } }) => data);
-};
-
 // 抓取全部action
-export const fetchAllAction = () => {
+export const fetchAllAction = (): Promise<string[]> => {
   return axiosInstance
     .get(`${API_URL}/stories/actions`)
     .then(({ data: { data } }) => {

@@ -20,23 +20,22 @@
 
 .root[data-variant='primary'] {
   color: #fff;
-  background: #5CA7FF;
+  background: #5ca7ff;
 }
 
 .root[data-variant='primary']:hover {
   color: #fff;
-  background: #5CA7FF;
+  background: #4e9cf5;
 }
-
 
 .root[data-variant='secondary'] {
   color: #0f0e0f;
-  background: #E0E0E0;
+  background: #e0e0e0;
 }
 
 .root[data-variant='secondary']:hover {
   color: #0f0e0f;
-  background: #E0E0E0;
+  background: #e0e0e0;
 }
 
 .root[data-variant='third'] {
@@ -52,7 +51,7 @@
 }
 
 .root[data-variant='nostyle'] {
-  background: #E0E0E0;
+  background: #e0e0e0;
   cursor: pointer;
   border: none;
   padding: 0;
@@ -65,7 +64,7 @@
 }
 
 .root[data-variant='nostyle']:hover {
-  background: #E0E0E0;
+  background: #e0e0e0;
   cursor: pointer;
   border: none;
   padding: 0;
