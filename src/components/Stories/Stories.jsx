@@ -377,7 +377,7 @@ const Stories = () => {
 
             // 按鈕只需要新增沒有相同意圖的就好，因為同意圖，代表是要回答現有的故事流程回答
             if (
-              cloneData.nlu.rasa_nlu_data.common_examples.some(
+              cloneData.nlu.rasa_nlu_data.common_examples.every(
                 (nluItem) => nluItem.intent !== intent,
               )
             ) {
@@ -399,7 +399,7 @@ const Stories = () => {
               });
               cloneData.domain.actions.push(actionName);
               cloneData.domain.responses[actionName] = [{ text: reply }];
-              cloneData.domain.intents.push(button.intent);
+              cloneData.domain.intents.push(button.payload);
             }
             return button;
           });
