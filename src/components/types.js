@@ -123,4 +123,11 @@ export type State = {
     buttonActionName: string,
     disabled: boolean,
   ) => void,
+  onAddResButtons: (
+    actionName: string,
+    title: string,
+    payload: string,
+    reply: string,
+    storyName: string,
+  ) => void,
 };
