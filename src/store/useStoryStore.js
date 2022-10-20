@@ -520,7 +520,9 @@ const reducer = (state: State, action: Action): State => {
       const intentStory = [];
       stories.map((item) => {
         return item.steps.map((step) =>
-          step.intent === title ? intentStory.push(item) : step,
+          step.intent === title && item.story !== `button_${title}`
+            ? intentStory.push(item)
+            : step,
         );
       });
       const isExist = stories.some((item) => item.story === `button_${title}`);
@@ -568,6 +570,7 @@ const reducer = (state: State, action: Action): State => {
           }
 
           domain.responses[buttonActionName] = [{ text: reply }];
+          domain.intents.push(title);
         }
         cloneData.stories = stories;
         cloneData.nlu = nlu;
@@ -576,7 +579,6 @@ const reducer = (state: State, action: Action): State => {
 
       if (intentStory.length || !isExist) {
         return postAllTrainData(cloneData).then((res) => {
-          console.log(res);
           if (res.status !== 'success') {
             return Toast.fire({
               icon: 'error',
