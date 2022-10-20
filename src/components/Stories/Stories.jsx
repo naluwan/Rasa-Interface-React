@@ -454,10 +454,18 @@ const Stories = () => {
   // 恢復刪除故事(只能恢復最後一筆資料)
   const atRecoverDeletedStory = React.useCallback(
     (deleteStory: StoryType) => {
+      const isExist = stories.some((item) => item.story === deleteStory.story);
+      if (isExist) {
+        Toast.fire({
+          icon: 'warning',
+          title: '故事名稱重複',
+        });
+        return;
+      }
       atClickSaveBtn(deleteStory);
       onSetDeleteStory({});
     },
-    [onSetDeleteStory, atClickSaveBtn],
+    [onSetDeleteStory, atClickSaveBtn, stories],
   );
 
   return (
