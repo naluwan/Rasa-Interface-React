@@ -1,3 +1,4 @@
+/* eslint-disable no-shadow */
 import * as React from 'react';
 import useSWR from 'swr';
 import { fetchAllData, postAllTrainData, fetchAllAction } from 'services/api';
