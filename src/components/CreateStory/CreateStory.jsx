@@ -1,10 +1,12 @@
 import * as React from 'react';
 import { Toast } from 'utils/swalInput';
+import shallow from 'zustand/shallow';
 import style from './CreateStory.module.scss';
 import StepControl from './StepControl';
 import UserStep from '../UserStep';
 import BotStep from '../BotStep';
-import type { StoryType, ExampleType } from '../types';
+import type { StoryType, ExampleType, State } from '../types';
+import useStoryStore from '../../store/useStoryStore';
 
 type CreateStoryProps = {
   isCreate: boolean,
@@ -18,6 +20,11 @@ type CreateStoryProps = {
 const CreateStory: React.FC<CreateStoryProps> = (props) => {
   const { isCreate, newStory, nlu, actions, onSetNewStory, onClickSaveBtn } =
     props;
+  const { stories } = useStoryStore((state: State) => {
+    return {
+      stories: state.stories,
+    };
+  }, shallow);
   /**
    * @type {[boolean, Function]}
    */
@@ -177,9 +184,10 @@ const CreateStory: React.FC<CreateStoryProps> = (props) => {
         const steps = prev.steps.map((step) => {
           if (step.action === action) {
             if (step.buttons) {
-              const isExist = step.buttons.some(
-                (button) => button.title === title,
-              );
+              const isExist =
+                step.buttons.some((button) => button.title === title) ||
+                stories.some((item) => item.story === `button_${title}`);
+
               if (isExist) {
                 Toast.fire({
                   icon: 'warning',
@@ -200,7 +208,7 @@ const CreateStory: React.FC<CreateStoryProps> = (props) => {
         };
       });
     },
-    [onSetNewStory],
+    [onSetNewStory, stories],
   );
 
   // 編輯機器人選項
