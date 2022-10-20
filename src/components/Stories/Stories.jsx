@@ -65,6 +65,11 @@ const Stories = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [data]);
 
+  // 只要資料有更新，就更新全部機器人回覆action name
+  React.useEffect(() => {
+    fetchAllAction().then((actionData) => onSetAllAction(actionData));
+  }, [cloneData, onSetAllAction]);
+
   // 離開頁面將顯示故事刪除
   React.useEffect(() => {
     // 離開頁面將story設為空
@@ -226,7 +231,6 @@ const Stories = () => {
               });
               return;
             }
-            fetchAllAction().then((actionData) => onSetAllAction(actionData));
             setNewStory({ story: createStoryName, steps: [] });
             onSetStory('');
             setCreate(true);
@@ -249,14 +253,13 @@ const Stories = () => {
           });
           return;
         }
-        fetchAllAction().then((actionData) => onSetAllAction(actionData));
         setNewStory({ story: createStoryName, steps: [] });
         onSetStory('');
         setCreate(true);
         setDefaultValue('');
       },
     );
-  }, [newStory, onSetStory, stories, onSetAllAction]);
+  }, [newStory, onSetStory, stories]);
 
   // 新增故事點擊儲存按鈕
   const atClickSaveBtn = React.useCallback(
