@@ -1,3 +1,18 @@
 .root {
-  
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+  .container {
+    width: 100%;
+    text-align: center;
+    background-color: aliceblue;
+    padding: 3rem;
+    border-radius: 10px;
+    .versionInfo {
+      padding-top: 2rem;
+      text-align: left;
+    }
+  }
 }
