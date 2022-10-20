@@ -355,13 +355,14 @@ const Stories = () => {
         .map((step) => {
           const buttons = [];
           if (step.buttons) {
-            step.buttons.map((button) =>
-              buttons.push({
+            step.buttons.map((button) => {
+              const isPayload = button.payload.indexOf('/');
+              return buttons.push({
                 title: button.title,
-                payload: button.payload,
+                payload: isPayload > -1 ? button.payload : `/${button.payload}`,
                 reply: button.reply,
-              }),
-            );
+              });
+            });
           }
           return {
             action: step.action,
