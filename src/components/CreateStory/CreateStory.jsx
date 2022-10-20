@@ -183,19 +183,20 @@ const CreateStory: React.FC<CreateStoryProps> = (props) => {
       return onSetNewStory((prev) => {
         const steps = prev.steps.map((step) => {
           if (step.action === action) {
-            if (step.buttons) {
-              const isExist =
-                step.buttons.some((button) => button.title === title) ||
-                stories.some((item) => item.story === `button_${title}`);
+            const isInStory = stories.some(
+              (item) => item.story === `button_${title}`,
+            );
+            const isExist = step.buttons?.some(
+              (button) => button.title === title,
+            );
 
-              if (isExist) {
-                Toast.fire({
-                  icon: 'warning',
-                  title: '此選項已存在',
-                });
-              } else {
-                step.buttons.push({ title, payload, reply });
-              }
+            if (isExist || isInStory) {
+              Toast.fire({
+                icon: 'warning',
+                title: '此選項已存在',
+              });
+            } else if (step.buttons) {
+              step.buttons.push({ title, payload, reply });
             } else {
               step.buttons = [{ title, payload, reply }];
             }
