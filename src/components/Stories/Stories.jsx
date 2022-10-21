@@ -40,6 +40,7 @@ const Stories = () => {
     onSetDeleteStory,
     onSetAllTrainData,
     onSetAllAction,
+    onSetRasaTrainState,
   } = useStoryStore((state: State) => {
     return {
       story: state.story,
@@ -54,6 +55,7 @@ const Stories = () => {
       onSetDeleteStory: state.onSetDeleteStory,
       onSetAllTrainData: state.onSetAllTrainData,
       onSetAllAction: state.onSetAllAction,
+      onSetRasaTrainState: state.onSetRasaTrainState,
     };
   }, shallow);
 
@@ -62,13 +64,15 @@ const Stories = () => {
   // 進入頁面獲取設定資料
   React.useEffect(() => {
     onSetAllTrainData(data);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [data]);
+  }, [data, onSetAllTrainData]);
 
   // 只要資料有更新，就更新全部機器人回覆action name
   React.useEffect(() => {
     fetchAllAction().then((actionData) => onSetAllAction(actionData));
-  }, [cloneData, onSetAllAction]);
+    fetch(`http://192.168.10.105:5005/status`)
+      .then((res) => res.json())
+      .then((data) => onSetRasaTrainState(data.num_active_training_jobs));
+  }, [cloneData, onSetAllAction, onSetRasaTrainState]);
 
   // 離開頁面將顯示故事刪除
   React.useEffect(() => {

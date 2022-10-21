@@ -4,6 +4,7 @@ import {
   RegisterUserInfoType,
   UserInfo,
   TrainDataType,
+  ApiTrainDataType,
 } from 'components/types';
 import { Toast } from 'utils/swalInput';
 
@@ -170,4 +171,31 @@ export const postAllTrainData = (
         text: data.message,
       });
     });
+};
+
+export const fetchRasa = (trainData: ApiTrainDataType) => {
+  return axios
+    .post(
+      'http://192.168.10.105:5005/model/train?save_to_default_model_directory=true&force_training=true',
+      {
+        body: JSON.stringify(trainData),
+        headers: {
+          'content-Type': 'application/json',
+        },
+      },
+    )
+    .then((res) => res.headers.get('filename'))
+    .catch((err) => console.log(err));
+};
+
+export const fetchRasaTrainState = () => {
+  return (
+    axios
+      .get('http://192.168.10.105:5005/status')
+      // eslint-disable-next-line camelcase
+      .then(({ data }) => {
+        return { state: data.num_active_training_jobs };
+      })
+      .catch((err) => console.log(err))
+  );
 };

@@ -26,6 +26,7 @@ import {
   actionEditResButtons,
   actionRemoveResButton,
   actionAddResButtons,
+  actionSetRasaTrainState,
 } from 'actions';
 // import { computed } from 'zustand-middleware-computed-state';
 import { Toast } from 'utils/swalInput';
@@ -39,11 +40,13 @@ const initialState = {
   stories: [],
   story: {},
   nlu: {},
+  config: {},
   domain: {},
   cloneData: { stories: {}, nlu: {}, domain: {} },
   deletedStory: {},
   actions: [],
   storiesOptions: [],
+  rasaTrainState: 1,
 };
 
 const reducer = (state: State, action: Action): State => {
@@ -474,6 +477,11 @@ const reducer = (state: State, action: Action): State => {
           1,
         );
 
+        cloneData.domain.actions.splice(
+          cloneData.domain.actions.indexOf(buttonActionName),
+          1,
+        );
+
         cloneData.domain.intents.splice(
           cloneData.domain.intents.indexOf(payload),
           1,
@@ -592,6 +600,12 @@ const reducer = (state: State, action: Action): State => {
       }
       return {
         ...state,
+      };
+    }
+    case 'SET_RASA_TRAIN_STATE': {
+      return {
+        ...state,
+        rasaTrainState: action.payload,
       };
     }
     default:
@@ -725,6 +739,9 @@ const useStoryStore = create((set) => {
       dispatch(
         actionAddResButtons(actionName, title, payload, reply, storyName),
       );
+    },
+    onSetRasaTrainState(state: number) {
+      dispatch(actionSetRasaTrainState(state));
     },
   };
 });

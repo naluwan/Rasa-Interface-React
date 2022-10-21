@@ -59,7 +59,8 @@ export type Action =
         reply: string,
         storyName: string,
       },
-    };
+    }
+  | { type: 'SET_RASA_TRAIN_STATE', payload: number };
 
 export const actionSetAllData = (data: TrainDataType): Action => ({
   type: 'SET_ALL_TRAIN_DATA',
@@ -150,4 +151,9 @@ export const actionAddResButtons = (
 ): Action => ({
   type: 'ADD_RES_BUTTONS',
   payload: { actionName, title, payload, reply, storyName },
+});
+
+export const actionSetRasaTrainState = (state: number): Action => ({
+  type: 'SET_RASA_TRAIN_STATE',
+  payload: state,
 });
