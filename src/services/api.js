@@ -4,7 +4,6 @@ import {
   RegisterUserInfoType,
   UserInfo,
   TrainDataType,
-  ApiTrainDataType,
 } from 'components/types';
 import { Toast } from 'utils/swalInput';
 
