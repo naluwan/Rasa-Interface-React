@@ -4,6 +4,7 @@ import { NavLink, Navigate } from 'react-router-dom';
 import shallow from 'zustand/shallow';
 import swal from 'sweetalert2';
 import type { State } from 'components/types';
+import cx from 'classnames';
 import style from './Login.module.scss';
 import MyInput from '../MyInput';
 import MyButton from '../MyButton';
@@ -126,7 +127,11 @@ const Login = () => {
         </div>
         <div className={style.account}>
           還沒有帳號?
-          <NavLink to="/register" variant="nostyle" className="btn">
+          <NavLink
+            to="/register"
+            variant="nostyle"
+            className={cx('btn', style.accountBtn)}
+          >
             註冊
           </NavLink>
         </div>

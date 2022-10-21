@@ -171,3 +171,16 @@ export const postAllTrainData = (
       });
     });
 };
+
+// 確認rasa訓練狀況
+export const fetchRasaTrainState = () => {
+  return (
+    axios
+      .get('http://192.168.10.105:5005/status')
+      // eslint-disable-next-line camelcase
+      .then(({ data }) => {
+        return { state: data.num_active_training_jobs };
+      })
+      .catch((err) => console.log(err))
+  );
+};

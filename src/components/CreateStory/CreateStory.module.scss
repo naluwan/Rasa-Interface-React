@@ -1,19 +1,20 @@
 .root {
-  background: #fff;
+  backdrop-filter: blur(20px);
   display: block;
   padding: 20px;
   margin: 15px;
   box-sizing: border-box;
   box-shadow: 0px 3px 4px 3px rgb(162 162 162);
   border-radius: 3px;
-  height: 410px;
+  height: 80%;
   .title {
     font-weight: bold;
     font-size: 1.8rem;
+    color: #fff;
   }
   .stepsPanel {
     padding: 15px;
     overflow-y: scroll;
-    height: 250px;
+    height: 80%;
   }
 }

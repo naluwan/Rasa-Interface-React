@@ -1,4 +1,5 @@
 import * as React from 'react';
+import cx from 'classnames';
 import style from './BotStep.module.scss';
 import type { StepsType } from '../types';
 import {
@@ -24,6 +25,7 @@ type BotStepProps = {
     title: string,
     payload: string,
     reply: string,
+    storyName?: string,
   ) => void,
   onEditResButtons: (
     action: string,
@@ -59,7 +61,7 @@ const BotStep: React.FC<BotStepProps> = (props) => {
 
   // 編輯機器人回覆
   const atEditBotResponse = React.useCallback(
-    (response: string, action: string, currentStoryName) => {
+    (response: string, action: string, currentStoryName: string) => {
       return swalInput(
         '編輯機器人回覆',
         'textarea',
@@ -74,14 +76,20 @@ const BotStep: React.FC<BotStepProps> = (props) => {
     [onEditBotRes],
   );
 
-  // 增加機器人回覆選項
+  // 增加機器人回覆按鈕選項
   const atAddResButtons = React.useCallback(
-    (action: string) => {
+    (action: string, currentStoryName: string) => {
       return swalMultipleInput('新增機器人回覆選項', '', '', true).then(
         (data) => {
           if (!data || !data.title) return;
           const payload = `/${data.title}`;
-          onAddResButtons(action, data.title, payload, data.reply);
+          onAddResButtons(
+            action,
+            data.title,
+            payload,
+            data.reply,
+            currentStoryName,
+          );
         },
       );
     },
@@ -133,8 +141,8 @@ const BotStep: React.FC<BotStepProps> = (props) => {
   );
 
   return (
-    <div className="row justify-content-end" id="botStep">
-      <div className="col-6">
+    <div className="row justify-content-end pt-2" id="botStep">
+      <div className={cx('col-6', style.botStepContainer)}>
         <div className="py-2">
           <button
             type="button"
@@ -148,7 +156,7 @@ const BotStep: React.FC<BotStepProps> = (props) => {
           <button
             type="button"
             className="btn btn-primary mx-2"
-            onClick={() => atAddResButtons(step.action)}
+            onClick={() => atAddResButtons(step.action, storyName)}
           >
             增加選項
           </button>

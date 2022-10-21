@@ -79,6 +79,13 @@ export type TrainDataType = {
   domain: DomainType,
 };
 
+export type ApiTrainDataType = {
+  stories: string,
+  nlu: NluType,
+  domain: string,
+  config: string,
+};
+
 export type State = {
   isAppInitializedComplete: boolean,
   user: UserInfo,
@@ -90,6 +97,7 @@ export type State = {
   cloneData: TrainDataType,
   deletedStory: StoryType,
   actions: string[],
+  rasaTrainState: number,
   // actions
   init: () => void,
   onLogin: (email: string, password: string) => void,
@@ -123,4 +131,12 @@ export type State = {
     buttonActionName: string,
     disabled: boolean,
   ) => void,
+  onAddResButtons: (
+    actionName: string,
+    title: string,
+    payload: string,
+    reply: string,
+    storyName: string,
+  ) => void,
+  onSetRasaTrainState: (state: number) => void,
 };

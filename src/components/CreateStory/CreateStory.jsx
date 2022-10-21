@@ -1,10 +1,13 @@
 import * as React from 'react';
 import { Toast } from 'utils/swalInput';
+import shallow from 'zustand/shallow';
 import style from './CreateStory.module.scss';
 import StepControl from './StepControl';
 import UserStep from '../UserStep';
 import BotStep from '../BotStep';
-import type { StoryType, ExampleType } from '../types';
+import type { StoryType, ExampleType, State } from '../types';
+import useStoryStore from '../../store/useStoryStore';
+import StepAlert from './StepAlert';
 
 type CreateStoryProps = {
   isCreate: boolean,
@@ -18,10 +21,17 @@ type CreateStoryProps = {
 const CreateStory: React.FC<CreateStoryProps> = (props) => {
   const { isCreate, newStory, nlu, actions, onSetNewStory, onClickSaveBtn } =
     props;
+  const { stories } = useStoryStore((state: State) => {
+    return {
+      stories: state.stories,
+    };
+  }, shallow);
   /**
    * @type {[boolean, Function]}
    */
   const [isUser, setIsUser] = React.useState(false);
+
+  const [isInputFocus, setIsInputFocus] = React.useState(undefined);
 
   React.useEffect(() => {
     // 雙驚嘆號為判斷是否存在，只返回boolean
@@ -31,6 +41,16 @@ const CreateStory: React.FC<CreateStoryProps> = (props) => {
         : false,
     );
   }, [setIsUser, newStory]);
+
+  // 控制顯示目前設定是誰的步驟
+  let CurStepAlert;
+  if (!isUser) {
+    if (isInputFocus) {
+      CurStepAlert = <StepAlert stepRole="user" />;
+    }
+  } else if (isInputFocus) {
+    CurStepAlert = <StepAlert stepRole="bot" />;
+  }
 
   // 編輯使用者對話;
   const atEditUserSay = React.useCallback(
@@ -176,18 +196,20 @@ const CreateStory: React.FC<CreateStoryProps> = (props) => {
       return onSetNewStory((prev) => {
         const steps = prev.steps.map((step) => {
           if (step.action === action) {
-            if (step.buttons) {
-              const isExist = step.buttons.some(
-                (button) => button.title === title,
-              );
-              if (isExist) {
-                Toast.fire({
-                  icon: 'warning',
-                  title: '此選項已存在',
-                });
-              } else {
-                step.buttons.push({ title, payload, reply });
-              }
+            const isInStory = stories.some(
+              (item) => item.story === `button_${title}`,
+            );
+            const isExist = step.buttons?.some(
+              (button) => button.title === title,
+            );
+
+            if (isExist || isInStory) {
+              Toast.fire({
+                icon: 'warning',
+                title: '此選項已存在',
+              });
+            } else if (step.buttons) {
+              step.buttons.push({ title, payload, reply });
             } else {
               step.buttons = [{ title, payload, reply }];
             }
@@ -200,7 +222,7 @@ const CreateStory: React.FC<CreateStoryProps> = (props) => {
         };
       });
     },
-    [onSetNewStory],
+    [onSetNewStory, stories],
   );
 
   // 編輯機器人選項
@@ -305,6 +327,7 @@ const CreateStory: React.FC<CreateStoryProps> = (props) => {
               />
             );
           })}
+        {CurStepAlert}
       </div>
       <StepControl
         onSetNewStory={onSetNewStory}
@@ -312,6 +335,7 @@ const CreateStory: React.FC<CreateStoryProps> = (props) => {
         nlu={nlu}
         steps={newStory.steps}
         actions={actions}
+        onSetIsInputFocus={setIsInputFocus}
       />
     </div>
   );

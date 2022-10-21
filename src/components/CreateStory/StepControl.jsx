@@ -11,10 +11,12 @@ type StepControlType = {
   steps: StepsType,
   actions: string[],
   onSetNewStory: (story: StoryType) => void,
+  onSetIsInputFocus: () => void,
 };
 
 const StepControl: React.FC<StepControlType> = (props) => {
-  const { isUser, nlu, onSetNewStory, steps, actions } = props;
+  const { isUser, nlu, onSetNewStory, steps, actions, onSetIsInputFocus } =
+    props;
   /**
    * @type {[string, Function]}
    */
@@ -80,7 +82,20 @@ const StepControl: React.FC<StepControlType> = (props) => {
 
   return (
     <div className="d-flex px-3 justify-content-start">
-      <div className="col-2">
+      <textarea
+        className={cx('col-9', style.stepTextarea)}
+        type="text"
+        name="conversation"
+        placeholder="輸入完對話後，請點擊左側步驟按鈕"
+        onChange={atChange}
+        value={conversation}
+        rows={1}
+        onFocus={() =>
+          onSetIsInputFocus((prev) => (prev === undefined ? true : !prev))
+        }
+        onBlur={() => onSetIsInputFocus(undefined)}
+      />
+      <div className="col-2 mx-3">
         <button
           className="btn btn-success mx-1"
           onClick={() => atUserStep(conversation)}
@@ -96,15 +111,6 @@ const StepControl: React.FC<StepControlType> = (props) => {
           機器人
         </button>
       </div>
-      <textarea
-        className={cx('col-9', style.stepTextarea)}
-        type="text"
-        name="conversation"
-        placeholder="輸入完對話後，請點擊左側步驟按鈕"
-        onChange={atChange}
-        value={conversation}
-        rows={1}
-      />
     </div>
   );
 };
