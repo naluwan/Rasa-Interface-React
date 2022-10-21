@@ -1,5 +1,5 @@
 .root {
-  background: #fff;
+  backdrop-filter: blur(20px);
   display: block;
   padding: 20px;
   margin: 15px;
@@ -10,6 +10,7 @@
   .title {
     font-weight: bold;
     font-size: 1.8rem;
+    color: #fff;
   }
   .stepsPanel {
     padding: 15px;

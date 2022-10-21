@@ -7,6 +7,7 @@ import UserStep from '../UserStep';
 import BotStep from '../BotStep';
 import type { StoryType, ExampleType, State } from '../types';
 import useStoryStore from '../../store/useStoryStore';
+import StepAlert from './StepAlert';
 
 type CreateStoryProps = {
   isCreate: boolean,
@@ -30,6 +31,8 @@ const CreateStory: React.FC<CreateStoryProps> = (props) => {
    */
   const [isUser, setIsUser] = React.useState(false);
 
+  const [isInputFocus, setIsInputFocus] = React.useState(undefined);
+
   React.useEffect(() => {
     // 雙驚嘆號為判斷是否存在，只返回boolean
     setIsUser(
@@ -38,6 +41,16 @@ const CreateStory: React.FC<CreateStoryProps> = (props) => {
         : false,
     );
   }, [setIsUser, newStory]);
+
+  // 控制顯示目前設定是誰的步驟
+  let CurStepAlert;
+  if (!isUser) {
+    if (isInputFocus) {
+      CurStepAlert = <StepAlert stepRole="user" />;
+    }
+  } else if (isInputFocus) {
+    CurStepAlert = <StepAlert stepRole="bot" />;
+  }
 
   // 編輯使用者對話;
   const atEditUserSay = React.useCallback(
@@ -314,6 +327,7 @@ const CreateStory: React.FC<CreateStoryProps> = (props) => {
               />
             );
           })}
+        {CurStepAlert}
       </div>
       <StepControl
         onSetNewStory={onSetNewStory}
@@ -321,6 +335,7 @@ const CreateStory: React.FC<CreateStoryProps> = (props) => {
         nlu={nlu}
         steps={newStory.steps}
         actions={actions}
+        onSetIsInputFocus={setIsInputFocus}
       />
     </div>
   );

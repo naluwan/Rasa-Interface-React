@@ -473,67 +473,64 @@ const Stories = () => {
   );
 
   return (
-    <div>
-      <div>
-        <div className={style.searchBar}>
-          <div>
-            <div className={style.senderId}>
-              <h4 className={style.searchTitle}>故事流程</h4>
-              <div>故事名稱：</div>
-              <select
-                id="stories"
-                className={style.storiesSelector}
-                onChange={(e) => atSelectStory(e.target.value)}
-                value={defaultValue}
-              >
-                <option value="" disabled hidden>
-                  請選擇
-                </option>
-                {storiesOptions &&
-                  storiesOptions.map((item) => (
-                    <option key={item.story} value={item.story}>
-                      {item.story}
-                    </option>
-                  ))}
-              </select>
+    <>
+      <div className={style.searchBar}>
+        <div>
+          <div className={style.senderId}>
+            <h4 className={style.searchTitle}>故事流程</h4>
+            <div>故事名稱：</div>
+            <select
+              id="stories"
+              className={style.storiesSelector}
+              onChange={(e) => atSelectStory(e.target.value)}
+              value={defaultValue}
+            >
+              <option value="" disabled hidden>
+                請選擇
+              </option>
+              {storiesOptions &&
+                storiesOptions.map((item) => (
+                  <option key={item.story} value={item.story}>
+                    {item.story}
+                  </option>
+                ))}
+            </select>
+            <div className={cx('btn', style.navbar)}>
+              <MyButton variant="third" onClick={atClickCreateStoryBtn}>
+                新增故事流程
+              </MyButton>
+            </div>
+            {Object.keys(deletedStory).length > 0 && (
               <div className={cx('btn', style.navbar)}>
-                <MyButton variant="third" onClick={atClickCreateStoryBtn}>
-                  新增故事流程
+                <MyButton
+                  variant="primary"
+                  onClick={() => atRecoverDeletedStory(deletedStory)}
+                >
+                  恢復刪除
                 </MyButton>
               </div>
-              {Object.keys(deletedStory).length > 0 && (
-                <div className={cx('btn', style.navbar)}>
-                  <MyButton
-                    variant="primary"
-                    onClick={() => atRecoverDeletedStory(deletedStory)}
-                  >
-                    恢復刪除
-                  </MyButton>
-                </div>
-              )}
-            </div>
+            )}
           </div>
         </div>
-        <div id="data-panel" />
-        {Object.keys(story).length > 0 && (
-          <ShowStory
-            story={story}
-            onDeleteStory={atDeleteStory}
-            onRecoverDeletedStory={atClickSaveBtn}
-          />
-        )}
-        {create && (
-          <CreateStory
-            isCreate={create}
-            newStory={newStory}
-            nlu={nlu.rasa_nlu_data.common_examples}
-            actions={actions}
-            onSetNewStory={setNewStory}
-            onClickSaveBtn={atClickSaveBtn}
-          />
-        )}
       </div>
-    </div>
+      {Object.keys(story).length > 0 && (
+        <ShowStory
+          story={story}
+          onDeleteStory={atDeleteStory}
+          onRecoverDeletedStory={atClickSaveBtn}
+        />
+      )}
+      {create && (
+        <CreateStory
+          isCreate={create}
+          newStory={newStory}
+          nlu={nlu.rasa_nlu_data.common_examples}
+          actions={actions}
+          onSetNewStory={setNewStory}
+          onClickSaveBtn={atClickSaveBtn}
+        />
+      )}
+    </>
   );
 };
 

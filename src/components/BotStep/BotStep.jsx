@@ -1,4 +1,5 @@
 import * as React from 'react';
+import cx from 'classnames';
 import style from './BotStep.module.scss';
 import type { StepsType } from '../types';
 import {
@@ -140,8 +141,8 @@ const BotStep: React.FC<BotStepProps> = (props) => {
   );
 
   return (
-    <div className="row justify-content-end" id="botStep">
-      <div className="col-6">
+    <div className="row justify-content-end pt-2" id="botStep">
+      <div className={cx('col-6', style.botStepContainer)}>
         <div className="py-2">
           <button
             type="button"

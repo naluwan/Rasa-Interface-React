@@ -173,21 +173,7 @@ export const postAllTrainData = (
     });
 };
 
-export const fetchRasa = (trainData: ApiTrainDataType) => {
-  return axios
-    .post(
-      'http://192.168.10.105:5005/model/train?save_to_default_model_directory=true&force_training=true',
-      {
-        body: JSON.stringify(trainData),
-        headers: {
-          'content-Type': 'application/json',
-        },
-      },
-    )
-    .then((res) => res.headers.get('filename'))
-    .catch((err) => console.log(err));
-};
-
+// 確認rasa訓練狀況
 export const fetchRasaTrainState = () => {
   return (
     axios
