@@ -50,7 +50,7 @@ const reducer = (state: State, action: Action): State => {
   switch (action.type) {
     case 'SET_ALL_TRAIN_DATA': {
       if (action.payload) {
-        const { stories } = action.payload;
+        const { stories, domain, nlu } = action.payload;
         const filteredStories = stories.filter(
           (item) => !item.story.includes('button_'),
         );
@@ -58,7 +58,7 @@ const reducer = (state: State, action: Action): State => {
           ...state,
           ...action.payload,
           storiesOptions: filteredStories,
-          cloneData: cloneDeep(action.payload),
+          cloneData: cloneDeep({ stories, nlu, domain }),
         };
       }
       return {
@@ -72,7 +72,7 @@ const reducer = (state: State, action: Action): State => {
           story: {},
         };
       }
-      const { domain, nlu, stories } = state.cloneData;
+      const { domain, nlu, stories } = cloneDeep(state.cloneData);
       const story = stories.filter((item) => item.story === action.payload)[0];
       story.steps.map((step) => {
         if (step.action) {
@@ -163,7 +163,9 @@ const reducer = (state: State, action: Action): State => {
       const repeat = [];
       const { onSetAllTrainData, onSetStory } = state;
       const { oriWord, newWord, storyName } = action.payload;
-      state.cloneData.nlu.rasa_nlu_data.common_examples.map((nluItem) =>
+      const { stories, domain, nlu } = cloneDeep(state.cloneData);
+
+      nlu.rasa_nlu_data.common_examples.map((nluItem) =>
         nluItem.text === newWord ? repeat.push(newWord) : nluItem,
       );
 
@@ -175,7 +177,7 @@ const reducer = (state: State, action: Action): State => {
       }
 
       // 更改stories訓練檔的使用者對話
-      const stories = state.cloneData.stories.map((item) => {
+      stories.map((item) => {
         if (item.story === storyName) {
           item.steps.map((step) => {
             if (step.user === oriWord) {
@@ -189,34 +191,25 @@ const reducer = (state: State, action: Action): State => {
       });
 
       // 更改nlu訓練檔中所有意圖與原意圖相同的例句
-      const nlu = {
-        rasa_nlu_data: {
-          common_examples:
-            state.cloneData.nlu.rasa_nlu_data.common_examples.map((nluItem) => {
-              if (nluItem.text === oriWord) {
-                nluItem.text = newWord;
-                nluItem.intent = newWord;
-              }
-              if (nluItem.intent === oriWord && nluItem.text !== oriWord) {
-                nluItem.intent = newWord;
-              }
-              return nluItem;
-            }),
-        },
-      };
+      nlu.rasa_nlu_data.common_examples.map((nluItem) => {
+        if (nluItem.text === oriWord) {
+          nluItem.text = newWord;
+          nluItem.intent = newWord;
+        }
+        if (nluItem.intent === oriWord && nluItem.text !== oriWord) {
+          nluItem.intent = newWord;
+        }
+        return nluItem;
+      });
 
       // 更改domain訓練檔中的意圖
-      const intentIdx = state.cloneData.domain.intents.indexOf(oriWord);
-      const domain = {
-        ...state.cloneData.domain,
-        intents: state.cloneData.domain.intents.splice(intentIdx, 1, newWord),
-      };
+      const intentIdx = domain.intents.indexOf(oriWord);
+      domain.intents.splice(intentIdx, 1, newWord);
 
       const cloneData = {
-        ...state.cloneData,
+        stories,
         domain,
         nlu,
-        stories,
       };
 
       return postAllTrainData(cloneData).then((res) => {
@@ -238,7 +231,7 @@ const reducer = (state: State, action: Action): State => {
     case 'EDIT_BOT_RESPONSE': {
       const { oriWord, newWord, actionName, storyName } = action.payload;
       const { onSetStory, onSetAllTrainData } = state;
-      const { domain } = state.cloneData;
+      const { domain } = cloneDeep(state.cloneData);
       if (
         state.cloneData.domain.responses[actionName] &&
         state.cloneData.domain.responses[actionName][0].text === oriWord
@@ -276,12 +269,14 @@ const reducer = (state: State, action: Action): State => {
         .filter((example) => example !== '');
       const repeat = [];
 
-      const nlu = state.cloneData.nlu.rasa_nlu_data.common_examples.filter(
+      const { nlu } = cloneDeep(state.cloneData);
+
+      const newNlu = nlu.rasa_nlu_data.common_examples.filter(
         (nluItem) => nluItem.intent !== intent || nluItem.text === intent,
       );
 
       currentExamples.map((example) => {
-        return nlu.map((nluItem) => {
+        return newNlu.map((nluItem) => {
           if (nluItem.text === example) {
             repeat.push(example);
           }
@@ -298,7 +293,7 @@ const reducer = (state: State, action: Action): State => {
       }
 
       currentExamples.map((example) =>
-        nlu.push({
+        newNlu.push({
           text: example,
           intent,
           entities: [],
@@ -307,7 +302,7 @@ const reducer = (state: State, action: Action): State => {
 
       const cloneData = {
         ...state.cloneData,
-        nlu: { rasa_nlu_data: { common_examples: nlu } },
+        nlu: { rasa_nlu_data: { common_examples: newNlu } },
       };
 
       return postAllTrainData(cloneData).then((res) => {
@@ -569,6 +564,7 @@ const reducer = (state: State, action: Action): State => {
             domain.responses[actionName][0].buttons = [{ title, payload }];
           }
 
+          domain.actions.push(buttonActionName);
           domain.responses[buttonActionName] = [{ text: reply }];
           domain.intents.push(title);
         }
