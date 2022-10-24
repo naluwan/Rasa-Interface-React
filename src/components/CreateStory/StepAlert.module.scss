@@ -1,0 +1,27 @@
+.title {
+  font-size: 20px;
+  color: #fff;
+}
+
+.inputFocus {
+  margin-left: 2px;
+  animation: animate 1s linear infinite;
+}
+
+@keyframes animate {
+  0% {
+    opacity: 0.2;
+  }
+  25% {
+    opacity: 0.6;
+  }
+  50% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.6;
+  }
+  100% {
+    opacity: 0.2;
+  }
+}

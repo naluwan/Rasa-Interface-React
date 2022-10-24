@@ -40,6 +40,7 @@ const Stories = () => {
     onSetDeleteStory,
     onSetAllTrainData,
     onSetAllAction,
+    onSetRasaTrainState,
   } = useStoryStore((state: State) => {
     return {
       story: state.story,
@@ -54,6 +55,7 @@ const Stories = () => {
       onSetDeleteStory: state.onSetDeleteStory,
       onSetAllTrainData: state.onSetAllTrainData,
       onSetAllAction: state.onSetAllAction,
+      onSetRasaTrainState: state.onSetRasaTrainState,
     };
   }, shallow);
 
@@ -62,8 +64,15 @@ const Stories = () => {
   // 進入頁面獲取設定資料
   React.useEffect(() => {
     onSetAllTrainData(data);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [data]);
+  }, [data, onSetAllTrainData]);
+
+  // 只要資料有更新，就更新全部機器人回覆action name
+  React.useEffect(() => {
+    fetchAllAction().then((actionData) => onSetAllAction(actionData));
+    fetch(`http://192.168.10.105:5005/status`)
+      .then((res) => res.json())
+      .then((data) => onSetRasaTrainState(data.num_active_training_jobs));
+  }, [cloneData, onSetAllAction, onSetRasaTrainState]);
 
   // 離開頁面將顯示故事刪除
   React.useEffect(() => {
@@ -226,7 +235,6 @@ const Stories = () => {
               });
               return;
             }
-            fetchAllAction().then((actionData) => onSetAllAction(actionData));
             setNewStory({ story: createStoryName, steps: [] });
             onSetStory('');
             setCreate(true);
@@ -249,14 +257,13 @@ const Stories = () => {
           });
           return;
         }
-        fetchAllAction().then((actionData) => onSetAllAction(actionData));
         setNewStory({ story: createStoryName, steps: [] });
         onSetStory('');
         setCreate(true);
         setDefaultValue('');
       },
     );
-  }, [newStory, onSetStory, stories, onSetAllAction]);
+  }, [newStory, onSetStory, stories]);
 
   // 新增故事點擊儲存按鈕
   const atClickSaveBtn = React.useCallback(
@@ -352,13 +359,14 @@ const Stories = () => {
         .map((step) => {
           const buttons = [];
           if (step.buttons) {
-            step.buttons.map((button) =>
-              buttons.push({
+            step.buttons.map((button) => {
+              const isPayload = button.payload.indexOf('/');
+              return buttons.push({
                 title: button.title,
-                payload: button.payload,
+                payload: isPayload > -1 ? button.payload : `/${button.payload}`,
                 reply: button.reply,
-              }),
-            );
+              });
+            });
           }
           return {
             action: step.action,
@@ -450,74 +458,79 @@ const Stories = () => {
   // 恢復刪除故事(只能恢復最後一筆資料)
   const atRecoverDeletedStory = React.useCallback(
     (deleteStory: StoryType) => {
+      const isExist = stories.some((item) => item.story === deleteStory.story);
+      if (isExist) {
+        Toast.fire({
+          icon: 'warning',
+          title: '故事名稱重複',
+        });
+        return;
+      }
       atClickSaveBtn(deleteStory);
       onSetDeleteStory({});
     },
-    [onSetDeleteStory, atClickSaveBtn],
+    [onSetDeleteStory, atClickSaveBtn, stories],
   );
 
   return (
-    <div>
-      <div>
-        <div className={style.searchBar}>
-          <div>
-            <div className={style.senderId}>
-              <h4 className={style.searchTitle}>故事流程</h4>
-              <div>故事名稱：</div>
-              <select
-                id="stories"
-                className={style.storiesSelector}
-                onChange={(e) => atSelectStory(e.target.value)}
-                value={defaultValue}
-              >
-                <option value="" disabled hidden>
-                  請選擇
-                </option>
-                {storiesOptions &&
-                  storiesOptions.map((item) => (
-                    <option key={item.story} value={item.story}>
-                      {item.story}
-                    </option>
-                  ))}
-              </select>
+    <>
+      <div className={style.searchBar}>
+        <div>
+          <div className={style.senderId}>
+            <h4 className={style.searchTitle}>故事流程</h4>
+            <div>故事名稱：</div>
+            <select
+              id="stories"
+              className={style.storiesSelector}
+              onChange={(e) => atSelectStory(e.target.value)}
+              value={defaultValue}
+            >
+              <option value="" disabled hidden>
+                請選擇
+              </option>
+              {storiesOptions &&
+                storiesOptions.map((item) => (
+                  <option key={item.story} value={item.story}>
+                    {item.story}
+                  </option>
+                ))}
+            </select>
+            <div className={cx('btn', style.navbar)}>
+              <MyButton variant="third" onClick={atClickCreateStoryBtn}>
+                新增故事流程
+              </MyButton>
+            </div>
+            {Object.keys(deletedStory).length > 0 && (
               <div className={cx('btn', style.navbar)}>
-                <MyButton variant="third" onClick={atClickCreateStoryBtn}>
-                  新增故事流程
+                <MyButton
+                  variant="primary"
+                  onClick={() => atRecoverDeletedStory(deletedStory)}
+                >
+                  恢復刪除
                 </MyButton>
               </div>
-              {Object.keys(deletedStory).length > 0 && (
-                <div className={cx('btn', style.navbar)}>
-                  <MyButton
-                    variant="primary"
-                    onClick={() => atRecoverDeletedStory(deletedStory)}
-                  >
-                    恢復刪除
-                  </MyButton>
-                </div>
-              )}
-            </div>
+            )}
           </div>
         </div>
-        <div id="data-panel" />
-        {Object.keys(story).length > 0 && (
-          <ShowStory
-            story={story}
-            onDeleteStory={atDeleteStory}
-            onRecoverDeletedStory={atClickSaveBtn}
-          />
-        )}
-        {create && (
-          <CreateStory
-            isCreate={create}
-            newStory={newStory}
-            nlu={nlu.rasa_nlu_data.common_examples}
-            actions={actions}
-            onSetNewStory={setNewStory}
-            onClickSaveBtn={atClickSaveBtn}
-          />
-        )}
       </div>
-    </div>
+      {Object.keys(story).length > 0 && (
+        <ShowStory
+          story={story}
+          onDeleteStory={atDeleteStory}
+          onRecoverDeletedStory={atClickSaveBtn}
+        />
+      )}
+      {create && (
+        <CreateStory
+          isCreate={create}
+          newStory={newStory}
+          nlu={nlu.rasa_nlu_data.common_examples}
+          actions={actions}
+          onSetNewStory={setNewStory}
+          onClickSaveBtn={atClickSaveBtn}
+        />
+      )}
+    </>
   );
 };
 

@@ -19,6 +19,7 @@ const ShowStory: React.FC<ShowStoryProps> = (props) => {
     onEditExamples,
     onEditResButtons,
     onRemoveResButton,
+    onAddResButtons,
   } = useStoryStore((state: State) => {
     return {
       onEditBotRes: state.onEditBotRes,
@@ -26,6 +27,7 @@ const ShowStory: React.FC<ShowStoryProps> = (props) => {
       onEditExamples: state.onEditExamples,
       onEditResButtons: state.onEditResButtons,
       onRemoveResButton: state.onRemoveResButton,
+      onAddResButtons: state.onAddResButtons,
     };
   }, shallow);
 
@@ -70,6 +72,7 @@ const ShowStory: React.FC<ShowStoryProps> = (props) => {
               onEditBotRes={onEditBotRes}
               onEditResButtons={onEditResButtons}
               onRemoveResButton={onRemoveResButton}
+              onAddResButtons={onAddResButtons}
             />
           );
         })}

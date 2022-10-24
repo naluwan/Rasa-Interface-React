@@ -1,18 +1,24 @@
-.botTitle {
-  padding: 10px;
-  font-size: 20px;
-  font-weight: 500;
-  word-break: keep-all;
-}
+.botStepContainer {
+  border: 1px solid #fff;
+  border-radius: 20px;
+  padding: 1rem;
+  .botTitle {
+    padding: 10px;
+    font-size: 20px;
+    font-weight: 500;
+    word-break: keep-all;
+    color: #fff;
+  }
 
-.botResponse {
-  box-shadow: 0px 5px 9px 4px #44444445;
-  border-radius: 10px;
-  padding: 10px;
-  width: 100%;
-  color: #111;
-  border: none;
-  cursor: text;
-  resize: none;
-  outline: none;
+  .botResponse {
+    box-shadow: 0px 5px 9px 4px #44444445;
+    border-radius: 10px;
+    padding: 10px;
+    width: 100%;
+    color: #111;
+    border: none;
+    cursor: text;
+    resize: none;
+    outline: none;
+  }
 }
