@@ -168,14 +168,16 @@ const reducer = (state: State, action: Action): State => {
       const { oriWord, newWord, storyName } = action.payload;
       const { stories, domain, nlu } = cloneDeep(state.cloneData);
 
+      const newUserSay = newWord.trim();
+
       nlu.rasa_nlu_data.common_examples.map((nluItem) =>
-        nluItem.text === newWord ? repeat.push(newWord) : nluItem,
+        nluItem.text === newUserSay ? repeat.push(newUserSay) : nluItem,
       );
 
       if (repeat.length) {
         return Toast.fire({
           icon: 'warning',
-          title: `使用者對話『${newWord}』重複`,
+          title: `使用者對話『${newUserSay}』重複`,
         });
       }
 
@@ -184,8 +186,8 @@ const reducer = (state: State, action: Action): State => {
         if (item.story === storyName) {
           item.steps.map((step) => {
             if (step.user === oriWord) {
-              step.user = newWord;
-              step.intent = newWord;
+              step.user = newUserSay;
+              step.intent = newUserSay;
             }
             return step;
           });
@@ -196,18 +198,18 @@ const reducer = (state: State, action: Action): State => {
       // 更改nlu訓練檔中所有意圖與原意圖相同的例句
       nlu.rasa_nlu_data.common_examples.map((nluItem) => {
         if (nluItem.text === oriWord) {
-          nluItem.text = newWord;
-          nluItem.intent = newWord;
+          nluItem.text = newUserSay;
+          nluItem.intent = newUserSay;
         }
         if (nluItem.intent === oriWord && nluItem.text !== oriWord) {
-          nluItem.intent = newWord;
+          nluItem.intent = newUserSay;
         }
         return nluItem;
       });
 
       // 更改domain訓練檔中的意圖
       const intentIdx = domain.intents.indexOf(oriWord);
-      domain.intents.splice(intentIdx, 1, newWord);
+      domain.intents.splice(intentIdx, 1, newUserSay);
 
       const cloneData = {
         stories,

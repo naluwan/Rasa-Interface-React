@@ -313,6 +313,8 @@ const Stories = () => {
       cloneNewStory.steps = cloneNewStory.steps.map((step) => {
         if (step.intent) {
           delete step.examples;
+          step.intent = step.intent.trim();
+          step.user = step.user.trim();
         }
         if (step.action) {
           delete step.response;
@@ -339,7 +341,10 @@ const Stories = () => {
       // 組成例句的訓練檔格式
       const currentExamples = createStory.steps
         .filter((step) => step.examples)
-        .map((step) => ({ intent: step.intent, examples: step.examples }));
+        .map((step) => ({
+          intent: step.intent.trim(),
+          examples: step.examples,
+        }));
 
       // 將例句訓練檔放進nlu訓練檔中
       // 將意圖放進domain訓練檔的intents中
