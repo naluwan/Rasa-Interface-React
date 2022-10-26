@@ -239,9 +239,12 @@ const reducer = (state: State, action: Action): State => {
       const { domain } = cloneDeep(state.cloneData);
       if (
         state.cloneData.domain.responses[actionName] &&
-        state.cloneData.domain.responses[actionName][0].text === oriWord
+        state.cloneData.domain.responses[actionName][0].text ===
+          JSON.parse(JSON.stringify(oriWord).replace(/ \\n/g, '  \\n'))
       ) {
-        domain.responses[actionName][0].text = newWord;
+        domain.responses[actionName][0].text = JSON.parse(
+          JSON.stringify(newWord).replace(/\\n/g, '  \\n'),
+        );
       }
 
       const cloneData = {

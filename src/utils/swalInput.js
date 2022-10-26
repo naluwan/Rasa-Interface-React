@@ -11,7 +11,7 @@ export const swalInput = async (
     const { value: formValue } = await Swal.fire({
       title,
       html: `
-      <input id="ori" class="swal2-input" style="display:none" value="${inputValue}">
+      <textarea id="ori" class="swal2-input" style="display:none">${inputValue}</textarea>
       <textarea id="new" class="swal2-textarea col-9">${inputValue}</textarea>
       `,
       inputPlaceholder,

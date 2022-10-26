@@ -385,15 +385,18 @@ const Stories = () => {
 
       // 將機器人回覆放進domain訓練檔中
       cloneAction.map((actionItem) => {
+        const responseText = JSON.parse(
+          JSON.stringify(actionItem.text).replace(/\\n/g, '  \\n'),
+        );
         // 放進按鈕回覆
         if (actionItem.buttons.length) {
           actionItem.buttons.map((button) => delete button.reply);
           cloneData.domain.responses[actionItem.action] = [
-            { text: actionItem.text, buttons: actionItem.buttons },
+            { text: responseText, buttons: actionItem.buttons },
           ];
         } else {
           cloneData.domain.responses[actionItem.action] = [
-            { text: actionItem.text },
+            { text: responseText },
           ];
         }
         return cloneData.domain.actions.push(actionItem.action);
@@ -412,7 +415,7 @@ const Stories = () => {
               )
             ) {
               const reply = JSON.parse(
-                JSON.stringify(button.reply).replace(/\\r\\n/g, '  \\n'),
+                JSON.stringify(button.reply).replace(/\\n/g, '  \\n'),
               );
               cloneData.nlu.rasa_nlu_data.common_examples.push({
                 text: button.title,
