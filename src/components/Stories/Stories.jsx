@@ -302,7 +302,7 @@ const Stories = () => {
       if (!isRightProcess) {
         return Toast.fire({
           icon: 'error',
-          title: '無法同時有兩個使用者對話，請重新嘗試',
+          title: '故事流程步驟順序有問題，請重新嘗試',
         });
       }
 

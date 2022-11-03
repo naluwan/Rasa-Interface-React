@@ -211,6 +211,32 @@ const reducer = (state: State, action: Action): State => {
       const intentIdx = domain.intents.indexOf(oriWord);
       domain.intents.splice(intentIdx, 1, newUserSay);
 
+      // 確認目前故事流程中所有的按鈕是否有串接到此故事
+      const responses = Object.entries(domain.responses);
+      let actionName = '';
+      const isInButton = responses.some((response) => {
+        return response[1].some((item) => {
+          return item.buttons?.some((button) => {
+            if (button.title === oriWord) {
+              [actionName] = response;
+              return true;
+            }
+            return false;
+          });
+        });
+      });
+
+      // 如果按鈕有串接到此故事，就把按鈕資料也一起更改
+      if (isInButton) {
+        domain.responses[actionName][0].buttons.map((button) => {
+          if (button.title === oriWord) {
+            button.title = newUserSay;
+            button.payload = `/${newUserSay}`;
+          }
+          return button;
+        });
+      }
+
       const cloneData = {
         stories,
         domain,
@@ -359,42 +385,81 @@ const reducer = (state: State, action: Action): State => {
         ...state.cloneData,
       };
 
+      // 驗證是否是新建按鈕或是串接別的故事
+      const isButton = cloneData.stories.some((item) => {
+        return item.steps.some((step) => {
+          if (step.intent === curOriPayload && item.story.includes('button_')) {
+            return true;
+          }
+          return false;
+        });
+      });
+
+      const currentReply = JSON.parse(
+        JSON.stringify(reply).replace(/\\r\\n/g, '  \\n'),
+      );
+
       // 如果按鈕標題有更改
       if (title !== curOriPayload) {
-        const stories = state.cloneData.stories.map((item) => {
+        const stories = cloneData.stories.map((item) => {
           // 將stories訓練檔中按鈕故事更改意圖與對話
-          if (item.story === `button_${curOriPayload}`) {
-            item.story = `button_${title}`;
+          if (isButton) {
+            if (item.story === `button_${curOriPayload}`) {
+              item.story = `button_${title}`;
+              item.steps.map((step) => {
+                if (step.intent) {
+                  step.user = title;
+                  step.intent = title;
+                }
+                return step;
+              });
+            }
+          } else {
             item.steps.map((step) => {
-              if (step.intent) {
+              if (step.intent === curOriPayload) {
                 step.user = title;
                 step.intent = title;
               }
               return step;
             });
           }
+
           return item;
+        });
+
+        // 判斷更新的按鈕例句是否已經存在，如果存在就先刪除在更新原本的例句
+        cloneData.nlu.rasa_nlu_data.common_examples.map((nluItem, idx) => {
+          if (nluItem.text === title && nluItem.intent === curOriPayload) {
+            cloneData.nlu.rasa_nlu_data.common_examples.splice(idx, 1);
+          }
+          return nluItem;
         });
 
         // 將nlu訓練檔中的按鈕例句更改
         const nlu = {
           rasa_nlu_data: {
-            common_examples:
-              state.cloneData.nlu.rasa_nlu_data.common_examples.map(
-                (nluItem) => {
-                  if (nluItem.intent === curOriPayload) {
+            common_examples: cloneData.nlu.rasa_nlu_data.common_examples.map(
+              (nluItem) => {
+                if (nluItem.intent === curOriPayload) {
+                  if (isButton) {
                     nluItem.text = title;
                     nluItem.intent = title;
+                  } else {
+                    if (nluItem.text === curOriPayload) {
+                      nluItem.text = title;
+                      nluItem.intent = title;
+                    }
+                    nluItem.intent = title;
                   }
-                  return nluItem;
-                },
-              ),
+                }
+                return nluItem;
+              },
+            ),
           },
         };
 
-        // 將domain訓練檔中responses的按鈕標題和payload更改
-        const { domain } = state.cloneData;
-
+        // 更改domain按鈕內容
+        const { domain } = cloneData;
         domain.responses[actionName][0].buttons.map((button) => {
           if (button.payload === oriPayload) {
             button.title = title;
@@ -412,12 +477,9 @@ const reducer = (state: State, action: Action): State => {
         cloneData.domain = domain;
       }
 
-      const currentReply = JSON.parse(
-        JSON.stringify(reply).replace(/\\r\\n/g, '  \\n'),
-      );
-
       // 將domain訓練檔中responses的按鈕回覆做更改
       const { domain } = cloneData;
+
       if (domain.responses[buttonActionName][0].text !== currentReply) {
         domain.responses[buttonActionName][0].text = currentReply;
       }

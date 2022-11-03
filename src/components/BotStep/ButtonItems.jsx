@@ -41,7 +41,7 @@ const ButtonItems: React.FC<ButtonItemsProps> = (props) => {
   }, [reply]);
 
   return (
-    <div className="card col-10 m-3" key={payload}>
+    <div className="card col-10 m-3">
       <div className="card-body">
         <h5 className="card-title d-flex justify-content-between">
           <button
@@ -51,14 +51,22 @@ const ButtonItems: React.FC<ButtonItemsProps> = (props) => {
           >
             {title}
           </button>
-          <button
-            className="btn btn-danger"
-            onClick={() =>
-              onRemoveResButton(title, payload, buttonAction, disabled)
-            }
-          >
-            刪除
-          </button>
+          <div>
+            <button
+              className="btn btn-primary mx-1"
+              onClick={() => onEditResButtons(title, reply, buttonAction)}
+            >
+              編輯
+            </button>
+            <button
+              className="btn btn-danger"
+              onClick={() =>
+                onRemoveResButton(title, payload, buttonAction, disabled)
+              }
+            >
+              刪除
+            </button>
+          </div>
         </h5>
         <textarea
           className={cx('card-text col-12', style.botResponse)}
