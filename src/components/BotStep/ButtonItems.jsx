@@ -44,13 +44,9 @@ const ButtonItems: React.FC<ButtonItemsProps> = (props) => {
     <div className="card col-10 m-3">
       <div className="card-body">
         <h5 className="card-title d-flex justify-content-between">
-          <button
-            className="btn btn-primary"
-            onClick={() => onEditResButtons(title, reply, buttonAction)}
-            disabled={disabled}
-          >
+          <span className="badge rounded-pill bg-info d-flex align-items-center">
             {title}
-          </button>
+          </span>
           <div>
             <button
               className="btn btn-primary mx-1"
