@@ -113,7 +113,12 @@ export type State = {
     actionName: string,
     storyName: string,
   ) => void,
-  onEditExamples: (intent: string, examples: string, storyName: string) => void,
+  onEditExamples: (
+    userSay: string,
+    intent: string,
+    examples: string,
+    storyName: string,
+  ) => void,
   onSetAllAction: (action: string[]) => void,
   onEditResButtons: (
     actionName: string,
@@ -138,5 +143,6 @@ export type State = {
     reply: string,
     storyName: string,
   ) => void,
+  onEditIntent: (oriIntent: string, intent: string, storyName: string) => void,
   onSetRasaTrainState: (state: number) => void,
 };

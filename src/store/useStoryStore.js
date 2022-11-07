@@ -27,6 +27,7 @@ import {
   actionRemoveResButton,
   actionAddResButtons,
   actionSetRasaTrainState,
+  actionEditIntent,
 } from 'actions';
 // import { computed } from 'zustand-middleware-computed-state';
 import { Toast } from 'utils/swalInput';
@@ -149,7 +150,7 @@ const reducer = (state: State, action: Action): State => {
         if (step.intent) {
           const examples = nlu.rasa_nlu_data.common_examples.filter(
             (nluItem) =>
-              nluItem.intent === step.intent && nluItem.text !== step.intent,
+              nluItem.intent === step.intent && nluItem.text !== step.user,
           );
 
           const currentExample = examples.map((example) => example.text);
@@ -187,7 +188,7 @@ const reducer = (state: State, action: Action): State => {
           item.steps.map((step) => {
             if (step.user === oriWord) {
               step.user = newUserSay;
-              step.intent = newUserSay;
+              // step.intent = newUserSay;
             }
             return step;
           });
@@ -199,43 +200,43 @@ const reducer = (state: State, action: Action): State => {
       nlu.rasa_nlu_data.common_examples.map((nluItem) => {
         if (nluItem.text === oriWord) {
           nluItem.text = newUserSay;
-          nluItem.intent = newUserSay;
+          // nluItem.intent = newUserSay;
         }
-        if (nluItem.intent === oriWord && nluItem.text !== oriWord) {
-          nluItem.intent = newUserSay;
-        }
+        // if (nluItem.intent === oriWord && nluItem.text !== oriWord) {
+        //   nluItem.intent = newUserSay;
+        // }
         return nluItem;
       });
 
       // 更改domain訓練檔中的意圖
-      const intentIdx = domain.intents.indexOf(oriWord);
-      domain.intents.splice(intentIdx, 1, newUserSay);
+      // const intentIdx = domain.intents.indexOf(oriWord);
+      // domain.intents.splice(intentIdx, 1, newUserSay);
 
       // 確認目前故事流程中所有的按鈕是否有串接到此故事
-      const responses = Object.entries(domain.responses);
-      let actionName = '';
-      const isInButton = responses.some((response) => {
-        return response[1].some((item) => {
-          return item.buttons?.some((button) => {
-            if (button.title === oriWord) {
-              [actionName] = response;
-              return true;
-            }
-            return false;
-          });
-        });
-      });
+      // const responses = Object.entries(domain.responses);
+      // let actionName = '';
+      // const isInButton = responses.some((response) => {
+      //   return response[1].some((item) => {
+      //     return item.buttons?.some((button) => {
+      //       if (button.title === oriWord) {
+      //         [actionName] = response;
+      //         return true;
+      //       }
+      //       return false;
+      //     });
+      //   });
+      // });
 
       // 如果按鈕有串接到此故事，就把按鈕資料也一起更改
-      if (isInButton) {
-        domain.responses[actionName][0].buttons.map((button) => {
-          if (button.title === oriWord) {
-            button.title = newUserSay;
-            button.payload = `/${newUserSay}`;
-          }
-          return button;
-        });
-      }
+      // if (isInButton) {
+      //   domain.responses[actionName][0].buttons.map((button) => {
+      //     if (button.title === oriWord) {
+      //       button.title = newUserSay;
+      //       button.payload = `/${newUserSay}`;
+      //     }
+      //     return button;
+      //   });
+      // }
 
       const cloneData = {
         stories,
@@ -294,7 +295,7 @@ const reducer = (state: State, action: Action): State => {
       });
     }
     case 'EDIT_EXAMPLES': {
-      const { intent, examples, storyName } = action.payload;
+      const { userSay, intent, examples, storyName } = action.payload;
       const { onSetStory, onSetAllTrainData } = state;
       const currentExamples = examples
         .split(',')
@@ -306,7 +307,7 @@ const reducer = (state: State, action: Action): State => {
       const { nlu } = cloneDeep(state.cloneData);
 
       const newNlu = nlu.rasa_nlu_data.common_examples.filter(
-        (nluItem) => nluItem.intent !== intent || nluItem.text === intent,
+        (nluItem) => nluItem.intent !== intent || nluItem.text === userSay,
       );
 
       currentExamples.map((example) => {
@@ -352,6 +353,7 @@ const reducer = (state: State, action: Action): State => {
           title: '編輯使用者例句成功',
         });
         onSetAllTrainData(res.data);
+        console.log('story name:', storyName);
         return onSetStory(storyName);
       });
     }
@@ -385,6 +387,15 @@ const reducer = (state: State, action: Action): State => {
         ...state.cloneData,
       };
 
+      const isRepeat = cloneData.domain.intents.includes(title);
+
+      if (isRepeat && title !== curOriPayload) {
+        return Toast.fire({
+          icon: 'warning',
+          title: `意圖『${title}』重複`,
+        });
+      }
+
       // 驗證是否是新建按鈕或是串接別的故事
       const isButton = cloneData.stories.some((item) => {
         return item.steps.some((step) => {
@@ -417,7 +428,7 @@ const reducer = (state: State, action: Action): State => {
           } else {
             item.steps.map((step) => {
               if (step.intent === curOriPayload) {
-                step.user = title;
+                // step.user = title;
                 step.intent = title;
               }
               return step;
@@ -427,13 +438,15 @@ const reducer = (state: State, action: Action): State => {
           return item;
         });
 
+        /* 因為啟用意圖功能，不會再修改到使用者對話，所以不會再有修改到重覆例句的問題
         // 判斷更新的按鈕例句是否已經存在，如果存在就先刪除在更新原本的例句
-        cloneData.nlu.rasa_nlu_data.common_examples.map((nluItem, idx) => {
-          if (nluItem.text === title && nluItem.intent === curOriPayload) {
-            cloneData.nlu.rasa_nlu_data.common_examples.splice(idx, 1);
-          }
-          return nluItem;
-        });
+        // cloneData.nlu.rasa_nlu_data.common_examples.map((nluItem, idx) => {
+        //   if (nluItem.text === title && nluItem.intent === curOriPayload) {
+        //     cloneData.nlu.rasa_nlu_data.common_examples.splice(idx, 1);
+        //   }
+        //   return nluItem;
+        // });
+        */
 
         // 將nlu訓練檔中的按鈕例句更改
         const nlu = {
@@ -445,10 +458,12 @@ const reducer = (state: State, action: Action): State => {
                     nluItem.text = title;
                     nluItem.intent = title;
                   } else {
+                    /* 啟用意圖功能後，此段可註解
                     if (nluItem.text === curOriPayload) {
                       nluItem.text = title;
                       nluItem.intent = title;
                     }
+                    // */
                     nluItem.intent = title;
                   }
                 }
@@ -675,6 +690,91 @@ const reducer = (state: State, action: Action): State => {
         rasaTrainState: action.payload,
       };
     }
+    case 'EDIT_INTENT': {
+      const { oriIntent, intent, storyName } = action.payload;
+      const { stories, nlu, domain } = cloneDeep(state.cloneData);
+      const { onSetStory, onSetAllTrainData } = state;
+      // 驗證意圖是否重複
+      const isRepeat = domain.intents.includes(intent);
+      if (isRepeat) {
+        return Toast.fire({
+          icon: 'warning',
+          title: `意圖『${intent}』重複`,
+        });
+      }
+
+      // 更新stories該故事意圖
+      stories.map((item) => {
+        if (item.story === storyName) {
+          item.steps.map((step) => {
+            if (step.intent === oriIntent) {
+              step.intent = intent;
+            }
+            return step;
+          });
+        }
+        return item;
+      });
+
+      // 將nlu訓練檔內的意圖更新
+      nlu.rasa_nlu_data.common_examples.map((nluItem) => {
+        if (nluItem.intent === oriIntent) {
+          nluItem.intent = intent;
+        }
+        return nluItem;
+      });
+
+      // 更新domain訓練檔內的intents，刪除就的意圖，新增新的意圖
+      domain.intents.splice(domain.intents.indexOf(oriIntent), 1, intent);
+
+      // 確認目前故事流程中所有的按鈕是否有串接到此故事
+      const responses = Object.entries(domain.responses);
+      let actionName = '';
+      const isInButton = responses.some((response) => {
+        return response[1].some((item) => {
+          return item.buttons?.some((button) => {
+            if (button.title === oriIntent) {
+              [actionName] = response;
+              return true;
+            }
+            return false;
+          });
+        });
+      });
+
+      // 如果按鈕有串接到此故事，就把按鈕資料也一起更改
+      if (isInButton) {
+        domain.responses[actionName][0].buttons.map((button) => {
+          if (button.title === oriIntent) {
+            button.title = intent;
+            button.payload = `/${intent}`;
+          }
+          return button;
+        });
+      }
+
+      const cloneData = {
+        stories,
+        domain,
+        nlu,
+      };
+
+      return postAllTrainData(cloneData).then((res) => {
+        if (res.status !== 'success') {
+          return Toast.fire({
+            icon: 'error',
+            title: '編輯意圖失敗',
+            text: res.message,
+          });
+        }
+        Toast.fire({
+          icon: 'success',
+          title: '編輯意圖成功',
+        });
+        onSetAllTrainData(res.data);
+        return onSetStory(storyName);
+      });
+    }
     default:
       return state;
   }
@@ -749,8 +849,13 @@ const useStoryStore = create((set) => {
     ) {
       dispatch(actionEditBotRes(oreWord, newWord, actionName, storyName));
     },
-    onEditExamples(intent: string, examples: string, storyName: string) {
-      dispatch(actionEditExamples(intent, examples, storyName));
+    onEditExamples(
+      userSay: string,
+      intent: string,
+      examples: string,
+      storyName: string,
+    ) {
+      dispatch(actionEditExamples(userSay, intent, examples, storyName));
     },
     onSetDeleteStory(deleteStory: StoryType) {
       dispatch(actionSetDeleteStory(deleteStory));
@@ -809,6 +914,9 @@ const useStoryStore = create((set) => {
     },
     onSetRasaTrainState(state: number) {
       dispatch(actionSetRasaTrainState(state));
+    },
+    onEditIntent(oriIntent: string, intent: string, storyName: string) {
+      dispatch(actionEditIntent(oriIntent, intent, storyName));
     },
   };
 });

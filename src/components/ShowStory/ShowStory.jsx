@@ -5,6 +5,7 @@ import BotStep from 'components/BotStep';
 import style from './ShowStory.module.scss';
 import type { StoryType, State } from '../types';
 import useStoryStore from '../../store/useStoryStore';
+// import StepControl from '../CreateStory/StepControl';
 
 type ShowStoryProps = {
   story: StoryType,
@@ -20,6 +21,7 @@ const ShowStory: React.FC<ShowStoryProps> = (props) => {
     onEditResButtons,
     onRemoveResButton,
     onAddResButtons,
+    onEditIntent,
   } = useStoryStore((state: State) => {
     return {
       onEditBotRes: state.onEditBotRes,
@@ -28,6 +30,7 @@ const ShowStory: React.FC<ShowStoryProps> = (props) => {
       onEditResButtons: state.onEditResButtons,
       onRemoveResButton: state.onRemoveResButton,
       onAddResButtons: state.onAddResButtons,
+      onEditIntent: state.onEditIntent,
     };
   }, shallow);
 
@@ -63,6 +66,7 @@ const ShowStory: React.FC<ShowStoryProps> = (props) => {
               storyName={story.story}
               onEditExamples={onEditExamples}
               onEditUserSay={onEditUserSay}
+              onEditIntent={onEditIntent}
             />
           ) : (
             <BotStep
@@ -76,6 +80,7 @@ const ShowStory: React.FC<ShowStoryProps> = (props) => {
             />
           );
         })}
+        {/* <StepControl /> */}
       </div>
     </div>
   );

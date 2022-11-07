@@ -18,7 +18,12 @@ export type Action =
     }
   | {
       type: 'EDIT_EXAMPLES',
-      payload: { intent: string, examples: string, storyName: string },
+      payload: {
+        userSay: string,
+        intent: string,
+        examples: string,
+        storyName: string,
+      },
     }
   | {
       type: 'SET_DELETE_STORY',
@@ -60,7 +65,11 @@ export type Action =
         storyName: string,
       },
     }
-  | { type: 'SET_RASA_TRAIN_STATE', payload: number };
+  | { type: 'SET_RASA_TRAIN_STATE', payload: number }
+  | {
+      type: 'EDIT_INTENT',
+      payload: { oriIntent: string, intent: string, storyName: string },
+    };
 
 export const actionSetAllData = (data: TrainDataType): Action => ({
   type: 'SET_ALL_TRAIN_DATA',
@@ -92,12 +101,13 @@ export const actionEditBotRes = (
 });
 
 export const actionEditExamples = (
+  userSay: string,
   intent: string,
   examples: string,
   storyName: string,
 ): Action => ({
   type: 'EDIT_EXAMPLES',
-  payload: { intent, examples, storyName },
+  payload: { userSay, intent, examples, storyName },
 });
 
 export const actionSetDeleteStory = (deleteStory: StoryType): Action => ({
@@ -156,4 +166,13 @@ export const actionAddResButtons = (
 export const actionSetRasaTrainState = (state: number): Action => ({
   type: 'SET_RASA_TRAIN_STATE',
   payload: state,
+});
+
+export const actionEditIntent = (
+  oriIntent: string,
+  intent: String,
+  storyName,
+): Action => ({
+  type: 'EDIT_INTENT',
+  payload: { oriIntent, intent, storyName },
 });

@@ -73,9 +73,42 @@ const CreateStory: React.FC<CreateStoryProps> = (props) => {
         return {
           ...prev,
           steps: prev.steps.map((step) => {
-            if (step.user === oriUserSay) {
+            if (step.user === oriUserSay && step.intent === oriUserSay) {
               step.user = userSay;
               step.intent = userSay;
+            } else {
+              step.user = userSay;
+            }
+            return step;
+          }),
+        };
+      });
+    },
+    [onSetNewStory, nlu, newStory],
+  );
+
+  // 編輯意圖
+  const atEditIntent = React.useCallback(
+    (oriIntent: string, intent: string) => {
+      const repeat = [];
+      nlu.map((nluItem) =>
+        nluItem.intent === intent ? repeat.push(intent) : nluItem,
+      );
+      newStory.steps.map((step) =>
+        step.intent === intent ? repeat.push(intent) : step,
+      );
+      if (repeat.length) {
+        return Toast.fire({
+          icon: 'warning',
+          title: `意圖『${intent}』重複`,
+        });
+      }
+      return onSetNewStory((prev) => {
+        return {
+          ...prev,
+          steps: prev.steps.map((step) => {
+            if (step.intent === oriIntent) {
+              step.intent = intent;
             }
             return step;
           }),
@@ -87,7 +120,7 @@ const CreateStory: React.FC<CreateStoryProps> = (props) => {
 
   // 編輯例句
   const atEditExamples = React.useCallback(
-    (intent: string, examples: string) => {
+    (userSay: string, intent: string, examples: string) => {
       const newExamples = examples
         .split(',')
         .map((example) => example.trimStart())
@@ -311,6 +344,7 @@ const CreateStory: React.FC<CreateStoryProps> = (props) => {
                 storyName={newStory.story}
                 onEditUserSay={atEditUserSay}
                 onEditExamples={atEditExamples}
+                onEditIntent={atEditIntent}
                 onRemoveUserStep={atRemoveUserStep}
               />
             ) : (

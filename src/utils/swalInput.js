@@ -7,7 +7,11 @@ export const swalInput = async (
   inputValue: string,
   showCancelButton: boolean,
 ) => {
-  if (title === '編輯使用者對話' || title === '編輯機器人回覆') {
+  if (
+    title === '編輯使用者對話' ||
+    title === '編輯機器人回覆' ||
+    title === '編輯意圖'
+  ) {
     const { value: formValue } = await Swal.fire({
       title,
       html: `
