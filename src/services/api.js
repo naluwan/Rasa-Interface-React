@@ -6,9 +6,10 @@ import {
   TrainDataType,
 } from 'components/types';
 import { Toast } from 'utils/swalInput';
+import type { ApiTrainDataType } from 'components/types';
 
 const JWT_TOKEN = 'JWT_TOKEN';
-const API_URL = 'http://192.168.10.127:3333/api';
+const API_URL = 'http://192.168.10.109:3333/api';
 
 const axiosInstance = axios.create();
 
@@ -134,6 +135,9 @@ export const fetchAllData = (): Promise<TrainDataType> => {
       Toast.fire({
         icon: 'error',
         title: err.response.data.message,
+      }).then(() => {
+        cleanToken();
+        window.location.reload();
       });
     });
 };
@@ -147,9 +151,11 @@ export const fetchAllAction = (): Promise<string[]> => {
     })
     .catch(({ response: { data } }) => {
       Toast.fire({
-        icon: 'warning',
-        title: '資料發生錯誤',
-        text: data.message,
+        icon: 'error',
+        title: data.message,
+      }).then(() => {
+        cleanToken();
+        window.location.reload();
       });
     });
 };
@@ -165,22 +171,53 @@ export const postAllTrainData = (
     })
     .catch(({ response: { data } }) => {
       Toast.fire({
-        icon: 'warning',
-        title: '資料發生錯誤',
-        text: data.message,
+        icon: 'error',
+        title: data.message,
+      }).then(() => {
+        cleanToken();
+        window.location.reload();
       });
     });
 };
 
 // 確認rasa訓練狀況
 export const fetchRasaTrainState = () => {
-  return (
-    axios
-      .get('http://192.168.10.105:5005/status')
-      // eslint-disable-next-line camelcase
-      .then(({ data }) => {
-        return { state: data.num_active_training_jobs };
-      })
-      .catch((err) => console.log(err))
-  );
+  return axios
+    .get('http://192.168.10.105:5005/status')
+    .then(({ data }) => {
+      return data.num_active_training_jobs;
+    })
+    .catch((err) => console.log(err));
+};
+
+// 發送訓練檔至rasa訓練
+export const postTrainDataToRasa = (currentData: ApiTrainDataType) => {
+  return axios(
+    'http://192.168.10.105:5005/model/train?save_to_default_model_directory=true&force_training=true',
+    {
+      method: 'POST',
+      data: JSON.stringify(currentData),
+      headers: {
+        'content-Type': 'application/json',
+      },
+    },
+  )
+    .then((res) => res.headers.filename)
+    .catch((err) => console.log(err));
+};
+
+// 發送最新訓練完成的model名稱至rasa套用model
+export const loadedNewModel = (fileName: string) => {
+  const payload = {
+    model_file: `/home/bill/Work/BF36_RASA_2.8.31_spacy/models/${fileName}`,
+  };
+  return axios('http://192.168.10.105:5005/model', {
+    method: 'PUT',
+    data: JSON.stringify(payload),
+    headers: {
+      'content-Type': 'application/json',
+    },
+  })
+    .then((res) => res)
+    .catch((err) => console.log(err));
 };

@@ -5,12 +5,11 @@ import { Link } from 'react-router-dom';
 import cx from 'classnames';
 import { CgSpinner } from 'react-icons/cg';
 import yaml from 'js-yaml';
-import { Toast } from 'utils/swalInput';
 import NavItem from './NavItem';
 import style from './NavBar.module.scss';
 import Authenticate from '../../containers/Authenticate';
 import useStoryStore from '../../store/useStoryStore';
-import type { State, ApiTrainDataType } from '../types';
+import type { State } from '../types';
 
 type NavBarProps = {
   navItems: NavItemType[],
@@ -26,8 +25,10 @@ const NavBar: React.FC<NavBarProps> = (props) => {
     config,
     domain,
     cloneData,
+    currentPage,
     onLogout,
-    onSetRasaTrainState,
+    onSetCurrentPage,
+    trainRasa,
   } = useStoryStore((state: State) => {
     return {
       user: state.user,
@@ -37,8 +38,10 @@ const NavBar: React.FC<NavBarProps> = (props) => {
       domain: state.domain,
       config: state.config,
       cloneData: state.cloneData,
+      currentPage: state.currentPage,
       onLogout: state.onLogout,
-      onSetRasaTrainState: state.onSetRasaTrainState,
+      onSetCurrentPage: state.onSetCurrentPage,
+      trainRasa: state.trainRasa,
     };
   }, shallow);
 
@@ -58,63 +61,66 @@ const NavBar: React.FC<NavBarProps> = (props) => {
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [stories, nlu, domain, config, cloneData]);
-
-  const atClickTrainBtn = React.useCallback(
-    (currentData: ApiTrainDataType) => {
-      fetch(`http://192.168.10.105:5005/status`)
-        .then((res) => {
-          return res.json();
-        })
-        .then((data) => {
-          return data.num_active_training_jobs;
-        })
-        .then((state) => {
-          if (!state) {
-            onSetRasaTrainState(1);
-            fetch(
-              'http://192.168.10.105:5005/model/train?save_to_default_model_directory=true&force_training=true',
-              {
-                method: 'post',
-                body: JSON.stringify(currentData),
-                headers: {
-                  'content-Type': 'application/json',
-                },
-              },
-            )
-              .then((res) => res.headers.get('filename'))
-              .then((fileName) => {
-                const payload = {
-                  model_file: `/home/bill/Work/BF36_RASA_2.8.31_spacy/models/${fileName}`,
-                };
-                return fetch('http://192.168.10.105:5005/model', {
-                  method: 'put',
-                  body: JSON.stringify(payload),
-                  headers: {
-                    'content-Type': 'application/json',
-                  },
-                });
-              })
-              .then((res) => {
-                if (res.status === 204) {
-                  onSetRasaTrainState(0);
-                }
-              });
-          } else {
-            onSetRasaTrainState(state);
-            Toast.fire({
-              icon: 'warning',
-              title: '機器人訓練中，請稍後',
-            });
-          }
-        });
-    },
-    [onSetRasaTrainState],
-  );
+  //   (currentData: ApiTrainDataType) => {
+  //     fetch(`http://192.168.10.105:5005/status`)
+  //       .then((res) => {
+  //         return res.json();
+  //       })
+  //       .then((data) => {
+  //         return data.num_active_training_jobs;
+  //       })
+  //       .then((state) => {
+  //         if (!state) {
+  //           onSetRasaTrainState(1);
+  //           console.log('currentData:', currentData);
+  //           fetch(
+  //             'http://192.168.10.105:5005/model/train?save_to_default_model_directory=true&force_training=true',
+  //             {
+  //               method: 'post',
+  //               body: JSON.stringify(currentData),
+  //               headers: {
+  //                 'content-Type': 'application/json',
+  //               },
+  //             },
+  //           )
+  //             .then((res) => res.headers.get('filename'))
+  //             .then((fileName) => {
+  //               const payload = {
+  //                 model_file: `/home/bill/Work/BF36_RASA_2.8.31_spacy/models/${fileName}`,
+  //               };
+  //               return fetch('http://192.168.10.105:5005/model', {
+  //                 method: 'put',
+  //                 body: JSON.stringify(payload),
+  //                 headers: {
+  //                   'content-Type': 'application/json',
+  //                 },
+  //               });
+  //             })
+  //             .then((res) => {
+  // if (res.status === 204) {
+  //   onSetRasaTrainState(0);
+  // }
+  //             });
+  //         } else {
+  // onSetRasaTrainState(state);
+  // Toast.fire({
+  //   icon: 'warning',
+  //   title: '機器人訓練中，請稍後',
+  // });
+  //         }
+  //       });
+  //   },
+  //   [onSetRasaTrainState],
+  // );
 
   return (
     <nav className={cx('navbar navbar-expand-lg navbar-dark', style.navbar)}>
       <div className="container-fluid">
-        <Link className={cx('navbar-brand', style.logo)} to="/" />
+        <Link
+          className={cx('navbar-brand', style.logo)}
+          onClick={() => onSetCurrentPage('首頁')}
+          to="/"
+        />
         <button
           className="navbar-toggler"
           type="button"
@@ -143,19 +149,20 @@ const NavBar: React.FC<NavBarProps> = (props) => {
           </ul>
           {user ? (
             <>
-              {rasaTrainState > 0 ? (
-                <button className="btn btn-outline-info mx-2" disabled>
-                  <CgSpinner className={cx('mx-2', style.loadingIcon)} />
-                  機器人訓練中
-                </button>
-              ) : (
-                <button
-                  className="btn btn-outline-info mx-2"
-                  onClick={() => atClickTrainBtn(trainData)}
-                >
-                  執行訓練
-                </button>
-              )}
+              {currentPage === '故事流程' &&
+                (rasaTrainState > 0 ? (
+                  <button className="btn btn-outline-info mx-2" disabled>
+                    <CgSpinner className={cx('mx-2', style.loadingIcon)} />
+                    機器人訓練中
+                  </button>
+                ) : (
+                  <button
+                    className="btn btn-outline-info mx-2"
+                    onClick={() => trainRasa(trainData)}
+                  >
+                    執行訓練
+                  </button>
+                ))}
 
               <button
                 className="btn btn-outline-light mx-1"

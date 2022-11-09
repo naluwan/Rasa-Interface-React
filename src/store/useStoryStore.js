@@ -6,12 +6,16 @@ import {
   fetchLogin,
   fetchRegister,
   postAllTrainData,
+  fetchRasaTrainState,
+  postTrainDataToRasa,
+  loadedNewModel,
 } from 'services/api';
 import type {
   RegisterUserInfoType,
   TrainDataType,
   State,
   StoryType,
+  ApiTrainDataType,
 } from 'components/types';
 
 import type { Action } from 'actions';
@@ -48,6 +52,7 @@ const initialState = {
   actions: [],
   storiesOptions: [],
   rasaTrainState: 1,
+  currentPage: null,
 };
 
 const reducer = (state: State, action: Action): State => {
@@ -58,6 +63,7 @@ const reducer = (state: State, action: Action): State => {
         const filteredStories = stories.filter(
           (item) => !item.story.includes('button_'),
         );
+        console.log('filteredStories:', filteredStories);
         return {
           ...state,
           ...action.payload,
@@ -797,16 +803,58 @@ const useStoryStore = create((set) => {
           .then((user) => {
             set({ user, isAppInitializedComplete: true });
           })
-          .catch(() => {});
+          .catch(() => {
+            set({ user: null, isAppInitializedComplete: true });
+            Toast.fire({
+              icon: 'error',
+              title: '無效Token',
+            }).then(() => {
+              cleanToken();
+              window.location.reload();
+            });
+          });
       } else {
         set({ isAppInitializedComplete: true });
+      }
+    },
+    async trainRasa(currentData: ApiTrainDataType) {
+      const rasaState = await fetchRasaTrainState();
+      if (rasaState > 0) {
+        set({ rasaTrainState: rasaState });
+        Toast.fire({
+          icon: 'warning',
+          title: '機器人訓練中，請稍後',
+        });
+      } else {
+        verifyToken(getJWTToken())
+          .then(() => {
+            set({ rasaTrainState: 1 });
+            return postTrainDataToRasa(currentData);
+          })
+          .then((fileName) => loadedNewModel(fileName))
+          .then((res) => {
+            if (res.status === 204) {
+              set({ rasaTrainState: 0 });
+            }
+          })
+          .catch((err) => {
+            console.log('err:', err);
+            set({ user: null, isAppInitializedComplete: true });
+            Toast.fire({
+              icon: 'error',
+              title: '無效Token',
+            }).then(() => {
+              cleanToken();
+              window.location.reload();
+            });
+          });
       }
     },
     onLogin(email: string, password: string) {
       set({ loading: true });
       fetchLogin(email, password).then((res) => {
         if (res.status === 'success') {
-          set({ user: res.user, loading: false });
+          set({ user: res.user, loading: false, currentPage: '首頁' });
           return Toast.fire({
             icon: 'success',
             title: '登入成功',
@@ -821,6 +869,7 @@ const useStoryStore = create((set) => {
     },
     onLogout() {
       cleanToken();
+      set({ user: null });
       window.location.reload();
     },
     onRegister(userInfo: RegisterUserInfoType) {
@@ -831,6 +880,9 @@ const useStoryStore = create((set) => {
           return res;
         })
         .catch((err) => console.log(err));
+    },
+    onSetCurrentPage(pageName: string) {
+      set({ currentPage: pageName });
     },
     onSetAllTrainData(data: TrainDataType) {
       dispatch(actionSetAllData(data));

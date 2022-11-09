@@ -50,7 +50,7 @@ const App = () => {
     return () => {
       clearInterval(trainState);
       if (user && rasaTrainState) {
-        Toast.fire({ icon: 'warning', title: '訓練完成' });
+        Toast.fire({ icon: 'success', title: '訓練完成' });
       }
     };
   }, [onSetRasaTrainState, rasaTrainState, user]);

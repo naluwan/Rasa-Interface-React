@@ -31,6 +31,13 @@ export type EntitiesType = {
   [entitiesKey: string]: string,
 };
 
+export type NluEntitiesType = {
+  start: number,
+  end: number,
+  value: string,
+  entity: string,
+};
+
 export type StepsType =
   | {
       intent: string,
@@ -97,12 +104,16 @@ export type State = {
   cloneData: TrainDataType,
   deletedStory: StoryType,
   actions: string[],
+  storiesOptions: StoryType[],
   rasaTrainState: number,
+  currentPage: string,
   // actions
   init: () => void,
+  trainRasa: (currentData: ApiTrainDataType) => void,
   onLogin: (email: string, password: string) => void,
   onLogout: () => void,
   onRegister: (userInfo: RegisterUserInfoType) => void,
+  onSetCurrentPage: (pageName: string) => void,
   onSetAllTrainData: (data: TrainDataType) => void,
   onSetStory: (storyName: string) => void,
   onSetDeleteStory: (deleteStory: StoryType) => void,
