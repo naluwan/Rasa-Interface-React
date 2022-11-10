@@ -5,7 +5,7 @@ import style from './CreateStory.module.scss';
 import StepControl from './StepControl';
 import UserStep from '../UserStep';
 import BotStep from '../BotStep';
-import type { StoryType, ExampleType, State } from '../types';
+import type { StoryType, ExampleType, State, NluEntitiesType } from '../types';
 import useStoryStore from '../../store/useStoryStore';
 import StepAlert from './StepAlert';
 
@@ -171,6 +171,131 @@ const CreateStory: React.FC<CreateStoryProps> = (props) => {
       });
     },
     [onSetNewStory, nlu, newStory],
+  );
+
+  // 新增關鍵字
+  const atCreateEntities = React.useCallback(
+    (entities: NluEntitiesType, intent: string) => {
+      return onSetNewStory((prev) => {
+        return {
+          ...prev,
+          steps: prev.steps.map((step) => {
+            if (step.intent === intent) {
+              step.entities.push(entities);
+            }
+            return step;
+          }),
+        };
+      });
+    },
+    [onSetNewStory],
+  );
+
+  // 編輯關鍵字
+  const atEditEntityValue = React.useCallback(
+    (stepIntent: string, oriEntityValue: string, newEntityValue: string) => {
+      const isValidEntityValue = newStory.steps.some((step) => {
+        if (step.intent && step.intent === stepIntent) {
+          return step.user.includes(newEntityValue);
+        }
+        return false;
+      });
+      if (!isValidEntityValue) {
+        return Toast.fire({
+          icon: 'warning',
+          title: '請填入正確的關鍵字',
+        });
+      }
+
+      const isRepeat = newStory.steps.some((step) => {
+        if (step.intent && step.entities.length && step.intent === stepIntent) {
+          return step.entities.some((entityItem) => {
+            if (entityItem.value !== oriEntityValue) {
+              if (
+                (entityItem.start <= step.user.indexOf(newEntityValue) &&
+                  step.user.indexOf(newEntityValue) <= entityItem.end - 1) ||
+                (entityItem.start <=
+                  step.user.indexOf(newEntityValue) + newEntityValue.length &&
+                  step.user.indexOf(newEntityValue) + newEntityValue.length <=
+                    entityItem.end)
+              ) {
+                return true;
+              }
+            }
+            return false;
+          });
+        }
+        return false;
+      });
+      if (isRepeat) {
+        return Toast.fire({
+          icon: 'warning',
+          title: '關鍵字不可重疊',
+        });
+      }
+      return onSetNewStory((prev) => {
+        return {
+          ...prev,
+          steps: prev.steps.map((step) => {
+            if (step.intent && step.entities.length) {
+              step.entities.map((entityItem) => {
+                if (entityItem.value === oriEntityValue) {
+                  entityItem.start = step.user.indexOf(newEntityValue);
+                  entityItem.end =
+                    step.user.indexOf(newEntityValue) + newEntityValue.length;
+                  entityItem.value = newEntityValue;
+                }
+                return entityItem;
+              });
+            }
+            return step;
+          }),
+        };
+      });
+    },
+    [onSetNewStory, newStory],
+  );
+
+  // 編輯關鍵字代表值
+  const atEditEntity = React.useCallback(
+    (stepIntent: string, oriEntity: string, newEntity: string) => {
+      const isRepeat = newStory.steps.some((step) => {
+        if (step.intent && step.intent === stepIntent) {
+          return step.entities.some((item) => {
+            if (item.entity !== oriEntity) {
+              return item.entity === newEntity;
+            }
+            return false;
+          });
+        }
+        return false;
+      });
+
+      if (isRepeat) {
+        return Toast.fire({
+          icon: 'warning',
+          title: '同一個對話內關鍵字代表值不可重複',
+        });
+      }
+
+      return onSetNewStory((prev) => {
+        return {
+          ...prev,
+          steps: prev.steps.map((step) => {
+            if (step.intent === stepIntent) {
+              step.entities = step.entities.map((entityItem) => {
+                if (entityItem.entity === oriEntity) {
+                  entityItem.entity = newEntity;
+                }
+                return entityItem;
+              });
+            }
+            return step;
+          }),
+        };
+      });
+    },
+    [onSetNewStory, newStory.steps],
   );
 
   // 編輯機器人回覆
@@ -345,7 +470,10 @@ const CreateStory: React.FC<CreateStoryProps> = (props) => {
                 onEditUserSay={atEditUserSay}
                 onEditExamples={atEditExamples}
                 onEditIntent={atEditIntent}
+                onCreateEntities={atCreateEntities}
                 onRemoveUserStep={atRemoveUserStep}
+                onEditEntityValue={atEditEntityValue}
+                onEditEntity={atEditEntity}
               />
             ) : (
               <BotStep

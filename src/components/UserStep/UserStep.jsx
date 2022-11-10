@@ -1,9 +1,10 @@
 import * as React from 'react';
 import cx from 'classnames';
+import Swal from 'sweetalert2';
 import style from './UserStep.module.scss';
-import type { StepsType } from '../types';
-import { swalInput } from '../../utils/swalInput';
-// import useStoryStore from '../../store/useStoryStore';
+import type { StepsType, NluEntitiesType } from '../types';
+import { swalInput, Toast } from '../../utils/swalInput';
+import Entities from '../Entities';
 
 type UserStepProps = {
   isCreate: boolean,
@@ -21,7 +22,22 @@ type UserStepProps = {
     storyName?: string,
   ) => void,
   onEditIntent: (oriIntent: String, intent: String, storyName?: string) => void,
+  onCreateEntities: (
+    entities: NluEntitiesType,
+    intent: string,
+    storyName: string,
+  ) => void,
   onRemoveUserStep: (intent: string, userSay: string) => void,
+  onEditEntityValue: (
+    stepIntent: string,
+    oriEntityValue: string,
+    newEntityValue: string,
+  ) => void,
+  onEditEntity: (
+    stepIntent: string,
+    oriEntity: string,
+    newEntity: string,
+  ) => void,
 };
 
 const UserStep: React.FC<UserStepProps> = (props) => {
@@ -32,13 +48,15 @@ const UserStep: React.FC<UserStepProps> = (props) => {
     onEditExamples,
     onEditUserSay,
     onEditIntent,
+    onCreateEntities,
     onRemoveUserStep,
+    onEditEntityValue,
+    onEditEntity,
   } = props;
   const showIntent =
     step.intent === 'get_started' ? '打開聊天室窗' : step.intent;
 
   const isGetStarted = step.intent === 'get_started';
-
   // 編輯例句
   const atAddExamples = React.useCallback(
     (
@@ -87,6 +105,104 @@ const UserStep: React.FC<UserStepProps> = (props) => {
     [onEditIntent, storyName],
   );
 
+  // 新增關鍵字
+  const atCreateEntities = React.useCallback(
+    async (
+      userSay: string,
+      intent: string,
+      currentEntities: NluEntitiesType,
+      currentStoryName: string,
+    ) => {
+      await Swal.fire({
+        title: '編輯關鍵字',
+        html: `
+          <input id="value" class="swal2-input" placeholder="請輸入關鍵字" />
+          <input id="entity" class="swal2-input" placeholder="請輸入關鍵字代表值" />
+        `,
+        preConfirm: () => {
+          return new Promise((resolve) => {
+            Swal.enableButtons();
+            // 獲取關鍵字(value)和關鍵字代表值(entity)
+            const { value } = document.querySelector('.swal2-input#value');
+            const entity = document.querySelector('.swal2-input#entity').value;
+            // 獲取關鍵字的起點和終點
+            const start = userSay.indexOf(value);
+            const end = userSay.indexOf(value) + value.length;
+            // 驗證關鍵字代表值是否有數字
+            const regex = /^[0-9]*$/g;
+
+            // 都沒值
+            if (value === '' && entity === '') {
+              return;
+            }
+
+            // 有一個欄位沒值
+            if (value === '' || entity === '') {
+              Swal.showValidationMessage(`所有欄位都是必填的`);
+              return;
+            }
+
+            // 關鍵字不在對話內
+            if (!userSay.includes(value)) {
+              Swal.showValidationMessage(`請填入正確的關鍵字`);
+              document.querySelector('.swal2-input#value').value = '';
+              return;
+            }
+
+            // 關鍵字代表值有數字
+            if (regex.test(entity)) {
+              Swal.showValidationMessage(`關鍵字代表值不可為數字`);
+              document.querySelector('.swal2-input#entity').value = '';
+              return;
+            }
+
+            if (currentEntities.length) {
+              // 驗證關鍵字是否重疊
+              const isRepeat = currentEntities.some(
+                (currentEntitiesItem) =>
+                  (currentEntitiesItem.start <= start &&
+                    start <= currentEntitiesItem.end - 1) ||
+                  (currentEntitiesItem.start <= end &&
+                    end <= currentEntitiesItem.end),
+              );
+
+              if (isRepeat) {
+                Swal.showValidationMessage(`關鍵字不可重疊`);
+                document.querySelector('.swal2-input#value').value = '';
+                return;
+              }
+
+              // 驗證關鍵字代表值是否重複
+              const isEntityRepeat = currentEntities.some(
+                (currentEntitiesItem) => currentEntitiesItem.entity === entity,
+              );
+
+              if (isEntityRepeat) {
+                Swal.showValidationMessage(`同一個對話內關鍵字代表值不可重複`);
+                document.querySelector('.swal2-input#entity').value = '';
+                return;
+              }
+            }
+
+            const entities = { start, end, entity, value };
+            resolve({ entities });
+          }).catch((err) => {
+            Toast.fire({
+              icon: 'warning',
+              title: err.message,
+            });
+          });
+        },
+      }).then((result) => {
+        if (result.isConfirmed) {
+          // 新增關鍵字
+          onCreateEntities(result.value.entities, intent, currentStoryName);
+        }
+      });
+    },
+    [onCreateEntities],
+  );
+
   return (
     <div className="row pt-2" id="userStep">
       <div className={cx('col-6', style.userStepContainer)}>
@@ -120,6 +236,20 @@ const UserStep: React.FC<UserStepProps> = (props) => {
             >
               例句
             </button>
+            <button
+              type="button"
+              className="btn btn-outline-info mx-2"
+              onClick={() =>
+                atCreateEntities(
+                  step.user,
+                  step.intent,
+                  step.entities,
+                  storyName,
+                )
+              }
+            >
+              關鍵字
+            </button>
             {isCreate && (
               <button
                 type="button"
@@ -143,6 +273,34 @@ const UserStep: React.FC<UserStepProps> = (props) => {
             <div className={style.userTitle}>意圖:</div>
             <div className={style.userText}>{step.intent}</div>
           </div>
+          {step.entities.length > 0 && (
+            <div className="d-flex flex-column pt-2">
+              <div className={style.userTitle}>關鍵字:</div>
+              {step.entities.map((entityItem) => {
+                let entity = '';
+                let entityValue = '';
+                if (isCreate) {
+                  entity = entityItem.entity;
+                  entityValue = entityItem.value;
+                } else {
+                  [entity] = Object.keys(entityItem);
+                  [entityValue] = Object.values(entityItem);
+                }
+                return (
+                  <Entities
+                    key={entity + entityValue}
+                    entity={entity}
+                    entityValue={entityValue}
+                    intent={step.intent}
+                    onEditEntityValue={onEditEntityValue}
+                    onEditEntity={onEditEntity}
+                    userSay={step.user}
+                    entities={step.entities}
+                  />
+                );
+              })}
+            </div>
+          )}
         </div>
       </div>
     </div>
