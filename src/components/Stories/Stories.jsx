@@ -141,7 +141,7 @@ const Stories = () => {
             step.entities = step.entities.map((entityItem) => {
               entitiesArr.push({ entity: Object.keys(entityItem)[0] });
               return {
-                start: step.user.indexOf(Object.values(entityItem)),
+                start: step.user.indexOf(Object.values(entityItem)[0]),
                 end:
                   step.user.indexOf(Object.values(entityItem)[0]) +
                   Object.values(entityItem)[0].length,
