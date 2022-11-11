@@ -16,6 +16,7 @@ import type {
   State,
   StoryType,
   ApiTrainDataType,
+  NluEntitiesType,
 } from 'components/types';
 
 import type { Action } from 'actions';
@@ -32,6 +33,7 @@ import {
   actionAddResButtons,
   actionSetRasaTrainState,
   actionEditIntent,
+  actionCreateEntities,
 } from 'actions';
 // import { computed } from 'zustand-middleware-computed-state';
 import { Toast } from 'utils/swalInput';
@@ -781,6 +783,57 @@ const reducer = (state: State, action: Action): State => {
         return onSetStory(storyName);
       });
     }
+    case 'CREATE_ENTITIES': {
+      const { entities, intent, storyName } = action.payload;
+      const { stories, nlu, domain } = cloneDeep(state.cloneData);
+      const { onSetStory, onSetAllTrainData } = state;
+
+      let userSay = '';
+      stories.map((item) => {
+        if (item.story === storyName) {
+          item.steps.map((step) => {
+            if (step.intent === intent) {
+              userSay = step.user;
+              step.entities.push({ [entities.entity]: entities.value });
+            }
+            return step;
+          });
+        }
+        return item;
+      });
+
+      nlu.rasa_nlu_data.common_examples.map((nluItem) => {
+        if (nluItem.text === userSay && nluItem.intent === intent) {
+          nluItem.entities.push(entities);
+        }
+        return nluItem;
+      });
+
+      if (!domain.entities.includes(entities.entity)) {
+        domain.entities.push(entities.entity);
+      }
+
+      const cloneData = {
+        stories,
+        nlu,
+        domain,
+      };
+      return postAllTrainData(cloneData).then((res) => {
+        if (res.status !== 'success') {
+          return Toast.fire({
+            icon: 'error',
+            title: '新增關鍵字失敗',
+            text: res.message,
+          });
+        }
+        Toast.fire({
+          icon: 'success',
+          title: '新增關鍵字成功',
+        });
+        onSetAllTrainData(res.data);
+        return onSetStory(storyName);
+      });
+    }
     default:
       return state;
   }
@@ -818,7 +871,9 @@ const useStoryStore = create((set) => {
       }
     },
     async trainRasa(currentData: ApiTrainDataType) {
+      // 獲取rasa最新訓練狀態
       const rasaState = await fetchRasaTrainState();
+      // 訓練中
       if (rasaState > 0) {
         set({ rasaTrainState: rasaState });
         Toast.fire({
@@ -826,18 +881,25 @@ const useStoryStore = create((set) => {
           title: '機器人訓練中，請稍後',
         });
       } else {
+        // 可訓練
+        // 驗證token
         verifyToken(getJWTToken())
           .then(() => {
+            // token有效
+            // 設定訓練狀態
             set({ rasaTrainState: 1 });
+            // 發送訓練檔
             return postTrainDataToRasa(currentData);
           })
-          .then((fileName) => loadedNewModel(fileName))
+          .then((fileName) => loadedNewModel(fileName)) // 回傳最新model名稱，使用loadedNewModel通知rasa套用最新model
           .then((res) => {
+            // 訓練正確
             if (res.status === 204) {
               set({ rasaTrainState: 0 });
             }
           })
           .catch((err) => {
+            // token失效處理方式
             console.log('err:', err);
             set({ user: null, isAppInitializedComplete: true });
             Toast.fire({
@@ -969,6 +1031,13 @@ const useStoryStore = create((set) => {
     },
     onEditIntent(oriIntent: string, intent: string, storyName: string) {
       dispatch(actionEditIntent(oriIntent, intent, storyName));
+    },
+    onCreateEntities(
+      entities: NluEntitiesType,
+      intent: string,
+      storyName: string,
+    ) {
+      dispatch(actionCreateEntities(entities, intent, storyName));
     },
   };
 });

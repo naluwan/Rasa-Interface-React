@@ -1,4 +1,8 @@
-import type { TrainDataType, StoryType } from 'components/types';
+import type {
+  TrainDataType,
+  StoryType,
+  NluEntitiesType,
+} from 'components/types';
 
 export type Action =
   | { type: 'SET_STORY', payload: string }
@@ -69,6 +73,10 @@ export type Action =
   | {
       type: 'EDIT_INTENT',
       payload: { oriIntent: string, intent: string, storyName: string },
+    }
+  | {
+      type: 'CREATE_ENTITIES',
+      payload: { entities: NluEntitiesType, intent: string, storyName: string },
     };
 
 export const actionSetAllData = (data: TrainDataType): Action => ({
@@ -175,4 +183,13 @@ export const actionEditIntent = (
 ): Action => ({
   type: 'EDIT_INTENT',
   payload: { oriIntent, intent, storyName },
+});
+
+export const actionCreateEntities = (
+  entities: NluEntitiesType,
+  intent: string,
+  storyName: string,
+): Action => ({
+  type: 'CREATE_ENTITIES',
+  payload: { entities, intent, storyName },
 });

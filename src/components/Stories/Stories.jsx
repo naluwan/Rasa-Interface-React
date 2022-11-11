@@ -101,7 +101,9 @@ const Stories = () => {
 
         const intentArr = [];
         const actionArr = [];
+        const entitiesArr = [];
 
+        console.log(story);
         // 將要刪除故事的使用者例句和機器人回覆組回去，並將要刪除故事的action和意圖取出
         story.steps.map((step) => {
           if (step.action) {
@@ -135,6 +137,18 @@ const Stories = () => {
 
           if (step.intent) {
             intentArr.push(step.intent);
+            // 將關鍵字組回原始資訊並將entity放進entitiesArr裡，後面繼續做處理
+            step.entities = step.entities.map((entityItem) => {
+              entitiesArr.push({ entity: Object.keys(entityItem)[0] });
+              return {
+                start: step.user.indexOf(Object.values(entityItem)),
+                end:
+                  step.user.indexOf(Object.values(entityItem)[0]) +
+                  Object.values(entityItem)[0].length,
+                value: Object.values(entityItem)[0],
+                entity: Object.keys(entityItem)[0],
+              };
+            });
           }
           return step;
         });
@@ -170,6 +184,46 @@ const Stories = () => {
             }
             return delete cloneData.domain.responses[deleteAction];
           });
+        });
+
+        // 驗證stories訓練檔中是否有其他故事有用到此關鍵字
+        entitiesArr.map((deleteEntity) => {
+          deleteEntity.isExist = cloneData.stories.some((item) => {
+            return item.steps.some((step) => {
+              if (step.intent && step.entities.length) {
+                return Object.keys(step.entities).some(
+                  (entityItem) => entityItem === deleteEntity.entity,
+                );
+              }
+              return false;
+            });
+          });
+          return deleteEntity;
+        });
+
+        // 驗證nlu訓練檔中是否有其他例句有此關鍵字
+        entitiesArr.map((deleteEntity) => {
+          deleteEntity.isExist =
+            cloneData.nlu.rasa_nlu_data.common_examples.some((nluItem) => {
+              if (nluItem.entities.length) {
+                return nluItem.entities.some(
+                  (entityItem) => entityItem.entity === deleteEntity.entity,
+                );
+              }
+              return false;
+            });
+          return deleteEntity;
+        });
+
+        // 如果關鍵字都不存在，就刪除domain訓練檔中的entities資料
+        entitiesArr.map((entityItem) => {
+          if (!entityItem.isExist) {
+            cloneData.domain.entities.splice(
+              cloneData.domain.entities.indexOf(entityItem.entity),
+              1,
+            );
+          }
+          return entityItem;
         });
 
         // 發送API更新資料庫資料
@@ -312,9 +366,13 @@ const Stories = () => {
       // 組成故事流程的訓練檔格式
       cloneNewStory.steps = cloneNewStory.steps.map((step) => {
         if (step.intent) {
+          console.log('step entities:', step.entities);
           delete step.examples;
           step.intent = step.intent.trim();
           step.user = step.user.trim();
+          step.entities = step.entities.map((entityItem) => ({
+            [entityItem.entity]: entityItem.value,
+          }));
         }
         if (step.action) {
           delete step.response;
@@ -331,13 +389,33 @@ const Stories = () => {
           cloneData.nlu.rasa_nlu_data.common_examples.push({
             text: step.user,
             intent: step.intent,
-            entities: [],
+            entities: createStory.steps.filter(
+              (createStoryStep) => createStoryStep.intent === step.intent,
+            )[0].entities,
           });
           cloneData.domain.intents.push(step.intent);
         }
         return step;
       });
 
+      console.log('cloneNewStory:', cloneNewStory);
+
+      cloneNewStory.steps.map((step) => {
+        if (step.intent) {
+          const { entities } = createStory.steps.filter(
+            (createStoryStep) => createStoryStep.intent === step.intent,
+          )[0];
+          console.log('entities:', entities);
+          entities.map(
+            (entityItem) =>
+              !cloneData.domain.entities.includes(entityItem.entity) &&
+              cloneData.domain.entities.push(entityItem.entity),
+          );
+        }
+        return step;
+      });
+
+      // TODO:要加入例句檢核，例句需要與範例有一樣的意圖和關鍵字才可以
       // 組成例句的訓練檔格式
       const currentExamples = createStory.steps
         .filter((step) => step.examples)
@@ -479,6 +557,8 @@ const Stories = () => {
     },
     [onSetDeleteStory, atClickSaveBtn, stories],
   );
+
+  console.log('newStory:', newStory);
 
   return (
     <>
