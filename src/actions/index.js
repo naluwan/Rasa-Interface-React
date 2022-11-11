@@ -90,6 +90,15 @@ export type Action =
         newEntityValue: string,
         storyName: string,
       },
+    }
+  | {
+      type: 'EDIT_ENTITY',
+      payload: {
+        stepIntent: string,
+        oriEntity: string,
+        newEntity: string,
+        storyName: string,
+      },
     };
 
 export const actionSetAllData = (data: TrainDataType): Action => ({
@@ -224,4 +233,14 @@ export const actionEditEntityValue = (
 ): Action => ({
   type: 'EDIT_ENTITY_VALUE',
   payload: { stepIntent, oriEntityValue, newEntityValue, storyName },
+});
+
+export const actionEditEntity = (
+  stepIntent: string,
+  oriEntity: string,
+  newEntity: string,
+  storyName: string,
+): Action => ({
+  type: 'EDIT_ENTITY',
+  payload: { stepIntent, oriEntity, newEntity, storyName },
 });

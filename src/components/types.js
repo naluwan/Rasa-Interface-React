@@ -168,4 +168,10 @@ export type State = {
     newEntityValue: string,
     storyName: string,
   ) => void,
+  onEditEntity: (
+    stepIntent: string,
+    oriEntity: string,
+    newEntity: string,
+    storyName: string,
+  ) => void,
 };

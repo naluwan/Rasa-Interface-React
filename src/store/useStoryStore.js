@@ -36,6 +36,7 @@ import {
   actionCreateEntities,
   actionDeleteEntities,
   actionEditEntityValue,
+  actionEditEntity,
 } from 'actions';
 // import { computed } from 'zustand-middleware-computed-state';
 import { Toast } from 'utils/swalInput';
@@ -1040,6 +1041,137 @@ const reducer = (state: State, action: Action): State => {
         return onSetStory(storyName);
       });
     }
+    case 'EDIT_ENTITY': {
+      const { stepIntent, oriEntity, newEntity, storyName } = action.payload;
+      // eslint-disable-next-line no-unused-vars
+      const { stories, nlu, domain } = cloneDeep(state.cloneData);
+      // eslint-disable-next-line no-unused-vars
+      const { onSetStory, onSetAllTrainData } = state;
+
+      // 驗證關鍵字代表值是否有數字
+      const regex = /^[0-9]*$/g;
+
+      // 關鍵字代表值有數字
+      if (regex.test(newEntity)) {
+        return Toast.fire({
+          icon: 'warning',
+          title: '關鍵字代表值不可為純數字',
+        });
+      }
+
+      // 驗證同個對話內是否有相同的關鍵字代表值
+      const isRepeat = stories.some((item) => {
+        if (item.story === storyName) {
+          return item.steps.some((step) => {
+            if (step.intent && step.intent === stepIntent) {
+              return step.entities.some((entityItem) => {
+                if (Object.keys(entityItem)[0] !== oriEntity) {
+                  return Object.keys(entityItem)[0] === newEntity;
+                }
+                return false;
+              });
+            }
+            return false;
+          });
+        }
+        return false;
+      });
+
+      if (isRepeat) {
+        return Toast.fire({
+          icon: 'warning',
+          title: '同一個對話內關鍵字代表值不可重複',
+        });
+      }
+
+      let userSay = '';
+      // 更改stories訓練檔中該故事該關鍵字的代表值
+      stories.map((item) => {
+        if (item.story === storyName) {
+          item.steps.map((step) => {
+            if (step.intent && step.intent === stepIntent) {
+              userSay = step.user;
+              step.entities = step.entities.map((entityItem) => {
+                if (Object.keys(entityItem)[0] === oriEntity) {
+                  return {
+                    [newEntity]: entityItem[Object.keys(entityItem)[0]],
+                  };
+                }
+                return entityItem;
+              });
+            }
+            return step;
+          });
+        }
+        return item;
+      });
+
+      // 更改nlu訓練檔中該例句的關鍵字代表值
+      nlu.rasa_nlu_data.common_examples.map((nluItem) => {
+        if (nluItem.intent === stepIntent && nluItem.text === userSay) {
+          nluItem.entities.map((entityItem) => {
+            if (entityItem.entity === oriEntity) {
+              entityItem.entity = newEntity;
+            }
+            return entityItem;
+          });
+        }
+        return nluItem;
+      });
+
+      // 確認關鍵字代表值是否還有存在其他故事中
+      let isExist = false;
+      isExist = stories.some((item) => {
+        return item.steps.some((step) => {
+          if (step.intent && step.entities.length) {
+            return step.entities.some((entityItem) => {
+              if (Object.keys(entityItem)[0] === oriEntity) {
+                return true;
+              }
+              return false;
+            });
+          }
+          return false;
+        });
+      });
+
+      // 更改domain
+      if (isExist) {
+        if (!domain.entities.includes(newEntity)) {
+          domain.entities.push(newEntity);
+        }
+      } else if (!domain.entities.includes(newEntity)) {
+        domain.entities.splice(
+          domain.entities.indexOf(oriEntity),
+          1,
+          newEntity,
+        );
+      } else {
+        domain.entities.splice(domain.entities.indexOf(oriEntity), 1);
+      }
+
+      const cloneData = {
+        stories,
+        nlu,
+        domain,
+      };
+
+      return postAllTrainData(cloneData).then((res) => {
+        if (res.status !== 'success') {
+          return Toast.fire({
+            icon: 'error',
+            title: '編輯關鍵字代表值失敗',
+            text: res.message,
+          });
+        }
+        Toast.fire({
+          icon: 'success',
+          title: '編輯關鍵字代表值成功',
+        });
+        onSetAllTrainData(res.data);
+        return onSetStory(storyName);
+      });
+    }
     default:
       return state;
   }
@@ -1262,6 +1394,14 @@ const useStoryStore = create((set) => {
           storyName,
         ),
       );
+    },
+    onEditEntity(
+      stepIntent: string,
+      oriEntity: string,
+      newEntity: string,
+      storyName: string,
+    ) {
+      dispatch(actionEditEntity(stepIntent, oriEntity, newEntity, storyName));
     },
   };
 });

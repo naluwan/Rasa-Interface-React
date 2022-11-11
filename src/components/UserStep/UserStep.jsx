@@ -189,7 +189,7 @@ const UserStep: React.FC<UserStepProps> = (props) => {
 
             // 關鍵字代表值有數字
             if (regex.test(entity)) {
-              Swal.showValidationMessage(`關鍵字代表值不可為數字`);
+              Swal.showValidationMessage(`關鍵字代表值不可為純數字`);
               document.querySelector('.swal2-input#entity').value = '';
               return;
             }
@@ -253,6 +253,7 @@ const UserStep: React.FC<UserStepProps> = (props) => {
     [onDeleteEntities, storyName],
   );
 
+  // 編輯關鍵字
   const atEditEntityValue = React.useCallback(
     (stepIntent: string, oriEntityValue: string, newEntityValue: string) => {
       onEditEntityValue(stepIntent, oriEntityValue, newEntityValue, storyName);
@@ -260,6 +261,7 @@ const UserStep: React.FC<UserStepProps> = (props) => {
     [onEditEntityValue, storyName],
   );
 
+  // 編輯關鍵字代表值
   const atEditEntity = React.useCallback(
     (stepIntent: string, oriEntity: string, newEntity: string) => {
       onEditEntity(stepIntent, oriEntity, newEntity, storyName);

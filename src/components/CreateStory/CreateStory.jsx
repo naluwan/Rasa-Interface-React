@@ -283,6 +283,10 @@ const CreateStory: React.FC<CreateStoryProps> = (props) => {
   // 編輯關鍵字代表值
   const atEditEntity = React.useCallback(
     (stepIntent: string, oriEntity: string, newEntity: string) => {
+      // 驗證關鍵字代表值是否有數字
+      const regex = /^[0-9]*$/g;
+
+      // 驗證關鍵字代表值是否在同一個對話內重複
       const isRepeat = newStory.steps.some((step) => {
         if (step.intent && step.intent === stepIntent) {
           return step.entities.some((item) => {
@@ -299,6 +303,14 @@ const CreateStory: React.FC<CreateStoryProps> = (props) => {
         return Toast.fire({
           icon: 'warning',
           title: '同一個對話內關鍵字代表值不可重複',
+        });
+      }
+
+      // 關鍵字代表值有數字
+      if (regex.test(newEntity)) {
+        return Toast.fire({
+          icon: 'warning',
+          title: '關鍵字代表值不可為純數字',
         });
       }
 
