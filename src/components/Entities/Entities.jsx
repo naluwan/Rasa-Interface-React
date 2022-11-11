@@ -92,7 +92,7 @@ const Entities: React.FC<EntitiesProps> = (props) => {
             }
             return false;
           });
-          if (!isValid || isRepeat) {
+          if (!isValid || isRepeat || newEntityValue === '') {
             setEntityItem((prev) => {
               return {
                 ...prev,
@@ -100,7 +100,9 @@ const Entities: React.FC<EntitiesProps> = (props) => {
               };
             });
           }
-          onEditEntityValue(stepIntent, oriEntityValue, newEntityValue);
+          if (newEntityValue !== '') {
+            onEditEntityValue(stepIntent, oriEntityValue, newEntityValue);
+          }
         }
         setShowValue((prev) => !prev);
       }
@@ -113,8 +115,11 @@ const Entities: React.FC<EntitiesProps> = (props) => {
     (e, stepIntent: string, oriEntity: string, newEntity: string) => {
       if (e.key === 'Enter' || e.type === 'blur') {
         if (oriEntity !== newEntity) {
+          // 驗證關鍵字代表值是否有數字
+          const regex = /^[0-9]*$/g;
+          // 驗證關鍵字是否在同一個對話內重複
           const isRepeat = entities.some((item) => item.entity === newEntity);
-          if (isRepeat) {
+          if (isRepeat || regex.test(newEntity) || newEntity === '') {
             setEntityItem((prev) => {
               return {
                 ...prev,
@@ -122,7 +127,9 @@ const Entities: React.FC<EntitiesProps> = (props) => {
               };
             });
           }
-          onEditEntity(stepIntent, oriEntity, newEntity);
+          if (newEntity !== '') {
+            onEditEntity(stepIntent, oriEntity, newEntity);
+          }
         }
         setShowEntity((prev) => !prev);
       }
