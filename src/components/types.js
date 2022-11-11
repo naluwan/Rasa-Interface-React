@@ -156,4 +156,10 @@ export type State = {
   ) => void,
   onEditIntent: (oriIntent: string, intent: string, storyName: string) => void,
   onSetRasaTrainState: (state: number) => void,
+  onCreateEntities: (
+    entities: NluEntitiesType,
+    intent: string,
+    storyName: string,
+  ) => void,
+  onDeleteEntities: (entity: string, intent: string, storyName: string) => void,
 };

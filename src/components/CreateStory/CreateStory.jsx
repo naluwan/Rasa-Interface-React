@@ -182,6 +182,7 @@ const CreateStory: React.FC<CreateStoryProps> = (props) => {
           steps: prev.steps.map((step) => {
             if (step.intent === intent) {
               step.entities.push(entities);
+              step.entities.sort((a, b) => a.start - b.start);
             }
             return step;
           }),
@@ -193,14 +194,14 @@ const CreateStory: React.FC<CreateStoryProps> = (props) => {
 
   // 刪除關鍵字
   const atDeleteEntities = React.useCallback(
-    (entityValue: string, intent: string) => {
+    (entity: string, intent: string) => {
       return onSetNewStory((prev) => {
         return {
           ...prev,
           steps: prev.steps.map((step) => {
             if (step.intent === intent && step.entities.length) {
-              const entitiesKeys = step.entities.map((item) => item.value);
-              step.entities.splice(entitiesKeys.indexOf(entityValue), 1);
+              const entitiesKeys = step.entities.map((item) => item.entity);
+              step.entities.splice(entitiesKeys.indexOf(entity), 1);
             }
             return step;
           }),

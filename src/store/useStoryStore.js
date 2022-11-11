@@ -34,6 +34,7 @@ import {
   actionSetRasaTrainState,
   actionEditIntent,
   actionCreateEntities,
+  actionDeleteEntities,
 } from 'actions';
 // import { computed } from 'zustand-middleware-computed-state';
 import { Toast } from 'utils/swalInput';
@@ -834,6 +835,82 @@ const reducer = (state: State, action: Action): State => {
         return onSetStory(storyName);
       });
     }
+    case 'DELETE_ENTITIES': {
+      const { entity, intent, storyName } = action.payload;
+      const { stories, nlu, domain } = cloneDeep(state.cloneData);
+      const { onSetStory, onSetAllTrainData } = state;
+
+      let userSay = '';
+      let isExist = false;
+      // 故事流程
+      stories.map((item) => {
+        if (item.story === storyName) {
+          // 刪除該故事的關鍵字
+          item.steps.map((step) => {
+            if (step.intent === intent && step.entities.length) {
+              userSay = step.user;
+              const entitiesKeys = step.entities.map(
+                (entityItem) => Object.keys(entityItem)[0],
+              );
+              step.entities.splice(entitiesKeys.indexOf(entity), 1);
+            }
+            return step;
+          });
+        } else {
+          // 驗證其他故事流程是否還有用到此關鍵字
+          item.steps.map((step) => {
+            if (step.intent && step.entities.length) {
+              const entitiesKeys = step.entities.map(
+                (entityItem) => Object.keys(entityItem)[0],
+              );
+              isExist = entitiesKeys.includes(entity);
+            }
+            return step;
+          });
+        }
+        return item;
+      });
+
+      nlu.rasa_nlu_data.common_examples.map((nluItem) => {
+        if (nluItem.text === userSay && nluItem.intent === intent) {
+          const entitiesKeys = nluItem.entities.map(
+            (entityItem) => entityItem.entity,
+          );
+          nluItem.entities.splice(entitiesKeys.indexOf(entity), 1);
+        } else if (nluItem.entities.length) {
+          const entitiesKeys = nluItem.entities.map(
+            (entityItem) => entityItem.entity,
+          );
+          isExist = entitiesKeys.includes(entity);
+        }
+        return nluItem;
+      });
+      if (!isExist) {
+        domain.entities.splice(domain.entities.indexOf(entity), 1);
+      }
+
+      const cloneData = {
+        stories,
+        nlu,
+        domain,
+      };
+
+      return postAllTrainData(cloneData).then((res) => {
+        if (res.status !== 'success') {
+          return Toast.fire({
+            icon: 'error',
+            title: '刪除關鍵字失敗',
+            text: res.message,
+          });
+        }
+        Toast.fire({
+          icon: 'success',
+          title: '刪除關鍵字成功',
+        });
+        onSetAllTrainData(res.data);
+        return onSetStory(storyName);
+      });
+    }
     default:
       return state;
   }
@@ -1038,6 +1115,9 @@ const useStoryStore = create((set) => {
       storyName: string,
     ) {
       dispatch(actionCreateEntities(entities, intent, storyName));
+    },
+    onDeleteEntities(entity: string, intent: string, storyName: string) {
+      dispatch(actionDeleteEntities(entity, intent, storyName));
     },
   };
 });

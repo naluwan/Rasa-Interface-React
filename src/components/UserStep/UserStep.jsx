@@ -45,6 +45,30 @@ type UserStepProps = {
   ) => void,
 };
 
+// 重組entities資料
+const filteredEntities = (
+  entities: { [key: string]: string } | NluEntitiesType,
+  userSay: string,
+) => {
+  const entitiesKeys = entities.map((item) => Object.keys(item));
+  if (
+    entitiesKeys.length &&
+    entitiesKeys.every((item) => item.every((keyItem) => keyItem !== 'start'))
+  ) {
+    // 重組entities
+    return entities
+      .map((entityItem) => {
+        entityItem.start = userSay.indexOf(Object.values(entityItem)[0]);
+        entityItem.end = entityItem.start + Object.values(entityItem)[0].length;
+        [entityItem.entity] = Object.keys(entityItem);
+        [entityItem.value] = Object.values(entityItem);
+        return entityItem;
+      })
+      .sort((a, b) => a.start - b.start); // 將entities做排序，開頭較前面的會排在上方
+  }
+  return entities;
+};
+
 const UserStep: React.FC<UserStepProps> = (props) => {
   const {
     isCreate,
@@ -63,6 +87,14 @@ const UserStep: React.FC<UserStepProps> = (props) => {
     step.intent === 'get_started' ? '打開聊天室窗' : step.intent;
 
   const isGetStarted = step.intent === 'get_started';
+
+  // 重組entities資料
+  const entitiesData = React.useMemo(() => {
+    return filteredEntities(step.entities, step.user);
+  }, [step.entities, step.user]);
+
+  console.log('entitiesData:', entitiesData);
+
   // 編輯例句
   const atAddExamples = React.useCallback(
     (
@@ -162,35 +194,14 @@ const UserStep: React.FC<UserStepProps> = (props) => {
               return;
             }
 
-            // 獲取所有entities的key值
-            const entitiesKeys = currentEntities.map((item) =>
-              Object.keys(item),
-            );
-
-            // 查詢故事頁，將entities傳進來時是沒有處理過的，所以這邊要再處理一次，否則無法驗證關鍵字是否重疊
-            if (
-              currentEntities.length &&
-              entitiesKeys.every((item) =>
-                item.every((keyItem) => keyItem !== 'start'),
-              )
-            ) {
-              currentEntities.map((item) => {
-                item.start = userSay.indexOf(Object.values(item)[0]);
-                item.end = item.start + Object.values(item)[0].length;
-                [item.entity] = Object.keys(item);
-                [item.value] = Object.values(item);
-                return item;
-              });
-            }
-
             if (currentEntities.length) {
               // 驗證關鍵字是否重疊
               const isRepeat = currentEntities.some(
                 (currentEntitiesItem) =>
                   (currentEntitiesItem.start <= start &&
                     start <= currentEntitiesItem.end - 1) ||
-                  (currentEntitiesItem.start <= end &&
-                    end <= currentEntitiesItem.end),
+                  (currentEntitiesItem.start <= end - 1 &&
+                    end - 1 <= currentEntitiesItem.end),
               );
 
               if (isRepeat) {
@@ -230,12 +241,13 @@ const UserStep: React.FC<UserStepProps> = (props) => {
     [onCreateEntities],
   );
 
+  // 刪除關鍵字
   const atDeleteEntities = React.useCallback(
-    (entityValue: string, intent: string) => {
+    (entity: string, entityValue: string, intent: string) => {
       confirmWidget(entityValue, 'deleteEntities').then((result) => {
         if (!result.isConfirmed) return;
 
-        onDeleteEntities(entityValue, intent, storyName);
+        onDeleteEntities(entity, intent, storyName);
       });
     },
     [onDeleteEntities, storyName],
@@ -281,7 +293,7 @@ const UserStep: React.FC<UserStepProps> = (props) => {
                 atCreateEntities(
                   step.user,
                   step.intent,
-                  step.entities,
+                  entitiesData,
                   storyName,
                 )
               }
@@ -311,19 +323,13 @@ const UserStep: React.FC<UserStepProps> = (props) => {
             <div className={style.userTitle}>意圖:</div>
             <div className={style.userText}>{step.intent}</div>
           </div>
-          {step.entities.length > 0 && (
+          {entitiesData.length > 0 && (
             <div className="d-flex flex-column pt-2">
               <div className={style.userTitle}>關鍵字:</div>
-              {step.entities.map((entityItem) => {
-                let entity = '';
-                let entityValue = '';
-                if (isCreate) {
-                  entity = entityItem.entity;
-                  entityValue = entityItem.value;
-                } else {
-                  [entity] = Object.keys(entityItem);
-                  [entityValue] = Object.values(entityItem);
-                }
+              {entitiesData.map((entityItem) => {
+                const { entity } = entityItem;
+                const entityValue = entityItem.value;
+
                 return (
                   <Entities
                     key={entity + entityValue}
@@ -333,7 +339,7 @@ const UserStep: React.FC<UserStepProps> = (props) => {
                     onEditEntityValue={onEditEntityValue}
                     onEditEntity={onEditEntity}
                     userSay={step.user}
-                    entities={step.entities}
+                    entities={entitiesData}
                     onDeleteEntities={atDeleteEntities}
                   />
                 );

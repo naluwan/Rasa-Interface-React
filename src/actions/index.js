@@ -77,6 +77,10 @@ export type Action =
   | {
       type: 'CREATE_ENTITIES',
       payload: { entities: NluEntitiesType, intent: string, storyName: string },
+    }
+  | {
+      type: 'DELETE_ENTITIES',
+      payload: { entity: string, intent: string, storyName: string },
     };
 
 export const actionSetAllData = (data: TrainDataType): Action => ({
@@ -192,4 +196,13 @@ export const actionCreateEntities = (
 ): Action => ({
   type: 'CREATE_ENTITIES',
   payload: { entities, intent, storyName },
+});
+
+export const actionDeleteEntities = (
+  entity: string,
+  intent: string,
+  storyName: string,
+): Action => ({
+  type: 'DELETE_ENTITIES',
+  payload: { entity, intent, storyName },
 });

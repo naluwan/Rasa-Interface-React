@@ -23,6 +23,7 @@ const ShowStory: React.FC<ShowStoryProps> = (props) => {
     onAddResButtons,
     onEditIntent,
     onCreateEntities,
+    onDeleteEntities,
   } = useStoryStore((state: State) => {
     return {
       onEditBotRes: state.onEditBotRes,
@@ -33,6 +34,7 @@ const ShowStory: React.FC<ShowStoryProps> = (props) => {
       onAddResButtons: state.onAddResButtons,
       onEditIntent: state.onEditIntent,
       onCreateEntities: state.onCreateEntities,
+      onDeleteEntities: state.onDeleteEntities,
     };
   }, shallow);
 
@@ -70,6 +72,7 @@ const ShowStory: React.FC<ShowStoryProps> = (props) => {
               onEditUserSay={onEditUserSay}
               onEditIntent={onEditIntent}
               onCreateEntities={onCreateEntities}
+              onDeleteEntities={onDeleteEntities}
             />
           ) : (
             <BotStep

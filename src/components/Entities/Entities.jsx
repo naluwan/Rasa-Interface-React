@@ -18,7 +18,11 @@ type EntitiesProps = {
     oriEntity: string,
     newEntity: string,
   ) => void,
-  onDeleteEntities: (entityValue: string, intent: string) => void,
+  onDeleteEntities: (
+    entity: string,
+    entityValue: string,
+    intent: string,
+  ) => void,
 };
 
 const Entities: React.FC<EntitiesProps> = (props) => {
@@ -215,7 +219,7 @@ const Entities: React.FC<EntitiesProps> = (props) => {
       <button
         type="button"
         className="btn btn-outline-danger"
-        onClick={() => onDeleteEntities(entityValue, intent)}
+        onClick={() => onDeleteEntities(entity, entityValue, intent)}
       >
         刪除關鍵字
       </button>
