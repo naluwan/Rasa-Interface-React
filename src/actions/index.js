@@ -81,6 +81,15 @@ export type Action =
   | {
       type: 'DELETE_ENTITIES',
       payload: { entity: string, intent: string, storyName: string },
+    }
+  | {
+      type: 'EDIT_ENTITY_VALUE',
+      payload: {
+        stepIntent: string,
+        oriEntityValue: string,
+        newEntityValue: string,
+        storyName: string,
+      },
     };
 
 export const actionSetAllData = (data: TrainDataType): Action => ({
@@ -205,4 +214,14 @@ export const actionDeleteEntities = (
 ): Action => ({
   type: 'DELETE_ENTITIES',
   payload: { entity, intent, storyName },
+});
+
+export const actionEditEntityValue = (
+  stepIntent: string,
+  oriEntityValue: string,
+  newEntityValue: string,
+  storyName: string,
+): Action => ({
+  type: 'EDIT_ENTITY_VALUE',
+  payload: { stepIntent, oriEntityValue, newEntityValue, storyName },
 });

@@ -25,18 +25,20 @@ type UserStepProps = {
   onCreateEntities: (
     entities: NluEntitiesType,
     intent: string,
-    storyName: string,
+    storyName?: string,
   ) => void,
   onRemoveUserStep: (intent: string, userSay: string) => void,
   onEditEntityValue: (
     stepIntent: string,
     oriEntityValue: string,
     newEntityValue: string,
+    storyName?: string,
   ) => void,
   onEditEntity: (
     stepIntent: string,
     oriEntity: string,
     newEntity: string,
+    storyName?: string,
   ) => void,
   onDeleteEntities: (
     entityValue: string,
@@ -92,8 +94,6 @@ const UserStep: React.FC<UserStepProps> = (props) => {
   const entitiesData = React.useMemo(() => {
     return filteredEntities(step.entities, step.user);
   }, [step.entities, step.user]);
-
-  console.log('entitiesData:', entitiesData);
 
   // 編輯例句
   const atAddExamples = React.useCallback(
@@ -253,6 +253,20 @@ const UserStep: React.FC<UserStepProps> = (props) => {
     [onDeleteEntities, storyName],
   );
 
+  const atEditEntityValue = React.useCallback(
+    (stepIntent: string, oriEntityValue: string, newEntityValue: string) => {
+      onEditEntityValue(stepIntent, oriEntityValue, newEntityValue, storyName);
+    },
+    [onEditEntityValue, storyName],
+  );
+
+  const atEditEntity = React.useCallback(
+    (stepIntent: string, oriEntity: string, newEntity: string) => {
+      onEditEntity(stepIntent, oriEntity, newEntity, storyName);
+    },
+    [onEditEntity, storyName],
+  );
+
   return (
     <div className="row pt-2" id="userStep">
       <div className={cx('col-6', style.userStepContainer)}>
@@ -336,8 +350,8 @@ const UserStep: React.FC<UserStepProps> = (props) => {
                     entity={entity}
                     entityValue={entityValue}
                     intent={step.intent}
-                    onEditEntityValue={onEditEntityValue}
-                    onEditEntity={onEditEntity}
+                    onEditEntityValue={atEditEntityValue}
+                    onEditEntity={atEditEntity}
                     userSay={step.user}
                     entities={entitiesData}
                     onDeleteEntities={atDeleteEntities}

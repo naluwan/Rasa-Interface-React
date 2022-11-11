@@ -235,8 +235,12 @@ const CreateStory: React.FC<CreateStoryProps> = (props) => {
                 (entityItem.start <= step.user.indexOf(newEntityValue) &&
                   step.user.indexOf(newEntityValue) <= entityItem.end - 1) ||
                 (entityItem.start <=
-                  step.user.indexOf(newEntityValue) + newEntityValue.length &&
-                  step.user.indexOf(newEntityValue) + newEntityValue.length <=
+                  step.user.indexOf(newEntityValue) +
+                    newEntityValue.length -
+                    1 &&
+                  step.user.indexOf(newEntityValue) +
+                    newEntityValue.length -
+                    1 <=
                     entityItem.end)
               ) {
                 return true;

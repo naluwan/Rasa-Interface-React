@@ -35,6 +35,7 @@ import {
   actionEditIntent,
   actionCreateEntities,
   actionDeleteEntities,
+  actionEditEntityValue,
 } from 'actions';
 // import { computed } from 'zustand-middleware-computed-state';
 import { Toast } from 'utils/swalInput';
@@ -66,7 +67,6 @@ const reducer = (state: State, action: Action): State => {
         const filteredStories = stories.filter(
           (item) => !item.story.includes('button_'),
         );
-        console.log('filteredStories:', filteredStories);
         return {
           ...state,
           ...action.payload,
@@ -911,6 +911,135 @@ const reducer = (state: State, action: Action): State => {
         return onSetStory(storyName);
       });
     }
+    case 'EDIT_ENTITY_VALUE': {
+      const { stepIntent, oriEntityValue, newEntityValue, storyName } =
+        action.payload;
+      const { stories, nlu, domain } = cloneDeep(state.cloneData);
+      const { onSetStory, onSetAllTrainData } = state;
+      // 驗證關鍵字是否有效
+      const isValidEntityValue = stories.some((item) => {
+        if (item.story === storyName) {
+          return item.steps.some((step) => {
+            if (step.intent && step.intent === stepIntent) {
+              return step.user.includes(newEntityValue);
+            }
+            return false;
+          });
+        }
+        return false;
+      });
+      if (!isValidEntityValue) {
+        return Toast.fire({
+          icon: 'warning',
+          title: '請填入正確的關鍵字',
+        });
+      }
+
+      // 驗證關鍵字是否重疊
+      const isRepeat = stories.some((item) => {
+        if (item.story === storyName) {
+          return item.steps.some((step) => {
+            if (
+              step.intent &&
+              step.entities.length &&
+              step.intent === stepIntent
+            ) {
+              return step.entities.some((entityItem) => {
+                if (Object.values(entityItem)[0] !== oriEntityValue) {
+                  const entityItemStart = step.user.indexOf(
+                    Object.values(entityItem)[0],
+                  );
+                  const entityItemEnd =
+                    entityItemStart + Object.values(entityItem)[0].length;
+                  const newEntityValueStart = step.user.indexOf(newEntityValue);
+                  const newEntityValueEnd =
+                    newEntityValueStart + newEntityValue.length;
+                  if (
+                    (entityItemStart <= newEntityValueStart &&
+                      newEntityValueStart <= entityItemEnd - 1) ||
+                    (entityItemStart <= newEntityValueEnd - 1 &&
+                      newEntityValueEnd - 1 <= entityItemEnd)
+                  ) {
+                    return true;
+                  }
+                }
+                return false;
+              });
+            }
+            return false;
+          });
+        }
+        return false;
+      });
+      if (isRepeat) {
+        return Toast.fire({
+          icon: 'warning',
+          title: '關鍵字不可重疊',
+        });
+      }
+
+      let userSay = '';
+      // 更新stories該story中的關鍵字
+      stories.map((item) => {
+        if (item.story === storyName) {
+          return item.steps.map((step) => {
+            if (
+              step.intent &&
+              step.intent === stepIntent &&
+              step.entities.length
+            ) {
+              userSay = step.user;
+              step.entities.map((entityItem) => {
+                if (Object.values(entityItem)[0] === oriEntityValue) {
+                  entityItem[Object.keys(entityItem)[0]] = newEntityValue;
+                }
+                return entityItem;
+              });
+            }
+            return step;
+          });
+        }
+        return item;
+      });
+
+      // 更新nlu中該例句的關鍵字
+      nlu.rasa_nlu_data.common_examples.map((nluItem) => {
+        if (nluItem.intent === stepIntent && nluItem.text === userSay) {
+          nluItem.entities.map((entityItem) => {
+            if (entityItem.value === oriEntityValue) {
+              entityItem.start = userSay.indexOf(newEntityValue);
+              entityItem.end =
+                userSay.indexOf(newEntityValue) + newEntityValue.length;
+              entityItem.value = newEntityValue;
+            }
+            return entityItem;
+          });
+        }
+        return nluItem;
+      });
+
+      const cloneData = {
+        stories,
+        nlu,
+        domain,
+      };
+
+      return postAllTrainData(cloneData).then((res) => {
+        if (res.status !== 'success') {
+          return Toast.fire({
+            icon: 'error',
+            title: '編輯關鍵字失敗',
+            text: res.message,
+          });
+        }
+        Toast.fire({
+          icon: 'success',
+          title: '編輯關鍵字成功',
+        });
+        onSetAllTrainData(res.data);
+        return onSetStory(storyName);
+      });
+    }
     default:
       return state;
   }
@@ -1118,6 +1247,21 @@ const useStoryStore = create((set) => {
     },
     onDeleteEntities(entity: string, intent: string, storyName: string) {
       dispatch(actionDeleteEntities(entity, intent, storyName));
+    },
+    onEditEntityValue(
+      stepIntent: string,
+      oriEntityValue: string,
+      newEntityValue: string,
+      storyName: string,
+    ) {
+      dispatch(
+        actionEditEntityValue(
+          stepIntent,
+          oriEntityValue,
+          newEntityValue,
+          storyName,
+        ),
+      );
     },
   };
 });

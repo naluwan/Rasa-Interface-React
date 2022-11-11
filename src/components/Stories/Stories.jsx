@@ -558,8 +558,6 @@ const Stories = () => {
     [onSetDeleteStory, atClickSaveBtn, stories],
   );
 
-  console.log('newStory:', newStory);
-
   return (
     <>
       <div className={style.searchBar}>

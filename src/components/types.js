@@ -162,4 +162,10 @@ export type State = {
     storyName: string,
   ) => void,
   onDeleteEntities: (entity: string, intent: string, storyName: string) => void,
+  onEditEntityValue: (
+    stepIntent: string,
+    oriEntityValue: string,
+    newEntityValue: string,
+    storyName: string,
+  ) => void,
 };
