@@ -18,6 +18,7 @@ type EntitiesProps = {
     oriEntity: string,
     newEntity: string,
   ) => void,
+  onDeleteEntities: (entityValue: string, intent: string) => void,
 };
 
 const Entities: React.FC<EntitiesProps> = (props) => {
@@ -29,6 +30,7 @@ const Entities: React.FC<EntitiesProps> = (props) => {
     entities,
     onEditEntityValue,
     onEditEntity,
+    onDeleteEntities,
   } = props;
   const [showValue, setShowValue] = React.useState(false);
   const [showEntity, setShowEntity] = React.useState(false);
@@ -140,74 +142,83 @@ const Entities: React.FC<EntitiesProps> = (props) => {
 
   return (
     <div className={style.root}>
-      <div className="px-2">
-        <label htmlFor="entityValue" className={style.label}>
-          關鍵字：
-        </label>
-        {showValue ? (
-          <input
-            type="text"
-            id="entityValue"
-            name="entityValue"
-            defaultValue={entityItem.entityValue}
-            ref={refValueInput}
-            onChange={atChange}
-            onKeyDown={(e) =>
-              atEntityValueKeyDown(
-                e,
-                intent,
-                entityValue,
-                entityItem.entityValue,
-              )
-            }
-            onBlur={(e) =>
-              atEntityValueKeyDown(
-                e,
-                intent,
-                entityValue,
-                entityItem.entityValue,
-              )
-            }
-          />
-        ) : (
-          <button
-            className="btn btn-outline-light"
-            id="entityValue"
-            onClick={atShowClick}
-          >
-            {entityItem.entityValue}
-          </button>
-        )}
+      <div className={style.info}>
+        <div className="px-2">
+          <label htmlFor="entityValue" className={style.label}>
+            關鍵字：
+          </label>
+          {showValue ? (
+            <input
+              type="text"
+              id="entityValue"
+              name="entityValue"
+              defaultValue={entityItem.entityValue}
+              ref={refValueInput}
+              onChange={atChange}
+              onKeyDown={(e) =>
+                atEntityValueKeyDown(
+                  e,
+                  intent,
+                  entityValue,
+                  entityItem.entityValue,
+                )
+              }
+              onBlur={(e) =>
+                atEntityValueKeyDown(
+                  e,
+                  intent,
+                  entityValue,
+                  entityItem.entityValue,
+                )
+              }
+            />
+          ) : (
+            <button
+              className="btn btn-outline-light"
+              id="entityValue"
+              onClick={atShowClick}
+            >
+              {entityItem.entityValue}
+            </button>
+          )}
+        </div>
+        <div className="px-2">
+          <label htmlFor="entity" className={style.label}>
+            代表值：
+          </label>
+          {showEntity ? (
+            <input
+              type="text"
+              id="entity"
+              name="entity"
+              defaultValue={entityItem.entity}
+              ref={refEntityInput}
+              onChange={(e) => atChange(e)}
+              onKeyDown={(e) =>
+                atEntityKeyDown(e, intent, entity, entityItem.entity)
+              }
+              onBlur={(e) =>
+                atEntityKeyDown(e, intent, entity, entityItem.entity)
+              }
+            />
+          ) : (
+            <button
+              className="btn btn-outline-primary"
+              id="entity"
+              onClick={atShowClick}
+            >
+              {entityItem.entity}
+            </button>
+          )}
+        </div>
       </div>
-      <div className="px-2">
-        <label htmlFor="entity" className={style.label}>
-          代表值：
-        </label>
-        {showEntity ? (
-          <input
-            type="text"
-            id="entity"
-            name="entity"
-            defaultValue={entityItem.entity}
-            ref={refEntityInput}
-            onChange={(e) => atChange(e)}
-            onKeyDown={(e) =>
-              atEntityKeyDown(e, intent, entity, entityItem.entity)
-            }
-            onBlur={(e) =>
-              atEntityKeyDown(e, intent, entity, entityItem.entity)
-            }
-          />
-        ) : (
-          <button
-            className="btn btn-outline-primary"
-            id="entity"
-            onClick={atShowClick}
-          >
-            {entityItem.entity}
-          </button>
-        )}
-      </div>
+      <button
+        type="button"
+        className="btn btn-outline-danger"
+        onClick={() => onDeleteEntities(entityValue, intent)}
+      >
+        刪除關鍵字
+      </button>
     </div>
   );
 };

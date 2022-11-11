@@ -47,17 +47,21 @@ export const Toast = Swal.mixin({
   timer: 3000,
 });
 
-export const confirmWidget = (storyName: string, type: string) => {
+export const confirmWidget = (value: string, type: string) => {
   let currentTitle = '';
   let currentText = '';
   switch (type) {
     case 'delete':
       currentTitle = `刪除`;
-      currentText = `確認要刪除『${storyName}』?`;
+      currentText = `確認要刪除『${value}』?`;
+      break;
+    case 'deleteEntities':
+      currentTitle = `刪除`;
+      currentText = `確認要刪除關鍵字『${value}』?`;
       break;
     default:
       currentTitle = '離開';
-      currentText = `故事『${storyName}』尚未儲存，確定要離開?`;
+      currentText = `故事『${value}』尚未儲存，確定要離開?`;
   }
   const swalWithBootstrapButtons = Swal.mixin({
     customClass: {

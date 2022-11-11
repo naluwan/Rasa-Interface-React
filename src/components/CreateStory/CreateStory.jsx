@@ -191,6 +191,25 @@ const CreateStory: React.FC<CreateStoryProps> = (props) => {
     [onSetNewStory],
   );
 
+  // 刪除關鍵字
+  const atDeleteEntities = React.useCallback(
+    (entityValue: string, intent: string) => {
+      return onSetNewStory((prev) => {
+        return {
+          ...prev,
+          steps: prev.steps.map((step) => {
+            if (step.intent === intent && step.entities.length) {
+              const entitiesKeys = step.entities.map((item) => item.value);
+              step.entities.splice(entitiesKeys.indexOf(entityValue), 1);
+            }
+            return step;
+          }),
+        };
+      });
+    },
+    [onSetNewStory],
+  );
+
   // 編輯關鍵字
   const atEditEntityValue = React.useCallback(
     (stepIntent: string, oriEntityValue: string, newEntityValue: string) => {
@@ -470,10 +489,11 @@ const CreateStory: React.FC<CreateStoryProps> = (props) => {
                 onEditUserSay={atEditUserSay}
                 onEditExamples={atEditExamples}
                 onEditIntent={atEditIntent}
-                onCreateEntities={atCreateEntities}
                 onRemoveUserStep={atRemoveUserStep}
+                onCreateEntities={atCreateEntities}
                 onEditEntityValue={atEditEntityValue}
                 onEditEntity={atEditEntity}
+                onDeleteEntities={atDeleteEntities}
               />
             ) : (
               <BotStep

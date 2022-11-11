@@ -3,7 +3,7 @@ import cx from 'classnames';
 import Swal from 'sweetalert2';
 import style from './UserStep.module.scss';
 import type { StepsType, NluEntitiesType } from '../types';
-import { swalInput, Toast } from '../../utils/swalInput';
+import { swalInput, Toast, confirmWidget } from '../../utils/swalInput';
 import Entities from '../Entities';
 
 type UserStepProps = {
@@ -38,6 +38,11 @@ type UserStepProps = {
     oriEntity: string,
     newEntity: string,
   ) => void,
+  onDeleteEntities: (
+    entityValue: string,
+    intent: string,
+    storyName?: string,
+  ) => void,
 };
 
 const UserStep: React.FC<UserStepProps> = (props) => {
@@ -52,6 +57,7 @@ const UserStep: React.FC<UserStepProps> = (props) => {
     onRemoveUserStep,
     onEditEntityValue,
     onEditEntity,
+    onDeleteEntities,
   } = props;
   const showIntent =
     step.intent === 'get_started' ? '打開聊天室窗' : step.intent;
@@ -156,6 +162,27 @@ const UserStep: React.FC<UserStepProps> = (props) => {
               return;
             }
 
+            // 獲取所有entities的key值
+            const entitiesKeys = currentEntities.map((item) =>
+              Object.keys(item),
+            );
+
+            // 查詢故事頁，將entities傳進來時是沒有處理過的，所以這邊要再處理一次，否則無法驗證關鍵字是否重疊
+            if (
+              currentEntities.length &&
+              entitiesKeys.every((item) =>
+                item.every((keyItem) => keyItem !== 'start'),
+              )
+            ) {
+              currentEntities.map((item) => {
+                item.start = userSay.indexOf(Object.values(item)[0]);
+                item.end = item.start + Object.values(item)[0].length;
+                [item.entity] = Object.keys(item);
+                [item.value] = Object.values(item);
+                return item;
+              });
+            }
+
             if (currentEntities.length) {
               // 驗證關鍵字是否重疊
               const isRepeat = currentEntities.some(
@@ -201,6 +228,17 @@ const UserStep: React.FC<UserStepProps> = (props) => {
       });
     },
     [onCreateEntities],
+  );
+
+  const atDeleteEntities = React.useCallback(
+    (entityValue: string, intent: string) => {
+      confirmWidget(entityValue, 'deleteEntities').then((result) => {
+        if (!result.isConfirmed) return;
+
+        onDeleteEntities(entityValue, intent, storyName);
+      });
+    },
+    [onDeleteEntities, storyName],
   );
 
   return (
@@ -296,6 +334,7 @@ const UserStep: React.FC<UserStepProps> = (props) => {
                     onEditEntity={onEditEntity}
                     userSay={step.user}
                     entities={step.entities}
+                    onDeleteEntities={atDeleteEntities}
                   />
                 );
               })}
