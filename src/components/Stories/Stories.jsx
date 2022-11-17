@@ -1,4 +1,3 @@
-/* eslint-disable no-shadow */
 import * as React from 'react';
 import useSWR from 'swr';
 import { fetchAllData, postAllTrainData, fetchAllAction } from 'services/api';
@@ -71,7 +70,9 @@ const Stories = () => {
     fetchAllAction().then((actionData) => onSetAllAction(actionData));
     fetch(`http://192.168.10.105:5005/status`)
       .then((res) => res.json())
-      .then((data) => onSetRasaTrainState(data.num_active_training_jobs));
+      .then((stateData) =>
+        onSetRasaTrainState(stateData.num_active_training_jobs),
+      );
   }, [cloneData, onSetAllAction, onSetRasaTrainState]);
 
   // 離開頁面將顯示故事刪除
@@ -419,19 +420,16 @@ const Stories = () => {
       // 組成例句的訓練檔格式
       const currentExamples = createStory.steps
         .filter((step) => step.examples)
-        .map((step) => ({
-          intent: step.intent.trim(),
-          examples: step.examples,
-        }));
+        .map((step) => step.examples);
 
       // 將例句訓練檔放進nlu訓練檔中
       // 將意圖放進domain訓練檔的intents中
       currentExamples.map((exampleItem) => {
-        return exampleItem.examples.map((example) => {
+        return exampleItem.map((example) => {
           return cloneData.nlu.rasa_nlu_data.common_examples.push({
-            text: example,
-            intent: exampleItem.intent,
-            entities: [],
+            text: example.text,
+            intent: example.intent,
+            entities: example.entities,
           });
         });
       });
@@ -596,6 +594,9 @@ const Stories = () => {
                 </MyButton>
               </div>
             )}
+            <div className={cx('btn', style.navbar)}>
+              <MyButton variant="secondary">記錄槽</MyButton>
+            </div>
           </div>
         </div>
       </div>

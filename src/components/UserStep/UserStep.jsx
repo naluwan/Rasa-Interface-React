@@ -1,10 +1,13 @@
 import * as React from 'react';
 import cx from 'classnames';
 import Swal from 'sweetalert2';
+import shallow from 'zustand/shallow';
 import style from './UserStep.module.scss';
-import type { StepsType, NluEntitiesType } from '../types';
+import type { StepsType, NluEntitiesType, NluType, State } from '../types';
 import { swalInput, Toast, confirmWidget } from '../../utils/swalInput';
 import Entities from '../Entities';
+import Examples from './Examples';
+import useStoryStore from '../../store/useStoryStore';
 
 type UserStepProps = {
   isCreate: boolean,
@@ -28,16 +31,22 @@ type UserStepProps = {
     storyName?: string,
   ) => void,
   onRemoveUserStep: (intent: string, userSay: string) => void,
-  onEditEntityValue: (
+  onEditEntityShowValue: (
     stepIntent: string,
-    oriEntityValue: string,
-    newEntityValue: string,
+    currentEntityValue: string,
+    newEntityShowValue: string,
     storyName?: string,
   ) => void,
   onEditEntity: (
     stepIntent: string,
     oriEntity: string,
     newEntity: string,
+    storyName?: string,
+  ) => void,
+  onEditEntityValue: (
+    stepIntent: string,
+    oriEntityValue: string,
+    newEntityValue: string,
     storyName?: string,
   ) => void,
   onDeleteEntities: (
@@ -51,24 +60,29 @@ type UserStepProps = {
 const filteredEntities = (
   entities: { [key: string]: string } | NluEntitiesType,
   userSay: string,
+  intent: string,
+  nlu: NluType,
 ) => {
   const entitiesKeys = entities.map((item) => Object.keys(item));
+  let currentEntities = [];
   if (
     entitiesKeys.length &&
     entitiesKeys.every((item) => item.every((keyItem) => keyItem !== 'start'))
   ) {
     // 重組entities
-    return entities
-      .map((entityItem) => {
-        entityItem.start = userSay.indexOf(Object.values(entityItem)[0]);
-        entityItem.end = entityItem.start + Object.values(entityItem)[0].length;
-        [entityItem.entity] = Object.keys(entityItem);
-        [entityItem.value] = Object.values(entityItem);
-        return entityItem;
-      })
-      .sort((a, b) => a.start - b.start); // 將entities做排序，開頭較前面的會排在上方
+    [currentEntities] = nlu.rasa_nlu_data.common_examples
+      .filter(
+        (nluItem) => nluItem.text === userSay && nluItem.intent === intent,
+      )
+      .map((item) => item.entities);
+    console.log('currentEntities:', currentEntities);
   }
-  return entities;
+  // 新建故事頁面的關鍵字
+  if (!currentEntities.length) {
+    return entities.sort((a, b) => a.start - b.start);
+  }
+  // 查詢故事頁面的關鍵字
+  return currentEntities.sort((a, b) => a.start - b.start); // 將entities做排序，開頭較前面的會排在上方
 };
 
 const UserStep: React.FC<UserStepProps> = (props) => {
@@ -81,10 +95,17 @@ const UserStep: React.FC<UserStepProps> = (props) => {
     onEditIntent,
     onCreateEntities,
     onRemoveUserStep,
-    onEditEntityValue,
+    onEditEntityShowValue,
     onEditEntity,
+    onEditEntityValue,
     onDeleteEntities,
   } = props;
+
+  const { nlu } = useStoryStore((state: State) => {
+    return {
+      nlu: state.nlu,
+    };
+  }, shallow);
   const showIntent =
     step.intent === 'get_started' ? '打開聊天室窗' : step.intent;
 
@@ -92,26 +113,8 @@ const UserStep: React.FC<UserStepProps> = (props) => {
 
   // 重組entities資料
   const entitiesData = React.useMemo(() => {
-    return filteredEntities(step.entities, step.user);
-  }, [step.entities, step.user]);
-
-  // 編輯例句
-  const atAddExamples = React.useCallback(
-    (
-      userSay: string,
-      intent: string,
-      examples: string,
-      currentStoryName: string | null,
-    ) => {
-      swalInput('新增例句', 'textarea', '請輸入例句', examples, true).then(
-        (newExamples) => {
-          if (newExamples === undefined || newExamples === examples) return;
-          onEditExamples(userSay, intent, newExamples, currentStoryName);
-        },
-      );
-    },
-    [onEditExamples],
-  );
+    return filteredEntities(step.entities, step.user, step.intent, nlu);
+  }, [step.entities, step.user, step.intent, nlu]);
 
   // 編輯使用者對話
   const atEditUserSay = React.useCallback(
@@ -154,36 +157,44 @@ const UserStep: React.FC<UserStepProps> = (props) => {
       await Swal.fire({
         title: '編輯關鍵字',
         html: `
-          <input id="value" class="swal2-input" placeholder="請輸入關鍵字" />
+          <input id="showValue" class="swal2-input" placeholder="請輸入關鍵字" />
+          <input id="currentValue" class="swal2-input" placeholder="請輸入記錄槽代表值" />
           <input id="entity" class="swal2-input" placeholder="請輸入關鍵字代表值" />
         `,
+        showCancelButton: true,
+        showCloseButton: true,
         preConfirm: () => {
           return new Promise((resolve) => {
             Swal.enableButtons();
             // 獲取關鍵字(value)和關鍵字代表值(entity)
-            const { value } = document.querySelector('.swal2-input#value');
+            const showValue = document.querySelector(
+              '.swal2-input#showValue',
+            ).value;
+            const currentValue = document.querySelector(
+              '.swal2-input#currentValue',
+            ).value;
             const entity = document.querySelector('.swal2-input#entity').value;
             // 獲取關鍵字的起點和終點
-            const start = userSay.indexOf(value);
-            const end = userSay.indexOf(value) + value.length;
+            const start = userSay.indexOf(showValue);
+            const end = userSay.indexOf(showValue) + showValue.length;
             // 驗證關鍵字代表值是否有數字
             const regex = /^[0-9]*$/g;
 
             // 都沒值
-            if (value === '' && entity === '') {
+            if (showValue === '' && entity === '' && currentValue === '') {
               return;
             }
 
             // 有一個欄位沒值
-            if (value === '' || entity === '') {
+            if (showValue === '' || entity === '' || currentValue === '') {
               Swal.showValidationMessage(`所有欄位都是必填的`);
               return;
             }
 
             // 關鍵字不在對話內
-            if (!userSay.includes(value)) {
+            if (!userSay.includes(showValue)) {
               Swal.showValidationMessage(`請填入正確的關鍵字`);
-              document.querySelector('.swal2-input#value').value = '';
+              document.querySelector('.swal2-input#showValue').value = '';
               return;
             }
 
@@ -206,7 +217,7 @@ const UserStep: React.FC<UserStepProps> = (props) => {
 
               if (isRepeat) {
                 Swal.showValidationMessage(`關鍵字不可重疊`);
-                document.querySelector('.swal2-input#value').value = '';
+                document.querySelector('.swal2-input#showValue').value = '';
                 return;
               }
 
@@ -220,9 +231,21 @@ const UserStep: React.FC<UserStepProps> = (props) => {
                 document.querySelector('.swal2-input#entity').value = '';
                 return;
               }
+
+              const isValueRepeat = currentEntities.some(
+                (currentEntitiesItem) =>
+                  currentEntitiesItem.value === currentValue,
+              );
+
+              if (isValueRepeat) {
+                Swal.showValidationMessage(`同一個對話內記錄槽代表值不可重複`);
+                document.querySelector('.swal2-input#currentValue').value = '';
+                return;
+              }
             }
 
-            const entities = { start, end, entity, value };
+            const entities = { start, end, entity, value: currentValue };
+
             resolve({ entities });
           }).catch((err) => {
             Toast.fire({
@@ -251,6 +274,31 @@ const UserStep: React.FC<UserStepProps> = (props) => {
       });
     },
     [onDeleteEntities, storyName],
+  );
+
+  // 編輯關鍵字位置
+  const atEditEntityShowValue = React.useCallback(
+    (
+      stepIntent: string,
+      currentEntityValue: string,
+      newEntityShowValue: string,
+    ) => {
+      onEditEntityShowValue(
+        stepIntent,
+        currentEntityValue,
+        newEntityShowValue,
+        storyName,
+      );
+    },
+    [onEditEntityShowValue, storyName],
+  );
+
+  // 編輯關鍵字代表值
+  const atEditEntity = React.useCallback(
+    (stepIntent: string, oriEntity: string, newEntity: string) => {
+      onEditEntity(stepIntent, oriEntity, newEntity, storyName);
+    },
+    [onEditEntity, storyName],
   );
 
   // 編輯關鍵字
@@ -340,20 +388,22 @@ const UserStep: React.FC<UserStepProps> = (props) => {
             <div className={style.userText}>{step.intent}</div>
           </div>
           {entitiesData.length > 0 && (
-            <div className="d-flex flex-column pt-2">
-              <div className={style.userTitle}>關鍵字:</div>
+            <div className={style.entitiesContainer}>
+              <div className={style.userTitle}>關鍵字資訊:</div>
               {entitiesData.map((entityItem) => {
-                const { entity } = entityItem;
+                const { entity, start, end } = entityItem;
                 const entityValue = entityItem.value;
-
+                const entityShowValue = step.user.slice(start, end);
                 return (
                   <Entities
                     key={entity + entityValue}
                     entity={entity}
                     entityValue={entityValue}
+                    entityShowValue={entityShowValue}
                     intent={step.intent}
-                    onEditEntityValue={atEditEntityValue}
+                    onEditEntityShowValue={atEditEntityShowValue}
                     onEditEntity={atEditEntity}
+                    onEditEntityValue={atEditEntityValue}
                     userSay={step.user}
                     entities={entitiesData}
                     onDeleteEntities={atDeleteEntities}

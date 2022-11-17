@@ -59,6 +59,10 @@ export const confirmWidget = (value: string, type: string) => {
       currentTitle = `刪除`;
       currentText = `確認要刪除關鍵字『${value}』?`;
       break;
+    case 'deleteExample':
+      currentTitle = `刪除`;
+      currentText = `確認要刪除例句『${value}』?`;
+      break;
     default:
       currentTitle = '離開';
       currentText = `故事『${value}』尚未儲存，確定要離開?`;

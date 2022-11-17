@@ -211,16 +211,16 @@ const CreateStory: React.FC<CreateStoryProps> = (props) => {
     [onSetNewStory],
   );
 
-  // 編輯關鍵字
-  const atEditEntityValue = React.useCallback(
-    (stepIntent: string, oriEntityValue: string, newEntityValue: string) => {
-      const isValidEntityValue = newStory.steps.some((step) => {
+  // 編輯關鍵字位置
+  const atEditEntityShowValue = React.useCallback(
+    (stepIntent: string, entityValue: string, newEntityShowValue: string) => {
+      const isValidEntityShowValue = newStory.steps.some((step) => {
         if (step.intent && step.intent === stepIntent) {
-          return step.user.includes(newEntityValue);
+          return step.user.includes(newEntityShowValue);
         }
         return false;
       });
-      if (!isValidEntityValue) {
+      if (!isValidEntityShowValue) {
         return Toast.fire({
           icon: 'warning',
           title: '請填入正確的關鍵字',
@@ -230,16 +230,17 @@ const CreateStory: React.FC<CreateStoryProps> = (props) => {
       const isRepeat = newStory.steps.some((step) => {
         if (step.intent && step.entities.length && step.intent === stepIntent) {
           return step.entities.some((entityItem) => {
-            if (entityItem.value !== oriEntityValue) {
+            if (entityItem.value !== entityValue) {
               if (
-                (entityItem.start <= step.user.indexOf(newEntityValue) &&
-                  step.user.indexOf(newEntityValue) <= entityItem.end - 1) ||
+                (entityItem.start <= step.user.indexOf(newEntityShowValue) &&
+                  step.user.indexOf(newEntityShowValue) <=
+                    entityItem.end - 1) ||
                 (entityItem.start <=
-                  step.user.indexOf(newEntityValue) +
-                    newEntityValue.length -
+                  step.user.indexOf(newEntityShowValue) +
+                    newEntityShowValue.length -
                     1 &&
-                  step.user.indexOf(newEntityValue) +
-                    newEntityValue.length -
+                  step.user.indexOf(newEntityShowValue) +
+                    newEntityShowValue.length -
                     1 <=
                     entityItem.end)
               ) {
@@ -263,11 +264,11 @@ const CreateStory: React.FC<CreateStoryProps> = (props) => {
           steps: prev.steps.map((step) => {
             if (step.intent && step.entities.length) {
               step.entities.map((entityItem) => {
-                if (entityItem.value === oriEntityValue) {
-                  entityItem.start = step.user.indexOf(newEntityValue);
+                if (entityItem.value === entityValue) {
+                  entityItem.start = step.user.indexOf(newEntityShowValue);
                   entityItem.end =
-                    step.user.indexOf(newEntityValue) + newEntityValue.length;
-                  entityItem.value = newEntityValue;
+                    step.user.indexOf(newEntityShowValue) +
+                    newEntityShowValue.length;
                 }
                 return entityItem;
               });
@@ -322,6 +323,45 @@ const CreateStory: React.FC<CreateStoryProps> = (props) => {
               step.entities = step.entities.map((entityItem) => {
                 if (entityItem.entity === oriEntity) {
                   entityItem.entity = newEntity;
+                }
+                return entityItem;
+              });
+            }
+            return step;
+          }),
+        };
+      });
+    },
+    [onSetNewStory, newStory.steps],
+  );
+
+  // 編輯關鍵字
+  const atEditEntityValue = React.useCallback(
+    (stepIntent: string, oriEntityValue: string, newEntityValue: string) => {
+      const isRepeat = newStory.steps.some((step) => {
+        if (step.intent && step.intent === stepIntent) {
+          return step.entities.some(
+            (entityItem) => entityItem.value === newEntityValue,
+          );
+        }
+        return false;
+      });
+
+      if (isRepeat) {
+        return Toast.fire({
+          icon: 'warning',
+          title: '同一個對話內記憶槽代表值不可重複',
+        });
+      }
+
+      return onSetNewStory((prev) => {
+        return {
+          ...prev,
+          steps: prev.steps.map((step) => {
+            if (step.intent && step.intent === stepIntent) {
+              step.entities.map((entityItem) => {
+                if (entityItem.value === oriEntityValue) {
+                  entityItem.value = newEntityValue;
                 }
                 return entityItem;
               });
@@ -508,8 +548,9 @@ const CreateStory: React.FC<CreateStoryProps> = (props) => {
                 onEditIntent={atEditIntent}
                 onRemoveUserStep={atRemoveUserStep}
                 onCreateEntities={atCreateEntities}
-                onEditEntityValue={atEditEntityValue}
+                onEditEntityShowValue={atEditEntityShowValue}
                 onEditEntity={atEditEntity}
+                onEditEntityValue={atEditEntityValue}
                 onDeleteEntities={atDeleteEntities}
               />
             ) : (

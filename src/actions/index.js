@@ -83,11 +83,11 @@ export type Action =
       payload: { entity: string, intent: string, storyName: string },
     }
   | {
-      type: 'EDIT_ENTITY_VALUE',
+      type: 'EDIT_ENTITY_SHOW_VALUE',
       payload: {
         stepIntent: string,
-        oriEntityValue: string,
-        newEntityValue: string,
+        currentEntityValue: string,
+        newEntityShowValue: string,
         storyName: string,
       },
     }
@@ -97,6 +97,15 @@ export type Action =
         stepIntent: string,
         oriEntity: string,
         newEntity: string,
+        storyName: string,
+      },
+    }
+  | {
+      type: 'EDIT_ENTITY_VALUE',
+      payload: {
+        stepIntent: string,
+        oriEntityValue: string,
+        newEntityValue: string,
         storyName: string,
       },
     };
@@ -225,14 +234,14 @@ export const actionDeleteEntities = (
   payload: { entity, intent, storyName },
 });
 
-export const actionEditEntityValue = (
+export const actionEditEntityShowValue = (
   stepIntent: string,
-  oriEntityValue: string,
-  newEntityValue: string,
+  currentEntityValue: string,
+  newEntityShowValue: string,
   storyName: string,
 ): Action => ({
-  type: 'EDIT_ENTITY_VALUE',
-  payload: { stepIntent, oriEntityValue, newEntityValue, storyName },
+  type: 'EDIT_ENTITY_SHOW_VALUE',
+  payload: { stepIntent, currentEntityValue, newEntityShowValue, storyName },
 });
 
 export const actionEditEntity = (
@@ -243,4 +252,14 @@ export const actionEditEntity = (
 ): Action => ({
   type: 'EDIT_ENTITY',
   payload: { stepIntent, oriEntity, newEntity, storyName },
+});
+
+export const actionEditEntityValue = (
+  stepIntent: string,
+  oriEntityValue: string,
+  newEntityValue: string,
+  storyName?: string,
+): Action => ({
+  type: 'EDIT_ENTITY_VALUE',
+  payload: { stepIntent, oriEntityValue, newEntityValue, storyName },
 });
