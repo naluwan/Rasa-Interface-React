@@ -25,7 +25,7 @@ import {
   actionSetStory,
   actionEditUserSay,
   actionEditBotRes,
-  actionEditExamples,
+  actionCreateExample,
   actionSetDeleteStory,
   actionSetAllAction,
   actionEditResButtons,
@@ -38,6 +38,7 @@ import {
   actionEditEntityShowValue,
   actionEditEntity,
   actionEditEntityValue,
+  actionDeleteExample,
 } from 'actions';
 // import { computed } from 'zustand-middleware-computed-state';
 import { Toast } from 'utils/swalInput';
@@ -305,31 +306,22 @@ const reducer = (state: State, action: Action): State => {
         return onSetStory(storyName);
       });
     }
-    case 'EDIT_EXAMPLES': {
-      const { userSay, intent, examples, storyName } = action.payload;
+    case 'CREATE_EXAMPLE': {
+      const { stepIntent, example, exampleEntities, storyName } =
+        action.payload;
+      const { stories, nlu, domain } = cloneDeep(state.cloneData);
       const { onSetStory, onSetAllTrainData } = state;
-      const currentExamples = examples
-        .split(',')
-        .map((example) => example.trimStart())
-        .map((example) => example.trimEnd())
-        .filter((example) => example !== '');
+      const currentExamples = example.trimStart().trimEnd();
       const repeat = [];
 
-      const { nlu } = cloneDeep(state.cloneData);
-
-      const newNlu = nlu.rasa_nlu_data.common_examples.filter(
-        (nluItem) => nluItem.intent !== intent || nluItem.text === userSay,
+      // 驗證例句是否重複
+      nlu.rasa_nlu_data.common_examples.map((nluItem) =>
+        nluItem.text === currentExamples
+          ? repeat.push(currentExamples)
+          : nluItem,
       );
 
-      currentExamples.map((example) => {
-        return newNlu.map((nluItem) => {
-          if (nluItem.text === example) {
-            repeat.push(example);
-          }
-          return nluItem;
-        });
-      });
-
+      // 例句重複處理
       if (repeat.length) {
         return Toast.fire({
           title: '以下例句重複',
@@ -338,17 +330,17 @@ const reducer = (state: State, action: Action): State => {
         });
       }
 
-      currentExamples.map((example) =>
-        newNlu.push({
-          text: example,
-          intent,
-          entities: [],
-        }),
-      );
+      // 添加例句
+      nlu.rasa_nlu_data.common_examples.push({
+        text: currentExamples,
+        intent: stepIntent,
+        entities: exampleEntities,
+      });
 
       const cloneData = {
-        ...state.cloneData,
-        nlu: { rasa_nlu_data: { common_examples: newNlu } },
+        stories,
+        nlu,
+        domain,
       };
 
       return postAllTrainData(cloneData).then((res) => {
@@ -364,7 +356,6 @@ const reducer = (state: State, action: Action): State => {
           title: '編輯使用者例句成功',
         });
         onSetAllTrainData(res.data);
-        console.log('story name:', storyName);
         return onSetStory(storyName);
       });
     }
@@ -1232,6 +1223,53 @@ const reducer = (state: State, action: Action): State => {
         return onSetStory(storyName);
       });
     }
+    case 'DELETE_EXAMPLE': {
+      const { userSay, stepIntent, storyName } = action.payload;
+      const { stories, nlu, domain } = cloneDeep(state.cloneData);
+      const { onSetStory, onSetAllTrainData } = state;
+
+      // 驗證例句是否存在
+      const isExist = nlu.rasa_nlu_data.common_examples.filter(
+        (nluItem) => nluItem.intent === stepIntent && nluItem.text === userSay,
+      )[0];
+
+      // 例句不存在處理
+      if (!isExist) {
+        return Toast.fire({
+          icon: 'warning',
+          title: '查無此例句，請重新嘗試',
+        });
+      }
+
+      // 獲取所有例句的值
+      const allExample = nlu.rasa_nlu_data.common_examples.map(
+        (nluItem) => nluItem.text,
+      );
+
+      // 刪除例句
+      nlu.rasa_nlu_data.common_examples.splice(allExample.indexOf(userSay), 1);
+      const cloneData = {
+        stories,
+        nlu,
+        domain,
+      };
+
+      return postAllTrainData(cloneData).then((res) => {
+        if (res.status !== 'success') {
+          return Toast.fire({
+            icon: 'error',
+            title: '刪除例句失敗',
+            text: res.message,
+          });
+        }
+        Toast.fire({
+          icon: 'success',
+          title: '刪除例句成功',
+        });
+        onSetAllTrainData(res.data);
+        return onSetStory(storyName);
+      });
+    }
     default:
       return state;
   }
@@ -1361,13 +1399,22 @@ const useStoryStore = create((set) => {
     ) {
       dispatch(actionEditBotRes(oreWord, newWord, actionName, storyName));
     },
-    onEditExamples(
+    onCreateExample(
       userSay: string,
-      intent: string,
-      examples: string,
+      stepIntent: string,
+      example: string,
+      exampleEntities: NluEntitiesType[],
       storyName: string,
     ) {
-      dispatch(actionEditExamples(userSay, intent, examples, storyName));
+      dispatch(
+        actionCreateExample(
+          userSay,
+          stepIntent,
+          example,
+          exampleEntities,
+          storyName,
+        ),
+      );
     },
     onSetDeleteStory(deleteStory: StoryType) {
       dispatch(actionSetDeleteStory(deleteStory));
@@ -1477,6 +1524,9 @@ const useStoryStore = create((set) => {
           storyName,
         ),
       );
+    },
+    onDeleteExample(userSay: string, stepIntent: string, storyName: string) {
+      dispatch(actionDeleteExample(userSay, stepIntent, storyName));
     },
   };
 });

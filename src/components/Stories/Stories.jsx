@@ -416,14 +416,12 @@ const Stories = () => {
         return step;
       });
 
-      // TODO:要加入例句檢核，例句需要與範例有一樣的意圖和關鍵字才可以
       // 組成例句的訓練檔格式
       const currentExamples = createStory.steps
         .filter((step) => step.examples)
         .map((step) => step.examples);
 
       // 將例句訓練檔放進nlu訓練檔中
-      // 將意圖放進domain訓練檔的intents中
       currentExamples.map((exampleItem) => {
         return exampleItem.map((example) => {
           return cloneData.nlu.rasa_nlu_data.common_examples.push({

@@ -1,3 +1,4 @@
+/* eslint-disable no-unreachable */
 import * as React from 'react';
 import cx from 'classnames';
 import Swal from 'sweetalert2';
@@ -13,10 +14,10 @@ type UserStepProps = {
   isCreate: boolean,
   step: StepsType,
   storyName: string,
-  onEditExamples: (
-    userSay: string,
+  onCreateExample: (
     intent: string,
     examples: string,
+    exampleEntities: NluEntitiesType[],
     storyName?: string,
   ) => void,
   onEditUserSay: (
@@ -52,6 +53,11 @@ type UserStepProps = {
   onDeleteEntities: (
     entityValue: string,
     intent: string,
+    storyName?: string,
+  ) => void,
+  onDeleteExample: (
+    userSay: string,
+    intent: String,
     storyName?: string,
   ) => void,
 };
@@ -90,7 +96,7 @@ const UserStep: React.FC<UserStepProps> = (props) => {
     isCreate,
     step,
     storyName,
-    onEditExamples,
+    onCreateExample,
     onEditUserSay,
     onEditIntent,
     onCreateEntities,
@@ -99,6 +105,7 @@ const UserStep: React.FC<UserStepProps> = (props) => {
     onEditEntity,
     onEditEntityValue,
     onDeleteEntities,
+    onDeleteExample,
   } = props;
 
   const { nlu } = useStoryStore((state: State) => {
@@ -309,13 +316,175 @@ const UserStep: React.FC<UserStepProps> = (props) => {
     [onEditEntityValue, storyName],
   );
 
-  // 編輯關鍵字代表值
-  const atEditEntity = React.useCallback(
-    (stepIntent: string, oriEntity: string, newEntity: string) => {
-      onEditEntity(stepIntent, oriEntity, newEntity, storyName);
+  // 新增例句
+  const atCreateExample = React.useCallback(
+    (
+      intent: string,
+      parentEntitiesData: NluEntitiesType[],
+      currentStoryName: string,
+    ) => {
+      const exampleValue = document.querySelector(
+        `#input-${intent}-example`,
+      ).value;
+      const entityKeys = parentEntitiesData.map(
+        (entityItem) => entityItem.entity,
+      );
+      const entitiesValue = entityKeys.map((key) => {
+        const { value } = document.querySelector(
+          `#input-${key}-entities-value`,
+        );
+        const showValue = document.querySelector(
+          `#input-${key}-entities-show-value`,
+        ).value;
+        return {
+          start: exampleValue.indexOf(showValue),
+          end: exampleValue.indexOf(showValue) + showValue.length,
+          entity: key,
+          value,
+          showValue,
+        };
+      });
+
+      console.log('entitiesValue:', entitiesValue);
+      // 所有輸入空的值都為空就返回
+      if (
+        exampleValue === '' &&
+        entitiesValue.every((entity) => entity.value === '')
+      ) {
+        return;
+      }
+
+      // 輸入框有空值處理方式
+      if (
+        exampleValue === '' ||
+        entitiesValue.some(
+          (entity) => entity.value === '' || entity.showValue === '',
+        )
+      ) {
+        Toast.fire({
+          icon: 'warning',
+          title: '所有欄位都是必填的',
+        });
+        return;
+      }
+
+      /*
+        驗證關鍵字是否有效
+        關鍵字必須包含在例句內
+      */
+      const isNotValid = [];
+      entitiesValue.map((entityItem) => {
+        if (!exampleValue.includes(entityItem.showValue)) {
+          isNotValid.push(entityItem.entity);
+        }
+        return entityItem;
+      });
+
+      if (isNotValid.length) {
+        isNotValid.map((notValidEntity) => {
+          document.querySelector(
+            `#input-${notValidEntity}-entities-show-value`,
+          ).value = '';
+          return notValidEntity;
+        });
+        Toast.fire({
+          icon: 'warning',
+          title: `關鍵字代表值『${isNotValid.toString()}』的關鍵字有誤，請輸入正確的關鍵字`,
+        });
+        return;
+      }
+
+      // 重組關鍵字資訊，關鍵字開始和結束位置
+      // 驗證關鍵字是否重疊
+      const repeatEntity = [];
+      const isRepeat = entitiesValue.some((entityItem) => {
+        return entitiesValue.some((checkEntityItem) => {
+          if (entityItem.showValue !== checkEntityItem.showValue) {
+            if (
+              (checkEntityItem.start <= entityItem.start &&
+                entityItem.start < checkEntityItem.end) ||
+              (checkEntityItem.end < entityItem.end &&
+                entityItem.end <= checkEntityItem.end)
+            ) {
+              repeatEntity.push(checkEntityItem.entity);
+              return true;
+            }
+            return false;
+          }
+          return false;
+        });
+      });
+
+      // 關鍵字重疊處理
+      if (isRepeat) {
+        repeatEntity.map((repeatKey) => {
+          document.querySelector(
+            `#input-${repeatKey}-entities-show-value`,
+          ).value = '';
+          return repeatKey;
+        });
+        Toast.fire({
+          icon: 'warning',
+          title: `代表值『${repeatEntity.toString()}』的關鍵字重疊，請重新輸入`,
+        });
+        return;
+      }
+
+      // 驗證關鍵字是否重複
+      const isValueRepeat = entitiesValue.some((entityItem) => {
+        return entitiesValue.some((checkEntityItem) => {
+          if (entityItem.showValue !== checkEntityItem.showValue) {
+            if (entityItem.value === checkEntityItem.value) {
+              repeatEntity.push(checkEntityItem.entity);
+              return true;
+            }
+            return false;
+          }
+          return false;
+        });
+      });
+
+      // 關鍵字重複處理
+      if (isValueRepeat) {
+        repeatEntity.map((repeatKey) => {
+          document.querySelector(`#input-${repeatKey}-entities-value`).value =
+            '';
+          return repeatKey;
+        });
+        Toast.fire({
+          icon: 'warning',
+          title: `代表值『${repeatEntity.toString()}』的記憶槽代表值重複，請重新輸入`,
+        });
+        return;
+      }
+
+      entitiesValue.map((entityItem) => delete entityItem.showValue);
+
+      onCreateExample(
+        intent,
+        exampleValue,
+        entitiesValue.sort((a, b) => a.start - b.start),
+        currentStoryName,
+      );
+      document.querySelector(`#input-${intent}-example`).value = '';
+      entityKeys.map((key) => {
+        document.querySelector(`#input-${key}-entities-value`).value = '';
+        document.querySelector(`#input-${key}-entities-show-value`).value = '';
+        return key;
+      });
     },
-    [onEditEntity, storyName],
+    [onCreateExample],
   );
+
+  // 刪除例句
+  const atDeleteExample = React.useCallback(
+    (userSay: string, intent: string) => {
+      onDeleteExample(userSay, intent, storyName);
+    },
+    [onDeleteExample, storyName],
+  );
+
+  console.log('entitiesData:', entitiesData);
 
   return (
     <div className="row pt-2" id="userStep">
@@ -338,18 +507,13 @@ const UserStep: React.FC<UserStepProps> = (props) => {
             </button>
             <button
               type="button"
-              className="btn btn-primary mx-2"
-              onClick={() =>
-                atAddExamples(
-                  step.user,
-                  step.intent,
-                  step.examples.toString(),
-                  storyName,
-                )
-              }
+              className="btn btn-primary"
+              data-bs-toggle="modal"
+              data-bs-target={`#show-${step.intent}-examples`}
             >
               例句
             </button>
+
             <button
               type="button"
               className="btn btn-outline-info mx-2"
@@ -412,6 +576,157 @@ const UserStep: React.FC<UserStepProps> = (props) => {
               })}
             </div>
           )}
+          {/* show examples modal */}
+          <div
+            className="modal fade"
+            id={`show-${step.intent}-examples`}
+            tabIndex="-1"
+            aria-labelledby={`show-${step.intent}-ExamplesLabel`}
+            aria-hidden="true"
+            data-bs-backdrop="false"
+          >
+            <div className="modal-dialog  modal-lg modal-dialog-scrollable">
+              <div className="modal-content">
+                <div className="modal-header">
+                  <h1
+                    className="modal-title fs-5"
+                    id={`show-${step.intent}-ExamplesLabel`}
+                  >
+                    例句
+                  </h1>
+                  <button
+                    type="button"
+                    className="btn-close"
+                    data-bs-dismiss="modal"
+                    aria-label="Close"
+                  />
+                </div>
+                <div className="modal-body">
+                  {step.examples.length > 0 ? (
+                    step.examples.map((example) => {
+                      const { text, intent, entities } = example;
+                      return (
+                        <Examples
+                          key={text + intent}
+                          text={text}
+                          intent={intent}
+                          entities={entities}
+                          onDeleteExample={atDeleteExample}
+                          entitiesData={entitiesData}
+                        />
+                      );
+                    })
+                  ) : (
+                    <div className="alert alert-warning" role="alert">
+                      沒有例句資料，請先添加例句
+                    </div>
+                  )}
+                </div>
+                <div className="modal-footer">
+                  <button
+                    type="button"
+                    className="btn btn-secondary"
+                    data-bs-dismiss="modal"
+                  >
+                    Close
+                  </button>
+                  <button
+                    className="btn btn-primary"
+                    data-bs-target={`#add-${step.intent}-example`}
+                    data-bs-toggle="modal"
+                  >
+                    新增例句
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* add example input modal */}
+          <div
+            className="modal fade"
+            id={`add-${step.intent}-example`}
+            tabIndex="-1"
+            aria-labelledby={`add-${step.intent}-ExampleLabel`}
+            aria-hidden="true"
+            data-bs-backdrop="false"
+          >
+            <div className="modal-dialog  modal-lg modal-dialog-scrollable">
+              <div className="modal-content">
+                <div className="modal-header">
+                  <h1
+                    className="modal-title fs-5"
+                    id={`add-${step.intent}-ExampleLabel`}
+                  >
+                    新增例句
+                  </h1>
+                  <button
+                    type="button"
+                    className="btn-close"
+                    data-bs-dismiss="modal"
+                    aria-label="Close"
+                  />
+                </div>
+                <div className="modal-body">
+                  <div className="mb-3">
+                    <input
+                      type="text"
+                      className="form-control"
+                      id={`input-${step.intent}-example`}
+                      placeholder="請輸入例句"
+                    />
+                  </div>
+                  {entitiesData.length > 0 && (
+                    <div className="d-flex flex-column">
+                      {entitiesData.map((entityItem) => {
+                        return (
+                          <div
+                            className="mb-3 p-2 border border-success rounded"
+                            key={`${entityItem.start}-${entityItem.start}-${
+                              entityItem.entity + entityItem.value
+                            }`}
+                          >
+                            <input
+                              type="text"
+                              className="form-control mb-2"
+                              id={`input-${entityItem.entity}-entities-show-value`}
+                              placeholder={`請輸入關鍵字代表值為『${entityItem.entity}』的關鍵字`}
+                            />
+                            <input
+                              type="text"
+                              className="form-control"
+                              id={`input-${entityItem.entity}-entities-value`}
+                              placeholder={`請輸入關鍵字代表值為『${entityItem.entity}』的記憶槽代表值`}
+                            />
+                          </div>
+                        );
+                      })}
+                    </div>
+                  )}
+                </div>
+                <div className="modal-footer">
+                  <button
+                    type="button"
+                    className="btn btn-secondary"
+                    data-bs-target={`#show-${step.intent}-examples`}
+                    data-bs-toggle="modal"
+                  >
+                    返回
+                  </button>
+                  <button
+                    className="btn btn-primary"
+                    data-bs-target={`#show-${step.intent}-examples`}
+                    data-bs-toggle="modal"
+                    onClick={() =>
+                      atCreateExample(step.intent, entitiesData, storyName)
+                    }
+                  >
+                    儲存
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>

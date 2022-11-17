@@ -124,10 +124,10 @@ export type State = {
     actionName: string,
     storyName: string,
   ) => void,
-  onEditExamples: (
-    userSay: string,
+  onCreateExample: (
     intent: string,
     examples: string,
+    exampleEntities: NluEntitiesType[],
     storyName: string,
   ) => void,
   onSetAllAction: (action: string[]) => void,
@@ -178,6 +178,11 @@ export type State = {
     stepIntent: string,
     oriEntityValue: string,
     newEntityValue: string,
+    storyName: string,
+  ) => void,
+  onDeleteExample: (
+    userSay: string,
+    stepIntent: string,
     storyName: string,
   ) => void,
 };

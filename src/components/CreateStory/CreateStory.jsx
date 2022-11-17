@@ -125,58 +125,59 @@ const CreateStory: React.FC<CreateStoryProps> = (props) => {
   );
 
   // 編輯例句
-  const atEditExamples = React.useCallback(
-    (userSay: string, intent: string, examples: string) => {
-      const newExamples = examples
-        .split(',')
-        .map((example) => example.trimStart())
-        .map((example) => example.trimEnd())
-        .filter((example) => example !== '');
+  const atCreateExample = React.useCallback(
+    (intent: string, example: string, exampleEntities: NluEntitiesType[]) => {
+      if (example === '') return;
+      const currentExample = example.trimStart().trimEnd();
       const repeat = [];
       // 驗證例句是否重複
-      newExamples.map((example) => {
-        // 驗證所有例句
-        nlu.map((nluItem) =>
-          nluItem.text === example ? repeat.push(example) : nluItem,
-        );
+      // 驗證所有例句
+      nlu.map((nluItem) =>
+        nluItem.text === currentExample ? repeat.push(currentExample) : nluItem,
+      );
 
-        // 驗證目前新增故事
-        newStory.steps.map((step) => {
-          if (step.user === example) {
-            repeat.push(example);
-          } else if (step.intent !== intent) {
-            step.examples?.map((stepExample) =>
-              stepExample === example ? repeat.push(example) : example,
-            );
+      newStory.steps.map((step) => {
+        if (step.intent) {
+          if (step.user === currentExample) {
+            repeat.push(currentExample);
           }
-          return step;
-        });
-        return example;
+          if (step.examples.length) {
+            step.examples.map((stepExample) => {
+              if (stepExample.text === currentExample) {
+                repeat.push(currentExample);
+              }
+              return stepExample;
+            });
+          }
+        }
+        return step;
       });
+      console.log('repeat', repeat);
       if (repeat.length) {
-        return Toast.fire({
+        Toast.fire({
           title: '以下例句重複',
           text: `${repeat.toString()}`,
           icon: 'warning',
         });
+        return;
       }
-      return onSetNewStory((prev) => {
+      onSetNewStory((prev) => {
         return {
           ...prev,
           steps: prev.steps.map((step) => {
             if (step.intent === intent) {
-              step.examples = examples
-                .split(',')
-                .map((example) => example.trimStart())
-                .map((example) => example.trimEnd())
-                .filter((example) => example !== '');
+              step.examples.push({
+                text: example,
+                intent,
+                entities: exampleEntities,
+              });
             }
             return step;
           }),
         };
       });
     },
-    [onSetNewStory, nlu, newStory],
+    [onSetNewStory, nlu, newStory.steps],
   );
 
   // 新增關鍵字
@@ -518,6 +519,29 @@ const CreateStory: React.FC<CreateStoryProps> = (props) => {
     [onSetNewStory],
   );
 
+  // 刪除例句
+  const atDeleteExample = React.useCallback(
+    (userSay: string, intent: string) => {
+      onSetNewStory((prev) => {
+        return {
+          ...prev,
+          steps: prev.steps.map((step) => {
+            if (step.intent && step.intent === intent) {
+              const allExample = step.examples.map((example) => example.text);
+              step.examples.splice(allExample.indexOf(userSay), 1);
+            }
+            return step;
+          }),
+        };
+      });
+    },
+    [onSetNewStory],
+  );
+
+  // const atAddExampleEntities = React.useCallback(() => {
+
+  // })
+
   return (
     <div className={style.root}>
       <div className="col d-flex align-items-center">
@@ -550,7 +574,7 @@ const CreateStory: React.FC<CreateStoryProps> = (props) => {
                 step={{ intent, user, entities, examples }}
                 storyName={newStory.story}
                 onEditUserSay={atEditUserSay}
-                onEditExamples={atEditExamples}
+                onCreateExample={atCreateExample}
                 onEditIntent={atEditIntent}
                 onRemoveUserStep={atRemoveUserStep}
                 onCreateEntities={atCreateEntities}
@@ -558,6 +582,7 @@ const CreateStory: React.FC<CreateStoryProps> = (props) => {
                 onEditEntity={atEditEntity}
                 onEditEntityValue={atEditEntityValue}
                 onDeleteEntities={atDeleteEntities}
+                onDeleteExample={atDeleteExample}
               />
             ) : (
               <BotStep

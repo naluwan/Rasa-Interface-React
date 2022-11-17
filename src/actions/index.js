@@ -21,11 +21,11 @@ export type Action =
       },
     }
   | {
-      type: 'EDIT_EXAMPLES',
+      type: 'CREATE_EXAMPLE',
       payload: {
-        userSay: string,
-        intent: string,
-        examples: string,
+        stepIntent: string,
+        example: string,
+        exampleEntities: NluEntitiesType[],
         storyName: string,
       },
     }
@@ -108,6 +108,10 @@ export type Action =
         newEntityValue: string,
         storyName: string,
       },
+    }
+  | {
+      type: 'DELETE_EXAMPLE',
+      payload: { userSay: string, stepIntent: string, storyName: string },
     };
 
 export const actionSetAllData = (data: TrainDataType): Action => ({
@@ -139,14 +143,14 @@ export const actionEditBotRes = (
   payload: { oriWord, newWord, actionName, storyName },
 });
 
-export const actionEditExamples = (
-  userSay: string,
-  intent: string,
-  examples: string,
+export const actionCreateExample = (
+  stepIntent: string,
+  example: string,
+  exampleEntities: NluEntitiesType[],
   storyName: string,
 ): Action => ({
-  type: 'EDIT_EXAMPLES',
-  payload: { userSay, intent, examples, storyName },
+  type: 'CREATE_EXAMPLE',
+  payload: { stepIntent, example, exampleEntities, storyName },
 });
 
 export const actionSetDeleteStory = (deleteStory: StoryType): Action => ({
@@ -262,4 +266,13 @@ export const actionEditEntityValue = (
 ): Action => ({
   type: 'EDIT_ENTITY_VALUE',
   payload: { stepIntent, oriEntityValue, newEntityValue, storyName },
+});
+
+export const actionDeleteExample = (
+  userSay: string,
+  stepIntent: string,
+  storyName: string,
+): ACtion => ({
+  type: 'DELETE_EXAMPLE',
+  payload: { userSay, stepIntent, storyName },
 });
