@@ -109,6 +109,12 @@ const CreateStory: React.FC<CreateStoryProps> = (props) => {
           steps: prev.steps.map((step) => {
             if (step.intent === oriIntent) {
               step.intent = intent;
+              if (step.examples.length) {
+                step.examples.map((example) => {
+                  example.intent = intent;
+                  return example;
+                });
+              }
             }
             return step;
           }),
