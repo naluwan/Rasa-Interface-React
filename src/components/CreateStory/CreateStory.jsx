@@ -1,6 +1,7 @@
 import * as React from 'react';
 import { Toast } from 'utils/swalInput';
 import shallow from 'zustand/shallow';
+import CheckPoint from 'components/CheckPoint';
 import style from './CreateStory.module.scss';
 import StepControl from './StepControl';
 import UserStep from '../UserStep';
@@ -37,7 +38,8 @@ const CreateStory: React.FC<CreateStoryProps> = (props) => {
     // 雙驚嘆號為判斷是否存在，只返回boolean
     setIsUser(
       newStory.steps.length
-        ? !!newStory.steps[newStory.steps.length - 1].intent
+        ? !!newStory.steps[newStory.steps.length - 1].intent ||
+            !!newStory.steps[newStory.steps.length - 1].checkpoint
         : false,
     );
   }, [setIsUser, newStory]);
@@ -538,9 +540,33 @@ const CreateStory: React.FC<CreateStoryProps> = (props) => {
     [onSetNewStory],
   );
 
-  // const atAddExampleEntities = React.useCallback(() => {
+  // 刪除支線故事
+  const atDeleteBranchStory = React.useCallback(
+    (checkPointName: string, branchName: string) => {
+      onSetNewStory((prev) => {
+        // 刪除支線故事
+        let steps = prev.steps.map((step) => {
+          if (step.checkpoint && step.checkpoint === checkPointName) {
+            step.branchStories = step.branchStories.filter(
+              (branchStory) => branchStory.story !== branchName,
+            );
+          }
+          return step;
+        });
 
-  // })
+        // 篩選出不是checkPoint步驟或branchStories.length不為0的步驟
+        steps = steps.filter((step) =>
+          step.checkpoint ? step.branchStories.length > 0 : step,
+        );
+
+        return {
+          ...prev,
+          steps,
+        };
+      });
+    },
+    [onSetNewStory],
+  );
 
   return (
     <div className={style.root}>
@@ -566,37 +592,85 @@ const CreateStory: React.FC<CreateStoryProps> = (props) => {
               action,
               response,
               buttons,
+              checkpoint,
+              branchStories,
             } = step;
-            return step.intent ? (
-              <UserStep
-                key={step.intent}
-                isCreate={isCreate}
-                step={{ intent, user, entities, examples }}
-                storyName={newStory.story}
-                onEditUserSay={atEditUserSay}
-                onCreateExample={atCreateExample}
-                onEditIntent={atEditIntent}
-                onRemoveUserStep={atRemoveUserStep}
-                onCreateEntities={atCreateEntities}
-                onEditEntityShowValue={atEditEntityShowValue}
-                onEditEntity={atEditEntity}
-                onEditEntityValue={atEditEntityValue}
-                onDeleteEntities={atDeleteEntities}
-                onDeleteExample={atDeleteExample}
-              />
-            ) : (
-              <BotStep
-                key={step.action}
-                isCreate={isCreate}
-                step={{ action, response, buttons }}
-                storyName={newStory.story}
-                onEditBotRes={atEditBotRes}
-                onRemoveBotStep={atRemoveBotStep}
-                onAddResButtons={atAddResButtons}
-                onEditResButtons={atEditResButtons}
-                onRemoveResButton={atRemoveResButton}
+            console.log('outside step:', step);
+            console.log('outside branchStories:', branchStories);
+            if (step.intent) {
+              return (
+                <UserStep
+                  key={step.intent}
+                  isCreate={isCreate}
+                  step={{ intent, user, entities, examples }}
+                  storyName={newStory.story}
+                  onEditUserSay={atEditUserSay}
+                  onCreateExample={atCreateExample}
+                  onEditIntent={atEditIntent}
+                  onRemoveUserStep={atRemoveUserStep}
+                  onCreateEntities={atCreateEntities}
+                  onEditEntityShowValue={atEditEntityShowValue}
+                  onEditEntity={atEditEntity}
+                  onEditEntityValue={atEditEntityValue}
+                  onDeleteEntities={atDeleteEntities}
+                  onDeleteExample={atDeleteExample}
+                />
+              );
+            }
+            if (step.action) {
+              return (
+                <BotStep
+                  key={step.action}
+                  isCreate={isCreate}
+                  step={{ action, response, buttons }}
+                  storyName={newStory.story}
+                  onEditBotRes={atEditBotRes}
+                  onRemoveBotStep={atRemoveBotStep}
+                  onAddResButtons={atAddResButtons}
+                  onEditResButtons={atEditResButtons}
+                  onRemoveResButton={atRemoveResButton}
+                />
+              );
+            }
+
+            return (
+              <CheckPoint
+                key={checkpoint}
+                branch={branchStories}
+                onDeleteBranchStory={atDeleteBranchStory}
               />
             );
+
+            // return step.intent ? (
+            //   <UserStep
+            //     key={step.intent}
+            //     isCreate={isCreate}
+            //     step={{ intent, user, entities, examples }}
+            //     storyName={newStory.story}
+            //     onEditUserSay={atEditUserSay}
+            //     onCreateExample={atCreateExample}
+            //     onEditIntent={atEditIntent}
+            //     onRemoveUserStep={atRemoveUserStep}
+            //     onCreateEntities={atCreateEntities}
+            //     onEditEntityShowValue={atEditEntityShowValue}
+            //     onEditEntity={atEditEntity}
+            //     onEditEntityValue={atEditEntityValue}
+            //     onDeleteEntities={atDeleteEntities}
+            //     onDeleteExample={atDeleteExample}
+            //   />
+            // ) : (
+            //   <BotStep
+            //     key={step.action}
+            //     isCreate={isCreate}
+            //     step={{ action, response, buttons }}
+            //     storyName={newStory.story}
+            //     onEditBotRes={atEditBotRes}
+            //     onRemoveBotStep={atRemoveBotStep}
+            //     onAddResButtons={atAddResButtons}
+            //     onEditResButtons={atEditResButtons}
+            //     onRemoveResButton={atRemoveResButton}
+            //   />
+            // );
           })}
         {CurStepAlert}
       </div>
@@ -605,6 +679,8 @@ const CreateStory: React.FC<CreateStoryProps> = (props) => {
         isUser={isUser}
         nlu={nlu}
         steps={newStory.steps}
+        stories={stories}
+        newStory={newStory}
         actions={actions}
         onSetIsInputFocus={setIsInputFocus}
       />

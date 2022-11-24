@@ -1,0 +1,31 @@
+.root {
+  padding-top: 1rem;
+  .tabContent {
+    color: #fff;
+  }
+  .checkPointNavTab {
+    /* :global(className) => 不要被css module轉換掉*/
+    &:not(:global(.active)) {
+      color: #fff;
+    }
+    position: relative;
+    // &:global(.active):hover {
+    //   .closeIcon {
+    //     display: inline;
+    //   }
+    // }
+    &:hover {
+      .closeIcon {
+        display: inline;
+      }
+    }
+    .closeIcon {
+      display: none;
+      position: absolute;
+      top: 0;
+      right: 0;
+      color: red;
+      font-size: 1.2rem;
+    }
+  }
+}
