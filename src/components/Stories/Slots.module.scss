@@ -1,0 +1,16 @@
+.add,
+.addSlotInput {
+  font-size: 1.5rem;
+  &:hover {
+    font-size: 2rem;
+  }
+}
+
+.removeSlotInput {
+  font-size: 1.5rem;
+  margin-left: 1rem;
+  color: rgb(195, 48, 48);
+  &:hover {
+    color: rgb(255, 0, 0);
+  }
+}

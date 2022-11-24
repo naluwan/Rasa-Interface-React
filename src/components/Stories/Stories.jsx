@@ -2,7 +2,6 @@ import * as React from 'react';
 import useSWR from 'swr';
 import { fetchAllData, postAllTrainData, fetchAllAction } from 'services/api';
 import shallow from 'zustand/shallow';
-// eslint-disable-next-line no-unused-vars
 import type { State, StoryType } from 'components/types';
 import ShowStory from 'components/ShowStory';
 import cx from 'classnames';
@@ -13,6 +12,7 @@ import { cloneDeep } from 'lodash-es';
 import { randomBotResAction } from 'utils/randomBotResAction';
 import style from './Stories.module.scss';
 import useStoryStore from '../../store/useStoryStore';
+import Slots from './Slots';
 
 const Stories = () => {
   /**
@@ -27,10 +27,15 @@ const Stories = () => {
    * @type {[StoryType, Function]}
    */
   const [newStory, setNewStory] = React.useState({});
+  /**
+   * @type {[{key:string,slotInfo:{type:string,values?:string[]}}[], Function]}
+   */
+  const [slots, setSlots] = React.useState([]);
   const {
     story,
     stories,
     nlu,
+    domain,
     cloneData,
     deletedStory,
     actions,
@@ -83,6 +88,18 @@ const Stories = () => {
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  // 待domain資料設定完成後，設定slots值
+  React.useEffect(() => {
+    if (Object.keys(domain).length && Object.keys(domain.slots).length) {
+      const allSlots = Object.entries(domain.slots);
+      const filteredSlots = allSlots.map((slot) => ({
+        key: slot[0],
+        slotInfo: slot[1],
+      }));
+      setSlots(filteredSlots);
+    }
+  }, [domain]);
 
   // 刪除故事
   const atDeleteStory = React.useCallback(
@@ -593,7 +610,38 @@ const Stories = () => {
               </div>
             )}
             <div className={cx('btn', style.navbar)}>
-              <MyButton variant="secondary">記錄槽</MyButton>
+              {/* <MyButton variant="secondary">記錄槽</MyButton> */}
+              <button
+                className="btn btn-secondary"
+                type="button"
+                data-bs-toggle="offcanvas"
+                data-bs-target="#showSlotsOffcanvas"
+                aria-controls="offcanvasWithBothOptions"
+              >
+                記錄槽
+              </button>
+
+              {/* offcanvas 左側邊欄 */}
+              <div
+                className={cx('offcanvas offcanvas-start ', style.offcanvas)}
+                data-bs-scroll="true"
+                id="showSlotsOffcanvas"
+                tabIndex="-1"
+                aria-labelledby="showSlotsOffcanvasLabel"
+              >
+                <div className="offcanvas-header">
+                  <h5 className="offcanvas-title" id="showSlotsOffcanvasLabel">
+                    記錄槽
+                  </h5>
+                  <button
+                    type="button"
+                    className="btn-close"
+                    data-bs-dismiss="offcanvas"
+                    aria-label="Close"
+                  />
+                </div>
+                <Slots slots={slots} domain={domain} />
+              </div>
             </div>
           </div>
         </div>

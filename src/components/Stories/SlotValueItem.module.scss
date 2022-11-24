@@ -1,0 +1,21 @@
+:global(.btn .badge) {
+  position: relative;
+  padding: 0.5rem;
+  font-size: 1rem;
+  &:hover {
+    .removeSlotValueIcon {
+      display: inline-block;
+    }
+  }
+  .removeSlotValueIcon {
+    position: absolute;
+    top: -0.4rem;
+    right: -0.4rem;
+    display: none;
+    font-size: 1.2rem;
+    color: rgb(195, 48, 48);
+    &:hover {
+      color: rgb(255, 0, 0);
+    }
+  }
+}

@@ -43,9 +43,17 @@ export type StepsType =
       intent: string,
       user: string,
       entities: EntitiesType[] | [],
+      checkpoint?: string,
       examples?: string[] | [],
     }
-  | { action: string, response?: string };
+  | { action: string, response?: string }
+  | {
+      checkpoint: string,
+      branchStories?: { story: String, steps: StepsType[] }[],
+      slot_was_set?: { [key: string]: string }[],
+      action?: string,
+      response?: string,
+    };
 
 export type StoryType = {
   story: string,
@@ -62,6 +70,7 @@ export type DomainType = {
   form: object,
   intents: string[],
   responses: ResponseType,
+  slots: { [key: string]: { type: String, values?: string[] } },
 };
 
 export type ExampleEntitiesType = {

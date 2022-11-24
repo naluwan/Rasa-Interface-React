@@ -112,6 +112,27 @@ export type Action =
   | {
       type: 'DELETE_EXAMPLE',
       payload: { userSay: string, stepIntent: string, storyName: string },
+    }
+  | {
+      type: 'CREATE_SLOT',
+      payload: {
+        slotName: string,
+        slotType: string,
+        slotValues: { name: string, id: string }[],
+      },
+    }
+  | {
+      type: 'REMOVE_SLOT',
+      payload: string,
+    }
+  | {
+      type: 'ADD_SLOT_VALUE',
+      payload: {
+        slotValues: {
+          slotName: string,
+          slotValueItems: { name: string, id: string }[],
+        },
+      },
     };
 
 export const actionSetAllData = (data: TrainDataType): Action => ({
@@ -275,4 +296,26 @@ export const actionDeleteExample = (
 ): ACtion => ({
   type: 'DELETE_EXAMPLE',
   payload: { userSay, stepIntent, storyName },
+});
+
+export const actionCreateSlot = (formValue: {
+  slotName: string,
+  slotType: string,
+  slotValues: { name: string, id: string }[],
+}): Action => ({
+  type: 'CREATE_SLOT',
+  payload: formValue,
+});
+
+export const actionRemoveSlot = (slotKey: string): Action => ({
+  type: 'REMOVE_SLOT',
+  payload: slotKey,
+});
+
+export const actionAddSlotValue = (slotValues: {
+  slotName: string,
+  slotValueItems: { name: string, id: string }[],
+}): Action => ({
+  type: 'ADD_SLOT_VALUE',
+  payload: { slotValues },
 });

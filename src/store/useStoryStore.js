@@ -39,6 +39,9 @@ import {
   actionEditEntity,
   actionEditEntityValue,
   actionDeleteExample,
+  actionCreateSlot,
+  actionRemoveSlot,
+  actionAddSlotValue,
 } from 'actions';
 // import { computed } from 'zustand-middleware-computed-state';
 import { Toast } from 'utils/swalInput';
@@ -1270,6 +1273,101 @@ const reducer = (state: State, action: Action): State => {
         return onSetStory(storyName);
       });
     }
+    case 'CREATE_SLOT': {
+      const formValue = action.payload;
+      const { stories, nlu, domain } = cloneDeep(state.cloneData);
+      const { onSetAllTrainData } = state;
+      const { slotName, slotType, slotValues } = formValue;
+
+      // 新增domain slot資訊
+      domain.slots[slotName] = { type: slotType };
+
+      // 如果slot type是儲存槽的話，要多一個values屬性並把slotValues裡的name放進values裡
+      if (slotType === 'categorical') {
+        domain.slots[slotName].values = [];
+        slotValues.map((item) => domain.slots[slotName].values.push(item.name));
+      }
+
+      const cloneData = {
+        stories,
+        domain,
+        nlu,
+      };
+
+      return postAllTrainData(cloneData).then((res) => {
+        if (res.status !== 'success') {
+          return Toast.fire({
+            icon: 'error',
+            title: '新增記錄槽失敗',
+            text: res.message,
+          });
+        }
+        Toast.fire({
+          icon: 'success',
+          title: '新增記錄槽成功',
+        });
+        return onSetAllTrainData(res.data);
+      });
+    }
+    case 'REMOVE_SLOT': {
+      const slotKey = action.payload;
+      const { stories, nlu, domain } = cloneDeep(state.cloneData);
+      const { onSetAllTrainData } = state;
+
+      // 利用slot key刪除domain slot
+      delete domain.slots[slotKey];
+
+      const cloneData = {
+        stories,
+        domain,
+        nlu,
+      };
+
+      return postAllTrainData(cloneData).then((res) => {
+        if (res.status !== 'success') {
+          return Toast.fire({
+            icon: 'error',
+            title: '刪除記錄槽失敗',
+            text: res.message,
+          });
+        }
+        Toast.fire({
+          icon: 'success',
+          title: '刪除記錄槽成功',
+        });
+        return onSetAllTrainData(res.data);
+      });
+    }
+    case 'ADD_SLOT_VALUE': {
+      const { slotValues } = action.payload;
+      const { stories, nlu, domain } = cloneDeep(state.cloneData);
+      const { onSetAllTrainData } = state;
+
+      slotValues.slotValueItems.map((item) =>
+        domain.slots[slotValues.slotName].values.push(item.name),
+      );
+
+      const cloneData = {
+        stories,
+        domain,
+        nlu,
+      };
+
+      return postAllTrainData(cloneData).then((res) => {
+        if (res.status !== 'success') {
+          return Toast.fire({
+            icon: 'error',
+            title: `新增${slotValues.slotName}的儲存槽值失敗`,
+            text: res.message,
+          });
+        }
+        Toast.fire({
+          icon: 'success',
+          title: `新增${slotValues.slotName}的儲存槽值成功`,
+        });
+        return onSetAllTrainData(res.data);
+      });
+    }
     default:
       return state;
   }
@@ -1527,6 +1625,22 @@ const useStoryStore = create((set) => {
     },
     onDeleteExample(userSay: string, stepIntent: string, storyName: string) {
       dispatch(actionDeleteExample(userSay, stepIntent, storyName));
+    },
+    onCreateSlot(formValue: {
+      slotName: string,
+      slotType: string,
+      slotValues: { name: string, id: string }[],
+    }) {
+      dispatch(actionCreateSlot(formValue));
+    },
+    onRemoveSlot(slotKey: string) {
+      dispatch(actionRemoveSlot(slotKey));
+    },
+    onAddSlotValue(slotValues: {
+      slotName: string,
+      slotValueItems: { name: string, id: string }[],
+    }) {
+      dispatch(actionAddSlotValue(slotValues));
     },
   };
 });

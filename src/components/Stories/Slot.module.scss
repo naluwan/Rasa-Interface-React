@@ -1,0 +1,15 @@
+.slotContainer {
+  position: relative;
+  padding: 0.5rem;
+  .dropdownMenu {
+    position: absolute;
+    top: -1.5rem;
+    right: -0.5rem;
+    & :global(.edit) {
+      color: rgb(39, 63, 244);
+    }
+    & :global(.delete) {
+      color: rgb(227, 8, 8);
+    }
+  }
+}
