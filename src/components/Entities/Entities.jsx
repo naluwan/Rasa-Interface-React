@@ -259,7 +259,7 @@ const Entities: React.FC<EntitiesProps> = (props) => {
         </div>
         <div className="py-2">
           <label htmlFor="entityValue" className={style.label}>
-            記憶槽代表值：
+            儲存槽代表值：
           </label>
           {showCurValue ? (
             <input
@@ -298,7 +298,7 @@ const Entities: React.FC<EntitiesProps> = (props) => {
         </div>
         <div className="py-2">
           <label htmlFor="entity" className={style.label}>
-            關鍵字代表值：
+            記錄槽名稱：
           </label>
           {showEntity ? (
             <input

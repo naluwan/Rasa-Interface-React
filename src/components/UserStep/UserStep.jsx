@@ -165,8 +165,8 @@ const UserStep: React.FC<UserStepProps> = (props) => {
         title: '編輯關鍵字',
         html: `
           <input id="showValue" class="swal2-input" placeholder="請輸入關鍵字" />
-          <input id="currentValue" class="swal2-input" placeholder="請輸入記錄槽代表值" />
-          <input id="entity" class="swal2-input" placeholder="請輸入關鍵字代表值" />
+          <input id="currentValue" class="swal2-input" placeholder="請輸入儲存槽代表值" />
+          <input id="entity" class="swal2-input" placeholder="請輸入記錄槽名稱" />
         `,
         showCancelButton: true,
         showCloseButton: true,
