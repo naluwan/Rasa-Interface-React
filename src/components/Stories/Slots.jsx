@@ -190,17 +190,36 @@ const Slots: React.FC<SlotsPropsType> = (props) => {
         // 如果儲存時為空值，就將此input刪除
         if (emptySlots.length) {
           // 因為是用傳參數的方式將值傳進來，所以需要在裡面直接改變值，改useState的無法改變傳去後端的參數
-          slotValue.slotValues = slotValue.slotValues.filter((item) =>
-            slotValue.slotValues.length > 1 ? item.name !== '' : item,
+
+          // 判斷是否全部輸入框都為空值
+          const isAllEmpty = slotValue.slotValues.every(
+            (item) => item.name === '',
           );
-          setFormValue((prev) => {
-            return {
-              ...prev,
-              slotValues: prev.slotValues.filter((item) =>
-                prev.slotValues.length > 1 ? item.name !== '' : item,
-              ),
-            };
-          });
+
+          if (isAllEmpty) {
+            // 全部空值就將slotValues重置
+            const id = uuid();
+            slotValue.slotValues = [{ name: '', id }];
+            setFormValue((prev) => {
+              return {
+                ...prev,
+                slotValues: [{ name: '', id }],
+              };
+            });
+          } else {
+            // 有輸入框不為空值，就將它篩選出來
+            slotValue.slotValues = slotValue.slotValues.filter((item) =>
+              slotValue.slotValues.length > 1 ? item.name !== '' : item,
+            );
+            setFormValue((prev) => {
+              return {
+                ...prev,
+                slotValues: prev.slotValues.filter((item) =>
+                  prev.slotValues.length > 1 ? item.name !== '' : item,
+                ),
+              };
+            });
+          }
         }
 
         // 如果空值刪除完，沒有儲存槽值的處理
@@ -440,6 +459,7 @@ const Slots: React.FC<SlotsPropsType> = (props) => {
           icon: 'warning',
           title: '儲存槽值最少需要填寫一個',
         });
+        return;
       }
 
       // 驗證重複
@@ -491,6 +511,8 @@ const Slots: React.FC<SlotsPropsType> = (props) => {
       }
 
       onAddSlotValue(slotValues);
+      // 關閉新增儲存槽視窗
+      document.querySelector('#addSlotValueModal .btn-close').click();
     },
     [setNewSlotValues, onAddSlotValue],
   );
