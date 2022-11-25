@@ -568,6 +568,78 @@ const CreateStory: React.FC<CreateStoryProps> = (props) => {
     [onSetNewStory],
   );
 
+  // 新建支線故事
+  const atCreateBranchStory = React.useCallback(
+    (newBranchStory: {
+      branchName: string,
+      slotValues: {
+        slotName: string,
+        slotValue: string,
+        id: string,
+        hasSlotValues: boolean,
+      }[],
+      botRes: { action: string, response: string },
+    }) => {
+      onSetNewStory((prev) => {
+        const isCheckPointExist = prev.steps.some((step) => step.checkpoint);
+        if (!isCheckPointExist) {
+          return {
+            ...prev,
+            steps: prev.steps.concat([
+              {
+                checkpoint: `${prev.story}_主線`,
+                branchStories: [
+                  {
+                    story: `${prev.story}_${newBranchStory.branchName}`,
+                    steps: [
+                      { checkpoint: `${prev.story}_主線` },
+                      {
+                        slot_was_set: newBranchStory.slotValues.map((item) => ({
+                          [item.slotName]: item.slotValue,
+                        })),
+                      },
+                      {
+                        action: newBranchStory.botRes.action,
+                        response: newBranchStory.botRes.response,
+                      },
+                    ],
+                  },
+                ],
+              },
+            ]),
+          };
+        }
+
+        return {
+          ...prev,
+          steps: prev.steps.map((step) => {
+            if (step.checkpoint) {
+              step.branchStories = step.branchStories.concat([
+                {
+                  story: `${prev.story}_${newBranchStory.branchName}`,
+                  steps: [
+                    { checkpoint: `${prev.story}_主線` },
+                    {
+                      slot_was_set: newBranchStory.slotValues.map((item) => ({
+                        [item.slotName]: item.slotValue,
+                      })),
+                    },
+                    {
+                      action: newBranchStory.botRes.action,
+                      response: newBranchStory.botRes.response,
+                    },
+                  ],
+                },
+              ]);
+            }
+            return step;
+          }),
+        };
+      });
+    },
+    [onSetNewStory],
+  );
+
   return (
     <div className={style.root}>
       <div className="col d-flex align-items-center">
@@ -614,6 +686,8 @@ const CreateStory: React.FC<CreateStoryProps> = (props) => {
                   onEditEntityValue={atEditEntityValue}
                   onDeleteEntities={atDeleteEntities}
                   onDeleteExample={atDeleteExample}
+                  newStory={newStory}
+                  onCreateBranchStory={atCreateBranchStory}
                 />
               );
             }
@@ -679,8 +753,6 @@ const CreateStory: React.FC<CreateStoryProps> = (props) => {
         isUser={isUser}
         nlu={nlu}
         steps={newStory.steps}
-        stories={stories}
-        newStory={newStory}
         actions={actions}
         onSetIsInputFocus={setIsInputFocus}
       />

@@ -3,17 +3,29 @@ import * as React from 'react';
 import cx from 'classnames';
 import Swal from 'sweetalert2';
 import shallow from 'zustand/shallow';
+import uuid from 'react-uuid';
+import { CgAddR } from 'react-icons/cg';
+import { BsTrashFill } from 'react-icons/bs';
 import style from './UserStep.module.scss';
-import type { StepsType, NluEntitiesType, NluType, State } from '../types';
+import type {
+  StepsType,
+  NluEntitiesType,
+  NluType,
+  State,
+  DomainType,
+  StoryType,
+} from '../types';
 import { swalInput, Toast, confirmWidget } from '../../utils/swalInput';
 import Entities from '../Entities';
 import Examples from './Examples';
 import useStoryStore from '../../store/useStoryStore';
+import { randomBotResAction } from '../../utils/randomBotResAction';
 
 type UserStepProps = {
   isCreate: boolean,
   step: StepsType,
   storyName: string,
+  newStory: StoryType,
   onCreateExample: (
     intent: string,
     examples: string,
@@ -60,6 +72,16 @@ type UserStepProps = {
     intent: String,
     storyName?: string,
   ) => void,
+  onCreateBranchStory: (newBranchStory: {
+    branchName: string,
+    slotValues: {
+      slotName: string,
+      slotValue: string,
+      id: string,
+      hasSlotValues: boolean,
+    }[],
+    botRes: { action: string, response: string },
+  }) => void,
 };
 
 // 重組entities資料
@@ -96,6 +118,7 @@ const UserStep: React.FC<UserStepProps> = (props) => {
     isCreate,
     step,
     storyName,
+    newStory,
     onCreateExample,
     onEditUserSay,
     onEditIntent,
@@ -106,13 +129,29 @@ const UserStep: React.FC<UserStepProps> = (props) => {
     onEditEntityValue,
     onDeleteEntities,
     onDeleteExample,
+    onCreateBranchStory,
   } = props;
 
-  const { nlu } = useStoryStore((state: State) => {
+  const { nlu, domain, actions, stories } = useStoryStore((state: State) => {
     return {
       nlu: state.nlu,
+      domain: state.domain,
+      actions: state.actions,
+      stories: state.stories,
     };
   }, shallow);
+
+  /**
+   * @type {[{branchName:string, slotValues:{slotName:string,slotValue:string,id:string,hasSlotValues: boolean}[],botRes:{action:string,response:string}}, Function]}
+   */
+  const [newBranchStory, setNewBranchStory] = React.useState({
+    branchName: '',
+    slotValues: [
+      { slotName: '', slotValue: '', id: uuid(), hasSlotValues: false },
+    ],
+    botRes: { action: randomBotResAction(actions), response: '' },
+  });
+
   const showIntent =
     step.intent === 'get_started' ? '打開聊天室窗' : step.intent;
 
@@ -484,7 +523,243 @@ const UserStep: React.FC<UserStepProps> = (props) => {
     [onDeleteExample, storyName],
   );
 
+  // 更新支線故事資訊
+  const atChangeNewBranchStory = React.useCallback(
+    (
+      e:
+        | React.ChangeEvent<HTMLInputElement>
+        | React.ChangeEvent<HTMLSelectElement>,
+      id: string,
+      domainData: DomainType,
+    ) => {
+      const { name, value } = e.target;
+
+      // 更新支線故事名稱
+      if (name === 'branchName') {
+        return setNewBranchStory((prev) => {
+          return {
+            ...prev,
+            [name]: value,
+          };
+        });
+      }
+
+      // 更新紀錄槽名稱
+      if (name === 'slotName') {
+        const hasSlotValues = domainData.slots[value].type === 'categorical';
+        return setNewBranchStory((prev) => {
+          return {
+            ...prev,
+            slotValues: prev.slotValues.map((item) => {
+              if (item.id === id) {
+                item.slotName = value;
+                item.hasSlotValues = hasSlotValues;
+              }
+              return item;
+            }),
+          };
+        });
+      }
+
+      // 更新儲存槽值
+      if (name === 'slotValue') {
+        return setNewBranchStory((prev) => {
+          return {
+            ...prev,
+            slotValues: prev.slotValues.map((item) => {
+              if (item.id === id) {
+                item.slotValue = value;
+              }
+              return item;
+            }),
+          };
+        });
+      }
+
+      // 更新機器人回覆
+      return setNewBranchStory((prev) => {
+        return {
+          ...prev,
+          botRes: {
+            ...prev.botRes,
+            [name]: value,
+          },
+        };
+      });
+    },
+    [setNewBranchStory],
+  );
+
+  // 取消新增支線故事，重置新增支線故事資訊
+  const atCancelCreateBranchStory = React.useCallback(
+    (allAction: string[]) => {
+      setNewBranchStory({
+        branchName: '',
+        slotValues: [{ slotName: '', slotValue: '', id: uuid() }],
+        botRes: { action: randomBotResAction(allAction), response: '' },
+      });
+    },
+    [setNewBranchStory],
+  );
+
+  // 新增slotValues 下拉選單
+  const atAddSlotValue = React.useCallback(() => {
+    setNewBranchStory((prev) => {
+      return {
+        ...prev,
+        slotValues: prev.slotValues.concat([
+          { slotName: '', slotValue: '', id: uuid() },
+        ]),
+      };
+    });
+  }, [setNewBranchStory]);
+
+  // 移除slotValues 下拉選單
+  const atRemoveSlotValue = React.useCallback(
+    (id: string) => {
+      setNewBranchStory((prev) => {
+        return {
+          ...prev,
+          slotValues: prev.slotValues.filter((item) =>
+            prev.slotValues.length > 1 ? item.id !== id : item,
+          ),
+        };
+      });
+    },
+    [setNewBranchStory],
+  );
+
+  // 驗證新增支線故事所有資訊的正確性，無誤後送出新增
+  const atSubmitNewBranchStory = React.useCallback(
+    (
+      newBranchStoryInfo: {
+        branchName: string,
+        slotValues: {
+          slotName: string,
+          slotValue: string,
+          id: string,
+          hasSlotValues: boolean,
+        }[],
+        botRes: { action: string, response: string },
+      },
+      storiesData: StoryType[],
+      newStoryData: StoryType,
+    ) => {
+      // 全部資料沒填，就關閉視窗
+      if (
+        newBranchStoryInfo.branchName === '' &&
+        newBranchStoryInfo.slotValues.every(
+          (item) => item.slotName === '' && item.slotValue === '',
+        ) &&
+        newBranchStoryInfo.botRes.response === ''
+      ) {
+        document.querySelector('#createBranchStoryModal .btn-close').click();
+        return;
+      }
+
+      // 有資料未填
+      /*
+      slotValues判斷方式為判斷hasSlotValues是否為true，如果為true，slotValue就一定要有值，
+      如果為false，代表slot為純text，那slotName一定要有值
+      // */
+      if (
+        newBranchStoryInfo.branchName === '' ||
+        newBranchStoryInfo.slotValues.some(
+          (item) =>
+            (item.slotName !== '' &&
+              item.slotValue === '' &&
+              item.hasSlotValues) ||
+            (item.slotName === '' && !item.hasSlotValues),
+        ) ||
+        newBranchStoryInfo.botRes.response === ''
+      ) {
+        Toast.fire({
+          icon: 'warning',
+          title: '所有欄位都是必填的',
+        });
+        return;
+      }
+
+      let isRepeat = false;
+
+      isRepeat = storiesData.some(
+        (item) => item.story === newBranchStoryInfo.branchName,
+      );
+
+      if (isRepeat) {
+        newBranchStoryInfo.branchName = '';
+        setNewBranchStory((prev) => {
+          return {
+            ...prev,
+            branchName: '',
+          };
+        });
+        Toast.fire({
+          icon: 'warning',
+          title: '支線故事名稱重複',
+        });
+        document.querySelector('#createBranchStoryModal #branchName').focus();
+        return;
+      }
+
+      isRepeat = newStoryData.story === newBranchStoryInfo.branchName;
+
+      if (isRepeat) {
+        newBranchStoryInfo.branchName = '';
+        setNewBranchStory((prev) => {
+          return {
+            ...prev,
+            branchName: '',
+          };
+        });
+        Toast.fire({
+          icon: 'warning',
+          title: '支線故事名稱重複',
+        });
+        document.querySelector('#createBranchStoryModal #branchName').focus();
+        return;
+      }
+
+      isRepeat = newStoryData.steps.some((newStoryStep) => {
+        if (newStoryStep.checkpoint && newStoryStep.branchStories.length) {
+          return newStoryStep.branchStories.some((branchStory) => {
+            const curName = branchStory.story.slice(
+              branchStory.story.lastIndexOf('_') + 1,
+              branchStory.story.length,
+            );
+            if (curName === newBranchStoryInfo.branchName) {
+              return true;
+            }
+            return false;
+          });
+        }
+        return false;
+      });
+
+      if (isRepeat) {
+        newBranchStoryInfo.branchName = '';
+        setNewBranchStory((prev) => {
+          return {
+            ...prev,
+            branchName: '',
+          };
+        });
+        Toast.fire({
+          icon: 'warning',
+          title: '支線故事名稱重複',
+        });
+        document.querySelector('#createBranchStoryModal #branchName').focus();
+        return;
+      }
+
+      onCreateBranchStory(newBranchStoryInfo);
+      document.querySelector('#createBranchStoryModal .btn-close').click();
+    },
+    [onCreateBranchStory],
+  );
+
   console.log('entitiesData:', entitiesData);
+  console.log('newBranchStory:', newBranchStory);
 
   return (
     <div className="row pt-2" id="userStep">
@@ -628,7 +903,7 @@ const UserStep: React.FC<UserStepProps> = (props) => {
                     className="btn btn-secondary"
                     data-bs-dismiss="modal"
                   >
-                    Close
+                    取消
                   </button>
                   <button
                     className="btn btn-primary"
@@ -719,6 +994,157 @@ const UserStep: React.FC<UserStepProps> = (props) => {
                     data-bs-toggle="modal"
                     onClick={() =>
                       atCreateExample(step.intent, entitiesData, storyName)
+                    }
+                  >
+                    儲存
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* add branch story */}
+          <div
+            className="modal fade"
+            id="createBranchStoryModal"
+            tabIndex="-1"
+            aria-labelledby="createBranchStoryModalLabel"
+            aria-hidden="true"
+            data-bs-backdrop="false"
+          >
+            <div className="modal-dialog  modal-lg modal-dialog-scrollable">
+              <div className="modal-content">
+                <div className="modal-header">
+                  <h1
+                    className="modal-title fs-5"
+                    id="createBranchStoryModalLabel"
+                  >
+                    新增支線故事
+                  </h1>
+                  <button
+                    type="button"
+                    className="btn-close"
+                    data-bs-dismiss="modal"
+                    aria-label="Close"
+                    onClick={() => atCancelCreateBranchStory(actions)}
+                  />
+                </div>
+                <div className="modal-body">
+                  <div className="mb-3">
+                    <label htmlFor="branchStoryName" className="form-label">
+                      支線故事名稱
+                    </label>
+                    <input
+                      className="form-control"
+                      id="branchName"
+                      name="branchName"
+                      placeholder="請輸入支線故事名稱"
+                      value={newBranchStory.branchName}
+                      onChange={(e) => atChangeNewBranchStory(e)}
+                    />
+                  </div>
+                  {newBranchStory.slotValues.map((slot) => {
+                    return (
+                      <div className="row border-bottom mb-3" key={slot.id}>
+                        <div className="mb-3 col-5">
+                          <label htmlFor="slotSelected" className="form-label">
+                            記錄槽
+                          </label>
+                          <select
+                            className="form-select"
+                            aria-label="slot select"
+                            id="slotName"
+                            name="slotName"
+                            value={slot.slotName}
+                            onChange={(e) =>
+                              atChangeNewBranchStory(e, slot.id, domain)
+                            }
+                          >
+                            <option value="" hidden disabled>
+                              請選擇記錄槽
+                            </option>
+                            {Object.entries(domain.slots).map((item) => (
+                              <option
+                                key={`${slot.id}-${item[0]}`}
+                                value={item[0]}
+                              >
+                                {item[0]}
+                              </option>
+                            ))}
+                          </select>
+                        </div>
+                        <div className="mb-3 col-5">
+                          <label htmlFor="slotSelected" className="form-label">
+                            儲存槽
+                          </label>
+                          <select
+                            className="form-select"
+                            aria-label="slot select"
+                            id="slotValue"
+                            name="slotValue"
+                            value={slot.slotValue}
+                            onChange={(e) => atChangeNewBranchStory(e, slot.id)}
+                            disabled={!slot.hasSlotValues}
+                          >
+                            <option value="" hidden>
+                              請選擇儲存槽值
+                            </option>
+                            {domain.slots[slot.slotName]?.type ===
+                              'categorical' &&
+                              domain.slots[slot.slotName].values.map((item) => {
+                                return (
+                                  <option
+                                    key={`${slot.id}-${item}`}
+                                    value={item}
+                                  >
+                                    {item}
+                                  </option>
+                                );
+                              })}
+                          </select>
+                        </div>
+                        <div className="mb-3 col-2 d-flex justify-content-center align-items-center">
+                          <BsTrashFill
+                            className={style.removeSlotValueIcon}
+                            onClick={() => atRemoveSlotValue(slot.id)}
+                          />
+                        </div>
+                      </div>
+                    );
+                  })}
+                  <div className="d-flex justify-content-center">
+                    <CgAddR
+                      className={style.addSlotValueSelect}
+                      onClick={() => atAddSlotValue()}
+                    />
+                  </div>
+                  <div className="mb-3">
+                    <label htmlFor="branchStoryName" className="form-label">
+                      機器人回覆
+                    </label>
+                    <input
+                      className="form-control"
+                      id="response"
+                      name="response"
+                      placeholder="請輸入機器人回覆"
+                      value={newBranchStory.botRes.response}
+                      onChange={(e) => atChangeNewBranchStory(e)}
+                    />
+                  </div>
+                </div>
+                <div className="modal-footer">
+                  <button
+                    type="button"
+                    className="btn btn-secondary"
+                    data-bs-dismiss="modal"
+                    onClick={() => atCancelCreateBranchStory(actions)}
+                  >
+                    取消
+                  </button>
+                  <button
+                    className="btn btn-primary"
+                    onClick={() =>
+                      atSubmitNewBranchStory(newBranchStory, stories, newStory)
                     }
                   >
                     儲存
