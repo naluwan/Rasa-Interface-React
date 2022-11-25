@@ -133,6 +133,13 @@ export type Action =
           slotValueItems: { name: string, id: string }[],
         },
       },
+    }
+  | {
+      type: 'REMOVE_SLOT_VALUE',
+      payload: {
+        key: string,
+        value: string,
+      },
     };
 
 export const actionSetAllData = (data: TrainDataType): Action => ({
@@ -318,4 +325,12 @@ export const actionAddSlotValue = (slotValues: {
 }): Action => ({
   type: 'ADD_SLOT_VALUE',
   payload: { slotValues },
+});
+
+export const actionRemoveSlotValue = (slotValue: {
+  key: string,
+  value: string,
+}): ACtion => ({
+  type: 'REMOVE_SLOT_VALUE',
+  payload: slotValue,
 });

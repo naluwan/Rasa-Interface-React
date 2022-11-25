@@ -1,4 +1,3 @@
-/* eslint-disable no-unused-vars */
 import * as React from 'react';
 import cx from 'classnames';
 import shallow from 'zustand/shallow';
@@ -14,16 +13,19 @@ type SlotValueItemPropsType = {
 const SlotValueItem: React.FC<SlotValueItemPropsType> = (props) => {
   const { slotValue } = props;
 
-  // const { onCreateSlot } = useStoryStore((state: State) => {
-  //   return {
-  //     onCreateSlot: state.onCreateSlot,
-  //   };
-  // }, shallow);
+  const { onRemoveSlotValue } = useStoryStore((state: State) => {
+    return {
+      onRemoveSlotValue: state.onRemoveSlotValue,
+    };
+  }, shallow);
 
   return (
     <span className={cx('badge text-bg-info m-2', style.item)}>
       {slotValue.value}
-      <RiCloseCircleFill className={style.removeSlotValueIcon} />
+      <RiCloseCircleFill
+        className={style.removeSlotValueIcon}
+        onClick={() => onRemoveSlotValue(slotValue)}
+      />
     </span>
   );
 };

@@ -42,6 +42,7 @@ import {
   actionCreateSlot,
   actionRemoveSlot,
   actionAddSlotValue,
+  actionRemoveSlotValue,
 } from 'actions';
 // import { computed } from 'zustand-middleware-computed-state';
 import { Toast } from 'utils/swalInput';
@@ -1368,6 +1369,37 @@ const reducer = (state: State, action: Action): State => {
         return onSetAllTrainData(res.data);
       });
     }
+    case 'REMOVE_SLOT_VALUE': {
+      const slotValue = action.payload;
+      const { stories, nlu, domain } = cloneDeep(state.cloneData);
+      const { onSetAllTrainData } = state;
+
+      // 獲取該儲存槽值在domain slots values中的陣列位置
+      const idx = domain.slots[slotValue.key].values.indexOf(slotValue.value);
+      // 使用idx刪除該儲存槽值在domain slots values裡的資料
+      domain.slots[slotValue.key].values.splice(idx, 1);
+
+      const cloneData = {
+        stories,
+        domain,
+        nlu,
+      };
+
+      return postAllTrainData(cloneData).then((res) => {
+        if (res.status !== 'success') {
+          return Toast.fire({
+            icon: 'error',
+            title: `刪除${slotValue.key}的儲存槽值失敗`,
+            text: res.message,
+          });
+        }
+        Toast.fire({
+          icon: 'success',
+          title: `刪除${slotValue.key}的儲存槽值成功`,
+        });
+        return onSetAllTrainData(res.data);
+      });
+    }
     default:
       return state;
   }
@@ -1641,6 +1673,9 @@ const useStoryStore = create((set) => {
       slotValueItems: { name: string, id: string }[],
     }) {
       dispatch(actionAddSlotValue(slotValues));
+    },
+    onRemoveSlotValue(slotValue: { key: string, value: string }) {
+      dispatch(actionRemoveSlotValue(slotValue));
     },
   };
 });
