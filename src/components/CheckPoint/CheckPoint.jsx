@@ -4,6 +4,8 @@ import cx from 'classnames';
 import style from './CheckPoint.module.scss';
 import type { StoryType } from '../types';
 import NavTab from './NavTab';
+import BotStep from '../BotStep';
+import ShowSlots from './ShowSlots';
 
 type CheckPointProps = {
   branch: StoryType[],
@@ -83,10 +85,31 @@ const CheckPoint: React.FC<CheckPointProps> = (props) => {
           tabIndex="-1"
         >
           {branchStory.steps?.length &&
+            // eslint-disable-next-line array-callback-return, consistent-return
             branchStory.steps.map((step) => {
-              return <div>{step.checkpoint}</div>;
+              console.log('step.slot_was_set:', step.slot_was_set);
+              if (step.slot_was_set) {
+                // eslint-disable-next-line camelcase
+                const { slot_was_set } = step;
+                // eslint-disable-next-line camelcase
+                return slot_was_set.map((slot) => {
+                  const slotKey = Object.keys(slot)[0];
+                  const slotValue = Object.values(slot)[0];
+                  return (
+                    <ShowSlots
+                      key={`${slotKey}-${slotValue}`}
+                      slotKey={slotKey}
+                      slotValue={slotValue}
+                    />
+                  );
+                });
+              }
+
+              if (step.action) {
+                const { action, response, buttons } = step;
+                return <BotStep step={{ action, response, buttons }} />;
+              }
             })}
-          {branchStory.story}
         </div>
       </div>
     </div>
