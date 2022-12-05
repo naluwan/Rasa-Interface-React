@@ -371,6 +371,10 @@ const Stories = () => {
   // 新增故事點擊儲存按鈕
   const atClickSaveBtn = React.useCallback(
     (createStory: StoryType) => {
+      const newStories = cloneDeep(cloneData.stories);
+      const newNlu = cloneDeep(cloneData.nlu);
+      const newDomain = cloneDeep(cloneData.domain);
+
       // 資料更新
       const userStep = [];
       const botStep = [];
@@ -427,22 +431,55 @@ const Stories = () => {
           delete step.response;
           delete step.buttons;
         }
+        if (step.checkpoint) {
+          delete step.branchStories;
+        }
         return step;
       });
 
-      cloneData.stories.push(cloneNewStory);
+      newStories.push(cloneNewStory);
+
+      let branchStories = [];
+
+      createStory.steps.map((step) => {
+        if (step.checkpoint) {
+          branchStories = step.branchStories;
+        }
+        return step;
+      });
+
+      if (branchStories.length) {
+        branchStories.map((branchStory) => {
+          branchStory.steps.map((step) => {
+            if (step.action) {
+              newDomain.responses[step.action] = [
+                {
+                  text: JSON.parse(
+                    JSON.stringify(step.response).replace(/\\n/g, '  \\n'),
+                  ),
+                },
+              ];
+              newDomain.actions.push(step.action);
+
+              delete step.response;
+            }
+            return step;
+          });
+          return newStories.push(branchStory);
+        });
+      }
 
       // 將使用者對話加入nlu和domain訓練檔中
       cloneNewStory.steps.map((step) => {
         if (step.intent) {
-          cloneData.nlu.rasa_nlu_data.common_examples.push({
+          newNlu.rasa_nlu_data.common_examples.push({
             text: step.user,
             intent: step.intent,
             entities: createStory.steps.filter(
               (createStoryStep) => createStoryStep.intent === step.intent,
             )[0].entities,
           });
-          cloneData.domain.intents.push(step.intent);
+          newDomain.intents.push(step.intent);
         }
         return step;
       });
@@ -457,8 +494,8 @@ const Stories = () => {
           console.log('entities:', entities);
           entities.map(
             (entityItem) =>
-              !cloneData.domain.entities.includes(entityItem.entity) &&
-              cloneData.domain.entities.push(entityItem.entity),
+              !newDomain.entities.includes(entityItem.entity) &&
+              newDomain.entities.push(entityItem.entity),
           );
         }
         return step;
@@ -472,7 +509,7 @@ const Stories = () => {
       // 將例句訓練檔放進nlu訓練檔中
       currentExamples.map((exampleItem) => {
         return exampleItem.map((example) => {
-          return cloneData.nlu.rasa_nlu_data.common_examples.push({
+          return newNlu.rasa_nlu_data.common_examples.push({
             text: example.text,
             intent: example.intent,
             entities: example.entities,
@@ -513,15 +550,13 @@ const Stories = () => {
         // 放進按鈕回覆
         if (actionItem.buttons.length) {
           actionItem.buttons.map((button) => delete button.reply);
-          cloneData.domain.responses[actionItem.action] = [
+          newDomain.responses[actionItem.action] = [
             { text: responseText, buttons: actionItem.buttons },
           ];
         } else {
-          cloneData.domain.responses[actionItem.action] = [
-            { text: responseText },
-          ];
+          newDomain.responses[actionItem.action] = [{ text: responseText }];
         }
-        return cloneData.domain.actions.push(actionItem.action);
+        return newDomain.actions.push(actionItem.action);
       });
 
       // 將按鈕意圖加入nlu訓練檔中
@@ -532,29 +567,29 @@ const Stories = () => {
 
             // 按鈕只需要新增沒有相同意圖的就好，因為同意圖，代表是要回答現有的故事流程回答
             if (
-              cloneData.nlu.rasa_nlu_data.common_examples.every(
+              newNlu.rasa_nlu_data.common_examples.every(
                 (nluItem) => nluItem.intent !== intent,
               )
             ) {
               const reply = JSON.parse(
                 JSON.stringify(button.reply).replace(/\\n/g, '  \\n'),
               );
-              cloneData.nlu.rasa_nlu_data.common_examples.push({
+              newNlu.rasa_nlu_data.common_examples.push({
                 text: button.title,
                 intent,
                 entities: [],
               });
               const actionName = randomBotResAction(actions);
-              cloneData.stories.push({
+              newStories.push({
                 story: `button_${intent}`,
                 steps: [
                   { user: button.title, intent, entities: [] },
                   { action: actionName },
                 ],
               });
-              cloneData.domain.actions.push(actionName);
-              cloneData.domain.responses[actionName] = [{ text: reply }];
-              cloneData.domain.intents.push(intent);
+              newDomain.actions.push(actionName);
+              newDomain.responses[actionName] = [{ text: reply }];
+              newDomain.intents.push(intent);
             }
             return button;
           });
@@ -562,7 +597,13 @@ const Stories = () => {
         return actionItem;
       });
 
-      return postAllTrainData(cloneData).then((res) => {
+      const newData = {
+        stories: newStories,
+        nlu: newNlu,
+        domain: newDomain,
+      };
+
+      return postAllTrainData(newData).then((res) => {
         if (res.status !== 'success') {
           return Toast.fire({
             icon: 'error',
