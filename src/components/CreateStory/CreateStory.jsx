@@ -590,7 +590,7 @@ const CreateStory: React.FC<CreateStoryProps> = (props) => {
                 checkpoint: `${prev.story}_主線`,
                 branchStories: [
                   {
-                    story: `${prev.story}_${newBranchStory.branchName}`,
+                    story: `支線_${prev.story}_${newBranchStory.branchName}`,
                     steps: [
                       { checkpoint: `${prev.story}_主線` },
                       {
@@ -616,7 +616,7 @@ const CreateStory: React.FC<CreateStoryProps> = (props) => {
             if (step.checkpoint) {
               step.branchStories = step.branchStories.concat([
                 {
-                  story: `${prev.story}_${newBranchStory.branchName}`,
+                  story: `支線_${prev.story}_${newBranchStory.branchName}`,
                   steps: [
                     { checkpoint: `${prev.story}_主線` },
                     {
@@ -714,37 +714,6 @@ const CreateStory: React.FC<CreateStoryProps> = (props) => {
                 onDeleteBranchStory={atDeleteBranchStory}
               />
             );
-
-            // return step.intent ? (
-            //   <UserStep
-            //     key={step.intent}
-            //     isCreate={isCreate}
-            //     step={{ intent, user, entities, examples }}
-            //     storyName={newStory.story}
-            //     onEditUserSay={atEditUserSay}
-            //     onCreateExample={atCreateExample}
-            //     onEditIntent={atEditIntent}
-            //     onRemoveUserStep={atRemoveUserStep}
-            //     onCreateEntities={atCreateEntities}
-            //     onEditEntityShowValue={atEditEntityShowValue}
-            //     onEditEntity={atEditEntity}
-            //     onEditEntityValue={atEditEntityValue}
-            //     onDeleteEntities={atDeleteEntities}
-            //     onDeleteExample={atDeleteExample}
-            //   />
-            // ) : (
-            //   <BotStep
-            //     key={step.action}
-            //     isCreate={isCreate}
-            //     step={{ action, response, buttons }}
-            //     storyName={newStory.story}
-            //     onEditBotRes={atEditBotRes}
-            //     onRemoveBotStep={atRemoveBotStep}
-            //     onAddResButtons={atAddResButtons}
-            //     onEditResButtons={atEditResButtons}
-            //     onRemoveResButton={atRemoveResButton}
-            //   />
-            // );
           })}
         {CurStepAlert}
       </div>
