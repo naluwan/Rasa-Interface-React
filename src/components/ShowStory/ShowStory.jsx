@@ -6,6 +6,7 @@ import style from './ShowStory.module.scss';
 import type { StoryType, State } from '../types';
 import useStoryStore from '../../store/useStoryStore';
 // import StepControl from '../CreateStory/StepControl';
+import CheckPoint from '../CheckPoint';
 
 type ShowStoryProps = {
   story: StoryType,
@@ -70,33 +71,76 @@ const ShowStory: React.FC<ShowStoryProps> = (props) => {
             action,
             response,
             buttons,
+            checkpoint,
+            branchStories,
           } = step;
-          return step.intent ? (
-            <UserStep
-              key={step.intent}
-              step={{ intent, user, entities, examples }}
-              storyName={story.story}
-              onCreateExample={onCreateExample}
-              onEditUserSay={onEditUserSay}
-              onEditIntent={onEditIntent}
-              onCreateEntities={onCreateEntities}
-              onDeleteEntities={onDeleteEntities}
-              onEditEntityShowValue={onEditEntityShowValue}
-              onEditEntity={onEditEntity}
-              onEditEntityValue={onEditEntityValue}
-              onDeleteExample={onDeleteExample}
-            />
-          ) : (
-            <BotStep
-              key={step.action}
-              step={{ action, response, buttons }}
-              storyName={story.story}
-              onEditBotRes={onEditBotRes}
-              onEditResButtons={onEditResButtons}
-              onRemoveResButton={onRemoveResButton}
-              onAddResButtons={onAddResButtons}
+          if (step.intent) {
+            return (
+              <UserStep
+                key={step.intent}
+                step={{ intent, user, entities, examples }}
+                storyName={story.story}
+                onCreateExample={onCreateExample}
+                onEditUserSay={onEditUserSay}
+                onEditIntent={onEditIntent}
+                onCreateEntities={onCreateEntities}
+                onDeleteEntities={onDeleteEntities}
+                onEditEntityShowValue={onEditEntityShowValue}
+                onEditEntity={onEditEntity}
+                onEditEntityValue={onEditEntityValue}
+                onDeleteExample={onDeleteExample}
+              />
+            );
+          }
+
+          if (step.action) {
+            return (
+              <BotStep
+                key={step.action}
+                step={{ action, response, buttons }}
+                storyName={story.story}
+                onEditBotRes={onEditBotRes}
+                onEditResButtons={onEditResButtons}
+                onRemoveResButton={onRemoveResButton}
+                onAddResButtons={onAddResButtons}
+              />
+            );
+          }
+
+          console.log('showStory step:', step);
+          return (
+            <CheckPoint
+              key={checkpoint}
+              branch={branchStories}
+              // onDeleteBranchStory={atDeleteBranchStory}
             />
           );
+          // return step.intent ? (
+          //   <UserStep
+          //     key={step.intent}
+          //     step={{ intent, user, entities, examples }}
+          //     storyName={story.story}
+          //     onCreateExample={onCreateExample}
+          //     onEditUserSay={onEditUserSay}
+          //     onEditIntent={onEditIntent}
+          //     onCreateEntities={onCreateEntities}
+          //     onDeleteEntities={onDeleteEntities}
+          //     onEditEntityShowValue={onEditEntityShowValue}
+          //     onEditEntity={onEditEntity}
+          //     onEditEntityValue={onEditEntityValue}
+          //     onDeleteExample={onDeleteExample}
+          //   />
+          // ) : (
+          //   <BotStep
+          //     key={step.action}
+          //     step={{ action, response, buttons }}
+          //     storyName={story.story}
+          //     onEditBotRes={onEditBotRes}
+          //     onEditResButtons={onEditResButtons}
+          //     onRemoveResButton={onRemoveResButton}
+          //     onAddResButtons={onAddResButtons}
+          //   />
+          // );
         })}
         {/* <StepControl /> */}
       </div>
