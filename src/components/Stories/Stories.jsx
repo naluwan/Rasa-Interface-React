@@ -120,6 +120,7 @@ const Stories = () => {
         const intentArr = [];
         const actionArr = [];
         const entitiesArr = [];
+        let branchStories = [];
 
         console.log(story);
         // 將要刪除故事的使用者例句和機器人回覆組回去，並將要刪除故事的action和意圖取出
@@ -168,7 +169,37 @@ const Stories = () => {
               };
             });
           }
+
+          // 將支線故事放進branchStories中，後面處理
+          if (step.checkpoint) {
+            branchStories = step.branchStories;
+          }
           return step;
+        });
+
+        // 刪除支線故事的故事流程、支線故事機器人回覆和回覆名稱
+        branchStories.map((item) => {
+          // 獲取所有故事名稱
+          const allStoryName = cloneData.stories.map(
+            (storyItem) => storyItem.story,
+          );
+          // 刪除故事
+          cloneData.stories.splice(allStoryName.indexOf(item.story), 1);
+
+          // 找到該支線故事的回覆
+          item.steps.map((step) => {
+            if (step.action) {
+              // 刪除機器人回覆
+              delete cloneData.domain.responses[step.action];
+              // 刪除機器人回覆名稱
+              cloneData.domain.actions.splice(
+                cloneData.domain.actions.indexOf(step.action),
+                1,
+              );
+            }
+            return step;
+          });
+          return item;
         });
 
         // 刪除nlu訓練檔中的例句
