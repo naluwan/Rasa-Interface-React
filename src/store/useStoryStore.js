@@ -87,14 +87,15 @@ const reducer = (state: State, action: Action): State => {
       };
     }
     case 'SET_STORY': {
-      if (!action.payload) {
+      const storyName = action.payload;
+      if (!storyName) {
         return {
           ...state,
           story: {},
         };
       }
       const { domain, nlu, stories } = cloneDeep(state.cloneData);
-      const story = stories.filter((item) => item.story === action.payload)[0];
+      const story = stories.filter((item) => item.story === storyName)[0];
       story.steps.map((step) => {
         if (step.action) {
           step.response = JSON.parse(
@@ -156,8 +157,11 @@ const reducer = (state: State, action: Action): State => {
 
             // 獲取按鈕回覆文字
             buttons.map((curButton) => {
-              curButton.reply =
-                domain.responses[curButton.buttonAction][0].text;
+              curButton.reply = JSON.parse(
+                JSON.stringify(
+                  domain.responses[curButton.buttonAction][0].text,
+                ).replace(/ \\n/g, '\\r'),
+              );
               return curButton;
             });
 
@@ -172,6 +176,39 @@ const reducer = (state: State, action: Action): State => {
 
           // const currentExample = examples.map((example) => example.text);
           step.examples = examples;
+        }
+
+        // 重組支線故事資料
+        if (step.checkpoint) {
+          const branchStories = [];
+          // 篩選出支線故事
+          stories.map((item) => {
+            return item.steps.map((branchStep) => {
+              if (
+                item.story !== storyName &&
+                branchStep.checkpoint === step.checkpoint
+              ) {
+                branchStories.push(item);
+              }
+              return branchStep;
+            });
+          });
+
+          // 重組支線故事的機器人回覆
+          branchStories.map((branchStory) => {
+            return branchStory.steps.map((branchStep) => {
+              if (branchStep.action) {
+                branchStep.response = JSON.parse(
+                  JSON.stringify(
+                    domain.responses[branchStep.action][0].text,
+                  ).replace(/ \\n/g, '\\r'),
+                );
+              }
+              return branchStep;
+            });
+          });
+
+          step.branchStories = branchStories;
         }
         return step;
       });
