@@ -34,8 +34,8 @@ const Examples: React.FC<ExamplesPropsType> = (props) => {
             return (
               <div key={entity + value} className="py-2">
                 <div>關鍵字:{text.slice(start, end)}</div>
-                <div>記憶槽:{value}</div>
-                <div>代表值:{entity}</div>
+                <div>儲存槽:{value}</div>
+                <div>記錄槽:{entity}</div>
               </div>
             );
           })}

@@ -971,7 +971,7 @@ const UserStep: React.FC<UserStepProps> = (props) => {
                               type="text"
                               className="form-control"
                               id={`input-${entityItem.entity}-entities-value`}
-                              placeholder={`請輸入關鍵字代表值為『${entityItem.entity}』的記憶槽代表值`}
+                              placeholder={`請輸入關鍵字代表值為『${entityItem.entity}』的儲存槽值`}
                             />
                           </div>
                         );
