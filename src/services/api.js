@@ -9,7 +9,7 @@ import { Toast } from 'utils/swalInput';
 import type { ApiTrainDataType } from 'components/types';
 
 const JWT_TOKEN = 'JWT_TOKEN';
-const API_URL = 'http://192.168.10.109:3333/api';
+const API_URL = 'http://192.168.10.103:3333/api';
 
 const axiosInstance = axios.create();
 
