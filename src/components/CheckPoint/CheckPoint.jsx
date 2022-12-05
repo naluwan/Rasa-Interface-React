@@ -41,7 +41,7 @@ const CheckPoint: React.FC<CheckPointProps> = (props) => {
       // 刪除支線故事
       if (target.id !== 'nav-home-tab') {
         const idx = storyName.lastIndexOf('_');
-        const checkPointName = `${storyName.slice(0, idx)}_主線`;
+        const checkPointName = `${storyName.slice(3, idx)}_主線`;
         // 刪除支線故事時，要將目前選取故事設為空
         setBranchStory({});
         return onDeleteBranchStory(checkPointName, storyName);
@@ -107,7 +107,9 @@ const CheckPoint: React.FC<CheckPointProps> = (props) => {
 
               if (step.action) {
                 const { action, response, buttons } = step;
-                return <BotStep step={{ action, response, buttons }} />;
+                return (
+                  <BotStep key={action} step={{ action, response, buttons }} />
+                );
               }
             })}
         </div>
