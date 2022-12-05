@@ -72,7 +72,8 @@ const reducer = (state: State, action: Action): State => {
       if (action.payload) {
         const { stories, domain, nlu } = action.payload;
         const filteredStories = stories.filter(
-          (item) => !item.story.includes('button_'),
+          (item) =>
+            !item.story.includes('button_') && !item.story.includes('支線_'),
         );
         return {
           ...state,
