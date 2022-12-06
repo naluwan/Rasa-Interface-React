@@ -1,7 +1,7 @@
 import * as React from 'react';
 import cx from 'classnames';
 import style from './BotStep.module.scss';
-import type { StepsType } from '../types';
+import type { StepsType, StoryType } from '../types';
 import {
   swalInput,
   swalMultipleInput,
@@ -13,6 +13,7 @@ type BotStepProps = {
   step: StepsType,
   storyName: string,
   isCreate: boolean,
+  stories: StoryType[],
   onEditBotRes: (
     oriBotRes: string,
     botRes: string,
@@ -44,6 +45,7 @@ const BotStep: React.FC<BotStepProps> = (props) => {
     isCreate,
     step,
     storyName,
+    stories,
     onEditBotRes,
     onRemoveBotStep,
     onAddResButtons,
@@ -89,11 +91,12 @@ const BotStep: React.FC<BotStepProps> = (props) => {
             payload,
             data.reply,
             currentStoryName,
+            stories,
           );
         },
       );
     },
-    [onAddResButtons],
+    [onAddResButtons, stories],
   );
 
   // 編輯機器人選項
@@ -111,11 +114,12 @@ const BotStep: React.FC<BotStepProps> = (props) => {
             data.reply,
             storyName,
             buttonActionName,
+            stories,
           );
         },
       );
     },
-    [onEditResButtons, step.action, storyName],
+    [onEditResButtons, step.action, storyName, stories],
   );
 
   // 刪除機器人選項

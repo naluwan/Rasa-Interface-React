@@ -2,7 +2,7 @@ import * as React from 'react';
 import useSWR from 'swr';
 import { fetchAllData, postAllTrainData, fetchAllAction } from 'services/api';
 import shallow from 'zustand/shallow';
-import type { State, StoryType } from 'components/types';
+import type { State, StoryType, CreateStoryState } from 'components/types';
 import ShowStory from 'components/ShowStory';
 import cx from 'classnames';
 import { Toast, confirmWidget, swalInput } from 'utils/swalInput';
@@ -12,6 +12,7 @@ import { cloneDeep } from 'lodash-es';
 import { randomBotResAction } from 'utils/randomBotResAction';
 import style from './Stories.module.scss';
 import useStoryStore from '../../store/useStoryStore';
+import useCreateStoryStore from '../../store/useCreateStoryStore';
 import Slots from './Slots';
 
 const Stories = () => {
@@ -23,10 +24,10 @@ const Stories = () => {
    * @type {[string, Function]}
    */
   const [defaultValue, setDefaultValue] = React.useState('');
-  /**
-   * @type {[StoryType, Function]}
-   */
-  const [newStory, setNewStory] = React.useState({});
+  // /**
+  //  * @type {[StoryType, Function]}
+  //  */
+  // const [newStory, setNewStory] = React.useState({});
   /**
    * @type {[{key:string,slotInfo:{type:string,values?:string[]}}[], Function]}
    */
@@ -62,6 +63,17 @@ const Stories = () => {
       onSetRasaTrainState: state.onSetRasaTrainState,
     };
   }, shallow);
+
+  const { newStory, onCreateNewStory, onInitialNewStory } = useCreateStoryStore(
+    (state: CreateStoryState) => {
+      return {
+        newStory: state.newStory,
+        onInitialNewStory: state.onInitialNewStory,
+        onCreateNewStory: state.onCreateNewStory,
+      };
+    },
+    shallow,
+  );
 
   // 進入頁面打API要所有訓練資料
   const { data } = useSWR('/api/getAllTrainData', fetchAllData);
@@ -308,15 +320,15 @@ const Stories = () => {
           onSetStory(storyName);
           setCreate(false);
           setDefaultValue(storyName);
-          setNewStory({});
+          onInitialNewStory();
         });
       }
       onSetStory(storyName);
       setCreate(false);
       setDefaultValue(storyName);
-      return setNewStory({});
+      return onInitialNewStory();
     },
-    [onSetStory, newStory],
+    [onSetStory, newStory, onInitialNewStory],
   );
 
   // 新增故事
@@ -338,7 +350,7 @@ const Stories = () => {
               });
               return;
             }
-            setNewStory({ story: createStoryName, steps: [] });
+            onCreateNewStory(createStoryName);
             onSetStory('');
             setCreate(true);
             setDefaultValue('');
@@ -360,13 +372,13 @@ const Stories = () => {
           });
           return;
         }
-        setNewStory({ story: createStoryName, steps: [] });
+        onCreateNewStory(createStoryName);
         onSetStory('');
         setCreate(true);
         setDefaultValue('');
       },
     );
-  }, [newStory, onSetStory, stories]);
+  }, [newStory, onSetStory, stories, onCreateNewStory]);
 
   // 新增故事點擊儲存按鈕
   const atClickSaveBtn = React.useCallback(
@@ -618,12 +630,12 @@ const Stories = () => {
         });
         onSetAllTrainData(res.data);
         setCreate(false);
-        setNewStory({});
+        onInitialNewStory();
         setDefaultValue(createStory.story);
         return onSetStory(createStory.story);
       });
     },
-    [onSetStory, onSetAllTrainData, cloneData, actions],
+    [onSetStory, onSetAllTrainData, cloneData, actions, onInitialNewStory],
   );
 
   // 恢復刪除故事(只能恢復最後一筆資料)
@@ -728,10 +740,10 @@ const Stories = () => {
       {create && (
         <CreateStory
           isCreate={create}
-          newStory={newStory}
+          // newStory={newStory}
           nlu={nlu.rasa_nlu_data.common_examples}
           actions={actions}
-          onSetNewStory={setNewStory}
+          // onSetNewStory={setNewStory}
           onClickSaveBtn={atClickSaveBtn}
         />
       )}

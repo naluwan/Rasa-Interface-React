@@ -195,3 +195,86 @@ export type State = {
     storyName: string,
   ) => void,
 };
+
+export type CreateStoryState = {
+  newStory: StoryType,
+  onInitialNewStory: () => void,
+  // 建立新故事
+  onCreateNewStory: (storyName: string) => void,
+  // 新增使用者步驟
+  onCreateUserStep: (userSay: string) => void,
+  // 編輯使用者對話
+  onEditUserSay: (
+    oriUserSay: string,
+    userSay: string,
+    storyName: string,
+    nlu: NluType,
+  ) => void,
+  // 編輯意圖
+  onEditIntent: (
+    oriIntent: string,
+    intent: string,
+    storyName: string,
+    nlu: NluType,
+  ) => void,
+  // 新增例句
+  onCreateExample: (
+    intent: string,
+    example: string,
+    exampleEntities: NluEntitiesType[],
+    storyName: string,
+    nlu: NluType,
+  ) => void,
+  // 刪除例句
+  onDeleteExample: (userSay: String, intent: string) => void,
+  // 新增關鍵字
+  onCreateEntities: (entities: NluEntitiesType, intent: string) => void,
+  // 刪除關鍵字
+  onDeleteEntities: (entity: string, intent: string) => void,
+  // 編輯關鍵字位置
+  onEditEntityShowValue: (
+    stepIntent: string,
+    entityValue: string,
+    newEntityShowValue: string,
+  ) => void,
+  // 編輯關鍵字
+  onEditEntity: (
+    stepIntent: string,
+    oriEntity: string,
+    newEntity: string,
+  ) => void,
+  // 編輯關鍵字代表值(儲存槽值)
+  onEditEntityValue: (
+    stepIntent: string,
+    oriEntityValue: string,
+    newEntityValue: string,
+  ) => void,
+  // 新增機器人步驟
+  onCreateBotStep: (actionName: string, botRes: string) => void,
+  // 編輯機器人回覆
+  onEditBotRes: (oriBotRes: string, botRes: string, actionName: string) => void,
+  // 刪除使用者步驟
+  onRemoveUserStep: (intent: string, userSay: string) => void,
+  // 刪除機器人步驟
+  onRemoveBotStep: (actionName: string) => void,
+  // 新增機器人按鈕選項
+  onAddResButtons: (
+    actionName: string,
+    title: string,
+    payload: string,
+    reply: string,
+    storyName: string,
+    stories: StoryType[],
+  ) => void,
+  onEditResButtons: (
+    actionName: string,
+    title: string,
+    oriPayload: string,
+    payload: string,
+    reply: string,
+    storyName: string,
+    buttonActionName: string,
+    stories: StoryType[],
+  ) => void,
+  onRemoveResButton: (actionName: string, payload: string) => void,
+};

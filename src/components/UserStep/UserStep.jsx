@@ -173,10 +173,10 @@ const UserStep: React.FC<UserStepProps> = (props) => {
         true,
       ).then((data) => {
         if (!data || !data.new || userSay === data.new) return;
-        onEditUserSay(data.ori, data.new, storyName);
+        onEditUserSay(data.ori, data.new, storyName, nlu);
       });
     },
-    [onEditUserSay, storyName],
+    [onEditUserSay, storyName, nlu],
   );
 
   // 編輯意圖
@@ -185,11 +185,180 @@ const UserStep: React.FC<UserStepProps> = (props) => {
       swalInput('編輯意圖', 'textarea', '請輸入意圖', intent, true).then(
         (data) => {
           if (!data || !data.new || intent === data.new) return;
-          onEditIntent(data.ori, data.new, storyName);
+          onEditIntent(data.ori, data.new, storyName, nlu);
         },
       );
     },
-    [onEditIntent, storyName],
+    [onEditIntent, storyName, nlu],
+  );
+
+  // 新增例句
+  const atCreateExample = React.useCallback(
+    (
+      intent: string,
+      parentEntitiesData: NluEntitiesType[],
+      currentStoryName: string,
+    ) => {
+      const exampleValue = document.querySelector(
+        `#input-${intent}-example`,
+      ).value;
+      const entityKeys = parentEntitiesData.map(
+        (entityItem) => entityItem.entity,
+      );
+      const entitiesValue = entityKeys.map((key) => {
+        const { value } = document.querySelector(
+          `#input-${key}-entities-value`,
+        );
+        const showValue = document.querySelector(
+          `#input-${key}-entities-show-value`,
+        ).value;
+        return {
+          start: exampleValue.indexOf(showValue),
+          end: exampleValue.indexOf(showValue) + showValue.length,
+          entity: key,
+          value,
+          showValue,
+        };
+      });
+
+      console.log('entitiesValue:', entitiesValue);
+      // 所有輸入空的值都為空就返回
+      if (
+        exampleValue === '' &&
+        entitiesValue.every((entity) => entity.value === '')
+      ) {
+        return;
+      }
+
+      // 輸入框有空值處理方式
+      if (
+        exampleValue === '' ||
+        entitiesValue.some(
+          (entity) => entity.value === '' || entity.showValue === '',
+        )
+      ) {
+        Toast.fire({
+          icon: 'warning',
+          title: '所有欄位都是必填的',
+        });
+        return;
+      }
+
+      /*
+          驗證關鍵字是否有效
+          關鍵字必須包含在例句內
+        */
+      const isNotValid = [];
+      entitiesValue.map((entityItem) => {
+        if (!exampleValue.includes(entityItem.showValue)) {
+          isNotValid.push(entityItem.entity);
+        }
+        return entityItem;
+      });
+
+      if (isNotValid.length) {
+        isNotValid.map((notValidEntity) => {
+          document.querySelector(
+            `#input-${notValidEntity}-entities-show-value`,
+          ).value = '';
+          return notValidEntity;
+        });
+        Toast.fire({
+          icon: 'warning',
+          title: `關鍵字代表值『${isNotValid.toString()}』的關鍵字有誤，請輸入正確的關鍵字`,
+        });
+        return;
+      }
+
+      // 重組關鍵字資訊，關鍵字開始和結束位置
+      // 驗證關鍵字是否重疊
+      const repeatEntity = [];
+      const isRepeat = entitiesValue.some((entityItem) => {
+        return entitiesValue.some((checkEntityItem) => {
+          if (entityItem.showValue !== checkEntityItem.showValue) {
+            if (
+              (checkEntityItem.start <= entityItem.start &&
+                entityItem.start < checkEntityItem.end) ||
+              (checkEntityItem.end < entityItem.end &&
+                entityItem.end <= checkEntityItem.end)
+            ) {
+              repeatEntity.push(checkEntityItem.entity);
+              return true;
+            }
+            return false;
+          }
+          return false;
+        });
+      });
+
+      // 關鍵字重疊處理
+      if (isRepeat) {
+        repeatEntity.map((repeatKey) => {
+          document.querySelector(
+            `#input-${repeatKey}-entities-show-value`,
+          ).value = '';
+          return repeatKey;
+        });
+        Toast.fire({
+          icon: 'warning',
+          title: `代表值『${repeatEntity.toString()}』的關鍵字重疊，請重新輸入`,
+        });
+        return;
+      }
+
+      // 驗證關鍵字是否重複
+      const isValueRepeat = entitiesValue.some((entityItem) => {
+        return entitiesValue.some((checkEntityItem) => {
+          if (entityItem.showValue !== checkEntityItem.showValue) {
+            if (entityItem.value === checkEntityItem.value) {
+              repeatEntity.push(checkEntityItem.entity);
+              return true;
+            }
+            return false;
+          }
+          return false;
+        });
+      });
+
+      // 關鍵字重複處理
+      if (isValueRepeat) {
+        repeatEntity.map((repeatKey) => {
+          document.querySelector(`#input-${repeatKey}-entities-value`).value =
+            '';
+          return repeatKey;
+        });
+        Toast.fire({
+          icon: 'warning',
+          title: `代表值『${repeatEntity.toString()}』的記憶槽代表值重複，請重新輸入`,
+        });
+        return;
+      }
+
+      entitiesValue.map((entityItem) => delete entityItem.showValue);
+
+      onCreateExample(
+        intent,
+        exampleValue,
+        entitiesValue.sort((a, b) => a.start - b.start),
+        currentStoryName,
+        nlu,
+      );
+      document.querySelector(`#input-${intent}-example`).value = '';
+      entityKeys.map((key) => {
+        document.querySelector(`#input-${key}-entities-value`).value = '';
+        document.querySelector(`#input-${key}-entities-show-value`).value = '';
+        return key;
+      });
+    },
+    [onCreateExample, nlu],
+  );
+
+  // 刪除例句
+  const atDeleteExample = React.useCallback(
+    (userSay: string, intent: string) => {
+      onDeleteExample(userSay, intent, storyName);
+    },
+    [onDeleteExample, storyName],
   );
 
   // 新增關鍵字
@@ -339,7 +508,7 @@ const UserStep: React.FC<UserStepProps> = (props) => {
     [onEditEntityShowValue, storyName],
   );
 
-  // 編輯關鍵字代表值
+  // 編輯關鍵字
   const atEditEntity = React.useCallback(
     (stepIntent: string, oriEntity: string, newEntity: string) => {
       onEditEntity(stepIntent, oriEntity, newEntity, storyName);
@@ -347,180 +516,12 @@ const UserStep: React.FC<UserStepProps> = (props) => {
     [onEditEntity, storyName],
   );
 
-  // 編輯關鍵字
+  // 編輯關鍵字代表值(儲存槽值)
   const atEditEntityValue = React.useCallback(
     (stepIntent: string, oriEntityValue: string, newEntityValue: string) => {
       onEditEntityValue(stepIntent, oriEntityValue, newEntityValue, storyName);
     },
     [onEditEntityValue, storyName],
-  );
-
-  // 新增例句
-  const atCreateExample = React.useCallback(
-    (
-      intent: string,
-      parentEntitiesData: NluEntitiesType[],
-      currentStoryName: string,
-    ) => {
-      const exampleValue = document.querySelector(
-        `#input-${intent}-example`,
-      ).value;
-      const entityKeys = parentEntitiesData.map(
-        (entityItem) => entityItem.entity,
-      );
-      const entitiesValue = entityKeys.map((key) => {
-        const { value } = document.querySelector(
-          `#input-${key}-entities-value`,
-        );
-        const showValue = document.querySelector(
-          `#input-${key}-entities-show-value`,
-        ).value;
-        return {
-          start: exampleValue.indexOf(showValue),
-          end: exampleValue.indexOf(showValue) + showValue.length,
-          entity: key,
-          value,
-          showValue,
-        };
-      });
-
-      console.log('entitiesValue:', entitiesValue);
-      // 所有輸入空的值都為空就返回
-      if (
-        exampleValue === '' &&
-        entitiesValue.every((entity) => entity.value === '')
-      ) {
-        return;
-      }
-
-      // 輸入框有空值處理方式
-      if (
-        exampleValue === '' ||
-        entitiesValue.some(
-          (entity) => entity.value === '' || entity.showValue === '',
-        )
-      ) {
-        Toast.fire({
-          icon: 'warning',
-          title: '所有欄位都是必填的',
-        });
-        return;
-      }
-
-      /*
-        驗證關鍵字是否有效
-        關鍵字必須包含在例句內
-      */
-      const isNotValid = [];
-      entitiesValue.map((entityItem) => {
-        if (!exampleValue.includes(entityItem.showValue)) {
-          isNotValid.push(entityItem.entity);
-        }
-        return entityItem;
-      });
-
-      if (isNotValid.length) {
-        isNotValid.map((notValidEntity) => {
-          document.querySelector(
-            `#input-${notValidEntity}-entities-show-value`,
-          ).value = '';
-          return notValidEntity;
-        });
-        Toast.fire({
-          icon: 'warning',
-          title: `關鍵字代表值『${isNotValid.toString()}』的關鍵字有誤，請輸入正確的關鍵字`,
-        });
-        return;
-      }
-
-      // 重組關鍵字資訊，關鍵字開始和結束位置
-      // 驗證關鍵字是否重疊
-      const repeatEntity = [];
-      const isRepeat = entitiesValue.some((entityItem) => {
-        return entitiesValue.some((checkEntityItem) => {
-          if (entityItem.showValue !== checkEntityItem.showValue) {
-            if (
-              (checkEntityItem.start <= entityItem.start &&
-                entityItem.start < checkEntityItem.end) ||
-              (checkEntityItem.end < entityItem.end &&
-                entityItem.end <= checkEntityItem.end)
-            ) {
-              repeatEntity.push(checkEntityItem.entity);
-              return true;
-            }
-            return false;
-          }
-          return false;
-        });
-      });
-
-      // 關鍵字重疊處理
-      if (isRepeat) {
-        repeatEntity.map((repeatKey) => {
-          document.querySelector(
-            `#input-${repeatKey}-entities-show-value`,
-          ).value = '';
-          return repeatKey;
-        });
-        Toast.fire({
-          icon: 'warning',
-          title: `代表值『${repeatEntity.toString()}』的關鍵字重疊，請重新輸入`,
-        });
-        return;
-      }
-
-      // 驗證關鍵字是否重複
-      const isValueRepeat = entitiesValue.some((entityItem) => {
-        return entitiesValue.some((checkEntityItem) => {
-          if (entityItem.showValue !== checkEntityItem.showValue) {
-            if (entityItem.value === checkEntityItem.value) {
-              repeatEntity.push(checkEntityItem.entity);
-              return true;
-            }
-            return false;
-          }
-          return false;
-        });
-      });
-
-      // 關鍵字重複處理
-      if (isValueRepeat) {
-        repeatEntity.map((repeatKey) => {
-          document.querySelector(`#input-${repeatKey}-entities-value`).value =
-            '';
-          return repeatKey;
-        });
-        Toast.fire({
-          icon: 'warning',
-          title: `代表值『${repeatEntity.toString()}』的記憶槽代表值重複，請重新輸入`,
-        });
-        return;
-      }
-
-      entitiesValue.map((entityItem) => delete entityItem.showValue);
-
-      onCreateExample(
-        intent,
-        exampleValue,
-        entitiesValue.sort((a, b) => a.start - b.start),
-        currentStoryName,
-      );
-      document.querySelector(`#input-${intent}-example`).value = '';
-      entityKeys.map((key) => {
-        document.querySelector(`#input-${key}-entities-value`).value = '';
-        document.querySelector(`#input-${key}-entities-show-value`).value = '';
-        return key;
-      });
-    },
-    [onCreateExample],
-  );
-
-  // 刪除例句
-  const atDeleteExample = React.useCallback(
-    (userSay: string, intent: string) => {
-      onDeleteExample(userSay, intent, storyName);
-    },
-    [onDeleteExample, storyName],
   );
 
   // 更新支線故事資訊

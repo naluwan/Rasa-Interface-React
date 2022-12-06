@@ -2,6 +2,7 @@ import type {
   TrainDataType,
   StoryType,
   NluEntitiesType,
+  NluType,
 } from 'components/types';
 
 export type Action =
@@ -140,7 +141,121 @@ export type Action =
         key: string,
         value: string,
       },
+    }
+  | {
+      type: 'CREATE_STORY_EDIT_USER_SAY',
+      payload: {
+        oriUserSay: string,
+        userSay: string,
+        storyName: string,
+        nlu: NluType,
+      },
+    }
+  | {
+      type: 'CREATE_STORY_USER_STEP',
+      payload: string,
+    }
+  | {
+      type: 'CREATE_NEW_STORY',
+      payload: string,
+    }
+  | {
+      type: 'CREATE_STORY_EDIT_INTENT',
+      payload: {
+        oriIntent: string,
+        intent: string,
+        storyName: string,
+        nlu: NluType,
+      },
+    }
+  | {
+      type: 'CREATE_STORY_CREATE_EXAMPLE',
+      payload: {
+        intent: string,
+        example: string,
+        exampleEntities: NluEntitiesType[],
+        storyName: string,
+        nlu: NluType,
+      },
+    }
+  | {
+      type: 'CREATE_STORY_DELETE_EXAMPLE',
+      payload: { userSay: string, intent: string },
+    }
+  | {
+      type: 'CREATE_STORY_CREATE_ENTITIES',
+      payload: { entities: NluEntitiesType, intent: string },
+    }
+  | {
+      type: 'CREATE_STORY_DELETE_ENTITIES',
+      payload: { entity: string, intent: string },
+    }
+  | {
+      type: 'CREATE_STORY_EDIT_ENTITY_SHOW_VALUE',
+      payload: {
+        stepIntent: string,
+        entityValue: string,
+        newEntityShowValue: string,
+      },
+    }
+  | {
+      type: 'CREATE_STORY_EDIT_ENTITY',
+      payload: { stepIntent: string, oriEntity: string, newEntity: string },
+    }
+  | {
+      type: 'CREATE_STORY_EDIT_ENTITY_VALUE',
+      payload: {
+        stepIntent: string,
+        oriEntityValue: string,
+        newEntityValue: string,
+      },
+    }
+  | {
+      type: 'CREATE_STORY_CREATE_BOT_STEP',
+      payload: { actionName: string, botRes: string },
+    }
+  | {
+      type: 'CREATE_STORY_EDIT_BOT_RES',
+      payload: { oriBotRes: string, botRes: string, actionName: string },
+    }
+  | {
+      type: 'CREATE_STORY_REMOVE_USER_STEP',
+      payload: { intent: string, userSay: string },
+    }
+  | {
+      type: 'CREATE_STORY_REMOVE_BOT_STEP',
+      payload: string,
+    }
+  | {
+      type: 'CREATE_STORY_ADD_RES_BUTTONS',
+      payload: {
+        actionName: string,
+        title: string,
+        payload: string,
+        reply: string,
+        storyName: string,
+        stories: StoryType[],
+      },
+    }
+  | {
+      type: 'CREATE_STORY_EDIT_RES_BUTTONS',
+      payload: {
+        actionName: string,
+        title: string,
+        oriPayload: string,
+        payload: string,
+        reply: string,
+        storyName: string,
+        buttonActionName: string,
+        stories: StoryType[],
+      },
+    }
+  | {
+      type: 'CREATE_STORY_REMOVE_RES_BUTTON',
+      payload: { actionName: string, payload: string },
     };
+
+// ====================== query story ======================
 
 export const actionSetAllData = (data: TrainDataType): Action => ({
   type: 'SET_ALL_TRAIN_DATA',
@@ -330,7 +445,174 @@ export const actionAddSlotValue = (slotValues: {
 export const actionRemoveSlotValue = (slotValue: {
   key: string,
   value: string,
-}): ACtion => ({
+}): Action => ({
   type: 'REMOVE_SLOT_VALUE',
   payload: slotValue,
+});
+
+// ====================== create story ======================
+
+export const actionCreateNewStory = (storyName: string): Action => ({
+  type: 'CREATE_NEW_STORY',
+  payload: storyName,
+});
+
+export const actionCreateStoryCreateUserStep = (userSay: string): Action => ({
+  type: 'CREATE_STORY_CREATE_USER_STEP',
+  payload: userSay,
+});
+
+export const actionCreateStoryEditUserSay = (
+  oriUserSay: string,
+  userSay: string,
+  storyName: string,
+  nlu: NluType,
+): Action => ({
+  type: 'CREATE_STORY_EDIT_USER_SAY',
+  payload: { oriUserSay, userSay, storyName, nlu },
+});
+
+export const actionCreateStoryEditIntent = (
+  oriIntent: string,
+  intent: string,
+  storyName: string,
+  nlu: NluType,
+): Action => ({
+  type: 'CREATE_STORY_EDIT_INTENT',
+  payload: { oriIntent, intent, storyName, nlu },
+});
+
+export const actionCreateStoryCreateExample = (
+  intent: string,
+  example: string,
+  exampleEntities: NluEntitiesType[],
+  storyName: string,
+  nlu: NluType,
+): Action => ({
+  type: 'CREATE_STORY_CREATE_EXAMPLE',
+  payload: { intent, example, exampleEntities, storyName, nlu },
+});
+
+export const actionCreateStoryDeleteExample = (
+  userSay: string,
+  intent: string,
+): Action => ({
+  type: 'CREATE_STORY_DELETE_EXAMPLE',
+  payload: { userSay, intent },
+});
+
+export const actionCreateStoryCreateEntities = (
+  entities: NluEntitiesType,
+  intent: string,
+): Action => ({
+  type: 'CREATE_STORY_CREATE_ENTITIES',
+  payload: { entities, intent },
+});
+
+export const actionCreateStoryDeleteEntities = (
+  entity: string,
+  intent: string,
+): Action => ({
+  type: 'CREATE_STORY_DELETE_ENTITIES',
+  payload: { entity, intent },
+});
+
+export const actionCreateStoryEditEntityShowValue = (
+  stepIntent: string,
+  entityValue: string,
+  newEntityShowValue: string,
+): Action => ({
+  type: 'CREATE_STORY_EDIT_ENTITY_SHOW_VALUE',
+  payload: { stepIntent, entityValue, newEntityShowValue },
+});
+
+export const actionCreateStoryEditEntity = (
+  stepIntent: string,
+  oriEntity: string,
+  newEntity: string,
+): Action => ({
+  type: 'CREATE_STORY_EDIT_ENTITY',
+  payload: { stepIntent, oriEntity, newEntity },
+});
+
+export const actionCreateStoryEditEntityValue = (
+  stepIntent: string,
+  oriEntityValue: string,
+  newEntityValue: string,
+): Action => ({
+  type: 'CREATE_STORY_EDIT_ENTITY_VALUE',
+  payload: { stepIntent, oriEntityValue, newEntityValue },
+});
+
+export const actionCreateStoryCreateBotStep = (
+  actionName: string,
+  botRes: string,
+): Action => ({
+  type: 'CREATE_STORY_CREATE_BOT_STEP',
+  payload: { actionName, botRes },
+});
+
+export const actionCreateStoryEditBotRes = (
+  oriBotRes: string,
+  botRes: string,
+  actionName: string,
+): Action => ({
+  type: 'CREATE_STORY_EDIT_BOT_RES',
+  payload: { oriBotRes, botRes, actionName },
+});
+
+export const actionCreateStoryRemoveUserStep = (
+  intent: string,
+  userSay: string,
+): Action => ({
+  type: 'CREATE_STORY_REMOVE_USER_STEP',
+  payload: { intent, userSay },
+});
+
+export const actionCreateStoryRemoveBotStep = (actionName: string): Action => ({
+  type: 'CREATE_STORY_REMOVE_BOT_STEP',
+  payload: actionName,
+});
+
+export const actionCreateStoryAddResButtons = (
+  actionName: string,
+  title: string,
+  payload: string,
+  reply: string,
+  storyName: string,
+  stories: StoryType[],
+): Action => ({
+  type: 'CREATE_STORY_ADD_RES_BUTTONS',
+  payload: { actionName, title, payload, reply, storyName, stories },
+});
+
+export const actionCreateStoryEditResButtons = (
+  actionName: string,
+  title: string,
+  oriPayload: string,
+  payload: string,
+  reply: string,
+  storyName: string,
+  buttonActionName: string,
+  stories: StoryType[],
+): Action => ({
+  type: 'CREATE_STORY_EDIT_RES_BUTTONS',
+  payload: {
+    actionName,
+    title,
+    oriPayload,
+    payload,
+    reply,
+    storyName,
+    buttonActionName,
+    stories,
+  },
+});
+
+export const actionCreateRemoveResButton = (
+  actionName: string,
+  payload: string,
+): Action => ({
+  type: 'CREATE_STORY_REMOVE_RES_BUTTON',
+  payload: { actionName, payload },
 });

@@ -1,9 +1,11 @@
 import * as React from 'react';
 import cx from 'classnames';
 import { Toast } from 'utils/swalInput';
+import shallow from 'zustand/shallow';
 import style from './StepControl.module.scss';
-import { StoryType, ExampleType, StepsType } from '../types';
+import { StoryType, ExampleType, StepsType, CreateStoryState } from '../types';
 import { randomBotResAction } from '../../utils/randomBotResAction';
+import useCreateStoryStore from '../../store/useCreateStoryStore';
 
 type StepControlType = {
   isUser: boolean,
@@ -17,12 +19,21 @@ type StepControlType = {
 };
 
 const StepControl: React.FC<StepControlType> = (props) => {
-  const { isUser, nlu, steps, actions, onSetNewStory, onSetIsInputFocus } =
-    props;
+  const { isUser, nlu, steps, actions, onSetIsInputFocus } = props;
   /**
    * @type {[string, Function]}
    */
   const [conversation, setConversation] = React.useState('');
+
+  const { onCreateUserStep, onCreateBotStep } = useCreateStoryStore(
+    (state: CreateStoryState) => {
+      return {
+        onCreateUserStep: state.onCreateUserStep,
+        onCreateBotStep: state.onCreateBotStep,
+      };
+    },
+    shallow,
+  );
 
   // 獲取輸入框文字
   const atChange = React.useCallback(
@@ -51,17 +62,10 @@ const StepControl: React.FC<StepControlType> = (props) => {
         setConversation('');
         return;
       }
-      onSetNewStory((prev) => {
-        return {
-          ...prev,
-          steps: prev.steps.concat([
-            { user: userSay, intent: userSay, entities: [], examples: [] },
-          ]),
-        };
-      });
+      onCreateUserStep(userSay);
       setConversation('');
     },
-    [onSetNewStory, nlu, steps],
+    [nlu, steps, onCreateUserStep],
   );
 
   // 點擊機器人按鈕
@@ -70,16 +74,11 @@ const StepControl: React.FC<StepControlType> = (props) => {
       if (!botRes) return;
       const actionName = randomBotResAction(actions);
 
-      onSetNewStory((prev) => {
-        return {
-          ...prev,
-          steps: prev.steps.concat([{ action: actionName, response: botRes }]),
-        };
-      });
+      onCreateBotStep(actionName, botRes);
 
       setConversation('');
     },
-    [onSetNewStory, actions],
+    [onCreateBotStep, actions],
   );
 
   return (
