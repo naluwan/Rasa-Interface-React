@@ -15,6 +15,7 @@ html {
     .layoutBlock {
       height: calc(100vh - 68px);
       background-image: url(../../images/home.png);
+      box-shadow: inset 0px 15px 15px -15px #000,inset 0px -15px 15px -15px #000;
       background-repeat: no-repeat;
       background-attachment: fixed;
       background-position: center;

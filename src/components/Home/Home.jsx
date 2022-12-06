@@ -13,7 +13,9 @@ const Home = () => {
           </Link>
         </div>
       </div>
-      <div>Chat bot 教學</div>
+      <div className={style.sButtonBlock}>
+        <div className={style.sButton}>Chat bot 教學</div>
+      </div>
     </div>
   );
 };
