@@ -11,12 +11,8 @@ export default {
 };
 
 const Template = (args) => {
-  return (
-    <Home
-      {...args}
-      {...action}
-    />
-  );
+  // eslint-disable-next-line react/jsx-props-no-spreading
+  return <Home {...args} {...action} />;
 };
 
 export const Basic = Template.bind({});

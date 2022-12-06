@@ -7,7 +7,6 @@
   align-items: center;
   font-size: 12px;
   min-height: 320px;
-  background: none;
 
   .title {
     font-weight: 700;
@@ -16,45 +15,76 @@
     padding: 0;
   }
 
-  .registerContainer {
-    background: #fff;
-    margin: 0 auto;
-    display: block;
-    max-width: 450px;
-    padding: 30px 50px 30px 50px;
-    text-align: center;
-    box-shadow: 0px 5px 9px 4px rgb(68 68 68 / 27%);
-    border-radius: 11px;
-    overflow: hidden;
-  }
-
-  .inputBlock {
-    margin: 10px 0;
+  .registerBlock {
     display: flex;
-    flex-direction: column;
-    text-align: left;
+    flex-direction: row;
 
-    .textRed {
-      color: red;
+    .registerBg {
+      background: url(../../images/robot.jpg) no-repeat center;
+      width: 450px;
+      position: relative;
+      border-radius: 11px ;
+
+      .title {
+        color: #fff;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+      }
+
+
     }
-  }
 
-  .account {
-    display: inline-flex;
-    word-break: keep-all;
-    margin: 0 auto;
-    align-items: center;
-    color: rgba(122, 122, 122, 0.8);
+    .registerContainer {
+      background: #fff;
+      margin: 0 auto;
+      display: block;
+      max-width: 450px;
+      padding: 30px 50px 30px 50px;
+      text-align: center;
+      box-shadow: 0px 5px 9px 4px rgb(68 68 68 / 27%);
+      border-radius: 11px ;
+      overflow: hidden;
 
-    button {
-      width: 0;
-      color: #5934ff;
+      .title {
+        color: #3551F5;
+      }
+    }
 
-      &:hover {
+    .inputBlock {
+      margin: 10px 0;
+      display: flex;
+      flex-direction: column;
+      text-align: left;
+
+      .textRed {
+        color: red;
+      }
+    }
+
+    .account {
+      display: inline-flex;
+      word-break: keep-all;
+      margin: 0 auto;
+      align-items: center;
+      color: rgba(122, 122, 122, 0.8);
+
+      button {
         width: 0;
-        outline: none;
-        border: none;
+        background: linear-gradient(270deg, #5D70DD -1.72%, #516AFF 54.66%, #3419DD 113.59%);
+        background-clip: text;
+        -webkit-background-clip: text;
+        color: transparent;
+
+        &:hover {
+          width: 0;
+          outline: none;
+          border: none;
+        }
       }
     }
   }
+
+  
 }
