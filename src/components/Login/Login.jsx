@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 /* eslint-disable react/jsx-props-no-spreading */
 import * as React from 'react';
 import { NavLink, Navigate } from 'react-router-dom';
@@ -96,7 +97,9 @@ const Login = () => {
         {/* login.hbs */}
         <h1 className={style.title}>Chat Bot</h1>
         <div className={style.inputBlock}>
+          <label htmlFor="login-Email">帳號</label>
           <MyInput
+            id="login-Email"
             required=""
             variant="email"
             className="form-control"
@@ -104,7 +107,9 @@ const Login = () => {
           />
         </div>
         <div className={style.inputBlock}>
+          <label htmlFor="login-password">密碼</label>
           <MyInput
+            id="login-password"
             required=""
             variant="password"
             className="form-control"
@@ -120,11 +125,11 @@ const Login = () => {
             登入
           </MyButton>
         </div>
-        <div className={style.inputBlock}>
+        {/* <div className={style.inputBlock}>
           <MyButton className="btn" variant="secondary" onClick={forgetButton}>
             忘記密碼
           </MyButton>
-        </div>
+        </div> */}
         <div className={style.account}>
           還沒有帳號?
           <NavLink

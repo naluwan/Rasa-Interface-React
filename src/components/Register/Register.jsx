@@ -80,121 +80,141 @@ const Register = () => {
   );
   return (
     <div className={style.register}>
-      <div className={style.registerContainer}>
-        <h1 className={style.title}>使用者註冊</h1>
-        <form onSubmit={handleSubmit(atRegister)} noValidate>
-          <div className="row">
-            <div className="col-6">
-              <div className={style.inputBlock}>
-                <input
-                  type="text"
-                  className="form-control"
-                  placeholder="公司代號"
-                  {...register('cpnyId', { required: true })}
-                />
-                {errors.cpnyId && (
-                  <small className={style.textRed}>*公司代號為必填欄位</small>
-                )}
+      <div className={style.registerBlock}>
+        <div className={style.registerBg}>
+          <h4 className={style.title}> Chat Bot</h4>
+        </div>
+        <div className={style.registerContainer}>
+          <h1 className={style.title}>註冊</h1>
+          <form onSubmit={handleSubmit(atRegister)} noValidate>
+            <div className="row">
+              <div className="col-6">
+                <div className={style.inputBlock}>
+                  <label htmlFor="cpnyId">公司代號</label>
+                  <input
+                    id="cpnyId"
+                    type="text"
+                    className="form-control"
+                    placeholder="公司代號"
+                    {...register('cpnyId', { required: true })}
+                  />
+                  {errors.cpnyId && (
+                    <small className={style.textRed}>*公司代號為必填欄位</small>
+                  )}
+                </div>
+              </div>
+              <div className="col-6">
+                <div className={style.inputBlock}>
+                  <label htmlFor="cpname">公司名稱</label>
+                  <input
+                    id="cpname"
+                    type="text"
+                    className="form-control"
+                    placeholder="公司名稱"
+                    {...register('cpnyName', { required: true })}
+                  />
+                  {errors.cpnyName && (
+                    <small className={style.textRed}>*公司名稱為必填欄位</small>
+                  )}
+                </div>
+              </div>
+              <div className="col-12">
+                <div className={style.inputBlock}>
+                  <label htmlFor="chatbotName">公司名稱</label>
+                  <input
+                    type="text"
+                    id="chatbotName"
+                    className="form-control"
+                    name="chatbotName"
+                    placeholder="機器人名稱"
+                    {...register('chatbotName', { required: true })}
+                  />
+                  {errors.chatbotName && (
+                    <small className={style.textRed}>
+                      *機器人名稱為必填欄位
+                    </small>
+                  )}
+                </div>
+              </div>
+              <div className="col-12">
+                <div className={style.inputBlock}>
+                  <label htmlFor="loginEmail">公司名稱</label>
+                  <input
+                    id="loginEmail"
+                    type="email"
+                    placeholder="登入帳號 - Email"
+                    className="form-control"
+                    {...register('email', {
+                      required: true,
+                      validate: (value) =>
+                        emailPattern.test(value) || 'Email格式錯誤',
+                    })}
+                  />
+                  {errors.email && (
+                    <small className={style.textRed}>
+                      {errors.email.message}
+                    </small>
+                  )}
+                </div>
+              </div>
+              <div className="col-6">
+                <div className={style.inputBlock}>
+                  <label htmlFor="loginPassword">密碼</label>
+                  <input
+                    id="loginPassword"
+                    type="password"
+                    placeholder="密碼"
+                    className="form-control"
+                    {...register('password', {
+                      required: true,
+                      validate: (value) => pwdPattern.test(value),
+                    })}
+                  />
+                  {errors.password && (
+                    <small className={style.textRed}>
+                      密碼最少八個字符，並且混合大小寫英文字母
+                    </small>
+                  )}
+                </div>
+              </div>
+              <div className="col-6">
+                <div className={style.inputBlock}>
+                  <label htmlFor="loginAginpass">密碼</label>
+                  <input
+                    id="loginAginpass"
+                    type="password"
+                    placeholder="再次輸入密碼"
+                    className="form-control"
+                    {...register('passwordCheck', {
+                      required: true,
+                      validate: (value) => value === watch('password'),
+                    })}
+                  />
+                  {errors.passwordCheck && (
+                    <small className={style.textRed}>
+                      *密碼和確認密碼不相符
+                    </small>
+                  )}
+                </div>
               </div>
             </div>
-            <div className="col-6">
-              <div className={style.inputBlock}>
-                <input
-                  type="text"
-                  className="form-control"
-                  placeholder="公司名稱"
-                  {...register('cpnyName', { required: true })}
-                />
-                {errors.cpnyName && (
-                  <small className={style.textRed}>*公司名稱為必填欄位</small>
-                )}
-              </div>
-            </div>
-            <div className="col-12">
-              <div className={style.inputBlock}>
-                <input
-                  type="text"
-                  id="chatbotName"
-                  className="form-control"
-                  name="chatbotName"
-                  placeholder="機器人名稱"
-                  {...register('chatbotName', { required: true })}
-                />
-                {errors.chatbotName && (
-                  <small className={style.textRed}>*機器人名稱為必填欄位</small>
-                )}
-              </div>
-            </div>
-            <div className="col-12">
-              <div className={style.inputBlock}>
-                <input
-                  type="email"
-                  placeholder="登入帳號 - Email"
-                  className="form-control"
-                  {...register('email', {
-                    required: true,
-                    validate: (value) =>
-                      emailPattern.test(value) || 'Email格式錯誤',
-                  })}
-                />
-                {errors.email && (
-                  <small className={style.textRed}>
-                    {errors.email.message}
-                  </small>
-                )}
-              </div>
-            </div>
-            <div className="col-6">
-              <div className={style.inputBlock}>
-                <input
-                  type="password"
-                  placeholder="密碼"
-                  className="form-control"
-                  {...register('password', {
-                    required: true,
-                    validate: (value) => pwdPattern.test(value),
-                  })}
-                />
-                {errors.password && (
-                  <small className={style.textRed}>
-                    密碼最少八個字符，並且混合大小寫英文字母
-                  </small>
-                )}
-              </div>
-            </div>
-            <div className="col-6">
-              <div className={style.inputBlock}>
-                <input
-                  type="password"
-                  placeholder="再次輸入密碼"
-                  className="form-control"
-                  {...register('passwordCheck', {
-                    required: true,
-                    validate: (value) => value === watch('password'),
-                  })}
-                />
-                {errors.passwordCheck && (
-                  <small className={style.textRed}>*密碼和確認密碼不相符</small>
-                )}
-              </div>
-            </div>
-          </div>
 
-          <div className={style.inputBlock}>
-            <MyButton
-              className="btn"
-              onClick={handleSubmit(atRegister)}
-              variant="primary"
-            >
-              註冊
-            </MyButton>
+            <div className={style.inputBlock}>
+              <MyButton
+                className="btn"
+                onClick={handleSubmit(atRegister)}
+                variant="primary"
+              >
+                註冊
+              </MyButton>
+            </div>
+          </form>
+          <div className={style.account}>
+            已有帳號?
+            <NavLink to="/login" className="btn" variant="primary">
+              登入
+            </NavLink>
           </div>
-        </form>
-        <div className={style.account}>
-          已有帳號?
-          <NavLink to="/login" className="btn" variant="primary">
-            登入
-          </NavLink>
         </div>
       </div>
     </div>

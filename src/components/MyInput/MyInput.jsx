@@ -7,16 +7,17 @@ type MyInputProps = {
   className?: string,
   placeholder: string,
   required: string,
+  id: string,
 };
 
 // eslint-disable-next-line no-unused-vars, consistent-return
 const MyInput: React.FC<MyInputProps> = (props) => {
-  const { variant, className, placeholder, required, onChange } = props;
+  const { variant, className, placeholder, required, onChange, id } = props;
   if (variant === 'password') {
     return (
       <input
         type="password"
-        id="password"
+        id={id}
         name="password"
         placeholder="請輸入密碼"
         className={cx(style.root, className)}
@@ -30,7 +31,8 @@ const MyInput: React.FC<MyInputProps> = (props) => {
     return (
       <input
         type="text"
-        placeholder={placeholder}
+        id={id}
+        placeholder={id}
         className={cx(style.root, className)}
         data-variant={variant}
         required={required}
@@ -42,7 +44,7 @@ const MyInput: React.FC<MyInputProps> = (props) => {
     return (
       <input
         type="email"
-        id="email"
+        id={id}
         name="email"
         placeholder="請輸入E-mail"
         className={cx(style.root, className)}
