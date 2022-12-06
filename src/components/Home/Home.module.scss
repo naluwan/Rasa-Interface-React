@@ -4,15 +4,29 @@
   justify-content: center;
   align-items: center;
   height: 100%;
+
   .container {
     width: 100%;
     text-align: center;
-    background-color: rgb(134, 181, 223);
+    color: #fff;
     padding: 3rem;
     border-radius: 10px;
+
     .versionInfo {
       padding-top: 2rem;
       text-align: left;
+    }
+
+    .Button {
+      max-width: 300px;
+      margin: 40px auto 0 auto;
+      div{
+        padding: 10px 20px;
+        background: linear-gradient(270deg, #5D70DD -1.72%, #516AFF 54.66%, #3419DD 113.59%);
+        color: #fff;
+        border-radius: 5px;
+        border:none;
+      }
     }
   }
 }

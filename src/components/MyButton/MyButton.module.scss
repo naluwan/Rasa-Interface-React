@@ -21,12 +21,11 @@
 .root[data-variant='primary'] {
   color: #fff;
   background: linear-gradient(270deg, #5D70DD -1.72%, #516AFF 54.66%, #3419DD 113.59%);
-
 }
 
 .root[data-variant='primary']:hover {
   color: #fff;
-    background: linear-gradient(270deg, #414e9b -1.72%, #242f70 54.66%, #25129e 113.59%);
+  background: linear-gradient(270deg, #5D70DD -1.72%, #516AFF 54.66%, #3419DD 113.59%);
 }
 
 .root[data-variant='secondary'] {

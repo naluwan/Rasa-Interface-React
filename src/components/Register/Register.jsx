@@ -81,9 +81,6 @@ const Register = () => {
   return (
     <div className={style.register}>
       <div className={style.registerBlock}>
-        <div className={style.registerBg}>
-          <h4 className={style.title}> Chat Bot</h4>
-        </div>
         <div className={style.registerContainer}>
           <h1 className={style.title}>註冊</h1>
           <form onSubmit={handleSubmit(atRegister)} noValidate>
@@ -138,7 +135,7 @@ const Register = () => {
               </div>
               <div className="col-12">
                 <div className={style.inputBlock}>
-                  <label htmlFor="loginEmail">公司名稱</label>
+                  <label htmlFor="loginEmail">登入帳號</label>
                   <input
                     id="loginEmail"
                     type="email"
