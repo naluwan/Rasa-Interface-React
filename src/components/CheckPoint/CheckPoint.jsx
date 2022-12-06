@@ -87,7 +87,6 @@ const CheckPoint: React.FC<CheckPointProps> = (props) => {
           {branchStory.steps?.length &&
             // eslint-disable-next-line array-callback-return, consistent-return
             branchStory.steps.map((step) => {
-              console.log('step.slot_was_set:', step.slot_was_set);
               if (step.slot_was_set) {
                 // eslint-disable-next-line camelcase
                 const { slot_was_set } = step;
