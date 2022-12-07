@@ -253,6 +253,23 @@ export type Action =
   | {
       type: 'CREATE_STORY_REMOVE_RES_BUTTON',
       payload: { actionName: string, payload: string },
+    }
+  | {
+      type: 'CREATE_STORY_CREATE_BRANCH_STORY',
+      payload: {
+        branchName: string,
+        slotValues: {
+          slotName: string,
+          slotValue: string,
+          id: string,
+          hasSlotValues: boolean,
+        }[],
+        botRes: { action: string, response: string },
+      },
+    }
+  | {
+      type: 'CREATE_STORY_DELETE_BRANCH_STORY',
+      payload: { checkPointName: string, branchName: string },
     };
 
 // ====================== query story ======================
@@ -615,4 +632,26 @@ export const actionCreateRemoveResButton = (
 ): Action => ({
   type: 'CREATE_STORY_REMOVE_RES_BUTTON',
   payload: { actionName, payload },
+});
+
+export const actionCreateStoryCreateBranchStory = (newBranchStory: {
+  branchName: string,
+  slotValues: {
+    slotName: string,
+    slotValue: string,
+    id: string,
+    hasSlotValues: boolean,
+  }[],
+  botRes: { action: string, response: string },
+}): Action => ({
+  type: 'CREATE_STORY_CREATE_BRANCH_STORY',
+  payload: newBranchStory,
+});
+
+export const actionCreateStoryDeleteBranchStory = (
+  checkPointName: string,
+  branchName: string,
+): Action => ({
+  type: 'CREATE_STORY_DELETE_BRANCH_STORY',
+  payload: { checkPointName, branchName },
 });

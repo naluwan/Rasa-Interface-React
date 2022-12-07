@@ -14,7 +14,6 @@ type StepControlType = {
   newStory: StoryType,
   steps: StepsType,
   actions: string[],
-  onSetNewStory: (story: StoryType) => void,
   onSetIsInputFocus: () => void,
 };
 

@@ -277,4 +277,16 @@ export type CreateStoryState = {
     stories: StoryType[],
   ) => void,
   onRemoveResButton: (actionName: string, payload: string) => void,
+  onCreateBranchStory: (newBranchStory: {
+    branchName: string,
+    slotValues: {
+      slotName: string,
+      slotValue: string,
+      id: string,
+      hasSlotValues: boolean,
+    }[],
+    botRes: { action: string, response: string },
+  }) => void,
+  // 移除支線故事
+  onDeleteBranchStory: (checkPointName: string, branchName: string) => void,
 };

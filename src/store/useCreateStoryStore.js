@@ -19,6 +19,8 @@ import {
   actionCreateStoryAddResButtons,
   actionCreateStoryEditResButtons,
   actionCreateRemoveResButton,
+  actionCreateStoryCreateBranchStory,
+  actionCreateStoryDeleteBranchStory,
 } from 'actions';
 import type {
   NluType,
@@ -543,6 +545,97 @@ const reducer = (state: CreateStoryState, action: Action): State => {
         },
       };
     }
+    case 'CREATE_STORY_CREATE_BRANCH_STORY': {
+      const newBranchStory = action.payload;
+      const { newStory } = state;
+
+      const isCheckPointExist = newStory.steps.some((step) => step.checkpoint);
+
+      if (!isCheckPointExist) {
+        return {
+          ...state,
+          newStory: {
+            ...state.newStory,
+            steps: state.newStory.steps.concat([
+              {
+                checkpoint: `${newStory.story}_主線`,
+                branchStories: [
+                  {
+                    story: `支線_${newStory.story}_${newBranchStory.branchName}`,
+                    steps: [
+                      { checkpoint: `${newStory.story}_主線` },
+                      {
+                        slot_was_set: newBranchStory.slotValues.map((item) => ({
+                          [item.slotName]: item.slotValue,
+                        })),
+                      },
+                      {
+                        action: newBranchStory.botRes.action,
+                        response: newBranchStory.botRes.response,
+                      },
+                    ],
+                  },
+                ],
+              },
+            ]),
+          },
+        };
+      }
+
+      return {
+        ...state,
+        newStory: {
+          ...state.newStory,
+          steps: state.newStory.steps.map((step) => {
+            if (step.checkpoint) {
+              step.branchStories = step.branchStories.concat([
+                {
+                  story: `支線_${newStory.story}_${newBranchStory.branchName}`,
+                  steps: [
+                    { checkpoint: `${newStory.story}_主線` },
+                    {
+                      slot_was_set: newBranchStory.slotValues.map((item) => ({
+                        [item.slotName]: item.slotValue,
+                      })),
+                    },
+                    {
+                      action: newBranchStory.botRes.action,
+                      response: newBranchStory.botRes.response,
+                    },
+                  ],
+                },
+              ]);
+            }
+            return step;
+          }),
+        },
+      };
+    }
+    case 'CREATE_STORY_DELETE_BRANCH_STORY': {
+      const { checkPointName, branchName } = action.payload;
+      const { newStory } = state;
+      let steps = newStory.steps.map((step) => {
+        if (step.checkpoint && step.checkpoint === checkPointName) {
+          step.branchStories = step.branchStories.filter(
+            (branchStory) => branchStory.story !== branchName,
+          );
+        }
+        return step;
+      });
+
+      // 篩選出不是checkPoint步驟或branchStories.length不為0的步驟
+      steps = steps.filter((step) =>
+        step.checkpoint ? step.branchStories.length > 0 : step,
+      );
+
+      return {
+        ...state,
+        newStory: {
+          ...state.newStory,
+          steps,
+        },
+      };
+    }
     default:
       return state;
   }
@@ -687,6 +780,7 @@ const useCreateStoryStore = create((set) => {
         ),
       );
     },
+    // 編輯機器人按鈕
     onEditResButtons(
       actionName: string,
       title: string,
@@ -710,8 +804,26 @@ const useCreateStoryStore = create((set) => {
         ),
       );
     },
+    // 移除機器人按鈕
     onRemoveResButton(actionName: string, payload: string) {
       dispatch(actionCreateRemoveResButton(actionName, payload));
+    },
+    // 新增支線故事
+    onCreateBranchStory(newBranchStory: {
+      branchName: string,
+      slotValues: {
+        slotName: string,
+        slotValue: string,
+        id: string,
+        hasSlotValues: boolean,
+      }[],
+      botRes: { action: string, response: string },
+    }) {
+      dispatch(actionCreateStoryCreateBranchStory(newBranchStory));
+    },
+    // 移除支線故事
+    onDeleteBranchStory(checkPointName: string, branchName: string) {
+      dispatch(actionCreateStoryDeleteBranchStory(checkPointName, branchName));
     },
   };
 });

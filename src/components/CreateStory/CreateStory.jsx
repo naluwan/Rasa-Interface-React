@@ -16,12 +16,11 @@ type CreateStoryProps = {
   newStory: StoryType,
   nlu: ExampleType[],
   actions: string[],
-  onSetNewStory: (story: StoryType) => void,
   onClickSaveBtn: (story: StoryType) => void,
 };
 
 const CreateStory: React.FC<CreateStoryProps> = (props) => {
-  const { isCreate, nlu, actions, onSetNewStory, onClickSaveBtn } = props;
+  const { isCreate, nlu, actions, onClickSaveBtn } = props;
   const { stories } = useStoryStore((state: State) => {
     return {
       stories: state.stories,
@@ -45,6 +44,8 @@ const CreateStory: React.FC<CreateStoryProps> = (props) => {
     onAddResButtons,
     onEditResButtons,
     onRemoveResButton,
+    onCreateBranchStory,
+    onDeleteBranchStory,
   } = useCreateStoryStore((state: CreateStoryState) => {
     return {
       newStory: state.newStory,
@@ -63,6 +64,8 @@ const CreateStory: React.FC<CreateStoryProps> = (props) => {
       onAddResButtons: state.onAddResButtons,
       onEditResButtons: state.onEditResButtons,
       onRemoveResButton: state.onRemoveResButton,
+      onCreateBranchStory: state.onCreateBranchStory,
+      onDeleteBranchStory: state.onDeleteBranchStory,
     };
   }, shallow);
   /**
@@ -579,104 +582,104 @@ const CreateStory: React.FC<CreateStoryProps> = (props) => {
   // );
 
   // 刪除支線故事
-  const atDeleteBranchStory = React.useCallback(
-    (checkPointName: string, branchName: string) => {
-      onSetNewStory((prev) => {
-        // 刪除支線故事
-        let steps = prev.steps.map((step) => {
-          if (step.checkpoint && step.checkpoint === checkPointName) {
-            step.branchStories = step.branchStories.filter(
-              (branchStory) => branchStory.story !== branchName,
-            );
-          }
-          return step;
-        });
+  // const atDeleteBranchStory = React.useCallback(
+  //   (checkPointName: string, branchName: string) => {
+  //     onSetNewStory((prev) => {
+  //       // 刪除支線故事
+  //       let steps = prev.steps.map((step) => {
+  //         if (step.checkpoint && step.checkpoint === checkPointName) {
+  //           step.branchStories = step.branchStories.filter(
+  //             (branchStory) => branchStory.story !== branchName,
+  //           );
+  //         }
+  //         return step;
+  //       });
 
-        // 篩選出不是checkPoint步驟或branchStories.length不為0的步驟
-        steps = steps.filter((step) =>
-          step.checkpoint ? step.branchStories.length > 0 : step,
-        );
+  //       // 篩選出不是checkPoint步驟或branchStories.length不為0的步驟
+  //       steps = steps.filter((step) =>
+  //         step.checkpoint ? step.branchStories.length > 0 : step,
+  //       );
 
-        return {
-          ...prev,
-          steps,
-        };
-      });
-    },
-    [onSetNewStory],
-  );
+  //       return {
+  //         ...prev,
+  //         steps,
+  //       };
+  //     });
+  //   },
+  //   [onSetNewStory],
+  // );
 
   // 新建支線故事
-  const atCreateBranchStory = React.useCallback(
-    (newBranchStory: {
-      branchName: string,
-      slotValues: {
-        slotName: string,
-        slotValue: string,
-        id: string,
-        hasSlotValues: boolean,
-      }[],
-      botRes: { action: string, response: string },
-    }) => {
-      onSetNewStory((prev) => {
-        const isCheckPointExist = prev.steps.some((step) => step.checkpoint);
-        if (!isCheckPointExist) {
-          return {
-            ...prev,
-            steps: prev.steps.concat([
-              {
-                checkpoint: `${prev.story}_主線`,
-                branchStories: [
-                  {
-                    story: `支線_${prev.story}_${newBranchStory.branchName}`,
-                    steps: [
-                      { checkpoint: `${prev.story}_主線` },
-                      {
-                        slot_was_set: newBranchStory.slotValues.map((item) => ({
-                          [item.slotName]: item.slotValue,
-                        })),
-                      },
-                      {
-                        action: newBranchStory.botRes.action,
-                        response: newBranchStory.botRes.response,
-                      },
-                    ],
-                  },
-                ],
-              },
-            ]),
-          };
-        }
+  // const atCreateBranchStory = React.useCallback(
+  //   (newBranchStory: {
+  //     branchName: string,
+  //     slotValues: {
+  //       slotName: string,
+  //       slotValue: string,
+  //       id: string,
+  //       hasSlotValues: boolean,
+  //     }[],
+  //     botRes: { action: string, response: string },
+  //   }) => {
+  //     onSetNewStory((prev) => {
+  //       const isCheckPointExist = prev.steps.some((step) => step.checkpoint);
+  //       if (!isCheckPointExist) {
+  //         return {
+  //           ...prev,
+  //           steps: prev.steps.concat([
+  //             {
+  //               checkpoint: `${prev.story}_主線`,
+  //               branchStories: [
+  //                 {
+  //                   story: `支線_${prev.story}_${newBranchStory.branchName}`,
+  //                   steps: [
+  //                     { checkpoint: `${prev.story}_主線` },
+  //                     {
+  //                       slot_was_set: newBranchStory.slotValues.map((item) => ({
+  //                         [item.slotName]: item.slotValue,
+  //                       })),
+  //                     },
+  //                     {
+  //                       action: newBranchStory.botRes.action,
+  //                       response: newBranchStory.botRes.response,
+  //                     },
+  //                   ],
+  //                 },
+  //               ],
+  //             },
+  //           ]),
+  //         };
+  //       }
 
-        return {
-          ...prev,
-          steps: prev.steps.map((step) => {
-            if (step.checkpoint) {
-              step.branchStories = step.branchStories.concat([
-                {
-                  story: `支線_${prev.story}_${newBranchStory.branchName}`,
-                  steps: [
-                    { checkpoint: `${prev.story}_主線` },
-                    {
-                      slot_was_set: newBranchStory.slotValues.map((item) => ({
-                        [item.slotName]: item.slotValue,
-                      })),
-                    },
-                    {
-                      action: newBranchStory.botRes.action,
-                      response: newBranchStory.botRes.response,
-                    },
-                  ],
-                },
-              ]);
-            }
-            return step;
-          }),
-        };
-      });
-    },
-    [onSetNewStory],
-  );
+  //       return {
+  //         ...prev,
+  //         steps: prev.steps.map((step) => {
+  //           if (step.checkpoint) {
+  //             step.branchStories = step.branchStories.concat([
+  //               {
+  //                 story: `支線_${prev.story}_${newBranchStory.branchName}`,
+  //                 steps: [
+  //                   { checkpoint: `${prev.story}_主線` },
+  //                   {
+  //                     slot_was_set: newBranchStory.slotValues.map((item) => ({
+  //                       [item.slotName]: item.slotValue,
+  //                     })),
+  //                   },
+  //                   {
+  //                     action: newBranchStory.botRes.action,
+  //                     response: newBranchStory.botRes.response,
+  //                   },
+  //                 ],
+  //               },
+  //             ]);
+  //           }
+  //           return step;
+  //         }),
+  //       };
+  //     });
+  //   },
+  //   [onSetNewStory],
+  // );
 
   return (
     <div className={style.root}>
@@ -725,7 +728,7 @@ const CreateStory: React.FC<CreateStoryProps> = (props) => {
                   onEditEntity={onEditEntity}
                   onEditEntityValue={onEditEntityValue}
                   onRemoveUserStep={onRemoveUserStep}
-                  onCreateBranchStory={atCreateBranchStory}
+                  onCreateBranchStory={onCreateBranchStory}
                 />
               );
             }
@@ -750,7 +753,7 @@ const CreateStory: React.FC<CreateStoryProps> = (props) => {
               <CheckPoint
                 key={checkpoint}
                 branch={branchStories}
-                onDeleteBranchStory={atDeleteBranchStory}
+                onDeleteBranchStory={onDeleteBranchStory}
               />
             );
           })}
