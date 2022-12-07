@@ -1,3 +1,4 @@
+/* eslint-disable react/jsx-props-no-spreading */
 // import * as React from 'react';
 import { actions } from '@storybook/addon-actions';
 
@@ -11,12 +12,7 @@ export default {
 };
 
 const Template = (args) => {
-  return (
-    <Login
-      {...args}
-      {...action}
-    />
-  );
+  return <Login {...args} {...action} />;
 };
 
 export const Basic = Template.bind({});

@@ -16,6 +16,23 @@ const Home = () => {
       <div className={style.sButtonBlock}>
         <div className={style.sButton}>Chat bot 教學</div>
       </div>
+      <div className={style.videoBlock}>
+        <div className={style.Carousel}>
+          <ul>
+            <li>
+              <iframe
+                width="560"
+                height="315"
+                src="https://www.youtube.com/embed/jfKfPfyJRdk"
+                title="YouTube video player"
+                frameBorder="0"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowfullscreen
+              />
+            </li>
+          </ul>
+        </div>
+      </div>
     </div>
   );
 };
