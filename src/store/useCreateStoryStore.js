@@ -28,6 +28,7 @@ import type {
   NluType,
   NluEntitiesType,
   CreateStoryState,
+  StoryType,
 } from '../components/types';
 import { Toast } from '../utils/swalInput';
 
@@ -35,6 +36,14 @@ const initialState = {
   newStory: {},
   currentStep: '',
   checkPointName: '',
+  selectedBranchStory: {
+    story: '',
+    steps: [],
+  },
+  selectedConnectBranchStory: {
+    story: '',
+    steps: [],
+  },
 };
 
 const reducer = (state: CreateStoryState, action: Action): State => {
@@ -981,6 +990,14 @@ const useCreateStoryStore = create((set) => {
     // 設定目前的支線故事名稱
     onSetCheckPointName(checkPointName: string) {
       set({ checkPointName });
+    },
+    // 設定目前選擇的支線故事
+    onSetSelectedBranchStory(selectedStory: StoryType) {
+      set({ selectedStory });
+    },
+    // 設定目前支線故事內串接的支線故事
+    onSetSelectedConnectBranchStory(selectedConnectBranchStory: StoryType) {
+      set({ selectedConnectBranchStory });
     },
     // 建立新故事
     onCreateNewStory(storyName: string) {

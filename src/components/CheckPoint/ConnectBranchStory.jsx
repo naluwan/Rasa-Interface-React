@@ -3,11 +3,13 @@ import ReactDom from 'react-dom';
 // import shallow from 'zustand/shallow';
 import uuid from 'react-uuid';
 import cx from 'classnames';
-// import useCreateStoryStore from '../../store/useCreateStoryStore';
+import shallow from 'zustand/shallow';
+import useCreateStoryStore from '../../store/useCreateStoryStore';
 import NavTab from './NavTab';
 import style from './CheckPoint.module.scss';
 import ShowSlots from './ShowSlots';
 import BotStep from '../BotStep';
+import type { CreateStoryState } from '../types';
 
 type ConnectBranchStoryProps = {
   branch: StoryType[],
@@ -20,10 +22,13 @@ type ConnectBranchStoryProps = {
 const ConnectBranchStory: React.FC<ConnectBranchStoryProps> = (props) => {
   const { branch, domTarget, onDeleteConnectBranchStory } = props;
 
-  const [branchStory, setBranchStory] = React.useState({
-    story: branch[0].story,
-    steps: branch[0].steps,
-  });
+  const { selectedConnectBranchStory, onSetSelectedConnectBranchStory } =
+    useCreateStoryStore((state: CreateStoryState) => {
+      return {
+        selectedConnectBranchStory: state.selectedConnectBranchStory,
+        onSetSelectedConnectBranchStory: state.onSetSelectedConnectBranchStory,
+      };
+    }, shallow);
 
   /* 
     當branch傳進來或內容發生改變時，永遠設定第一個為被選取的支線故事
@@ -31,12 +36,12 @@ const ConnectBranchStory: React.FC<ConnectBranchStoryProps> = (props) => {
     useEffect - 瀏覽器更新後才執行
     useLayoutEffect - 瀏覽器更新前執行，useLayoutEffect是同步處理，如果處理太多事情會卡住執行續
   */
-  React.useLayoutEffect(() => {
-    setBranchStory({
-      story: branch[0].story,
-      steps: branch[0].steps,
-    });
-  }, [setBranchStory, branch]);
+  // React.useLayoutEffect(() => {
+  //   setBranchStory({
+  //     story: branch[0].story,
+  //     steps: branch[0].steps,
+  //   });
+  // }, [setBranchStory, branch]);
 
   // 選取支線故事或刪除支線故事
   const atClickTab = React.useCallback(
@@ -47,8 +52,20 @@ const ConnectBranchStory: React.FC<ConnectBranchStoryProps> = (props) => {
       if (target.id !== 'nav-home-tab') {
         const idx = storyName.lastIndexOf('_');
         const checkPointName = `${storyName.slice(0, idx)}_主線`;
-        // 刪除支線故事時，要將目前選取故事設為空
-        setBranchStory({});
+
+        if (storyName === selectedConnectBranchStory.story) {
+          if (branch.length > 1) {
+            const allBranchName = branch.map((item) => item.story);
+            const deleteStoryIdx = allBranchName.indexOf(storyName);
+            const beforeDeleteStory = branch[deleteStoryIdx - 1];
+            onSetSelectedConnectBranchStory(beforeDeleteStory);
+          } else {
+            onSetSelectedConnectBranchStory({
+              story: '',
+              steps: [],
+            });
+          }
+        }
         return onDeleteConnectBranchStory(checkPointName, storyName);
       }
 
@@ -56,9 +73,15 @@ const ConnectBranchStory: React.FC<ConnectBranchStoryProps> = (props) => {
       const selectedStory = branch.filter(
         (item) => item.story === storyName,
       )[0];
-      return setBranchStory(selectedStory);
+      console.log('selectedStory ===>', selectedStory);
+      return onSetSelectedConnectBranchStory(selectedStory);
     },
-    [setBranchStory, onDeleteConnectBranchStory, branch],
+    [
+      onSetSelectedConnectBranchStory,
+      onDeleteConnectBranchStory,
+      branch,
+      selectedConnectBranchStory,
+    ],
   );
 
   const portalTarget = domTarget || document.querySelector('#nav-tabContent');
@@ -76,14 +99,17 @@ const ConnectBranchStory: React.FC<ConnectBranchStoryProps> = (props) => {
                 key={`${uuid()}-${item.story}`}
                 story={story}
                 steps={steps}
-                isActive={branchStory?.story === story}
+                isActive={selectedConnectBranchStory?.story === story}
                 onClickTab={atClickTab}
               />
             );
           })}
         </div>
       </nav>
-      <div className={cx('tab-content', style.tabContent)} id="nav-tabContent">
+      <div
+        className={cx('tab-content', style.tabContent)}
+        id="connect-branch-story-nav-tabContent"
+      >
         <div
           className="tab-pane fade show active"
           id="nav-home"
@@ -91,9 +117,9 @@ const ConnectBranchStory: React.FC<ConnectBranchStoryProps> = (props) => {
           aria-labelledby="nav-home-tab"
           tabIndex="-1"
         >
-          {branchStory?.steps?.length &&
+          {selectedConnectBranchStory?.steps?.length > 0 &&
             // eslint-disable-next-line array-callback-return, consistent-return
-            branchStory.steps.map((step) => {
+            selectedConnectBranchStory.steps.map((step) => {
               if (step.slot_was_set) {
                 // eslint-disable-next-line camelcase
                 const { slot_was_set } = step;

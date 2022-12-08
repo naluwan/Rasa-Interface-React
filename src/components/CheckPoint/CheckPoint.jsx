@@ -19,20 +19,27 @@ type CheckPointProps = {
 const CheckPoint: React.FC<CheckPointProps> = (props) => {
   const { branch, onDeleteBranchStory } = props;
   // console.log('inside CheckPoint branchStories:', branch);
-  const [branchStory, setBranchStory] = React.useState({
-    story: '',
-    steps: [],
-  });
+  // const [branchStory, setBranchStory] = React.useState({
+  //   story: '',
+  //   steps: [],
+  // });
   // console.log('branchStory first:', branchStory);
 
-  const { onSetBranchStep, onSetCheckPointName, onDeleteConnectBranchStory } =
-    useCreateStoryStore((state: State) => {
-      return {
-        onSetBranchStep: state.onSetBranchStep,
-        onSetCheckPointName: state.onSetCheckPointName,
-        onDeleteConnectBranchStory: state.onDeleteConnectBranchStory,
-      };
-    }, shallow);
+  const {
+    selectedStory,
+    onSetSelectedBranchStory,
+    onSetBranchStep,
+    onSetCheckPointName,
+    onDeleteConnectBranchStory,
+  } = useCreateStoryStore((state: State) => {
+    return {
+      selectedStory: state.selectedStory,
+      onSetBranchStep: state.onSetBranchStep,
+      onSetCheckPointName: state.onSetCheckPointName,
+      onDeleteConnectBranchStory: state.onDeleteConnectBranchStory,
+      onSetSelectedBranchStory: state.onSetSelectedBranchStory,
+    };
+  }, shallow);
   /* 
     當branch傳進來或內容發生改變時，永遠設定第一個為被選取的支線故事
     因更新資料時，畫面會閃爍，所以需要使用useLayoutEffect()來設定選取故事
@@ -40,11 +47,11 @@ const CheckPoint: React.FC<CheckPointProps> = (props) => {
     useLayoutEffect - 瀏覽器更新前執行，useLayoutEffect是同步處理，如果處理太多事情會卡住執行續
   */
   // React.useLayoutEffect(() => {
-  //   setBranchStory({
+  //   onSetSelectedBranchStory({
   //     story: branch[0].story,
   //     steps: branch[0].steps,
   //   });
-  // }, [setBranchStory, branch]);
+  // }, [onSetSelectedBranchStory, branch]);
 
   // 選取支線故事或刪除支線故事
   const atClickTab = React.useCallback(
@@ -55,18 +62,30 @@ const CheckPoint: React.FC<CheckPointProps> = (props) => {
       if (target.id !== 'nav-home-tab') {
         const idx = storyName.lastIndexOf('_');
         const checkPointName = `${storyName.slice(0, idx)}_主線`;
-        // 刪除支線故事時，要將目前選取故事設為空
-        setBranchStory({});
+
+        if (storyName === selectedStory.story) {
+          if (branch.length > 1) {
+            const allBranchName = branch.map((item) => item.story);
+            const deleteStoryIdx = allBranchName.indexOf(storyName);
+            const beforeDeleteStory = branch[deleteStoryIdx - 1];
+            onSetSelectedBranchStory(beforeDeleteStory);
+          } else {
+            onSetSelectedBranchStory({
+              story: '',
+              steps: [],
+            });
+          }
+        }
         return onDeleteBranchStory(checkPointName, storyName);
       }
 
       // 選取故事
-      const selectedStory = branch.filter(
+      const currentSelectedStory = branch.filter(
         (item) => item.story === storyName,
       )[0];
-      return setBranchStory(selectedStory);
+      return onSetSelectedBranchStory(currentSelectedStory);
     },
-    [setBranchStory, onDeleteBranchStory, branch],
+    [onSetSelectedBranchStory, onDeleteBranchStory, branch, selectedStory],
   );
 
   const atClickCreateBranch = React.useCallback(
@@ -90,7 +109,7 @@ const CheckPoint: React.FC<CheckPointProps> = (props) => {
                 key={`${uuid()}-${item.story}`}
                 story={story}
                 steps={steps}
-                isActive={branchStory?.story === story}
+                isActive={selectedStory?.story === story}
                 onClickTab={atClickTab}
               />
             );
@@ -105,9 +124,9 @@ const CheckPoint: React.FC<CheckPointProps> = (props) => {
           aria-labelledby="nav-home-tab"
           tabIndex="-1"
         >
-          {branchStory?.steps?.length > 0 &&
+          {selectedStory?.steps?.length > 0 &&
             // eslint-disable-next-line array-callback-return, consistent-return
-            branchStory.steps.map((step, idx) => {
+            selectedStory.steps.map((step, idx) => {
               const {
                 // eslint-disable-next-line camelcase
                 slot_was_set,
@@ -148,8 +167,8 @@ const CheckPoint: React.FC<CheckPointProps> = (props) => {
                 );
               }
             })}
-          {branchStory?.steps?.length > 0 &&
-            branchStory.steps.every(
+          {selectedStory?.steps?.length > 0 &&
+            selectedStory.steps.every(
               (step) => !step.action || step.checkpoint,
             ) && (
               <div className="d-flex justify-content-end mt-3">
@@ -158,7 +177,7 @@ const CheckPoint: React.FC<CheckPointProps> = (props) => {
                     className="btn btn-warning"
                     data-bs-toggle="modal"
                     data-bs-target="#createBranchStoryModal"
-                    onClick={() => atClickCreateBranch(branchStory.story)}
+                    onClick={() => atClickCreateBranch(selectedStory.story)}
                   >
                     串接支線故事
                   </button>

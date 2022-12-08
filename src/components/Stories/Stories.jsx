@@ -64,16 +64,21 @@ const Stories = () => {
     };
   }, shallow);
 
-  const { newStory, onCreateNewStory, onInitialNewStory } = useCreateStoryStore(
-    (state: CreateStoryState) => {
-      return {
-        newStory: state.newStory,
-        onInitialNewStory: state.onInitialNewStory,
-        onCreateNewStory: state.onCreateNewStory,
-      };
-    },
-    shallow,
-  );
+  const {
+    newStory,
+    onSetSelectedBranchStory,
+    onCreateNewStory,
+    onInitialNewStory,
+    onSetSelectedConnectBranchStory,
+  } = useCreateStoryStore((state: CreateStoryState) => {
+    return {
+      newStory: state.newStory,
+      onInitialNewStory: state.onInitialNewStory,
+      onCreateNewStory: state.onCreateNewStory,
+      onSetSelectedBranchStory: state.onSetSelectedBranchStory,
+      onSetSelectedConnectBranchStory: state.onSetSelectedConnectBranchStory,
+    };
+  }, shallow);
 
   // 進入頁面打API要所有訓練資料
   const { data } = useSWR('/api/getAllTrainData', fetchAllData);
@@ -317,18 +322,40 @@ const Stories = () => {
       if (Object.keys(newStory).length !== 0) {
         return confirmWidget(newStory.story, null).then((result) => {
           if (!result.isConfirmed) return;
+          onSetSelectedBranchStory({
+            story: '',
+            steps: [],
+          });
+          onSetSelectedConnectBranchStory({
+            story: '',
+            steps: [],
+          });
           onSetStory(storyName);
           setCreate(false);
           setDefaultValue(storyName);
           onInitialNewStory();
         });
       }
+      onSetSelectedBranchStory({
+        story: '',
+        steps: [],
+      });
+      onSetSelectedConnectBranchStory({
+        story: '',
+        steps: [],
+      });
       onSetStory(storyName);
       setCreate(false);
       setDefaultValue(storyName);
       return onInitialNewStory();
     },
-    [onSetStory, newStory, onInitialNewStory],
+    [
+      onSetStory,
+      newStory,
+      onInitialNewStory,
+      onSetSelectedBranchStory,
+      onSetSelectedConnectBranchStory,
+    ],
   );
 
   // 新增故事
@@ -350,6 +377,14 @@ const Stories = () => {
               });
               return;
             }
+            onSetSelectedBranchStory({
+              story: '',
+              steps: [],
+            });
+            onSetSelectedConnectBranchStory({
+              story: '',
+              steps: [],
+            });
             onCreateNewStory(createStoryName);
             onSetStory('');
             setCreate(true);
@@ -378,7 +413,14 @@ const Stories = () => {
         setDefaultValue('');
       },
     );
-  }, [newStory, onSetStory, stories, onCreateNewStory]);
+  }, [
+    newStory,
+    onSetStory,
+    stories,
+    onCreateNewStory,
+    onSetSelectedBranchStory,
+    onSetSelectedConnectBranchStory,
+  ]);
 
   // 新增故事點擊儲存按鈕
   const atClickSaveBtn = React.useCallback(
@@ -651,6 +693,14 @@ const Stories = () => {
           icon: 'success',
           title: '新增故事成功',
         });
+        onSetSelectedBranchStory({
+          story: '',
+          steps: [],
+        });
+        onSetSelectedConnectBranchStory({
+          story: '',
+          steps: [],
+        });
         onSetAllTrainData(res.data);
         setCreate(false);
         onInitialNewStory();
@@ -658,7 +708,15 @@ const Stories = () => {
         return onSetStory(createStory.story);
       });
     },
-    [onSetStory, onSetAllTrainData, cloneData, actions, onInitialNewStory],
+    [
+      onSetStory,
+      onSetAllTrainData,
+      cloneData,
+      actions,
+      onInitialNewStory,
+      onSetSelectedBranchStory,
+      onSetSelectedConnectBranchStory,
+    ],
   );
 
   // 恢復刪除故事(只能恢復最後一筆資料)

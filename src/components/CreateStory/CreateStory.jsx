@@ -78,7 +78,7 @@ const CreateStory: React.FC<CreateStoryProps> = (props) => {
   React.useEffect(() => {
     // 雙驚嘆號為判斷是否存在，只返回boolean
     setIsUser(
-      newStory.steps.length
+      newStory.steps?.length
         ? !!newStory.steps[newStory.steps.length - 1].intent ||
             !!newStory.steps[newStory.steps.length - 1].checkpoint
         : false,
@@ -694,7 +694,7 @@ const CreateStory: React.FC<CreateStoryProps> = (props) => {
         </button>
       </div>
       <div className={style.stepsPanel} id="stepsPanel">
-        {newStory.steps?.length !== 0 &&
+        {newStory?.steps?.length > 0 &&
           newStory.steps.map((step) => {
             // 要先將值取出來，再當作props傳進去，React才會檢查到有改變需要重新render
             const {
