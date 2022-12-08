@@ -204,7 +204,7 @@ const Stories = () => {
           cloneData.stories.splice(allStoryName.indexOf(item.story), 1);
 
           // 找到該支線故事的回覆
-          item.steps.map((step) => {
+          item.steps.map((step, idx) => {
             if (step.action) {
               // 刪除機器人回覆
               delete cloneData.domain.responses[step.action];
@@ -213,6 +213,27 @@ const Stories = () => {
                 cloneData.domain.actions.indexOf(step.action),
                 1,
               );
+            }
+            if (idx !== 0 && step.checkpoint && step.branchStories.length) {
+              // 刪除支線故事內串接的支線故事
+              step.branchStories.map((branchStory) => {
+                console.log('delete story connect story ===>', branchStory);
+                cloneData.stories.splice(
+                  allStoryName.indexOf(branchStory.story),
+                  1,
+                );
+                return branchStory.steps.map((branchStep) => {
+                  if (branchStep.action) {
+                    delete cloneData.domain.responses[branchStep.action];
+                    // 刪除機器人回覆名稱
+                    cloneData.domain.actions.splice(
+                      cloneData.domain.actions.indexOf(branchStep.action),
+                      1,
+                    );
+                  }
+                  return branchStep;
+                });
+              });
             }
             return step;
           });
