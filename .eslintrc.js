@@ -45,5 +45,6 @@ module.exports = {
     'react/react-in-jsx-scope': 0,
     'react/state-in-constructor': 0,
     'eslint-disable-next-line no-unused-vars': 0,
+    'react/jsx-props-no-spreading': 'off',
   },
 };
