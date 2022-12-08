@@ -1,4 +1,3 @@
-/* eslint-disable no-unreachable */
 import * as React from 'react';
 import cx from 'classnames';
 import Swal from 'sweetalert2';
@@ -20,6 +19,7 @@ import Entities from '../Entities';
 import Examples from './Examples';
 import useStoryStore from '../../store/useStoryStore';
 import { randomBotResAction } from '../../utils/randomBotResAction';
+import useCreateStoryStore from '../../store/useCreateStoryStore';
 
 type UserStepProps = {
   isCreate: boolean,
@@ -103,7 +103,7 @@ const filteredEntities = (
         (nluItem) => nluItem.text === userSay && nluItem.intent === intent,
       )
       .map((item) => item.entities);
-    console.log('currentEntities:', currentEntities);
+    // console.log('currentEntities:', currentEntities);
   }
   // 新建故事頁面的關鍵字
   if (!currentEntities.length) {
@@ -141,8 +141,18 @@ const UserStep: React.FC<UserStepProps> = (props) => {
     };
   }, shallow);
 
+  const { currentStep, onConnectBranchStory } = useCreateStoryStore(
+    (state: State) => {
+      return {
+        currentStep: state.currentStep,
+        onConnectBranchStory: state.onConnectBranchStory,
+      };
+    },
+    shallow,
+  );
+
   /**
-   * @type {[{branchName:string, slotValues:{slotName:string,slotValue:string,id:string,hasSlotValues: boolean}[],botRes:{action:string,response:string}}, Function]}
+   * @type {[{branchName:string, slotValues:{slotName:string,slotValue:string,id:string,hasSlotValues: boolean}[],botRes?:{action:string,response:string}}, Function]}
    */
   const [newBranchStory, setNewBranchStory] = React.useState({
     branchName: '',
@@ -151,6 +161,12 @@ const UserStep: React.FC<UserStepProps> = (props) => {
     ],
     botRes: { action: randomBotResAction(actions), response: '' },
   });
+
+  /**
+   * @type {[string, Function]}
+   */
+  // eslint-disable-next-line no-unused-vars
+  const [resSelect, setResSelect] = React.useState('botRes');
 
   const showIntent =
     step.intent === 'get_started' ? '打開聊天室窗' : step.intent;
@@ -221,7 +237,7 @@ const UserStep: React.FC<UserStepProps> = (props) => {
         };
       });
 
-      console.log('entitiesValue:', entitiesValue);
+      // console.log('entitiesValue:', entitiesValue);
       // 所有輸入空的值都為空就返回
       if (
         exampleValue === '' &&
@@ -577,6 +593,34 @@ const UserStep: React.FC<UserStepProps> = (props) => {
         });
       }
 
+      if (name === 'resSelect') {
+        setResSelect(value);
+        if (value === 'branchStory') {
+          return setNewBranchStory((prev) => {
+            const newData = prev;
+            delete newData.botRes;
+            return {
+              ...newData,
+              resSelect: 'branchStory',
+            };
+          });
+        }
+        setResSelect('botRes');
+        return setNewBranchStory((prev) => {
+          const newData = prev;
+          delete newData.resSelect;
+          if (newData.botRes) {
+            return {
+              ...newData,
+            };
+          }
+          return {
+            ...newData,
+            botRes: { action: randomBotResAction(actions), response: '' },
+          };
+        });
+      }
+
       // 更新機器人回覆
       return setNewBranchStory((prev) => {
         return {
@@ -588,7 +632,7 @@ const UserStep: React.FC<UserStepProps> = (props) => {
         };
       });
     },
-    [setNewBranchStory],
+    [setNewBranchStory, actions],
   );
 
   // 取消新增支線故事，重置新增支線故事資訊
@@ -599,6 +643,7 @@ const UserStep: React.FC<UserStepProps> = (props) => {
         slotValues: [{ slotName: '', slotValue: '', id: uuid() }],
         botRes: { action: randomBotResAction(allAction), response: '' },
       });
+      setResSelect('botRes');
     },
     [setNewBranchStory],
   );
@@ -672,7 +717,7 @@ const UserStep: React.FC<UserStepProps> = (props) => {
               item.hasSlotValues) ||
             (item.slotName === '' && !item.hasSlotValues),
         ) ||
-        newBranchStoryInfo.botRes.response === ''
+        (resSelect === 'botRes' && newBranchStoryInfo.botRes.response === '')
       ) {
         Toast.fire({
           icon: 'warning',
@@ -752,15 +797,23 @@ const UserStep: React.FC<UserStepProps> = (props) => {
         document.querySelector('#createBranchStoryModal #branchName').focus();
         return;
       }
+      if (currentStep === 'main') {
+        onCreateBranchStory(newBranchStoryInfo);
+      }
 
-      onCreateBranchStory(newBranchStoryInfo);
+      if (currentStep === 'branchStory') {
+        onConnectBranchStory(newStoryData, newBranchStoryInfo);
+      }
+
+      setResSelect('botRes');
       document.querySelector('#createBranchStoryModal .btn-close').click();
     },
-    [onCreateBranchStory],
+    [onCreateBranchStory, onConnectBranchStory, resSelect, currentStep],
   );
 
-  console.log('entitiesData:', entitiesData);
-  console.log('newBranchStory:', newBranchStory);
+  // console.log('entitiesData:', entitiesData);
+  // console.log('newBranchStory:', newBranchStory);
+  // console.log('resSelect ========================>', resSelect);
 
   return (
     <div className="row pt-2" id="userStep">
@@ -1119,19 +1172,65 @@ const UserStep: React.FC<UserStepProps> = (props) => {
                       onClick={() => atAddSlotValue()}
                     />
                   </div>
-                  <div className="mb-3">
-                    <label htmlFor="branchStoryName" className="form-label">
-                      機器人回覆
+
+                  <div className="mb-3 col-12">
+                    <label htmlFor="botResRadio" className="form-label">
+                      選擇回覆方式
                     </label>
-                    <input
-                      className="form-control"
-                      id="response"
-                      name="response"
-                      placeholder="請輸入機器人回覆"
-                      value={newBranchStory.botRes.response}
-                      onChange={(e) => atChangeNewBranchStory(e)}
-                    />
+
+                    <div className="mb-3 col-12">
+                      <div className="form-check form-check-inline">
+                        <input
+                          className="form-check-input"
+                          type="radio"
+                          name="resSelect"
+                          id="botResRadio"
+                          value="botRes"
+                          checked={resSelect === 'botRes'}
+                          onChange={(e) => atChangeNewBranchStory(e)}
+                        />
+                        <label
+                          className="form-check-label"
+                          htmlFor="botResRadio"
+                        >
+                          機器人回覆
+                        </label>
+                      </div>
+                      <div className="form-check form-check-inline">
+                        <input
+                          className="form-check-input"
+                          type="radio"
+                          name="resSelect"
+                          id="branchStoryRadio"
+                          value="branchStory"
+                          checked={resSelect === 'branchStory'}
+                          onChange={(e) => atChangeNewBranchStory(e)}
+                        />
+                        <label
+                          className="form-check-label"
+                          htmlFor="branchStoryRadio"
+                        >
+                          串接支線故事
+                        </label>
+                      </div>
+                    </div>
                   </div>
+                  {resSelect === 'botRes' && (
+                    <div className="mb-3">
+                      <label htmlFor="branchStoryName" className="form-label">
+                        機器人回覆
+                      </label>
+                      <textarea
+                        className="form-control"
+                        id="response"
+                        name="response"
+                        rows={4}
+                        placeholder="請輸入機器人回覆"
+                        value={newBranchStory.botRes.response}
+                        onChange={(e) => atChangeNewBranchStory(e)}
+                      />
+                    </div>
+                  )}
                 </div>
                 <div className="modal-footer">
                   <button
@@ -1148,7 +1247,7 @@ const UserStep: React.FC<UserStepProps> = (props) => {
                       atSubmitNewBranchStory(newBranchStory, stories, newStory)
                     }
                   >
-                    儲存
+                    儲存 {currentStep}
                   </button>
                 </div>
               </div>

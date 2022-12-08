@@ -16,7 +16,7 @@ const NavTab: React.FC<NavTabProps> = (props) => {
   const { story, isActive, onClickTab } = props;
   const idx = story.lastIndexOf('_');
   const storyName = story.slice(idx + 1, story.length);
-  console.log('navTab isActive:', isActive);
+  // console.log('navTab isActive:', isActive);
   return (
     <button
       className={cx('nav-link', { active: isActive }, style.checkPointNavTab)}

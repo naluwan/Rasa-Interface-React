@@ -694,7 +694,7 @@ const CreateStory: React.FC<CreateStoryProps> = (props) => {
         </button>
       </div>
       <div className={style.stepsPanel} id="stepsPanel">
-        {newStory.steps.length !== 0 &&
+        {newStory.steps?.length !== 0 &&
           newStory.steps.map((step) => {
             // 要先將值取出來，再當作props傳進去，React才會檢查到有改變需要重新render
             const {
@@ -708,8 +708,7 @@ const CreateStory: React.FC<CreateStoryProps> = (props) => {
               checkpoint,
               branchStories,
             } = step;
-            console.log('outside step:', step);
-            console.log('outside branchStories:', branchStories);
+
             if (step.intent) {
               return (
                 <UserStep

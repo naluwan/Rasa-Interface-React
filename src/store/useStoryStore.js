@@ -73,7 +73,7 @@ const reducer = (state: State, action: Action): State => {
         const { stories, domain, nlu } = action.payload;
         const filteredStories = stories.filter(
           (item) =>
-            !item.story.includes('button_') && !item.story.includes('支線_'),
+            !item.story.includes('button_') && !item.steps[0].checkpoint,
         );
         return {
           ...state,
@@ -188,6 +188,7 @@ const reducer = (state: State, action: Action): State => {
                 item.story !== storyName &&
                 branchStep.checkpoint === step.checkpoint
               ) {
+                console.log('set story branch step =====>', branchStep);
                 branchStories.push(item);
               }
               return branchStep;
@@ -196,13 +197,44 @@ const reducer = (state: State, action: Action): State => {
 
           // 重組支線故事的機器人回覆
           branchStories.map((branchStory) => {
-            return branchStory.steps.map((branchStep) => {
+            return branchStory.steps.map((branchStep, idx) => {
               if (branchStep.action) {
                 branchStep.response = JSON.parse(
                   JSON.stringify(
                     domain.responses[branchStep.action][0].text,
                   ).replace(/ \\n/g, '\\r'),
                 );
+              }
+              if (idx !== 0 && branchStep.checkpoint) {
+                console.log('set story branchStep =====>', branchStep);
+                const connectBranchStories = [];
+                stories.map((item) => {
+                  return item.steps.map((connectStep, connectStepIdx) => {
+                    if (
+                      connectStepIdx !== 2 &&
+                      connectStep.checkpoint === branchStep.checkpoint
+                    ) {
+                      console.log('set story connect branch story ====>', item);
+                      connectBranchStories.push(item);
+                    }
+                    return connectStep;
+                  });
+                });
+
+                connectBranchStories.map((currentConnectStory) => {
+                  return currentConnectStory.steps.map((connectStep) => {
+                    if (connectStep.action) {
+                      connectStep.response = JSON.parse(
+                        JSON.stringify(
+                          domain.responses[connectStep.action][0].text,
+                        ).replace(/ \\n/g, '\\r'),
+                      );
+                    }
+                    return connectStep;
+                  });
+                });
+
+                branchStep.branchStories = connectBranchStories;
               }
               return branchStep;
             });

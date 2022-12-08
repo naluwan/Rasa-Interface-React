@@ -284,7 +284,7 @@ const Slots: React.FC<SlotsPropsType> = (props) => {
         }
       }
 
-      console.log('final slotValue:', slotValue);
+      // console.log('final slotValue:', slotValue);
       // 將資料送進store並操作資料庫
       onCreateSlot(slotValue);
       // 關閉新增視窗

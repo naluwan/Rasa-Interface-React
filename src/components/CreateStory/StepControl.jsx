@@ -24,15 +24,14 @@ const StepControl: React.FC<StepControlType> = (props) => {
    */
   const [conversation, setConversation] = React.useState('');
 
-  const { onCreateUserStep, onCreateBotStep } = useCreateStoryStore(
-    (state: CreateStoryState) => {
+  const { onCreateUserStep, onCreateBotStep, onSetMainStep } =
+    useCreateStoryStore((state: CreateStoryState) => {
       return {
         onCreateUserStep: state.onCreateUserStep,
         onCreateBotStep: state.onCreateBotStep,
+        onSetMainStep: state.onSetMainStep,
       };
-    },
-    shallow,
-  );
+    }, shallow);
 
   // 獲取輸入框文字
   const atChange = React.useCallback(
@@ -117,6 +116,7 @@ const StepControl: React.FC<StepControlType> = (props) => {
           data-bs-toggle="modal"
           data-bs-target="#createBranchStoryModal"
           disabled={!isUser}
+          onClick={() => onSetMainStep()}
         >
           新增支線故事
         </button>

@@ -134,7 +134,7 @@ const Stories = () => {
         const entitiesArr = [];
         let branchStories = [];
 
-        console.log(story);
+        // console.log(story);
         // 將要刪除故事的使用者例句和機器人回覆組回去，並將要刪除故事的action和意圖取出
         story.steps.map((step) => {
           if (step.action) {
@@ -431,7 +431,7 @@ const Stories = () => {
       // 組成故事流程的訓練檔格式
       cloneNewStory.steps = cloneNewStory.steps.map((step) => {
         if (step.intent) {
-          console.log('step entities:', step.entities);
+          // console.log('step entities:', step.entities);
           delete step.examples;
           step.intent = step.intent.trim();
           step.user = step.user.trim();
@@ -462,7 +462,7 @@ const Stories = () => {
 
       if (branchStories.length) {
         branchStories.map((branchStory) => {
-          branchStory.steps.map((step) => {
+          branchStory.steps.map((step, idx) => {
             if (step.action) {
               newDomain.responses[step.action] = [
                 {
@@ -475,6 +475,29 @@ const Stories = () => {
 
               delete step.response;
             }
+            if (idx !== 0 && step.checkpoint) {
+              step.branchStories.map((connectBranchStory) => {
+                connectBranchStory.steps.map((connectStep) => {
+                  if (connectStep.action) {
+                    newDomain.responses[connectStep.action] = [
+                      {
+                        text: JSON.parse(
+                          JSON.stringify(connectStep.response).replace(
+                            /\\n/g,
+                            '  \\n',
+                          ),
+                        ),
+                      },
+                    ];
+                    newDomain.actions.push(connectStep.action);
+                    delete connectStep.response;
+                  }
+                  return connectStep;
+                });
+                return newStories.push(connectBranchStory);
+              });
+            }
+            delete step.branchStories;
             return step;
           });
           return newStories.push(branchStory);
@@ -496,14 +519,14 @@ const Stories = () => {
         return step;
       });
 
-      console.log('cloneNewStory:', cloneNewStory);
+      // console.log('cloneNewStory:', cloneNewStory);
 
       cloneNewStory.steps.map((step) => {
         if (step.intent) {
           const { entities } = createStory.steps.filter(
             (createStoryStep) => createStoryStep.intent === step.intent,
           )[0];
-          console.log('entities:', entities);
+          // console.log('entities:', entities);
           entities.map(
             (entityItem) =>
               !newDomain.entities.includes(entityItem.entity) &&

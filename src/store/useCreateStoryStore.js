@@ -21,6 +21,8 @@ import {
   actionCreateRemoveResButton,
   actionCreateStoryCreateBranchStory,
   actionCreateStoryDeleteBranchStory,
+  actionCheckPointConnectBranchStory,
+  actionCheckPointDeleteConnectBranchStory,
 } from 'actions';
 import type {
   NluType,
@@ -31,6 +33,8 @@ import { Toast } from '../utils/swalInput';
 
 const initialState = {
   newStory: {},
+  currentStep: '',
+  checkPointName: '',
 };
 
 const reducer = (state: CreateStoryState, action: Action): State => {
@@ -552,6 +556,38 @@ const reducer = (state: CreateStoryState, action: Action): State => {
       const isCheckPointExist = newStory.steps.some((step) => step.checkpoint);
 
       if (!isCheckPointExist) {
+        if (newBranchStory.botRes) {
+          return {
+            ...state,
+            newStory: {
+              ...state.newStory,
+              steps: state.newStory.steps.concat([
+                {
+                  checkpoint: `${newStory.story}_主線`,
+                  branchStories: [
+                    {
+                      story: `${newStory.story}_${newBranchStory.branchName}`,
+                      steps: [
+                        { checkpoint: `${newStory.story}_主線` },
+                        {
+                          slot_was_set: newBranchStory.slotValues.map(
+                            (item) => ({
+                              [item.slotName]: item.slotValue,
+                            }),
+                          ),
+                        },
+                        {
+                          action: newBranchStory.botRes.action,
+                          response: newBranchStory.botRes.response,
+                        },
+                      ],
+                    },
+                  ],
+                },
+              ]),
+            },
+          };
+        }
         return {
           ...state,
           newStory: {
@@ -561,7 +597,33 @@ const reducer = (state: CreateStoryState, action: Action): State => {
                 checkpoint: `${newStory.story}_主線`,
                 branchStories: [
                   {
-                    story: `支線_${newStory.story}_${newBranchStory.branchName}`,
+                    story: `${newStory.story}_${newBranchStory.branchName}`,
+                    steps: [
+                      { checkpoint: `${newStory.story}_主線` },
+                      {
+                        slot_was_set: newBranchStory.slotValues.map((item) => ({
+                          [item.slotName]: item.slotValue,
+                        })),
+                      },
+                    ],
+                  },
+                ],
+              },
+            ]),
+          },
+        };
+      }
+
+      if (newBranchStory.botRes) {
+        return {
+          ...state,
+          newStory: {
+            ...state.newStory,
+            steps: state.newStory.steps.map((step) => {
+              if (step.checkpoint) {
+                step.branchStories = step.branchStories.concat([
+                  {
+                    story: `${newStory.story}_${newBranchStory.branchName}`,
                     steps: [
                       { checkpoint: `${newStory.story}_主線` },
                       {
@@ -575,13 +637,13 @@ const reducer = (state: CreateStoryState, action: Action): State => {
                       },
                     ],
                   },
-                ],
-              },
-            ]),
+                ]);
+              }
+              return step;
+            }),
           },
         };
       }
-
       return {
         ...state,
         newStory: {
@@ -590,17 +652,13 @@ const reducer = (state: CreateStoryState, action: Action): State => {
             if (step.checkpoint) {
               step.branchStories = step.branchStories.concat([
                 {
-                  story: `支線_${newStory.story}_${newBranchStory.branchName}`,
+                  story: `${newStory.story}_${newBranchStory.branchName}`,
                   steps: [
                     { checkpoint: `${newStory.story}_主線` },
                     {
                       slot_was_set: newBranchStory.slotValues.map((item) => ({
                         [item.slotName]: item.slotValue,
                       })),
-                    },
-                    {
-                      action: newBranchStory.botRes.action,
-                      response: newBranchStory.botRes.response,
                     },
                   ],
                 },
@@ -613,6 +671,8 @@ const reducer = (state: CreateStoryState, action: Action): State => {
     }
     case 'CREATE_STORY_DELETE_BRANCH_STORY': {
       const { checkPointName, branchName } = action.payload;
+      console.log('checkPointName:', checkPointName);
+      console.log('branchName:', branchName);
       const { newStory } = state;
       let steps = newStory.steps.map((step) => {
         if (step.checkpoint && step.checkpoint === checkPointName) {
@@ -623,10 +683,266 @@ const reducer = (state: CreateStoryState, action: Action): State => {
         return step;
       });
 
+      console.log('before steps:', steps);
+
       // 篩選出不是checkPoint步驟或branchStories.length不為0的步驟
       steps = steps.filter((step) =>
         step.checkpoint ? step.branchStories.length > 0 : step,
       );
+
+      console.log('after steps:', steps);
+
+      return {
+        ...state,
+        newStory: {
+          ...state.newStory,
+          steps,
+        },
+      };
+    }
+    case 'CHECK_POINT_CONNECT_BRANCH_STORY': {
+      const { newStory, newBranchStory } = action.payload;
+      const { checkPointName } = state;
+
+      const isCheckPointExist = newStory.steps.some((step) => {
+        if (step.checkpoint) {
+          return step.branchStories.some((branchStory) => {
+            if (branchStory.story === checkPointName) {
+              return branchStory.steps.some(
+                (branchStep, idx) => idx !== 0 && branchStep.checkpoint,
+              );
+            }
+            return false;
+          });
+        }
+        return false;
+      });
+
+      if (!isCheckPointExist) {
+        if (newBranchStory.botRes) {
+          return {
+            ...state,
+            newStory: {
+              ...state.newStory,
+              steps: state.newStory.steps.map((step) => {
+                if (step.checkpoint) {
+                  step.branchStories = step.branchStories.map((branchStory) => {
+                    if (branchStory.story === checkPointName) {
+                      branchStory.steps = branchStory.steps.concat([
+                        {
+                          checkpoint: `${checkPointName}_主線`,
+                          branchStories: [
+                            {
+                              story: `${checkPointName}_${newBranchStory.branchName}`,
+                              steps: [
+                                { checkpoint: `${checkPointName}_主線` },
+                                {
+                                  slot_was_set: newBranchStory.slotValues.map(
+                                    (item) => ({
+                                      [item.slotName]: item.slotValue,
+                                    }),
+                                  ),
+                                },
+                                {
+                                  action: newBranchStory.botRes.action,
+                                  response: newBranchStory.botRes.response,
+                                },
+                              ],
+                            },
+                          ],
+                        },
+                      ]);
+                    }
+                    return branchStory;
+                  });
+                }
+                return step;
+              }),
+            },
+          };
+        }
+        return {
+          ...state,
+          newStory: {
+            ...state.newStory,
+            steps: state.newStory.steps.map((step) => {
+              if (step.checkpoint) {
+                step.branchStories = step.branchStories.map((branchStory) => {
+                  if (branchStory.story === checkPointName) {
+                    branchStory.steps = branchStory.steps.concat([
+                      {
+                        checkpoint: `${checkPointName}_主線`,
+                        branchStories: [
+                          {
+                            story: `${checkPointName}_${newBranchStory.branchName}`,
+                            steps: [
+                              { checkpoint: `${checkPointName}_主線` },
+                              {
+                                slot_was_set: newBranchStory.slotValues.map(
+                                  (item) => ({
+                                    [item.slotName]: item.slotValue,
+                                  }),
+                                ),
+                              },
+                            ],
+                          },
+                        ],
+                      },
+                    ]);
+                  }
+                  return branchStory;
+                });
+              }
+              return step;
+            }),
+          },
+        };
+      }
+
+      if (newBranchStory.botRes) {
+        return {
+          ...state,
+          newStory: {
+            ...state.newStory,
+            steps: state.newStory.steps.map((step) => {
+              if (step.checkpoint) {
+                step.branchStories = step.branchStories.map((branchStory) => {
+                  if (branchStory.story === checkPointName) {
+                    console.log('branchStory ===============>', branchStory);
+
+                    branchStory.steps.map((branchStep, idx) => {
+                      if (
+                        idx !== 0 &&
+                        branchStep.checkpoint &&
+                        branchStep.checkpoint.slice(
+                          0,
+                          branchStep.checkpoint.lastIndexOf('_'),
+                        ) === checkPointName
+                      ) {
+                        branchStep.branchStories =
+                          branchStep.branchStories.concat([
+                            {
+                              story: `${checkPointName}_${newBranchStory.branchName}`,
+                              steps: [
+                                { checkpoint: `${checkPointName}_主線` },
+                                {
+                                  slot_was_set: newBranchStory.slotValues.map(
+                                    (item) => ({
+                                      [item.slotName]: item.slotValue,
+                                    }),
+                                  ),
+                                },
+                                {
+                                  action: newBranchStory.botRes.action,
+                                  response: newBranchStory.botRes.response,
+                                },
+                              ],
+                            },
+                          ]);
+                      }
+                      return branchStep;
+                    });
+                  }
+                  return branchStory;
+                });
+              }
+              return step;
+            }),
+          },
+        };
+      }
+
+      return {
+        ...state,
+        newStory: {
+          ...state.newStory,
+          steps: state.newStory.steps.map((step) => {
+            if (step.checkpoint) {
+              step.branchStories = step.branchStories.map((branchStory) => {
+                if (branchStory.story === checkPointName) {
+                  branchStory.steps.map((branchStep) => {
+                    if (
+                      branchStep.checkpoint &&
+                      branchStep.checkpoint.slice(
+                        0,
+                        branchStep.checkpoint.lastIndexOf('_'),
+                      ) === checkPointName
+                    ) {
+                      branchStep.branchStories =
+                        branchStep.branchStories.concat([
+                          {
+                            story: `${checkPointName}_${newBranchStory.branchName}`,
+                            steps: [
+                              { checkpoint: `${checkPointName}_主線` },
+                              {
+                                slot_was_set: newBranchStory.slotValues.map(
+                                  (item) => ({
+                                    [item.slotName]: item.slotValue,
+                                  }),
+                                ),
+                              },
+                            ],
+                          },
+                        ]);
+                    }
+                    return branchStep;
+                  });
+                }
+                return branchStory;
+              });
+            }
+            return step;
+          }),
+        },
+      };
+    }
+    case 'CHECK_POINT_DELETE_CONNECT_BRANCH_STORY': {
+      const { checkPointName, branchName } = action.payload;
+      const { newStory } = state;
+
+      let steps = newStory.steps.map((step) => {
+        if (step.checkpoint) {
+          step.branchStories = step.branchStories.map((branchStory) => {
+            if (
+              branchStory.story ===
+              checkPointName.slice(0, checkPointName.lastIndexOf('_'))
+            ) {
+              branchStory.steps.map((branchStep) => {
+                if (
+                  branchStep.checkpoint &&
+                  branchStep.checkpoint === checkPointName
+                ) {
+                  branchStep.branchStories = branchStep.branchStories.filter(
+                    (item) => item.story !== branchName,
+                  );
+                }
+                return branchStep;
+              });
+            }
+            return branchStory;
+          });
+        }
+        return step;
+      });
+
+      steps = steps.map((step) => {
+        if (step.checkpoint) {
+          step.branchStories.map((branchStory) => {
+            if (
+              branchStory.story ===
+              checkPointName.slice(0, checkPointName.lastIndexOf('_'))
+            ) {
+              branchStory.steps = branchStory.steps.filter((branchStep, idx) =>
+                idx !== 0 && branchStep.checkpoint
+                  ? branchStep.branchStories.length > 0
+                  : branchStep,
+              );
+            }
+            return branchStory;
+          });
+        }
+        return step;
+      });
 
       return {
         ...state,
@@ -653,6 +969,18 @@ const useCreateStoryStore = create((set) => {
     // 初始化新故事
     onInitialNewStory() {
       set({ newStory: {} });
+    },
+    // 設定新增支線故事彈跳窗是在支線故事內點擊
+    onSetBranchStep() {
+      set({ currentStep: 'branchStory' });
+    },
+    // 設定新增支線故事彈跳窗是在正常流程點擊
+    onSetMainStep() {
+      set({ currentStep: 'main' });
+    },
+    // 設定目前的支線故事名稱
+    onSetCheckPointName(checkPointName: string) {
+      set({ checkPointName });
     },
     // 建立新故事
     onCreateNewStory(storyName: string) {
@@ -824,6 +1152,28 @@ const useCreateStoryStore = create((set) => {
     // 移除支線故事
     onDeleteBranchStory(checkPointName: string, branchName: string) {
       dispatch(actionCreateStoryDeleteBranchStory(checkPointName, branchName));
+    },
+    // 支線故事內串接支線故事
+    onConnectBranchStory(
+      newStory: StoryType,
+      newBranchStory: {
+        branchName: string,
+        slotValues: {
+          slotName: string,
+          slotValue: string,
+          id: string,
+          hasSlotValues: boolean,
+        }[],
+        botRes?: { action: string, response: string },
+      },
+    ) {
+      dispatch(actionCheckPointConnectBranchStory(newStory, newBranchStory));
+    },
+    // 刪除支線故事內串接的支線故事
+    onDeleteConnectBranchStory(checkPointName: string, branchName: string) {
+      dispatch(
+        actionCheckPointDeleteConnectBranchStory(checkPointName, branchName),
+      );
     },
   };
 });

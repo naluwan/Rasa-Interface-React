@@ -270,6 +270,26 @@ export type Action =
   | {
       type: 'CREATE_STORY_DELETE_BRANCH_STORY',
       payload: { checkPointName: string, branchName: string },
+    }
+  | {
+      type: 'CHECK_POINT_CONNECT_BRANCH_STORY',
+      payload: {
+        newStory: StoryType,
+        newBranchStory: {
+          branchName: string,
+          slotValues: {
+            slotName: string,
+            slotValue: string,
+            id: string,
+            hasSlotValues: boolean,
+          }[],
+          botRes?: { action: string, response: string },
+        },
+      },
+    }
+  | {
+      type: 'CHECK_POINT_DELETE_CONNECT_BRANCH_STORY',
+      payload: { checkPointName: string, branchName: string },
     };
 
 // ====================== query story ======================
@@ -642,7 +662,7 @@ export const actionCreateStoryCreateBranchStory = (newBranchStory: {
     id: string,
     hasSlotValues: boolean,
   }[],
-  botRes: { action: string, response: string },
+  botRes?: { action: string, response: string },
 }): Action => ({
   type: 'CREATE_STORY_CREATE_BRANCH_STORY',
   payload: newBranchStory,
@@ -653,5 +673,32 @@ export const actionCreateStoryDeleteBranchStory = (
   branchName: string,
 ): Action => ({
   type: 'CREATE_STORY_DELETE_BRANCH_STORY',
+  payload: { checkPointName, branchName },
+});
+
+// ====================== checkpoint ======================
+
+export const actionCheckPointConnectBranchStory = (
+  newStory: StoryType,
+  newBranchStory: {
+    branchName: string,
+    slotValues: {
+      slotName: string,
+      slotValue: string,
+      id: string,
+      hasSlotValues: boolean,
+    }[],
+    botRes?: { action: string, response: string },
+  },
+): Action => ({
+  type: 'CHECK_POINT_CONNECT_BRANCH_STORY',
+  payload: { newStory, newBranchStory },
+});
+
+export const actionCheckPointDeleteConnectBranchStory = (
+  checkPointName: string,
+  branchName: string,
+): Action => ({
+  type: 'CHECK_POINT_DELETE_CONNECT_BRANCH_STORY',
   payload: { checkPointName, branchName },
 });

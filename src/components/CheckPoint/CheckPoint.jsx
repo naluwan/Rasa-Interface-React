@@ -1,11 +1,15 @@
 import * as React from 'react';
 import cx from 'classnames';
 // import { RiCloseCircleFill } from 'react-icons/ri';
+import shallow from 'zustand/shallow';
+import uuid from 'react-uuid';
 import style from './CheckPoint.module.scss';
 import type { StoryType } from '../types';
 import NavTab from './NavTab';
 import BotStep from '../BotStep';
 import ShowSlots from './ShowSlots';
+import useCreateStoryStore from '../../store/useCreateStoryStore';
+import ConnectBranchStory from './ConnectBranchStory';
 
 type CheckPointProps = {
   branch: StoryType[],
@@ -14,24 +18,33 @@ type CheckPointProps = {
 
 const CheckPoint: React.FC<CheckPointProps> = (props) => {
   const { branch, onDeleteBranchStory } = props;
+  // console.log('inside CheckPoint branchStories:', branch);
   const [branchStory, setBranchStory] = React.useState({
-    story: branch[0].story,
-    steps: branch[0].steps,
+    story: '',
+    steps: [],
   });
-  console.log('branchStory first:', branchStory);
+  // console.log('branchStory first:', branchStory);
 
+  const { onSetBranchStep, onSetCheckPointName, onDeleteConnectBranchStory } =
+    useCreateStoryStore((state: State) => {
+      return {
+        onSetBranchStep: state.onSetBranchStep,
+        onSetCheckPointName: state.onSetCheckPointName,
+        onDeleteConnectBranchStory: state.onDeleteConnectBranchStory,
+      };
+    }, shallow);
   /* 
     當branch傳進來或內容發生改變時，永遠設定第一個為被選取的支線故事
     因更新資料時，畫面會閃爍，所以需要使用useLayoutEffect()來設定選取故事
     useEffect - 瀏覽器更新後才執行
     useLayoutEffect - 瀏覽器更新前執行，useLayoutEffect是同步處理，如果處理太多事情會卡住執行續
   */
-  React.useLayoutEffect(() => {
-    setBranchStory({
-      story: branch[0].story,
-      steps: branch[0].steps,
-    });
-  }, [setBranchStory, branch]);
+  // React.useLayoutEffect(() => {
+  //   setBranchStory({
+  //     story: branch[0].story,
+  //     steps: branch[0].steps,
+  //   });
+  // }, [setBranchStory, branch]);
 
   // 選取支線故事或刪除支線故事
   const atClickTab = React.useCallback(
@@ -41,7 +54,7 @@ const CheckPoint: React.FC<CheckPointProps> = (props) => {
       // 刪除支線故事
       if (target.id !== 'nav-home-tab') {
         const idx = storyName.lastIndexOf('_');
-        const checkPointName = `${storyName.slice(3, idx)}_主線`;
+        const checkPointName = `${storyName.slice(0, idx)}_主線`;
         // 刪除支線故事時，要將目前選取故事設為空
         setBranchStory({});
         return onDeleteBranchStory(checkPointName, storyName);
@@ -56,20 +69,28 @@ const CheckPoint: React.FC<CheckPointProps> = (props) => {
     [setBranchStory, onDeleteBranchStory, branch],
   );
 
+  const atClickCreateBranch = React.useCallback(
+    (checkPointName: string) => {
+      onSetBranchStep();
+      onSetCheckPointName(checkPointName);
+    },
+    [onSetBranchStep, onSetCheckPointName],
+  );
+
   return (
     <div className={style.root} id="checkPointStep">
       <nav>
         <div className="nav nav-tabs" id="nav-tab" role="tablist">
           {branch.map((item) => {
             const { story, steps } = item;
-            console.log('branchStory.story:', branchStory.story);
-            console.log('story:', story);
+            // console.log('branchStory.story:', branchStory.story);
+            // console.log('story:', story);
             return (
               <NavTab
-                key={item.story}
+                key={`${uuid()}-${item.story}`}
                 story={story}
                 steps={steps}
-                isActive={branchStory.story === story}
+                isActive={branchStory?.story === story}
                 onClickTab={atClickTab}
               />
             );
@@ -84,12 +105,20 @@ const CheckPoint: React.FC<CheckPointProps> = (props) => {
           aria-labelledby="nav-home-tab"
           tabIndex="-1"
         >
-          {branchStory.steps?.length &&
+          {branchStory?.steps?.length > 0 &&
             // eslint-disable-next-line array-callback-return, consistent-return
-            branchStory.steps.map((step) => {
-              if (step.slot_was_set) {
+            branchStory.steps.map((step, idx) => {
+              const {
                 // eslint-disable-next-line camelcase
-                const { slot_was_set } = step;
+                slot_was_set,
+                checkpoint,
+                branchStories,
+                action,
+                response,
+                buttons,
+              } = step;
+
+              if (step.slot_was_set) {
                 // eslint-disable-next-line camelcase
                 return slot_was_set.map((slot) => {
                   const slotKey = Object.keys(slot)[0];
@@ -97,20 +126,45 @@ const CheckPoint: React.FC<CheckPointProps> = (props) => {
                   return (
                     <ShowSlots
                       key={`${slotKey}-${slotValue}`}
-                      slotKey={slotKey}
-                      slotValue={slotValue}
+                      slotInfo={{ slotKey, slotValue }}
                     />
                   );
                 });
               }
 
               if (step.action) {
-                const { action, response, buttons } = step;
                 return (
                   <BotStep key={action} step={{ action, response, buttons }} />
                 );
               }
+
+              if (idx !== 0 && step.checkpoint && branchStories.length) {
+                return (
+                  <ConnectBranchStory
+                    key={`${uuid()}-${checkpoint}`}
+                    branch={branchStories}
+                    onDeleteConnectBranchStory={onDeleteConnectBranchStory}
+                  />
+                );
+              }
             })}
+          {branchStory?.steps?.length > 0 &&
+            branchStory.steps.every(
+              (step) => !step.action || step.checkpoint,
+            ) && (
+              <div className="d-flex justify-content-end mt-3">
+                <div className="col-6">
+                  <button
+                    className="btn btn-warning"
+                    data-bs-toggle="modal"
+                    data-bs-target="#createBranchStoryModal"
+                    onClick={() => atClickCreateBranch(branchStory.story)}
+                  >
+                    串接支線故事
+                  </button>
+                </div>
+              </div>
+            )}
         </div>
       </div>
     </div>

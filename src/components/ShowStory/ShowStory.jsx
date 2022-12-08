@@ -107,40 +107,7 @@ const ShowStory: React.FC<ShowStoryProps> = (props) => {
             );
           }
 
-          console.log('showStory step:', step);
-          return (
-            <CheckPoint
-              key={checkpoint}
-              branch={branchStories}
-              // onDeleteBranchStory={atDeleteBranchStory}
-            />
-          );
-          // return step.intent ? (
-          //   <UserStep
-          //     key={step.intent}
-          //     step={{ intent, user, entities, examples }}
-          //     storyName={story.story}
-          //     onCreateExample={onCreateExample}
-          //     onEditUserSay={onEditUserSay}
-          //     onEditIntent={onEditIntent}
-          //     onCreateEntities={onCreateEntities}
-          //     onDeleteEntities={onDeleteEntities}
-          //     onEditEntityShowValue={onEditEntityShowValue}
-          //     onEditEntity={onEditEntity}
-          //     onEditEntityValue={onEditEntityValue}
-          //     onDeleteExample={onDeleteExample}
-          //   />
-          // ) : (
-          //   <BotStep
-          //     key={step.action}
-          //     step={{ action, response, buttons }}
-          //     storyName={story.story}
-          //     onEditBotRes={onEditBotRes}
-          //     onEditResButtons={onEditResButtons}
-          //     onRemoveResButton={onRemoveResButton}
-          //     onAddResButtons={onAddResButtons}
-          //   />
-          // );
+          return <CheckPoint key={checkpoint} branch={branchStories} />;
         })}
         {/* <StepControl /> */}
       </div>
