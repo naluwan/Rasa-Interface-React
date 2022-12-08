@@ -1,3 +1,5 @@
+/* eslint-disable react/style-prop-object */
+/* eslint-disable no-plusplus */
 /* eslint-disable no-empty */
 /* eslint-disable no-alert */
 import * as React from 'react';
@@ -107,6 +109,7 @@ const Slider: React.FC<SliderProps> = (props) => {
     if (current !== slides[type].index) {
       current = type;
     }
+
     try {
       document.querySelector('[data-choose="current"] #player').stopVideo();
     } catch (error) {}
@@ -119,7 +122,6 @@ const Slider: React.FC<SliderProps> = (props) => {
           type * (100 / slides.length)
         }%);transition: all .3s;`,
       );
-    console.log(slides.length);
     document
       .querySelector(`#wrapperTransform [data-number="${Number(type)}"]`)
       .setAttribute('data-choose', 'current');
@@ -157,13 +159,12 @@ const Slider: React.FC<SliderProps> = (props) => {
             <Slide
               key={slide.index}
               current={0}
-              slide={slide}
+              slideObj={slide}
               onClick={() => handleSlideClick(slide.index)}
             />
           );
         })}
       </ul>
-
       <div className={cx(style.slider__controls)}>
         <SliderControl
           type="previous"

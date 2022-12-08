@@ -77,4 +77,15 @@
       width: 100%;
     }
   }
+
+  [data-videoblock="open"] {
+    opacity: 1;
+    transition: all .3;
+  }
+
+  [data-videoblock="none"] {
+    opacity: 0;
+    pointer-events: none;
+    transition: all .3;
+  }
 }

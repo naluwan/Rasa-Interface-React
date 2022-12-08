@@ -54,19 +54,18 @@
 .slider {
     --slide-size: 45vmin;
     --slide-width: 80vmin;
-     --slide-margin: 4vmin;
+    --slide-margin: 4vmin;
 
     height: var(--slide-size);
     margin: 0 auto;
     position: relative;
-    width: var(--slide-size);
+    width: var(--slide-width);
 }
 
 .slider__wrapper {
     --base-duration: 600ms;
     display: flex;
     margin: 0 calc(var(--slide-margin) * -1);
-    left: -45%;
     position: absolute;
     transition: transform var(--base-duration) cubic-bezier(0.25, 1, 0.35, 1);
 }
@@ -84,3 +83,4 @@
         opacity: 1
     }
 }
+
