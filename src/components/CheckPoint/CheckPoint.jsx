@@ -31,6 +31,7 @@ const CheckPoint: React.FC<CheckPointProps> = (props) => {
     onSetBranchStep,
     onSetCheckPointName,
     onDeleteConnectBranchStory,
+    onSetSelectedConnectBranchStory,
   } = useCreateStoryStore((state: State) => {
     return {
       selectedStory: state.selectedStory,
@@ -38,6 +39,7 @@ const CheckPoint: React.FC<CheckPointProps> = (props) => {
       onSetCheckPointName: state.onSetCheckPointName,
       onDeleteConnectBranchStory: state.onDeleteConnectBranchStory,
       onSetSelectedBranchStory: state.onSetSelectedBranchStory,
+      onSetSelectedConnectBranchStory: state.onSetSelectedConnectBranchStory,
     };
   }, shallow);
   /* 
@@ -80,12 +82,22 @@ const CheckPoint: React.FC<CheckPointProps> = (props) => {
       }
 
       // 選取故事
+      onSetSelectedConnectBranchStory({
+        story: '',
+        steps: [],
+      });
       const currentSelectedStory = branch.filter(
         (item) => item.story === storyName,
       )[0];
       return onSetSelectedBranchStory(currentSelectedStory);
     },
-    [onSetSelectedBranchStory, onDeleteBranchStory, branch, selectedStory],
+    [
+      onSetSelectedBranchStory,
+      onDeleteBranchStory,
+      branch,
+      selectedStory,
+      onSetSelectedConnectBranchStory,
+    ],
   );
 
   const atClickCreateBranch = React.useCallback(

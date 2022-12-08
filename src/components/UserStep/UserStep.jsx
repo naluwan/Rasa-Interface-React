@@ -141,15 +141,14 @@ const UserStep: React.FC<UserStepProps> = (props) => {
     };
   }, shallow);
 
-  const { currentStep, onConnectBranchStory } = useCreateStoryStore(
-    (state: State) => {
+  const { currentStep, checkPointName, onConnectBranchStory } =
+    useCreateStoryStore((state: State) => {
       return {
         currentStep: state.currentStep,
         onConnectBranchStory: state.onConnectBranchStory,
+        checkPointName: state.checkPointName,
       };
-    },
-    shallow,
-  );
+    }, shallow);
 
   /**
    * @type {[{branchName:string, slotValues:{slotName:string,slotValue:string,id:string,hasSlotValues: boolean}[],botRes?:{action:string,response:string}}, Function]}
@@ -690,6 +689,7 @@ const UserStep: React.FC<UserStepProps> = (props) => {
       },
       storiesData: StoryType[],
       newStoryData: StoryType,
+      currentCheckPointName: string,
     ) => {
       // 全部資料沒填，就關閉視窗
       if (
@@ -769,28 +769,31 @@ const UserStep: React.FC<UserStepProps> = (props) => {
       isRepeat = newStoryData.steps.some((newStoryStep) => {
         if (newStoryStep.checkpoint && newStoryStep.branchStories.length) {
           return newStoryStep.branchStories.some((branchStory) => {
-            return branchStory.steps.some((branchStep, idx) => {
-              if (idx === 2 && branchStep?.branchStories?.length) {
-                return branchStep.branchStories.some((connectStory) => {
-                  const curName = connectStory.story.slice(
-                    connectStory.story.lastIndexOf('_') + 1,
-                    connectStory.story.length,
-                  );
-                  if (curName === newBranchStoryInfo.branchName) {
-                    return true;
-                  }
-                  return false;
-                });
-              }
-              const curName = branchStory.story.slice(
-                branchStory.story.lastIndexOf('_') + 1,
-                branchStory.story.length,
-              );
-              if (curName === newBranchStoryInfo.branchName) {
-                return true;
-              }
-              return false;
-            });
+            if (branchStory.story === currentCheckPointName) {
+              return branchStory.steps.some((branchStep, idx) => {
+                if (idx === 2 && branchStep?.branchStories?.length) {
+                  return branchStep.branchStories.some((connectStory) => {
+                    const curName = connectStory.story.slice(
+                      connectStory.story.lastIndexOf('_') + 1,
+                      connectStory.story.length,
+                    );
+                    if (curName === newBranchStoryInfo.branchName) {
+                      return true;
+                    }
+                    return false;
+                  });
+                }
+                const curName = branchStory.story.slice(
+                  branchStory.story.lastIndexOf('_') + 1,
+                  branchStory.story.length,
+                );
+                if (curName === newBranchStoryInfo.branchName) {
+                  return true;
+                }
+                return false;
+              });
+            }
+            return false;
           });
         }
         return false;
@@ -1025,9 +1028,7 @@ const UserStep: React.FC<UserStepProps> = (props) => {
                         return (
                           <div
                             className="mb-3 p-2 border border-success rounded"
-                            key={`${entityItem.start}-${entityItem.start}-${
-                              entityItem.entity + entityItem.value
-                            }`}
+                            key={`${entityItem.start}-${entityItem.start}-${entityItem.entity} + ${entityItem.value}`}
                           >
                             <input
                               type="text"
@@ -1261,7 +1262,12 @@ const UserStep: React.FC<UserStepProps> = (props) => {
                   <button
                     className="btn btn-primary"
                     onClick={() =>
-                      atSubmitNewBranchStory(newBranchStory, stories, newStory)
+                      atSubmitNewBranchStory(
+                        newBranchStory,
+                        stories,
+                        newStory,
+                        checkPointName,
+                      )
                     }
                   >
                     儲存
