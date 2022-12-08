@@ -139,6 +139,53 @@ h3 {
             transition: all .3s;
         }
     }
+
+    .slide__image_wrapper {
+        width: 100%;
+        height: 100%;
+    }
+
+
+}
+
+[data-dis="none"] {
+
+
+    div:nth-of-type(2) {
+        position: absolute;
+        top: 0;
+        pointer-events: none;
+        opacity: 0;
+        width: 100%;
+        height: 100%;
+
+    }
+}
+
+[data-dis="open"] {
+
+    div:nth-of-type(1) {
+        top: 0;
+        opacity: 0;
+        pointer-events: none;
+        width: 100%;
+        height: 100%;
+
+    }
+
+    div:nth-of-type(2) {
+        position: absolute;
+        top: 0;
+        opacity: 1;
+        width: 100%;
+        height: 100%;
+
+    }
+
+    article {
+        opacity: 0;
+        pointer-events: none;
+    }
 }
 
 [data-choose="current"] {
@@ -149,12 +196,12 @@ h3 {
     opacity: 1;
     pointer-events: auto;
     user-select: auto;
-    transition: all .3s;
+
 
     @media (hover: hover) {
         &:hover .slide__image_wrapper {
             transform:
-                scale(1.025) translate(calc(var(--x) / var(--d) * 1px),
+                scale(1) translate(calc(var(--x) / var(--d) * 1px),
                     calc(var(--y) / var(--d) * 1px));
         }
     }
@@ -230,7 +277,8 @@ h3 {
     >*+* {
         margin-top: 2rem;
     }
-    button{
+
+    button {
         background: #000;
     }
 
@@ -250,4 +298,79 @@ h3 {
     to {
         opacity: 1
     }
+}
+
+.closeBlock {
+    position: absolute;
+    top: 0;
+    z-index: 99;
+    color: #ffffff;
+    right: -3rem;
+}
+
+.close {
+    position: relative;
+    width: 44px;
+    height: 44px;
+    display: block;
+    cursor: pointer;
+
+    &:before {
+        content: "";
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        background: #fff;
+        width: 48px;
+        display: block;
+        height: 5px;
+        transform: translate(-50%, -50%) rotate(45deg);
+        transition: all .3s;
+    }
+
+    &:after {
+        content: "";
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        background: #fff;
+        width: 48px;
+        display: block;
+        height: 5px;
+        transform: translate(-50%, -50%) rotate(-45deg);
+        transition: all .3s;
+
+
+    }
+
+    &:hover {
+        &:after {
+            content: "";
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            background: #fff;
+            width: 48px;
+            display: block;
+            height: 5px;
+            transform: translate(-50%, -50%) rotate(45deg);
+            transition: all .3s;
+
+
+        }
+
+        &:before {
+            content: "";
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            background: #fff;
+            width: 48px;
+            display: block;
+            height: 5px;
+            transform: translate(-50%, -50%) rotate(-45deg);
+            transition: all .3s;
+        }
+    }
+
 }
