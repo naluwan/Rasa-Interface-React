@@ -1187,48 +1187,51 @@ const UserStep: React.FC<UserStepProps> = (props) => {
                     />
                   </div>
 
-                  <div className="mb-3 col-12">
-                    <label htmlFor="botResRadio" className="form-label">
-                      選擇回覆方式
-                    </label>
-
+                  {currentStep === 'main' && (
                     <div className="mb-3 col-12">
-                      <div className="form-check form-check-inline">
-                        <input
-                          className="form-check-input"
-                          type="radio"
-                          name="resSelect"
-                          id="botResRadio"
-                          value="botRes"
-                          checked={resSelect === 'botRes'}
-                          onChange={(e) => atChangeNewBranchStory(e)}
-                        />
-                        <label
-                          className="form-check-label"
-                          htmlFor="botResRadio"
-                        >
-                          機器人回覆
-                        </label>
-                      </div>
-                      <div className="form-check form-check-inline">
-                        <input
-                          className="form-check-input"
-                          type="radio"
-                          name="resSelect"
-                          id="branchStoryRadio"
-                          value="branchStory"
-                          checked={resSelect === 'branchStory'}
-                          onChange={(e) => atChangeNewBranchStory(e)}
-                        />
-                        <label
-                          className="form-check-label"
-                          htmlFor="branchStoryRadio"
-                        >
-                          串接支線故事
-                        </label>
+                      <label htmlFor="botResRadio" className="form-label">
+                        選擇回覆方式
+                      </label>
+
+                      <div className="mb-3 col-12">
+                        <div className="form-check form-check-inline">
+                          <input
+                            className="form-check-input"
+                            type="radio"
+                            name="resSelect"
+                            id="botResRadio"
+                            value="botRes"
+                            checked={resSelect === 'botRes'}
+                            onChange={(e) => atChangeNewBranchStory(e)}
+                          />
+                          <label
+                            className="form-check-label"
+                            htmlFor="botResRadio"
+                          >
+                            機器人回覆
+                          </label>
+                        </div>
+                        <div className="form-check form-check-inline">
+                          <input
+                            className="form-check-input"
+                            type="radio"
+                            name="resSelect"
+                            id="branchStoryRadio"
+                            value="branchStory"
+                            checked={resSelect === 'branchStory'}
+                            onChange={(e) => atChangeNewBranchStory(e)}
+                          />
+                          <label
+                            className="form-check-label"
+                            htmlFor="branchStoryRadio"
+                          >
+                            串接支線故事
+                          </label>
+                        </div>
                       </div>
                     </div>
-                  </div>
+                  )}
+
                   {resSelect === 'botRes' && (
                     <div className="mb-3">
                       <label htmlFor="branchStoryName" className="form-label">
