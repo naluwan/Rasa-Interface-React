@@ -14,8 +14,11 @@ type SlideProps = {
 
 const Slide: React.FC<SlideProps> = (props) => {
   const { current, slideObj, onClick } = props;
+  const [x, setX] = React.useState(0);
+  const [y, setY] = React.useState(0);
+  const ref = React.useRef();
   // 播放影片
-  const playYoutube = () => {
+  const playYoutube = (e) => {
     const allopenView = document.querySelectorAll('[data-dis]');
     for (let i = 0; i < allopenView.length; i++) {
       allopenView[i].setAttribute('data-dis', 'none');
@@ -37,24 +40,19 @@ const Slide: React.FC<SlideProps> = (props) => {
         '*',
       );
     } catch (error) {}
+    e.stopPropagation();
   };
   // 屬標移動
   const handleMouseMove = (event) => {
-    const el = slideObj.current;
+    const el = ref.current;
     const r = el.getBoundingClientRect();
 
-    el.style.setProperty(
-      '--x',
-      event.clientX - (r.left + Math.floor(r.width / 2)),
-    );
-    el.style.setProperty(
-      '--y',
-      event.clientY - (r.top + Math.floor(r.height / 2)),
-    );
+    setX(event.clientX - (r.left + Math.floor(r.width / 2)));
+    setY(event.clientY - (r.top + Math.floor(r.height / 2)));
   };
   const handleMouseLeave = () => {
-    slideObj.current.style.setProperty('--x', 0);
-    slideObj.current.style.setProperty('--y', 0);
+    setX(0);
+    setY(0);
   };
 
   const imageLoaded = (event) => {
@@ -75,15 +73,18 @@ const Slide: React.FC<SlideProps> = (props) => {
   return (
     <li
       data-dis="none"
-      ref={slideObj}
+      ref={ref}
       data-number={index}
       data-choose={anyclass}
       className={cx(style.slide)}
       onMouseMove={() => handleMouseMove(event)}
       onMouseLeave={() => handleMouseLeave(event)}
-      onClick={onClick}
+      style={{
+        '--x': x,
+        '--y': y,
+      }}
     >
-      <div className={cx(style.slide__image_wrapper)}>
+      <div className={cx(style.slide__image_wrapper)} onClick={onClick}>
         <img
           className={cx(style.slide__image)}
           alt={headline}
@@ -106,7 +107,7 @@ const Slide: React.FC<SlideProps> = (props) => {
         <h2 className={cx(style.slide__headline)}>{headline}</h2>
         <button
           className={cx(style.slide__action, style.btn)}
-          onClick={() => playYoutube()}
+          onClick={() => playYoutube(event)}
         >
           播放
         </button>

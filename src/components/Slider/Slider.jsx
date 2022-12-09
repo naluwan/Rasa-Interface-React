@@ -1,3 +1,4 @@
+/* eslint-disable no-useless-escape */
 /* eslint-disable react/style-prop-object */
 /* eslint-disable no-plusplus */
 /* eslint-disable no-empty */
@@ -105,6 +106,10 @@ const Slider: React.FC<SliderProps> = (props) => {
 
   // 滑動點擊
   const handleSlideClick = (type) => {
+    const allopenView = document.querySelectorAll('[data-dis]');
+    for (let i = 0; i < allopenView.length; i++) {
+      allopenView[i].setAttribute('data-dis', 'none');
+    }
     let current = 0;
     if (current !== slides[type].index) {
       current = type;
@@ -113,6 +118,13 @@ const Slider: React.FC<SliderProps> = (props) => {
     try {
       document.querySelector('[data-choose="current"] #player').stopVideo();
     } catch (error) {}
+    const alliframe = document.querySelectorAll('[data-dis] .videoId');
+    for (let i = 0; i < alliframe.length; i++) {
+      alliframe[i].contentWindow.postMessage(
+        '{"event":"command", "func":"pauseVideo", "args":""}',
+        '*',
+      );
+    }
 
     document
       .querySelector('#wrapperTransform')
@@ -143,7 +155,8 @@ const Slider: React.FC<SliderProps> = (props) => {
   const wrapperTransform = {
     transform: `translateX(-${0 * (100 / slides.length)}%) transition: all .3s`,
   };
-  const headingId = `slider-heading__${heading
+  const headingId = `slider-heading__${heading}
+    // eslint-disable-next-line no-useless-escape
     .replace(/\s+/g, '-')
     .toLowerCase()}`;
 
