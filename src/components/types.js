@@ -198,6 +198,10 @@ export type State = {
 
 export type CreateStoryState = {
   newStory: StoryType,
+  currentStep: string,
+  checkPointName: string,
+  selectedBranchStory: StoryType,
+  selectedConnectBranchStory: StoryType,
   onInitialNewStory: () => void,
   // 建立新故事
   onCreateNewStory: (storyName: string) => void,
@@ -289,4 +293,31 @@ export type CreateStoryState = {
   }) => void,
   // 移除支線故事
   onDeleteBranchStory: (checkPointName: string, branchName: string) => void,
+  // 支線故事內串接支線故事
+  onConnectBranchStory: (
+    newStory: StoryType,
+    newBranchStory: {
+      branchName: string,
+      slotValues: {
+        slotName: string,
+        slotValue: string,
+        id: string,
+        hasSlotValues: boolean,
+      }[],
+      botRes?: { action: string, response: string },
+    },
+  ) => void,
+  // 刪除支線故事內串接的支線故事
+  onDeleteConnectBranchStory: (
+    checkPointName: string,
+    branchName: string,
+  ) => void,
+  // 編輯支線故事內的機器人回覆
+  onEditBranchStoryBotRes: (
+    oriBotRes: string,
+    botRes: string,
+    actionName: string,
+    storyName: string,
+    checkPointName: string,
+  ) => void,
 };

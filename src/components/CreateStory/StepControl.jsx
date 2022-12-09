@@ -9,6 +9,7 @@ import useCreateStoryStore from '../../store/useCreateStoryStore';
 
 type StepControlType = {
   isUser: boolean,
+  hasBranch: boolean,
   nlu: ExampleType[],
   stories: StoryType[],
   newStory: StoryType,
@@ -18,7 +19,7 @@ type StepControlType = {
 };
 
 const StepControl: React.FC<StepControlType> = (props) => {
-  const { isUser, nlu, steps, actions, onSetIsInputFocus } = props;
+  const { isUser, hasBranch, nlu, steps, actions, onSetIsInputFocus } = props;
   /**
    * @type {[string, Function]}
    */
@@ -106,7 +107,7 @@ const StepControl: React.FC<StepControlType> = (props) => {
           <button
             className="btn btn-primary"
             onClick={() => atBotStep(conversation)}
-            disabled={!isUser}
+            disabled={!isUser || hasBranch}
           >
             機器人
           </button>

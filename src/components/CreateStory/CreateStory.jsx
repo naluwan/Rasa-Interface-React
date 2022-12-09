@@ -72,15 +72,30 @@ const CreateStory: React.FC<CreateStoryProps> = (props) => {
    * @type {[boolean, Function]}
    */
   const [isUser, setIsUser] = React.useState(false);
+  // /**
+  //  * @type {[boolean, Function]}
+  //  */
+  const [hasBranch, setHasBranch] = React.useState(false);
 
   const [isInputFocus, setIsInputFocus] = React.useState(undefined);
 
   React.useEffect(() => {
     // 雙驚嘆號為判斷是否存在，只返回boolean
+    /*
+    判斷目前已新增的步驟是否為使用者步驟
+    true => 新增故事的使用者按鈕會變成『不可點擊狀態』；機器人和支線故事按鈕改為『可點擊狀態』
+    false => 新增故事的使用者按鈕會變成『可點擊狀態』；機器人和支線故事按鈕改為『不可點擊狀態』
+    */
     setIsUser(
       newStory.steps?.length
         ? !!newStory.steps[newStory.steps.length - 1].intent ||
             !!newStory.steps[newStory.steps.length - 1].checkpoint
+        : false,
+    );
+
+    setHasBranch(
+      newStory.steps?.length
+        ? !!newStory.steps[newStory.steps.length - 1].checkpoint
         : false,
     );
   }, [setIsUser, newStory]);
@@ -760,6 +775,7 @@ const CreateStory: React.FC<CreateStoryProps> = (props) => {
       </div>
       <StepControl
         isUser={isUser}
+        hasBranch={hasBranch}
         nlu={nlu}
         steps={newStory.steps}
         actions={actions}

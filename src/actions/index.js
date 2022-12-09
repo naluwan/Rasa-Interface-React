@@ -290,6 +290,16 @@ export type Action =
   | {
       type: 'CHECK_POINT_DELETE_CONNECT_BRANCH_STORY',
       payload: { checkPointName: string, branchName: string },
+    }
+  | {
+      type: 'CREATE_STORY_BRANCH_STORY_EDIT_BOT_RES',
+      payload: {
+        oriBotRes: string,
+        botRes: string,
+        actionName: string,
+        storyName: string,
+        checkPointName: string,
+      },
     };
 
 // ====================== query story ======================
@@ -701,4 +711,15 @@ export const actionCheckPointDeleteConnectBranchStory = (
 ): Action => ({
   type: 'CHECK_POINT_DELETE_CONNECT_BRANCH_STORY',
   payload: { checkPointName, branchName },
+});
+
+export const actionCreateStoryBranchStoryEditBotRes = (
+  oriBotRes: string,
+  botRes: string,
+  actionName: string,
+  storyName: string,
+  checkPointName: string,
+): Action => ({
+  type: 'CREATE_STORY_BRANCH_STORY_EDIT_BOT_RES',
+  payload: { oriBotRes, botRes, actionName, storyName, checkPointName },
 });

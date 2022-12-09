@@ -4,7 +4,7 @@ import cx from 'classnames';
 import shallow from 'zustand/shallow';
 import uuid from 'react-uuid';
 import style from './CheckPoint.module.scss';
-import type { StoryType } from '../types';
+import type { StoryType, CreateStoryState } from '../types';
 import NavTab from './NavTab';
 import BotStep from '../BotStep';
 import ShowSlots from './ShowSlots';
@@ -32,7 +32,8 @@ const CheckPoint: React.FC<CheckPointProps> = (props) => {
     onSetCheckPointName,
     onDeleteConnectBranchStory,
     onSetSelectedConnectBranchStory,
-  } = useCreateStoryStore((state: State) => {
+    onEditBranchStoryBotRes,
+  } = useCreateStoryStore((state: CreateStoryState) => {
     return {
       selectedStory: state.selectedStory,
       onSetBranchStep: state.onSetBranchStep,
@@ -40,6 +41,7 @@ const CheckPoint: React.FC<CheckPointProps> = (props) => {
       onDeleteConnectBranchStory: state.onDeleteConnectBranchStory,
       onSetSelectedBranchStory: state.onSetSelectedBranchStory,
       onSetSelectedConnectBranchStory: state.onSetSelectedConnectBranchStory,
+      onEditBranchStoryBotRes: state.onEditBranchStoryBotRes,
     };
   }, shallow);
   /* 
@@ -100,6 +102,7 @@ const CheckPoint: React.FC<CheckPointProps> = (props) => {
     ],
   );
 
+  // 點擊串接支線故事
   const atClickCreateBranch = React.useCallback(
     (checkPointName: string) => {
       onSetBranchStep();
@@ -107,6 +110,8 @@ const CheckPoint: React.FC<CheckPointProps> = (props) => {
     },
     [onSetBranchStep, onSetCheckPointName],
   );
+
+  // 編輯機器人回覆
 
   return (
     <div className={style.root} id="checkPointStep">
@@ -165,7 +170,12 @@ const CheckPoint: React.FC<CheckPointProps> = (props) => {
 
               if (step.action) {
                 return (
-                  <BotStep key={action} step={{ action, response, buttons }} />
+                  <BotStep
+                    key={action}
+                    step={{ action, response, buttons }}
+                    checkPointName={selectedStory.story}
+                    onEditBotRes={onEditBranchStoryBotRes}
+                  />
                 );
               }
 

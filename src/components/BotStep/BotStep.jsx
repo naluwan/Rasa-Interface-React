@@ -14,6 +14,7 @@ type BotStepProps = {
   storyName: string,
   isCreate: boolean,
   stories: StoryType[],
+  checkPointName: string,
   onEditBotRes: (
     oriBotRes: string,
     botRes: string,
@@ -46,6 +47,7 @@ const BotStep: React.FC<BotStepProps> = (props) => {
     step,
     storyName,
     stories,
+    checkPointName,
     onEditBotRes,
     onRemoveBotStep,
     onAddResButtons,
@@ -63,7 +65,12 @@ const BotStep: React.FC<BotStepProps> = (props) => {
 
   // 編輯機器人回覆
   const atEditBotResponse = React.useCallback(
-    (response: string, action: string, currentStoryName: string) => {
+    (
+      response: string,
+      action: string,
+      currentStoryName: string,
+      currentCheckPointName: string,
+    ) => {
       return swalInput(
         '編輯機器人回覆',
         'textarea',
@@ -72,7 +79,13 @@ const BotStep: React.FC<BotStepProps> = (props) => {
         true,
       ).then((data) => {
         if (!data || !data.new || response === data.new) return;
-        onEditBotRes(data.ori, data.new, action, currentStoryName);
+        onEditBotRes(
+          data.ori,
+          data.new,
+          action,
+          currentStoryName,
+          currentCheckPointName,
+        );
       });
     },
     [onEditBotRes],
@@ -152,7 +165,12 @@ const BotStep: React.FC<BotStepProps> = (props) => {
             type="button"
             className="btn btn-info mx-2"
             onClick={() =>
-              atEditBotResponse(step.response, step.action, storyName)
+              atEditBotResponse(
+                step.response,
+                step.action,
+                storyName,
+                checkPointName,
+              )
             }
           >
             編輯

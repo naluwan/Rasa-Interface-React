@@ -23,6 +23,7 @@ import {
   actionCreateStoryDeleteBranchStory,
   actionCheckPointConnectBranchStory,
   actionCheckPointDeleteConnectBranchStory,
+  actionCreateStoryBranchStoryEditBotRes,
 } from 'actions';
 import type {
   NluType,
@@ -961,6 +962,35 @@ const reducer = (state: CreateStoryState, action: Action): State => {
         },
       };
     }
+    case 'CREATE_STORY_BRANCH_STORY_EDIT_BOT_RES': {
+      const { oriBotRes, botRes, actionName, checkPointName } = action.payload;
+
+      return {
+        ...state,
+        newStory: {
+          ...state.newStory,
+          steps: state.newStory.steps.map((step) => {
+            if (step.checkpoint) {
+              step.branchStories = step.branchStories.map((branchStory) => {
+                if (branchStory.story === checkPointName) {
+                  branchStory.steps = branchStory.steps.map((branchStep) => {
+                    if (
+                      branchStep.action === actionName &&
+                      branchStep.response === oriBotRes
+                    ) {
+                      branchStep.response = botRes;
+                    }
+                    return branchStep;
+                  });
+                }
+                return branchStory;
+              });
+            }
+            return step;
+          }),
+        },
+      };
+    }
     default:
       return state;
   }
@@ -1190,6 +1220,24 @@ const useCreateStoryStore = create((set) => {
     onDeleteConnectBranchStory(checkPointName: string, branchName: string) {
       dispatch(
         actionCheckPointDeleteConnectBranchStory(checkPointName, branchName),
+      );
+    },
+    // 編輯支線故事內的機器人回覆
+    onEditBranchStoryBotRes(
+      oriBotRes: string,
+      botRes: string,
+      actionName: string,
+      storyName: string,
+      checkPointName: string,
+    ) {
+      dispatch(
+        actionCreateStoryBranchStoryEditBotRes(
+          oriBotRes,
+          botRes,
+          actionName,
+          storyName,
+          checkPointName,
+        ),
       );
     },
   };
