@@ -59,6 +59,17 @@ const Slide: React.FC<SlideProps> = (props) => {
     event.target.style.opacity = 1;
   };
   const closeView = () => {
+    const allopenView = document.querySelectorAll('[data-dis]');
+    for (let i = 0; i < allopenView.length; i++) {
+      allopenView[i].setAttribute('data-dis', 'none');
+    }
+    const alliframe = document.querySelectorAll('[data-dis] .videoId');
+    for (let i = 0; i < alliframe.length; i++) {
+      alliframe[i].contentWindow.postMessage(
+        '{"event":"command", "func":"pauseVideo", "args":""}',
+        '*',
+      );
+    }
     document
       .querySelector('[data-videoblock]')
       .setAttribute('data-videoblock', 'none');
