@@ -87,5 +87,8 @@
     opacity: 0;
     pointer-events: none;
     transition: all .3;
+    [data-dis="none"]{
+      display: none;
+    }
   }
 }
