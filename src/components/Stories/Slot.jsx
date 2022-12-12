@@ -76,7 +76,6 @@ const Slot: React.FC<SlotPropsType> = (props) => {
               </button>
             </li>
           )}
-
           <li>
             <button
               className="dropdown-item delete"

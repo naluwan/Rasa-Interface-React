@@ -821,7 +821,6 @@ const Stories = () => {
         <div>
           <div className={style.senderId}>
             <h4 className={style.searchTitle}>故事流程</h4>
-            <div>故事名稱：</div>
             <select
               id="stories"
               className={style.storiesSelector}
@@ -838,7 +837,7 @@ const Stories = () => {
                   </option>
                 ))}
             </select>
-            <div className={cx('btn', style.navbar)}>
+            <div className={cx(style.btn, style.navbar)}>
               <MyButton variant="third" onClick={atClickCreateStoryBtn}>
                 新增故事流程
               </MyButton>
@@ -853,7 +852,7 @@ const Stories = () => {
                 </MyButton>
               </div>
             )}
-            <div className={cx('btn', style.navbar)}>
+            <div className={cx(style.btn, style.navbar)}>
               {/* <MyButton variant="secondary">記錄槽</MyButton> */}
               <button
                 className="btn btn-secondary"

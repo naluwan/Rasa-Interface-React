@@ -1,15 +1,17 @@
 .userStepContainer {
-  border: 1px solid #fff;
+  border: 1px solid #B7B7B7;
   border-radius: 20px;
   padding: 1rem;
+  background: #ECECEC;
+
   .userTitle {
     padding: 10px;
     font-size: 20px;
     font-weight: 500;
-    color: #fff;
+    color: #000000;
   }
+
   .userText {
-    box-shadow: 0px 5px 9px 4px #44444445;
     border-radius: 10px;
     padding: 10px;
     max-width: 50%;
@@ -17,11 +19,13 @@
     background-color: cadetblue;
     color: #fff;
   }
+
   .entitiesContainer {
     display: flex;
     flex-direction: column;
     padding-top: 2px;
-    & > div:not(:nth-of-type(1)) + div:not(:nth-of-type(2)) {
+
+    &>div:not(:nth-of-type(1))+div:not(:nth-of-type(2)) {
       margin-top: 1rem;
     }
   }
@@ -35,6 +39,7 @@
 .addSlotValueSelect {
   font-size: 1.2rem;
   cursor: pointer;
+
   &:hover {
     font-size: 1.5rem;
   }
@@ -43,7 +48,15 @@
 .removeSlotValueIcon {
   font-size: 1.5rem;
   cursor: pointer;
+
   &:hover {
     color: red;
   }
+
+}
+
+.keywordBtn {
+  color: #fff!important;
+  background: #566def!important;
+  border: #566def !important;
 }

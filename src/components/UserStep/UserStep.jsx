@@ -853,7 +853,7 @@ const UserStep: React.FC<UserStepProps> = (props) => {
             </button>
             <button
               type="button"
-              className="btn btn-primary"
+              className={cx('btn', 'btn-primary')}
               data-bs-toggle="modal"
               data-bs-target={`#show-${step.intent}-examples`}
             >
@@ -862,7 +862,7 @@ const UserStep: React.FC<UserStepProps> = (props) => {
 
             <button
               type="button"
-              className="btn btn-outline-info mx-2"
+              className={cx('btn btn-outline-info mx-2', style.keywordBtn)}
               onClick={() =>
                 atCreateEntities(
                   step.user,
