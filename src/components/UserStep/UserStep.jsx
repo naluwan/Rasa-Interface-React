@@ -769,26 +769,26 @@ const UserStep: React.FC<UserStepProps> = (props) => {
       isRepeat = newStoryData.steps.some((newStoryStep) => {
         if (newStoryStep.checkpoint && newStoryStep.branchStories.length) {
           return newStoryStep.branchStories.some((branchStory) => {
+            const curBranchStoryName = branchStory.story.slice(
+              branchStory.story.lastIndexOf('_') + 1,
+              branchStory.story.length,
+            );
+            if (curBranchStoryName === newBranchStoryInfo.branchName) {
+              return true;
+            }
             if (branchStory.story === currentCheckPointName) {
               return branchStory.steps.some((branchStep, idx) => {
                 if (idx === 2 && branchStep?.branchStories?.length) {
                   return branchStep.branchStories.some((connectStory) => {
-                    const curName = connectStory.story.slice(
+                    const curConnectStoryName = connectStory.story.slice(
                       connectStory.story.lastIndexOf('_') + 1,
                       connectStory.story.length,
                     );
-                    if (curName === newBranchStoryInfo.branchName) {
+                    if (curConnectStoryName === newBranchStoryInfo.branchName) {
                       return true;
                     }
                     return false;
                   });
-                }
-                const curName = branchStory.story.slice(
-                  branchStory.story.lastIndexOf('_') + 1,
-                  branchStory.story.length,
-                );
-                if (curName === newBranchStoryInfo.branchName) {
-                  return true;
                 }
                 return false;
               });
