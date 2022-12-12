@@ -22,13 +22,19 @@ type ConnectBranchStoryProps = {
 const ConnectBranchStory: React.FC<ConnectBranchStoryProps> = (props) => {
   const { branch, domTarget, onDeleteConnectBranchStory } = props;
 
-  const { selectedConnectBranchStory, onSetSelectedConnectBranchStory } =
-    useCreateStoryStore((state: CreateStoryState) => {
-      return {
-        selectedConnectBranchStory: state.selectedConnectBranchStory,
-        onSetSelectedConnectBranchStory: state.onSetSelectedConnectBranchStory,
-      };
-    }, shallow);
+  const {
+    selectedBranchStory,
+    selectedConnectBranchStory,
+    onSetSelectedConnectBranchStory,
+    onEditConnectStoryBotRes,
+  } = useCreateStoryStore((state: CreateStoryState) => {
+    return {
+      selectedBranchStory: state.selectedBranchStory,
+      selectedConnectBranchStory: state.selectedConnectBranchStory,
+      onSetSelectedConnectBranchStory: state.onSetSelectedConnectBranchStory,
+      onEditConnectStoryBotRes: state.onEditConnectStoryBotRes,
+    };
+  }, shallow);
 
   /* 
     當branch傳進來或內容發生改變時，永遠設定第一個為被選取的支線故事
@@ -70,11 +76,10 @@ const ConnectBranchStory: React.FC<ConnectBranchStoryProps> = (props) => {
       }
 
       // 選取故事
-      const selectedStory = branch.filter(
+      const currentSelectedBranchStory = branch.filter(
         (item) => item.story === storyName,
       )[0];
-      console.log('selectedStory ===>', selectedStory);
-      return onSetSelectedConnectBranchStory(selectedStory);
+      return onSetSelectedConnectBranchStory(currentSelectedBranchStory);
     },
     [
       onSetSelectedConnectBranchStory,
@@ -139,7 +144,13 @@ const ConnectBranchStory: React.FC<ConnectBranchStoryProps> = (props) => {
               if (step.action) {
                 const { action, response, buttons } = step;
                 return (
-                  <BotStep key={action} step={{ action, response, buttons }} />
+                  <BotStep
+                    key={action}
+                    step={{ action, response, buttons }}
+                    checkPointName={selectedBranchStory.story}
+                    connectBranchStoryName={selectedConnectBranchStory.story}
+                    onEditBotRes={onEditConnectStoryBotRes}
+                  />
                 );
               }
             })}

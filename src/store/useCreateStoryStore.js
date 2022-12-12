@@ -24,6 +24,7 @@ import {
   actionCheckPointConnectBranchStory,
   actionCheckPointDeleteConnectBranchStory,
   actionCreateStoryBranchStoryEditBotRes,
+  actionCreateStoryConnectStoryEditBotRes,
 } from 'actions';
 import type {
   NluType,
@@ -991,6 +992,57 @@ const reducer = (state: CreateStoryState, action: Action): State => {
         },
       };
     }
+    case 'CREATE_STORY_CONNECT_STORY_EDIT_BOT_RES': {
+      const {
+        oriBotRes,
+        botRes,
+        actionName,
+        checkPointName,
+        connectStoryName,
+      } = action.payload;
+
+      return {
+        ...state,
+        newStory: {
+          ...state.newStory,
+          steps: state.newStory.steps.map((step) => {
+            if (step.checkpoint) {
+              step.branchStories = step.branchStories.map((branchStory) => {
+                if (branchStory.story === checkPointName) {
+                  branchStory.steps = branchStory.steps.map(
+                    (branchStep, idx) => {
+                      if (idx !== 0 && branchStep.checkpoint) {
+                        branchStep.branchStories = branchStep.branchStories.map(
+                          (connectStory) => {
+                            if (connectStory.story === connectStoryName) {
+                              connectStory.steps = connectStory.steps.map(
+                                (connectStep) => {
+                                  if (
+                                    connectStep.action === actionName &&
+                                    connectStep.response === oriBotRes
+                                  ) {
+                                    connectStep.response = botRes;
+                                  }
+                                  return connectStep;
+                                },
+                              );
+                            }
+                            return connectStory;
+                          },
+                        );
+                      }
+                      return branchStep;
+                    },
+                  );
+                }
+                return branchStory;
+              });
+            }
+            return step;
+          }),
+        },
+      };
+    }
     default:
       return state;
   }
@@ -1022,8 +1074,8 @@ const useCreateStoryStore = create((set) => {
       set({ checkPointName });
     },
     // 設定目前選擇的支線故事
-    onSetSelectedBranchStory(selectedStory: StoryType) {
-      set({ selectedStory });
+    onSetSelectedBranchStory(selectedBranchStory: StoryType) {
+      set({ selectedBranchStory });
     },
     // 設定目前支線故事內串接的支線故事
     onSetSelectedConnectBranchStory(selectedConnectBranchStory: StoryType) {
@@ -1237,6 +1289,26 @@ const useCreateStoryStore = create((set) => {
           actionName,
           storyName,
           checkPointName,
+        ),
+      );
+    },
+    // 編輯支線故事內串接支線故事的機器人回覆
+    onEditConnectStoryBotRes(
+      oriBotRes: string,
+      botRes: string,
+      actionName: string,
+      storyName: string,
+      checkPointName: String,
+      connectStoryName: string,
+    ) {
+      dispatch(
+        actionCreateStoryConnectStoryEditBotRes(
+          oriBotRes,
+          botRes,
+          actionName,
+          storyName,
+          checkPointName,
+          connectStoryName,
         ),
       );
     },

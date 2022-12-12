@@ -26,7 +26,7 @@ const CheckPoint: React.FC<CheckPointProps> = (props) => {
   // console.log('branchStory first:', branchStory);
 
   const {
-    selectedStory,
+    selectedBranchStory,
     onSetSelectedBranchStory,
     onSetBranchStep,
     onSetCheckPointName,
@@ -35,7 +35,7 @@ const CheckPoint: React.FC<CheckPointProps> = (props) => {
     onEditBranchStoryBotRes,
   } = useCreateStoryStore((state: CreateStoryState) => {
     return {
-      selectedStory: state.selectedStory,
+      selectedBranchStory: state.selectedBranchStory,
       onSetBranchStep: state.onSetBranchStep,
       onSetCheckPointName: state.onSetCheckPointName,
       onDeleteConnectBranchStory: state.onDeleteConnectBranchStory,
@@ -67,7 +67,7 @@ const CheckPoint: React.FC<CheckPointProps> = (props) => {
         const idx = storyName.lastIndexOf('_');
         const checkPointName = `${storyName.slice(0, idx)}_主線`;
 
-        if (storyName === selectedStory.story) {
+        if (storyName === selectedBranchStory.story) {
           if (branch.length > 1) {
             const allBranchName = branch.map((item) => item.story);
             const deleteStoryIdx = allBranchName.indexOf(storyName);
@@ -97,7 +97,7 @@ const CheckPoint: React.FC<CheckPointProps> = (props) => {
       onSetSelectedBranchStory,
       onDeleteBranchStory,
       branch,
-      selectedStory,
+      selectedBranchStory,
       onSetSelectedConnectBranchStory,
     ],
   );
@@ -110,8 +110,6 @@ const CheckPoint: React.FC<CheckPointProps> = (props) => {
     },
     [onSetBranchStep, onSetCheckPointName],
   );
-
-  // 編輯機器人回覆
 
   return (
     <div className={style.root} id="checkPointStep">
@@ -126,7 +124,7 @@ const CheckPoint: React.FC<CheckPointProps> = (props) => {
                 key={`${uuid()}-${item.story}`}
                 story={story}
                 steps={steps}
-                isActive={selectedStory?.story === story}
+                isActive={selectedBranchStory?.story === story}
                 onClickTab={atClickTab}
               />
             );
@@ -141,9 +139,9 @@ const CheckPoint: React.FC<CheckPointProps> = (props) => {
           aria-labelledby="nav-home-tab"
           tabIndex="-1"
         >
-          {selectedStory?.steps?.length > 0 &&
+          {selectedBranchStory?.steps?.length > 0 &&
             // eslint-disable-next-line array-callback-return, consistent-return
-            selectedStory.steps.map((step, idx) => {
+            selectedBranchStory.steps.map((step, idx) => {
               const {
                 // eslint-disable-next-line camelcase
                 slot_was_set,
@@ -173,7 +171,7 @@ const CheckPoint: React.FC<CheckPointProps> = (props) => {
                   <BotStep
                     key={action}
                     step={{ action, response, buttons }}
-                    checkPointName={selectedStory.story}
+                    checkPointName={selectedBranchStory.story}
                     onEditBotRes={onEditBranchStoryBotRes}
                   />
                 );
@@ -189,8 +187,8 @@ const CheckPoint: React.FC<CheckPointProps> = (props) => {
                 );
               }
             })}
-          {selectedStory?.steps?.length > 0 &&
-            selectedStory.steps.every(
+          {selectedBranchStory?.steps?.length > 0 &&
+            selectedBranchStory.steps.every(
               (step) => !step.action || step.checkpoint,
             ) && (
               <div className="d-flex justify-content-end mt-3">
@@ -199,7 +197,9 @@ const CheckPoint: React.FC<CheckPointProps> = (props) => {
                     className="btn btn-warning"
                     data-bs-toggle="modal"
                     data-bs-target="#createBranchStoryModal"
-                    onClick={() => atClickCreateBranch(selectedStory.story)}
+                    onClick={() =>
+                      atClickCreateBranch(selectedBranchStory.story)
+                    }
                   >
                     串接支線故事
                   </button>

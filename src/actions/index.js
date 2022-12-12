@@ -300,6 +300,17 @@ export type Action =
         storyName: string,
         checkPointName: string,
       },
+    }
+  | {
+      type: 'CREATE_STORY_CONNECT_STORY_EDIT_BOT_RES',
+      payload: {
+        oriBotRes: string,
+        botRes: string,
+        actionName: string,
+        storyName: string,
+        checkPointName: String,
+        connectStoryName: string,
+      },
     };
 
 // ====================== query story ======================
@@ -722,4 +733,23 @@ export const actionCreateStoryBranchStoryEditBotRes = (
 ): Action => ({
   type: 'CREATE_STORY_BRANCH_STORY_EDIT_BOT_RES',
   payload: { oriBotRes, botRes, actionName, storyName, checkPointName },
+});
+
+export const actionCreateStoryConnectStoryEditBotRes = (
+  oriBotRes: string,
+  botRes: string,
+  actionName: string,
+  storyName: string,
+  checkPointName: String,
+  connectStoryName: string,
+): Action => ({
+  type: 'CREATE_STORY_CONNECT_STORY_EDIT_BOT_RES',
+  payload: {
+    oriBotRes,
+    botRes,
+    actionName,
+    storyName,
+    checkPointName,
+    connectStoryName,
+  },
 });

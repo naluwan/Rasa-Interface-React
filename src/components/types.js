@@ -202,7 +202,20 @@ export type CreateStoryState = {
   checkPointName: string,
   selectedBranchStory: StoryType,
   selectedConnectBranchStory: StoryType,
+  // 初始化新故事
   onInitialNewStory: () => void,
+  // 設定新增支線故事彈跳窗是在支線故事內點擊
+  onSetBranchStep: () => void,
+  // 設定新增支線故事彈跳窗是在正常流程點擊
+  onSetMainStep: () => void,
+  // 設定目前的支線故事名稱
+  onSetCheckPointName: (checkPointName: string) => void,
+  // 設定目前選擇的支線故事
+  onSetSelectedBranchStory: (selectedBranchStory: StoryType) => void,
+  // 設定目前支線故事內串接的支線故事
+  onSetSelectedConnectBranchStory: (
+    selectedConnectBranchStory: StoryType,
+  ) => void,
   // 建立新故事
   onCreateNewStory: (storyName: string) => void,
   // 新增使用者步驟
@@ -319,5 +332,14 @@ export type CreateStoryState = {
     actionName: string,
     storyName: string,
     checkPointName: string,
+  ) => void,
+  // 編輯支線故事內串接支線故事的機器人回覆
+  onEditConnectStoryBotRes: (
+    oriBotRes: string,
+    botRes: string,
+    actionName: string,
+    storyName: string,
+    checkPointName: String,
+    connectStoryName: string,
   ) => void,
 };

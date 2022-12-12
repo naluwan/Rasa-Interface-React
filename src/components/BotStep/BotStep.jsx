@@ -15,11 +15,14 @@ type BotStepProps = {
   isCreate: boolean,
   stories: StoryType[],
   checkPointName: string,
+  connectBranchStoryName: string,
   onEditBotRes: (
     oriBotRes: string,
     botRes: string,
     action: string,
     storyName?: string,
+    checkPointName?: string,
+    connectStoryName?: string,
   ) => void,
   onRemoveBotStep: (action: string) => void,
   onAddResButtons: (
@@ -48,6 +51,7 @@ const BotStep: React.FC<BotStepProps> = (props) => {
     storyName,
     stories,
     checkPointName,
+    connectBranchStoryName,
     onEditBotRes,
     onRemoveBotStep,
     onAddResButtons,
@@ -70,6 +74,7 @@ const BotStep: React.FC<BotStepProps> = (props) => {
       action: string,
       currentStoryName: string,
       currentCheckPointName: string,
+      currentConnectBranchStoryName: string,
     ) => {
       return swalInput(
         '編輯機器人回覆',
@@ -85,6 +90,7 @@ const BotStep: React.FC<BotStepProps> = (props) => {
           action,
           currentStoryName,
           currentCheckPointName,
+          currentConnectBranchStoryName,
         );
       });
     },
@@ -170,6 +176,7 @@ const BotStep: React.FC<BotStepProps> = (props) => {
                 step.action,
                 storyName,
                 checkPointName,
+                connectBranchStoryName,
               )
             }
           >
