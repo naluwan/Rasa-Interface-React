@@ -2,7 +2,7 @@
   border-radius: 20px;
   padding: 1rem;
   border: 1px solid #B7B7B7;
-  background: #ECECEC;
+  background: #fff;
 
   .botTitle {
     padding: 10px;
@@ -14,7 +14,8 @@
   }
 
   .botResponse {
-    box-shadow: 0px 5px 9px 4px #44444445;
+
+    background: #ECECEC;
     border-radius: 10px;
     padding: 10px;
     width: 100%;
@@ -25,3 +26,70 @@
     outline: none;
   }
 }
+    .info {
+      border: 1px solid #B7B7B7;
+      border-radius: 20px;
+      padding: 1rem;
+      background: #fff;
+    }
+  
+    //editBtn
+    .editBtn {
+      background: #fff !important;
+      color: #000 !important;
+      border: 1px solid #B7B7B7 !important;
+      display: inline-flex !important;
+      flex-direction: row;
+      align-items: center;
+  
+      &:hover {
+        background: #E14D2A !important;
+        color: #fff !important;
+        fill: #fff !important;
+        border: 1px solid #E14D2A !important;
+  
+        svg {
+          path {
+            fill: #fff;
+          }
+        }
+  
+  
+      }
+  
+      svg {
+        width: 20px;
+        height: 20px;
+        display: inherit;
+        margin: 0 10px 0 0;
+      }
+    }
+  
+    //addBtn
+    .addBtn {
+      background-color: #fff !important;
+      color: #000 !important;
+      border: 1px solid #B7B7B7 !important;
+      display: inline-flex !important;
+      flex-direction: row;
+      align-items: center;
+  
+      &:hover {
+        background: #FD841F !important;
+        color: #fff !important;
+        border: 1px solid #FD841F !important;
+  
+        svg {
+          path {
+            fill: #fff;
+          }
+        }
+      }
+  
+      svg {
+        width: 20px;
+        height: 20px;
+        display: inherit;
+        margin: 0 10px 0 0;
+      }
+    }

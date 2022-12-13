@@ -863,7 +863,7 @@ const Stories = () => {
             <div className={cx(style.btn, style.navbar)}>
               {/* <MyButton variant="secondary">記錄槽</MyButton> */}
               <button
-                className="btn btn-secondary"
+                className={cx('btn btn-secondary', style.recordBtn)}
                 type="button"
                 data-bs-toggle="offcanvas"
                 data-bs-target="#showSlotsOffcanvas"
@@ -881,7 +881,10 @@ const Stories = () => {
                 aria-labelledby="showSlotsOffcanvasLabel"
               >
                 <div className="offcanvas-header">
-                  <h5 className="offcanvas-title" id="showSlotsOffcanvasLabel">
+                  <h5
+                    className={cx('offcanvas-title')}
+                    id="showSlotsOffcanvasLabel"
+                  >
                     記錄槽
                   </h5>
                   <button
@@ -895,13 +898,18 @@ const Stories = () => {
               </div>
             </div>
             <div className={cx(style.searchBar)}>
-              <input type="text" placeholder="搜尋故事流程" />
+              <input
+                type="text"
+                className="form-control"
+                placeholder="搜尋故事流程"
+              />
             </div>
             <ul className={cx(style.listmenu)}>
               {storiesOptions &&
                 storiesOptions.map((item) => (
                   <li>
                     <button
+                      className={cx(style.listBtn)}
                       data-check="none"
                       key={item.story}
                       value={item.story}

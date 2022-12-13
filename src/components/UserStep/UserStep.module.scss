@@ -2,7 +2,7 @@
   border: 1px solid #B7B7B7;
   border-radius: 20px;
   padding: 1rem;
-  background: #ECECEC;
+  background: #fff;
 
   .userTitle {
     padding: 10px;
@@ -16,7 +16,7 @@
     padding: 10px;
     max-width: 50%;
     width: fit-content;
-    background-color: cadetblue;
+    background-color: rgb(95, 121, 160);
     color: #fff;
   }
 
@@ -55,8 +55,125 @@
 
 }
 
-.keywordBtn {
-  color: #fff!important;
-  background: #566def!important;
-  border: #566def !important;
+
+
+//editBtn
+.editBtn {
+  background: #fff !important;
+  color: #000 !important;
+  border: 1px solid #B7B7B7 !important;
+  display: inline-flex!important;
+  flex-direction: row;
+  align-items: center;
+
+  &:hover {
+    background: #E14D2A !important;
+    color: #fff !important;
+    fill: #fff !important;
+    border: 1px solid #E14D2A !important;
+
+    svg {
+      path {
+        fill: #fff;
+      }
+    }
+
+
+  }
+
+  svg {
+    width: 20px;
+    height: 20px;
+    display: inherit;
+    margin: 0 10px 0 0;
+  }
+}
+
+
+
+//intentionBtn
+.intentionBtn {
+  background-color: #fff !important;
+  color: #000 !important;
+  border: 1px solid #B7B7B7 !important;
+  display: inline-flex!important;
+  flex-direction: row;
+  align-items: center;
+
+  &:hover {
+    background: #FD841F !important;
+    color: #fff !important;
+    border: 1px solid #FD841F !important;
+
+    svg {
+      path {
+        fill: #fff;
+      }
+    }
+  }
+
+  svg {
+    width: 20px;
+    height: 20px;
+    display: inherit;
+    margin: 0 10px 0 0;
+  }
+}
+
+//exampleBtn
+.exampleBtn {
+  background-color: #fff !important;
+  color: #000 !important;
+  border: 1px solid #B7B7B7 !important;
+  display: inline-flex!important;
+  flex-direction: row;
+  align-items: center;
+
+  &:hover {
+    background: #3E6D9C !important;
+    color: #fff !important;
+    border: 1px solid #3E6D9C !important;
+
+    svg {
+      path {
+        fill: #fff;
+      }
+    }
+  }
+
+  svg {
+    width: 20px;
+    height: 20px;
+    display: inherit;
+    margin: 0 10px 0 0;
+  }
+}
+
+//keyWordBtn
+.keyWordBtn {
+  background-color: #fff !important;
+  color: #000 !important;
+  border: 1px solid #B7B7B7 !important;
+  display: inline-flex!important;
+  flex-direction: row;
+  align-items: center;
+
+  &:hover {
+    background: #001253 !important;
+    color: #fff !important;
+    border: 1px solid #001253 !important;
+
+    svg {
+      path {
+        fill: #fff;
+      }
+    }
+  }
+
+  svg {
+    width: 20px;
+    height: 20px;
+    display: inherit;
+    margin: 0 10px 0 0;
+  }
 }

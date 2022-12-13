@@ -1,7 +1,7 @@
 import * as React from 'react';
+import cx from 'classnames';
 import style from './Entities.module.scss';
 // import { Toast } from '../../utils/swalInput';
-
 type EntitiesProps = {
   entity: string,
   entityValue: string,
@@ -215,13 +215,14 @@ const Entities: React.FC<EntitiesProps> = (props) => {
 
   return (
     <div className={style.root}>
-      <div className={style.info}>
+      <div className={cx('col-sm-12 col-lg-6', style.info)}>
         <div className="py-2">
           <label htmlFor="entityShowValue" className={style.label}>
             關鍵字：
           </label>
           {showValue ? (
             <input
+              className={cx(style.formControl)}
               type="text"
               id="entityShowValue"
               name="entityShowValue"
@@ -249,7 +250,7 @@ const Entities: React.FC<EntitiesProps> = (props) => {
             />
           ) : (
             <button
-              className="btn btn-outline-warning"
+              className={cx('btn', style.keyWordBtn)}
               id="entityShowValue"
               onClick={atShowClick}
             >
@@ -263,6 +264,7 @@ const Entities: React.FC<EntitiesProps> = (props) => {
           </label>
           {showCurValue ? (
             <input
+              className={cx(style.formControl)}
               type="text"
               id="entityValue"
               name="entityValue"
@@ -288,7 +290,7 @@ const Entities: React.FC<EntitiesProps> = (props) => {
             />
           ) : (
             <button
-              className="btn btn-outline-warning"
+              className={cx('btn', style.saveBtn)}
               id="entityValue"
               onClick={atShowClick}
             >
@@ -302,6 +304,7 @@ const Entities: React.FC<EntitiesProps> = (props) => {
           </label>
           {showEntity ? (
             <input
+              className={cx(style.formControl)}
               type="text"
               id="entity"
               name="entity"
@@ -317,7 +320,7 @@ const Entities: React.FC<EntitiesProps> = (props) => {
             />
           ) : (
             <button
-              className="btn btn-outline-primary"
+              className={cx('btn', style.recordBtn)}
               id="entity"
               onClick={atShowClick}
             >

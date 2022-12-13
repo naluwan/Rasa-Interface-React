@@ -1,8 +1,6 @@
 .title {
   font-size: 20px;
   color: rgb(0, 0, 0);
-  display: flex;
-  flex-direction: row;
 }
 
 .inputFocus {
@@ -10,10 +8,14 @@
   animation: animate 1s linear infinite;
 }
 .alertBlock{
+ 
   position: absolute;
   bottom: 0;
   left: 0;
-  display: block;
+  text-align: left;
+  display: block!important;
+  width: 100%;
+  box-sizing: border-box;
   word-break: keep-all;
 
 }

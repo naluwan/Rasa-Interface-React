@@ -182,7 +182,7 @@ const BotStep: React.FC<BotStepProps> = (props) => {
         <div className="py-2">
           <button
             type="button"
-            className="btn btn-info mx-2"
+            className={cx('btn mx-2', style.editBtn)}
             onClick={() =>
               atEditBotResponse(
                 step.response,
@@ -193,15 +193,39 @@ const BotStep: React.FC<BotStepProps> = (props) => {
               )
             }
           >
+            <svg
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M5 19H6.4L15.025 10.375L13.625 8.975L5 17.6V19ZM19.3 8.925L15.05 4.725L16.45 3.325C16.8333 2.94167 17.3043 2.75 17.863 2.75C18.421 2.75 18.8917 2.94167 19.275 3.325L20.675 4.725C21.0583 5.10833 21.2583 5.571 21.275 6.113C21.2917 6.65433 21.1083 7.11667 20.725 7.5L19.3 8.925ZM17.85 10.4L7.25 21H3V16.75L13.6 6.15L17.85 10.4ZM14.325 9.675L13.625 8.975L15.025 10.375L14.325 9.675Z"
+                fill="black"
+              />
+            </svg>
             編輯
           </button>
           <button
             type="button"
-            className="btn btn-primary mx-2"
+            className={cx('btn mx-2', style.addBtn)}
             onClick={() =>
               atAddResButtons(step.action, storyName, checkPointName)
             }
           >
+            <svg
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M11 19V13H5V11H11V5H13V11H19V13H13V19H11Z"
+                fill="black"
+              />
+            </svg>
             增加選項
           </button>
           {isCreate && (

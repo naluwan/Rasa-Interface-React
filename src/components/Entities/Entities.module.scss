@@ -3,8 +3,67 @@
   display: flex;
   justify-content: space-between;
   border: 1px solid #aaa;
-  border-radius: 5px;
+  border-radius: 20px;
+  background: #f4f4f5;
+
   .label {
     color: rgb(0, 0, 0);
   }
+
+  .keyWordBtn {
+    background-color: #fff !important;
+    color: #000 !important;
+    border: 1px solid #B7B7B7 !important;
+    display: inline-flex !important;
+    flex-direction: row;
+    align-items: center;
+
+    &:hover {
+      background: #001253 !important;
+      color: #fff !important;
+      border: 1px solid #001253 !important;
+
+
+    }
+
+  }
+
+  .saveBtn {
+    background-color: #fff !important;
+    color: #000 !important;
+    border: 1px solid #B7B7B7 !important;
+    display: inline-flex !important;
+    flex-direction: row;
+    align-items: center;
+
+    &:hover {
+      background: #fab51f !important;
+      color: rgb(26, 25, 25) !important;
+      border: 1px solid #fab51f !important;
+    }
+  }
+
+  .recordBtn {
+    background-color: #fff !important;
+    color: rgb(0, 0, 0) !important;
+    border: 1px solid #B7B7B7 !important;
+    display: inline-flex !important;
+    flex-direction: row;
+    align-items: center;
+
+    &:hover {
+      background: #276d16 !important;
+      color: #fff !important;
+      border: 1px solid #276d16 !important;
+    }
+  }
+
+  .formControl {
+    border-radius: 5px;
+    padding: 5px 10px;
+    margin: 0;
+    border: 1px solid rgb(185, 185, 185);
+  }
+
+
 }

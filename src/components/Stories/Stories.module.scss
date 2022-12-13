@@ -4,12 +4,16 @@
   align-items: center;
   background: #fff;
   width: 300px;
-  border-right: 1px solid rgb(65 62 236);
+  // border-right: 1px solid rgb(65 62 236);
+}
+
+.recordBtn {
+  width: 100%;
+  display: block;
 }
 
 .searchTitle {
   font-weight: 900;
-  margin: 0 40px 0 0;
 }
 
 .senderId {
@@ -26,7 +30,7 @@
     margin: 10px 0 0 0;
   }
 
-  button {
+  .listBtn {
     display: block;
     width: 100%;
   }
@@ -47,12 +51,15 @@
 .center {
   margin: 0 auto;
 }
-.searchBar{
+
+.searchBar {
   display: block;
-  input{
-  width: 100%;
+
+  input {
+    width: 100%;
   }
 }
+
 .listmenu {
   height: calc(100% - 127px);
   overflow: auto;
@@ -61,11 +68,12 @@
   margin-top: 0;
   width: 247px;
   padding-right: 12px;
-   button{
-      background: #fff;
-      border: none;
-      margin: 15px 0;
-      text-align: left;
-      border-bottom: 1px solid #000;
+
+  button {
+    background: #fff;
+    border: none;
+    margin: 15px 0;
+    text-align: left;
+    border-bottom: 1px solid #000;
   }
 }
