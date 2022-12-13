@@ -10,7 +10,13 @@ type StepAlertType = {
 const StepAlert: React.FC<StepAlertType> = (props) => {
   const { stepRole } = props;
   return (
-    <div className={cx('row', stepRole !== 'user' && 'justify-content-end')}>
+    <div
+      className={cx(
+        'row',
+        style.alertBlock,
+        stepRole !== 'user' && 'justify-content-end',
+      )}
+    >
       <div className={cx('col-6', style.title)}>
         {stepRole === 'user' ? '使用者輸入中' : '機器人輸入中'}
         <HiDotsHorizontal className={cx(style.inputFocus)} />

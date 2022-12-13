@@ -81,7 +81,7 @@ const StepControl: React.FC<StepControlType> = (props) => {
   );
 
   return (
-    <div className="d-flex px-3 justify-content-start">
+    <div className={cx('d-flex px-3 justify-content-start', style.stepBlock)}>
       <textarea
         className={cx('col-9', style.stepTextarea)}
         type="text"
