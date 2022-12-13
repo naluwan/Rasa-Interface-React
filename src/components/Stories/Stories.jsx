@@ -23,7 +23,8 @@ const Stories = () => {
   /**
    * @type {[string, Function]}
    */
-  const [defaultValue, setDefaultValue] = React.useState('');
+  const [setDefaultValue] = React.useState('');
+  // const [defaultValue, setDefaultValue] = React.useState('');
   // /**
   //  * @type {[StoryType, Function]}
   //  */
@@ -821,7 +822,7 @@ const Stories = () => {
         <div>
           <div className={style.senderId}>
             <h4 className={style.searchTitle}>故事流程</h4>
-            <select
+            {/* <select
               id="stories"
               className={style.storiesSelector}
               onChange={(e) => atSelectStory(e.target.value)}
@@ -836,7 +837,7 @@ const Stories = () => {
                     {item.story}
                   </option>
                 ))}
-            </select>
+            </select> */}
             <div className={cx(style.btn, style.navbar)}>
               <MyButton variant="third" onClick={atClickCreateStoryBtn}>
                 新增故事流程
@@ -886,6 +887,24 @@ const Stories = () => {
                 <Slots slots={slots} domain={domain} />
               </div>
             </div>
+            <div className={cx(style.searchBar)}>
+              <input type="text" placeholder="搜尋故事流程" />
+            </div>
+            <ul className={cx(style.listmenu)}>
+              {storiesOptions &&
+                storiesOptions.map((item) => (
+                  <li>
+                    <button
+                      data-check="none"
+                      key={item.story}
+                      value={item.story}
+                      onClick={(e) => atSelectStory(e.target.value)}
+                    >
+                      {item.story}
+                    </button>
+                  </li>
+                ))}
+            </ul>
           </div>
         </div>
       </div>
