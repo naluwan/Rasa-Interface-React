@@ -834,7 +834,7 @@ const UserStep: React.FC<UserStepProps> = (props) => {
 
   return (
     <div className="row pt-2" id="userStep">
-      <div className={cx('col-6', style.userStepContainer)}>
+      <div className={cx('col-sm-12 col-lg-6', style.userStepContainer)}>
         {!isGetStarted && (
           <div className={cx('py-2')}>
             <button

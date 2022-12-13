@@ -249,7 +249,7 @@ const Entities: React.FC<EntitiesProps> = (props) => {
             />
           ) : (
             <button
-              className="btn btn-outline-light"
+              className="btn btn-outline-warning"
               id="entityShowValue"
               onClick={atShowClick}
             >
