@@ -11,12 +11,7 @@ export default {
 };
 
 const Template = (args) => {
-  return (
-    <Layout
-      {...args}
-      {...action}
-    />
-  );
+  return <Layout {...args} {...action} />;
 };
 
 export const Basic = Template.bind({});

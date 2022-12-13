@@ -11,12 +11,7 @@ export default {
 };
 
 const Template = (args) => {
-  return (
-    <Menu
-      {...args}
-      {...action}
-    />
-  );
+  return <Menu {...args} {...action} />;
 };
 
 export const Basic = Template.bind({});

@@ -11,12 +11,7 @@ export default {
 };
 
 const Template = (args) => {
-  return (
-    <Stories
-      {...args}
-      {...action}
-    />
-  );
+  return <Stories {...args} {...action} />;
 };
 
 export const Basic = Template.bind({});

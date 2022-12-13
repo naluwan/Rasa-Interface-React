@@ -11,12 +11,7 @@ export default {
 };
 
 const Template = (args) => {
-  return (
-    <WebChatWidget
-      {...args}
-      {...action}
-    />
-  );
+  return <WebChatWidget {...args} {...action} />;
 };
 
 export const Basic = Template.bind({});
