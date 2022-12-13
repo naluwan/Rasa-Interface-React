@@ -23,7 +23,6 @@ const Stories = () => {
   /**
    * @type {[string, Function]}
    */
-  const [setDefaultValue] = React.useState('');
   // const [defaultValue, setDefaultValue] = React.useState('');
   // /**
   //  * @type {[StoryType, Function]}
@@ -356,7 +355,7 @@ const Stories = () => {
             title: '刪除故事流程成功',
           });
           onSetAllTrainData(res.data);
-          setDefaultValue('');
+          // setDefaultValue('');
           onSetDeleteStory(story);
           return onSetStory('');
         });
@@ -381,7 +380,7 @@ const Stories = () => {
           });
           onSetStory(storyName);
           setCreate(false);
-          setDefaultValue(storyName);
+          // setDefaultValue(storyName);
           onInitialNewStory();
         });
       }
@@ -395,7 +394,7 @@ const Stories = () => {
       });
       onSetStory(storyName);
       setCreate(false);
-      setDefaultValue(storyName);
+      // setDefaultValue(storyName);
       return onInitialNewStory();
     },
     [
@@ -437,7 +436,7 @@ const Stories = () => {
             onCreateNewStory(createStoryName);
             onSetStory('');
             setCreate(true);
-            setDefaultValue('');
+            // setDefaultValue('');
           },
         );
       });
@@ -456,10 +455,18 @@ const Stories = () => {
           });
           return;
         }
+        onSetSelectedBranchStory({
+          story: '',
+          steps: [],
+        });
+        onSetSelectedConnectBranchStory({
+          story: '',
+          steps: [],
+        });
         onCreateNewStory(createStoryName);
         onSetStory('');
         setCreate(true);
-        setDefaultValue('');
+        // setDefaultValue('');
       },
     );
   }, [
@@ -784,7 +791,7 @@ const Stories = () => {
         onSetAllTrainData(res.data);
         setCreate(false);
         onInitialNewStory();
-        setDefaultValue(createStory.story);
+        // setDefaultValue(createStory.story);
         return onSetStory(createStory.story);
       });
     },
