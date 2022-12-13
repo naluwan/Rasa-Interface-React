@@ -6,7 +6,10 @@
   .checkPointNavTab {
     /* :global(className) => 不要被css module轉換掉*/
     &:not(:global(.active)) {
-      color: #fff;
+      color: rgb(0, 0, 0);
+    }
+    &:global(.active) {
+      font-weight: bold;
     }
     position: relative;
     // &:global(.active):hover {
