@@ -350,7 +350,7 @@ const reducer = (state: State, action: Action): State => {
                           return curButton;
                         });
 
-                        branchStep.buttons = buttons;
+                        connectStep.buttons = buttons;
                       }
                     }
                     return connectStep;
