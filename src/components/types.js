@@ -342,4 +342,14 @@ export type CreateStoryState = {
     checkPointName: String,
     connectStoryName: string,
   ) => void,
+  // 支線故事新增機器人回覆按鈕
+  onAddBranchStoryResButtons: (
+    actionName: string,
+    title: string,
+    payload: string,
+    reply: string,
+    storyName: string,
+    stories: StoryType[],
+    checkPointName: string,
+  ) => void,
 };

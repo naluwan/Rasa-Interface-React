@@ -188,7 +188,6 @@ const reducer = (state: State, action: Action): State => {
                 item.story !== storyName &&
                 branchStep.checkpoint === step.checkpoint
               ) {
-                console.log('set story branch step =====>', branchStep);
                 branchStories.push(item);
               }
               return branchStep;
@@ -204,9 +203,71 @@ const reducer = (state: State, action: Action): State => {
                     domain.responses[branchStep.action][0].text,
                   ).replace(/ \\n/g, '\\r'),
                 );
+
+                // 獲取回覆資料
+                const botRes = domain.responses[branchStep.action][0];
+
+                // 判斷是否有按鈕
+                if (botRes.buttons) {
+                  const buttons = [];
+                  const buttonStory = [];
+                  let intent = '';
+
+                  // 將按鈕故事篩選出來
+                  botRes.buttons.map((button) => {
+                    intent = button.payload.replace(/\//g, '');
+                    return stories.map((item) => {
+                      if (item.story === `button_${intent}`) {
+                        buttonStory.push(item);
+                      } else {
+                        item.steps.map((buttonStep) => {
+                          if (buttonStep.intent) {
+                            if (buttonStep.intent === intent) {
+                              item.intentStory = true;
+                              buttonStory.push(item);
+                            }
+                          }
+                          return buttonStep;
+                        });
+                      }
+                      return item;
+                    });
+                  });
+
+                  // 重組按鈕資料
+                  buttonStory.map((item) => {
+                    const button = {};
+                    item.steps.map((itemStep) => {
+                      if (item.intentStory) {
+                        button.disabled = true;
+                      }
+                      if (itemStep.action) {
+                        button.buttonAction = itemStep.action;
+                      }
+                      if (itemStep.intent) {
+                        button.title = itemStep.intent;
+                        button.payload = itemStep.intent;
+                      }
+                      return itemStep;
+                    });
+                    delete item.intentStory;
+                    return buttons.push(button);
+                  });
+
+                  // 獲取按鈕回覆文字
+                  buttons.map((curButton) => {
+                    curButton.reply = JSON.parse(
+                      JSON.stringify(
+                        domain.responses[curButton.buttonAction][0].text,
+                      ).replace(/ \\n/g, '\\r'),
+                    );
+                    return curButton;
+                  });
+
+                  branchStep.buttons = buttons;
+                }
               }
               if (idx !== 0 && branchStep.checkpoint) {
-                console.log('set story branchStep =====>', branchStep);
                 const connectBranchStories = [];
                 stories.map((item) => {
                   return item.steps.map((connectStep, connectStepIdx) => {
@@ -214,7 +275,6 @@ const reducer = (state: State, action: Action): State => {
                       connectStepIdx !== 2 &&
                       connectStep.checkpoint === branchStep.checkpoint
                     ) {
-                      console.log('set story connect branch story ====>', item);
                       connectBranchStories.push(item);
                     }
                     return connectStep;
@@ -229,6 +289,69 @@ const reducer = (state: State, action: Action): State => {
                           domain.responses[connectStep.action][0].text,
                         ).replace(/ \\n/g, '\\r'),
                       );
+
+                      // 獲取回覆資料
+                      const botRes = domain.responses[branchStep.action][0];
+
+                      // 判斷是否有按鈕
+                      if (botRes.buttons) {
+                        const buttons = [];
+                        const buttonStory = [];
+                        let intent = '';
+
+                        // 將按鈕故事篩選出來
+                        botRes.buttons.map((button) => {
+                          intent = button.payload.replace(/\//g, '');
+                          return stories.map((item) => {
+                            if (item.story === `button_${intent}`) {
+                              buttonStory.push(item);
+                            } else {
+                              item.steps.map((buttonStep) => {
+                                if (buttonStep.intent) {
+                                  if (buttonStep.intent === intent) {
+                                    item.intentStory = true;
+                                    buttonStory.push(item);
+                                  }
+                                }
+                                return buttonStep;
+                              });
+                            }
+                            return item;
+                          });
+                        });
+
+                        // 重組按鈕資料
+                        buttonStory.map((item) => {
+                          const button = {};
+                          item.steps.map((itemStep) => {
+                            if (item.intentStory) {
+                              button.disabled = true;
+                            }
+                            if (itemStep.action) {
+                              button.buttonAction = itemStep.action;
+                            }
+                            if (itemStep.intent) {
+                              button.title = itemStep.intent;
+                              button.payload = itemStep.intent;
+                            }
+                            return itemStep;
+                          });
+                          delete item.intentStory;
+                          return buttons.push(button);
+                        });
+
+                        // 獲取按鈕回覆文字
+                        buttons.map((curButton) => {
+                          curButton.reply = JSON.parse(
+                            JSON.stringify(
+                              domain.responses[curButton.buttonAction][0].text,
+                            ).replace(/ \\n/g, '\\r'),
+                          );
+                          return curButton;
+                        });
+
+                        branchStep.buttons = buttons;
+                      }
                     }
                     return connectStep;
                   });

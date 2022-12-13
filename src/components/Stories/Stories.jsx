@@ -194,42 +194,54 @@ const Stories = () => {
           return step;
         });
 
+        const deleteBranchStories = [];
+        const allStoryName = [];
         // 刪除支線故事的故事流程、支線故事機器人回覆和回覆名稱
         branchStories.map((item) => {
           // 獲取所有故事名稱
-          const allStoryName = cloneData.stories.map(
-            (storyItem) => storyItem.story,
+          cloneData.stories.map((storyItem) =>
+            allStoryName.push(storyItem.story),
           );
-          // 刪除故事
-          cloneData.stories.splice(allStoryName.indexOf(item.story), 1);
+          // 將要刪除的故事名稱放進待刪除故事陣列中，後面一併處理
+          deleteBranchStories.push(item.story);
 
           // 找到該支線故事的回覆
           item.steps.map((step, idx) => {
             if (step.action) {
-              // 刪除機器人回覆
-              delete cloneData.domain.responses[step.action];
-              // 刪除機器人回覆名稱
-              cloneData.domain.actions.splice(
-                cloneData.domain.actions.indexOf(step.action),
-                1,
-              );
+              actionArr.push(step.action);
+              if (step.buttons) {
+                step.buttons.map((button) => {
+                  // 如果是自建的選項才需要此步驟，如果是選項是回覆現有故事流程中的故事就不用
+                  if (!button.disabled) {
+                    actionArr.push(button.buttonAction);
+                    intentArr.push(button.payload);
+                  }
+                  // 將要刪除的故事名稱放進待刪除故事陣列中，後面一併處理
+                  deleteBranchStories.push(`button_${button.title}`);
+                  return button;
+                });
+              }
             }
             if (idx !== 0 && step.checkpoint && step.branchStories.length) {
               // 刪除支線故事內串接的支線故事
               step.branchStories.map((branchStory) => {
-                console.log('delete story connect story ===>', branchStory);
-                cloneData.stories.splice(
-                  allStoryName.indexOf(branchStory.story),
-                  1,
-                );
+                // 將要刪除的故事名稱放進待刪除故事陣列中，後面一併處理
+                deleteBranchStories.push(branchStory.story);
                 return branchStory.steps.map((branchStep) => {
                   if (branchStep.action) {
-                    delete cloneData.domain.responses[branchStep.action];
-                    // 刪除機器人回覆名稱
-                    cloneData.domain.actions.splice(
-                      cloneData.domain.actions.indexOf(branchStep.action),
-                      1,
-                    );
+                    actionArr.push(branchStep.action);
+                    if (branchStep.buttons) {
+                      branchStep.buttons.map((button) => {
+                        // 如果是自建的選項才需要此步驟，如果是選項是回覆現有故事流程中的故事就不用
+                        if (!button.disabled) {
+                          actionArr.push(button.buttonAction);
+                          intentArr.push(button.payload);
+                        }
+                        // 將要刪除的故事名稱放進待刪除故事陣列中，後面一併處理
+                        deleteBranchStories.push(`button_${button.title}`);
+                        return button;
+                      });
+                    }
                   }
                   return branchStep;
                 });
@@ -238,6 +250,15 @@ const Stories = () => {
             return step;
           });
           return item;
+        });
+
+        // 刪除故事
+        deleteBranchStories.map((deleteBranchStory) => {
+          const deleteBranchStoryIdx = allStoryName.indexOf(deleteBranchStory);
+          if (deleteBranchStoryIdx > -1) {
+            cloneData.stories.splice(deleteIdx, 1);
+          }
+          return deleteBranchStory;
         });
 
         // 刪除nlu訓練檔中的例句
@@ -266,6 +287,12 @@ const Stories = () => {
         // 刪除domain訓練檔中的actions和機器人回覆
         actionArr.map((deleteAction) => {
           return cloneData.domain.actions.map((domainAction, idx) => {
+            // console.log('delete story domainAction ===>', domainAction);
+            // console.log('delete story deleteAction ===>', deleteAction);
+            // console.log(
+            //   'domainAction === deleteAction ===>',
+            //   domainAction === deleteAction,
+            // );
             if (domainAction === deleteAction) {
               cloneData.domain.actions.splice(idx, 1);
             }
@@ -515,54 +542,84 @@ const Stories = () => {
       newStories.push(cloneNewStory);
 
       let branchStories = [];
+      const currentAction = [];
 
-      createStory.steps.map((step) => {
+      const cloneBranchStories = cloneDeep(createStory);
+      cloneBranchStories.steps.map((step) => {
         if (step.checkpoint) {
           branchStories = step.branchStories;
         }
         return step;
       });
 
+      // 支線故事和支線故事內的串接故事處理
       if (branchStories.length) {
+        // 支線故事
         branchStories.map((branchStory) => {
           branchStory.steps.map((step, idx) => {
+            // 支線故事action和buttons處理
             if (step.action) {
-              newDomain.responses[step.action] = [
-                {
-                  text: JSON.parse(
-                    JSON.stringify(step.response).replace(/\\n/g, '  \\n'),
-                  ),
-                },
-              ];
-              newDomain.actions.push(step.action);
-
+              const buttons = [];
+              if (step.buttons) {
+                step.buttons.map((button) => {
+                  const isPayload = button.payload.indexOf('/');
+                  return buttons.push({
+                    title: button.title,
+                    payload:
+                      isPayload > -1 ? button.payload : `/${button.payload}`,
+                    reply: button.reply,
+                  });
+                });
+              }
+              currentAction.push({
+                action: step.action,
+                text: step.response,
+                buttons,
+              });
+              // 上方action和buttons處離完後，需要刪除不能在訓練檔出現的資料
               delete step.response;
+              delete step.buttons;
             }
             if (idx !== 0 && step.checkpoint) {
+              // 支線故事內的串接故事
               step.branchStories.map((connectBranchStory) => {
                 connectBranchStory.steps.map((connectStep) => {
+                  // 串接故事的action和buttons處理
                   if (connectStep.action) {
-                    newDomain.responses[connectStep.action] = [
-                      {
-                        text: JSON.parse(
-                          JSON.stringify(connectStep.response).replace(
-                            /\\n/g,
-                            '  \\n',
-                          ),
-                        ),
-                      },
-                    ];
-                    newDomain.actions.push(connectStep.action);
+                    const buttons = [];
+                    if (connectStep.buttons) {
+                      connectStep.buttons.map((button) => {
+                        const isPayload = button.payload.indexOf('/');
+                        return buttons.push({
+                          title: button.title,
+                          payload:
+                            isPayload > -1
+                              ? button.payload
+                              : `/${button.payload}`,
+                          reply: button.reply,
+                        });
+                      });
+                    }
+                    currentAction.push({
+                      action: connectStep.action,
+                      text: connectStep.response,
+                      buttons,
+                    });
+                    // 上方action和buttons處離完後，需要刪除不能在訓練檔出現的資料
                     delete connectStep.response;
+                    delete connectStep.buttons;
                   }
                   return connectStep;
                 });
+                // 將串接故事新增進stories訓練檔中
                 return newStories.push(connectBranchStory);
               });
             }
+            // 支線故事和串接故事處理完後，一樣需要刪除
             delete step.branchStories;
             return step;
           });
+          // 將支線故事新增進stories訓練檔中
           return newStories.push(branchStory);
         });
       }
@@ -616,8 +673,8 @@ const Stories = () => {
       });
 
       // 組成機器人回覆的訓練檔格式
-      const currentAction = createStory.steps
-        .filter((step) => step.action)
+      createStory.steps
+        .filter((step) => step.action || step.checkpoint)
         .map((step) => {
           const buttons = [];
           if (step.buttons) {
@@ -629,12 +686,13 @@ const Stories = () => {
                 reply: button.reply,
               });
             });
+            currentAction.push({
+              action: step.action,
+              text: step.response,
+              buttons,
+            });
           }
-          return {
-            action: step.action,
-            text: step.response,
-            buttons,
-          };
+          return step;
         });
 
       // 需要操作currentAction，所以必須要深拷貝一份

@@ -1,19 +1,20 @@
 import * as React from 'react';
 import cx from 'classnames';
+import shallow from 'zustand/shallow';
 import style from './BotStep.module.scss';
-import type { StepsType, StoryType } from '../types';
+import type { StepsType, StoryType, State } from '../types';
 import {
   swalInput,
   swalMultipleInput,
   confirmWidget,
 } from '../../utils/swalInput';
 import ButtonItems from './ButtonItems';
+import useStoryStore from '../../store/useStoryStore';
 
 type BotStepProps = {
   step: StepsType,
   storyName: string,
   isCreate: boolean,
-  stories: StoryType[],
   checkPointName: string,
   connectBranchStoryName: string,
   onEditBotRes: (
@@ -31,6 +32,8 @@ type BotStepProps = {
     payload: string,
     reply: string,
     storyName?: string,
+    stories?: StoryType[],
+    checkPointName?: string,
   ) => void,
   onEditResButtons: (
     action: string,
@@ -49,7 +52,6 @@ const BotStep: React.FC<BotStepProps> = (props) => {
     isCreate,
     step,
     storyName,
-    stories,
     checkPointName,
     connectBranchStoryName,
     onEditBotRes,
@@ -58,6 +60,12 @@ const BotStep: React.FC<BotStepProps> = (props) => {
     onEditResButtons,
     onRemoveResButton,
   } = props;
+
+  const { stories } = useStoryStore((state: State) => {
+    return {
+      stories: state.stories,
+    };
+  }, shallow);
 
   // textarea 自適應高度
   const textAreaRef = React.useRef();
@@ -99,7 +107,11 @@ const BotStep: React.FC<BotStepProps> = (props) => {
 
   // 增加機器人回覆按鈕選項
   const atAddResButtons = React.useCallback(
-    (action: string, currentStoryName: string) => {
+    (
+      action: string,
+      currentStoryName: string,
+      currentCheckPointName: string,
+    ) => {
       return swalMultipleInput('新增機器人回覆選項', '', '', true).then(
         (data) => {
           if (!data || !data.title) return;
@@ -111,6 +123,7 @@ const BotStep: React.FC<BotStepProps> = (props) => {
             data.reply,
             currentStoryName,
             stories,
+            currentCheckPointName,
           );
         },
       );
@@ -185,7 +198,9 @@ const BotStep: React.FC<BotStepProps> = (props) => {
           <button
             type="button"
             className="btn btn-primary mx-2"
-            onClick={() => atAddResButtons(step.action, storyName)}
+            onClick={() =>
+              atAddResButtons(step.action, storyName, checkPointName)
+            }
           >
             增加選項
           </button>

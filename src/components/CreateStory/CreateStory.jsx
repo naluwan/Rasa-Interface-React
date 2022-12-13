@@ -6,8 +6,7 @@ import style from './CreateStory.module.scss';
 import StepControl from './StepControl';
 import UserStep from '../UserStep';
 import BotStep from '../BotStep';
-import type { StoryType, ExampleType, State, CreateStoryState } from '../types';
-import useStoryStore from '../../store/useStoryStore';
+import type { StoryType, ExampleType, CreateStoryState } from '../types';
 import StepAlert from './StepAlert';
 import useCreateStoryStore from '../../store/useCreateStoryStore';
 
@@ -21,11 +20,6 @@ type CreateStoryProps = {
 
 const CreateStory: React.FC<CreateStoryProps> = (props) => {
   const { isCreate, nlu, actions, onClickSaveBtn } = props;
-  const { stories } = useStoryStore((state: State) => {
-    return {
-      stories: state.stories,
-    };
-  }, shallow);
 
   const {
     newStory,
@@ -753,7 +747,6 @@ const CreateStory: React.FC<CreateStoryProps> = (props) => {
                   isCreate={isCreate}
                   step={{ action, response, buttons }}
                   storyName={newStory.story}
-                  stories={stories}
                   onEditBotRes={onEditBotRes}
                   onRemoveBotStep={onRemoveBotStep}
                   onAddResButtons={onAddResButtons}

@@ -25,6 +25,7 @@ import {
   actionCheckPointDeleteConnectBranchStory,
   actionCreateStoryBranchStoryEditBotRes,
   actionCreateStoryConnectStoryEditBotRes,
+  actionCreateStoryBranchStoryAddResButtons,
 } from 'actions';
 import type {
   NluType,
@@ -682,8 +683,8 @@ const reducer = (state: CreateStoryState, action: Action): State => {
     }
     case 'CREATE_STORY_DELETE_BRANCH_STORY': {
       const { checkPointName, branchName } = action.payload;
-      console.log('checkPointName:', checkPointName);
-      console.log('branchName:', branchName);
+      // console.log('checkPointName:', checkPointName);
+      // console.log('branchName:', branchName);
       const { newStory } = state;
       let steps = newStory.steps.map((step) => {
         if (step.checkpoint && step.checkpoint === checkPointName) {
@@ -694,14 +695,14 @@ const reducer = (state: CreateStoryState, action: Action): State => {
         return step;
       });
 
-      console.log('before steps:', steps);
+      // console.log('before steps:', steps);
 
       // 篩選出不是checkPoint步驟或branchStories.length不為0的步驟
       steps = steps.filter((step) =>
         step.checkpoint ? step.branchStories.length > 0 : step,
       );
 
-      console.log('after steps:', steps);
+      // console.log('after steps:', steps);
 
       return {
         ...state,
@@ -819,7 +820,7 @@ const reducer = (state: CreateStoryState, action: Action): State => {
               if (step.checkpoint) {
                 step.branchStories = step.branchStories.map((branchStory) => {
                   if (branchStory.story === checkPointName) {
-                    console.log('branchStory ===============>', branchStory);
+                    // console.log('branchStory ===============>', branchStory);
 
                     branchStory.steps.map((branchStep, idx) => {
                       if (
@@ -1034,6 +1035,74 @@ const reducer = (state: CreateStoryState, action: Action): State => {
                       return branchStep;
                     },
                   );
+                }
+                return branchStory;
+              });
+            }
+            return step;
+          }),
+        },
+      };
+    }
+    case 'CREATE_STORY_BRANCH_STORY_ADD_RES_BUTTONS': {
+      const { actionName, title, payload, reply, stories, checkPointName } =
+        action.payload;
+      const { newStory } = state;
+
+      const isInStory = stories.some(
+        (item) => item.story === `button_${title}`,
+      );
+
+      const isExist = newStory.steps.some((step) => {
+        if (step.checkpoint) {
+          return step.branchStories.some((branchStory) => {
+            if (branchStory.story === checkPointName) {
+              return branchStory.steps.some((branchStep) => {
+                if (branchStep.action === actionName) {
+                  return branchStep.buttons?.some(
+                    (button) => button.title === title,
+                  );
+                }
+                return false;
+              });
+            }
+            return false;
+          });
+        }
+        return false;
+      });
+
+      if (isExist || isInStory) {
+        return Toast.fire({
+          icon: 'warning',
+          title: '此選項已存在',
+        });
+      }
+
+      return {
+        ...state,
+        newStory: {
+          ...state.newStory,
+          steps: state.newStory.steps.map((step) => {
+            if (step.checkpoint) {
+              step.branchStories = step.branchStories.map((branchStory) => {
+                if (branchStory.story === checkPointName) {
+                  branchStory.steps = branchStory.steps.map((branchStep) => {
+                    if (branchStep.action === actionName) {
+                      if (branchStep.buttons) {
+                        branchStep.buttons = branchStep.buttons.concat([
+                          { title, payload, reply },
+                        ]);
+                      } else {
+                        branchStep.buttons = [{ title, payload, reply }];
+                      }
+                    }
+                    console.log(
+                      'CREATE_STORY_BRANCH_STORY_ADD_RES_BUTTONS branchStep ===>',
+                      branchStep,
+                    );
+                    return branchStep;
+                  });
                 }
                 return branchStory;
               });
@@ -1309,6 +1378,28 @@ const useCreateStoryStore = create((set) => {
           storyName,
           checkPointName,
           connectStoryName,
+        ),
+      );
+    },
+    // 支線故事新增機器人回覆按鈕
+    onAddBranchStoryResButtons(
+      actionName: string,
+      title: string,
+      payload: string,
+      reply: string,
+      storyName: string,
+      stories: StoryType[],
+      checkPointName: string,
+    ) {
+      dispatch(
+        actionCreateStoryBranchStoryAddResButtons(
+          actionName,
+          title,
+          payload,
+          reply,
+          storyName,
+          stories,
+          checkPointName,
         ),
       );
     },
