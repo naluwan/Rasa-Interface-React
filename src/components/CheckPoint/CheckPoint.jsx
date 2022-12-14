@@ -35,6 +35,7 @@ const CheckPoint: React.FC<CheckPointProps> = (props) => {
     onEditBranchStoryBotRes,
     onAddBranchStoryResButtons,
     onRemoveBranchStoryResButton,
+    onEditBranchStoryResButtons,
   } = useCreateStoryStore((state: CreateStoryState) => {
     return {
       selectedBranchStory: state.selectedBranchStory,
@@ -46,6 +47,7 @@ const CheckPoint: React.FC<CheckPointProps> = (props) => {
       onEditBranchStoryBotRes: state.onEditBranchStoryBotRes,
       onAddBranchStoryResButtons: state.onAddBranchStoryResButtons,
       onRemoveBranchStoryResButton: state.onRemoveBranchStoryResButton,
+      onEditBranchStoryResButtons: state.onEditBranchStoryResButtons,
     };
   }, shallow);
   /* 
@@ -179,6 +181,7 @@ const CheckPoint: React.FC<CheckPointProps> = (props) => {
                     onEditBotRes={onEditBranchStoryBotRes}
                     onAddResButtons={onAddBranchStoryResButtons}
                     onRemoveResButton={onRemoveBranchStoryResButton}
+                    onEditResButtons={onEditBranchStoryResButtons}
                   />
                 );
               }

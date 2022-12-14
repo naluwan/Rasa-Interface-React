@@ -334,6 +334,20 @@ export type Action =
         disabled?: string,
         checkPointName: string,
       },
+    }
+  | {
+      type: 'CREATE_STORY_BRANCH_STORY_EDIT_RES_BUTTONS',
+      payload: {
+        actionName: string,
+        title: string,
+        oriPayload: string,
+        payload: string,
+        reply: string,
+        storyName: string,
+        buttonActionName: string,
+        stories: StoryType[],
+        checkPointName: string,
+      },
     };
 
 // ====================== query story ======================
@@ -813,6 +827,31 @@ export const actionCreateStoryBranchStoryRemoveResButton = (
     storyName,
     buttonActionName,
     disabled,
+    checkPointName,
+  },
+});
+
+export const actionCreateStoryBranchStoryEditResButtons = (
+  actionName: string,
+  title: string,
+  oriPayload: string,
+  payload: string,
+  reply: string,
+  storyName: string,
+  buttonActionName: string,
+  stories: StoryType[],
+  checkPointName: string,
+): Action => ({
+  type: 'CREATE_STORY_BRANCH_STORY_EDIT_RES_BUTTONS',
+  payload: {
+    actionName,
+    title,
+    oriPayload,
+    payload,
+    reply,
+    storyName,
+    buttonActionName,
+    stories,
     checkPointName,
   },
 });

@@ -27,6 +27,7 @@ import {
   actionCreateStoryConnectStoryEditBotRes,
   actionCreateStoryBranchStoryAddResButtons,
   actionCreateStoryBranchStoryRemoveResButton,
+  actionCreateStoryBranchStoryEditResButtons,
 } from 'actions';
 import type {
   NluType,
@@ -1098,10 +1099,6 @@ const reducer = (state: CreateStoryState, action: Action): State => {
                         branchStep.buttons = [{ title, payload, reply }];
                       }
                     }
-                    // console.log(
-                    //   'CREATE_STORY_BRANCH_STORY_ADD_RES_BUTTONS branchStep ===>',
-                    //   branchStep,
-                    // );
                     return branchStep;
                   });
                 }
@@ -1129,6 +1126,92 @@ const reducer = (state: CreateStoryState, action: Action): State => {
                       branchStep.buttons = branchStep.buttons.filter(
                         (button) => button.payload !== payload,
                       );
+                    }
+                    return branchStep;
+                  });
+                }
+                return branchStory;
+              });
+            }
+            return step;
+          }),
+        },
+      };
+    }
+    case 'CREATE_STORY_BRANCH_STORY_EDIT_RES_BUTTONS': {
+      const {
+        actionName,
+        title,
+        oriPayload,
+        payload,
+        reply,
+        stories,
+        checkPointName,
+      } = action.payload;
+
+      // console.log('actionName ===> ', actionName);
+      // console.log('title ===> ', title);
+      // console.log('oriPayload ===> ', oriPayload);
+      // console.log('payload ===> ', payload);
+      // console.log('reply ===> ', reply);
+      // console.log('stories ===> ', stories);
+      // console.log('checkPointName ===> ', checkPointName);
+      const { newStory } = state;
+
+      const ownButtonInfo = newStory.steps
+        .filter((step) => step.checkpoint)
+        .filter((step) => step.branchStories);
+
+      console.log('edit res buttons ownButtonInfo ===> ', ownButtonInfo);
+
+      const isInStory = stories.some(
+        (item) => item.story === `button_${checkPointName}_${title}`,
+      );
+
+      const isExist = newStory.steps.some((step) => {
+        if (step.checkpoint) {
+          return step.branchStories.some((branchStory) => {
+            if (branchStory.story === checkPointName) {
+              return branchStory.steps.some((branchStep) => {
+                if (branchStep.action && branchStep.action === actionName) {
+                  return branchStep.buttons.some(
+                    (button) => button.title === title,
+                  );
+                }
+                return false;
+              });
+            }
+            return false;
+          });
+        }
+        return false;
+      });
+
+      if (isExist || isInStory) {
+        return Toast.fire({
+          icon: 'warning',
+          title: '此選項已存在',
+        });
+      }
+
+      return {
+        ...state,
+        newStory: {
+          ...state.newStory,
+          steps: state.newStory.steps.map((step) => {
+            if (step.checkpoint) {
+              step.branchStories = step.branchStories.map((branchStory) => {
+                if (branchStory.story === checkPointName) {
+                  branchStory.steps = branchStory.steps.map((branchStep) => {
+                    if (branchStep.action && branchStep.action === actionName) {
+                      branchStep.buttons = branchStep.buttons.map((button) => {
+                        if (button.payload === oriPayload) {
+                          button.title = title;
+                          button.payload = payload;
+                          button.reply = reply;
+                        }
+                        return button;
+                      });
                     }
                     return branchStep;
                   });
@@ -1448,6 +1531,32 @@ const useCreateStoryStore = create((set) => {
           storyName,
           buttonActionName,
           disabled,
+          checkPointName,
+        ),
+      );
+    },
+    // 編輯支線故事的機器人按鈕
+    onEditBranchStoryResButtons(
+      actionName: string,
+      title: string,
+      oriPayload: string,
+      payload: string,
+      reply: string,
+      storyName: string,
+      buttonActionName: string,
+      stories: StoryType[],
+      checkPointName: string,
+    ) {
+      dispatch(
+        actionCreateStoryBranchStoryEditResButtons(
+          actionName,
+          title,
+          oriPayload,
+          payload,
+          reply,
+          storyName,
+          buttonActionName,
+          stories,
           checkPointName,
         ),
       );

@@ -138,6 +138,7 @@ const BotStep: React.FC<BotStepProps> = (props) => {
         (data) => {
           if (!data || !data.title || !data.reply) return;
           const payload = `/${data.title}`;
+          // if (data.oriPayload === payload && ) return;
           onEditResButtons(
             step.action,
             data.title,
@@ -147,11 +148,12 @@ const BotStep: React.FC<BotStepProps> = (props) => {
             storyName,
             buttonActionName,
             stories,
+            checkPointName,
           );
         },
       );
     },
-    [onEditResButtons, step.action, storyName, stories],
+    [onEditResButtons, step.action, storyName, stories, checkPointName],
   );
 
   // 刪除機器人選項
