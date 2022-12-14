@@ -4,7 +4,7 @@
   display: block;
   padding: 20px;
   box-sizing: border-box;
-  background: #f4f4f5;
+  background: #ECECEC;
   width: 100%;
   height: 100%;
 
@@ -19,4 +19,13 @@
     overflow-y: scroll;
     height: 90%;
   }
+}
+
+@media (max-width: 960px) {
+  .root {
+    height: calc(100% - 197px);
+  }
+
+
+
 }

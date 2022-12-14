@@ -4,4 +4,51 @@
   height: 80px;
   max-height: 80px;
   resize: none;
+  flex: 8;
+}
+
+.BtnBlock {
+  flex: 4;
+  max-width: 200px;
+}
+
+.stepBlock {
+  position: absolute;
+  width: calc(100% - 60px);
+  bottom: 10px;
+  left: 0;
+}
+
+.userBtn {
+  width: 100%;
+  flex: 1;
+  margin: 0 5px 0 0;
+  word-break: keep-all;
+  &[disabled] {
+    background: #bbb !important;
+    border: 1px solid #bbb !important;
+    color: #000 !important;
+  }
+}
+
+.botBtn {
+  width: 100%;
+  flex: 1;
+  margin: 0 0 0 5px;
+  word-break: keep-all;
+  &[disabled] {
+    background: #bbb !important;
+    border: 1px solid #bbb !important;
+    color: #000 !important;
+  }
+}
+
+.createBranchStoryModalBtn {
+  width: 100% !important;
+
+  &[disabled] {
+    background: #bbb !important;
+    border: 1px solid #bbb !important;
+    color: #000 !important;
+  }
 }

@@ -7,6 +7,10 @@
   align-items: center;
   font-size: 12px;
   min-height: 320px;
+  background: url(../../images/robot.jpg) no-repeat center bottom;
+  -webkit-background-size: cover;
+  background-size: cover;
+  background-attachment: fixed;
 
   .title {
     font-weight: 700;
@@ -23,7 +27,7 @@
       background: url(../../images/robot.jpg) no-repeat center;
       width: 450px;
       position: relative;
-      border-radius: 11px ;
+      border-radius: 11px;
 
       .title {
         color: #fff;
@@ -44,7 +48,7 @@
       padding: 30px 50px 30px 50px;
       text-align: center;
       box-shadow: 0px 5px 9px 4px rgb(68 68 68 / 27%);
-      border-radius: 11px ;
+      border-radius: 11px;
       overflow: hidden;
 
       .title {
@@ -86,5 +90,5 @@
     }
   }
 
-  
+
 }

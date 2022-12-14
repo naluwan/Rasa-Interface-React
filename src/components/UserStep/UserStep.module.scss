@@ -1,6 +1,6 @@
 .userStepContainer {
   border: 1px solid #B7B7B7;
-  border-radius: 20px;
+  border-radius: 10px;
   padding: 1rem;
   background: #fff;
 
@@ -56,13 +56,16 @@
 }
 
 
+.deleteBtn {
+  float: right;
+}
 
 //editBtn
 .editBtn {
   background: #fff !important;
   color: #000 !important;
   border: 1px solid #B7B7B7 !important;
-  display: inline-flex!important;
+  display: inline-flex !important;
   flex-direction: row;
   align-items: center;
 
@@ -96,7 +99,7 @@
   background-color: #fff !important;
   color: #000 !important;
   border: 1px solid #B7B7B7 !important;
-  display: inline-flex!important;
+  display: inline-flex !important;
   flex-direction: row;
   align-items: center;
 
@@ -125,7 +128,7 @@
   background-color: #fff !important;
   color: #000 !important;
   border: 1px solid #B7B7B7 !important;
-  display: inline-flex!important;
+  display: inline-flex !important;
   flex-direction: row;
   align-items: center;
 
@@ -154,7 +157,7 @@
   background-color: #fff !important;
   color: #000 !important;
   border: 1px solid #B7B7B7 !important;
-  display: inline-flex!important;
+  display: inline-flex !important;
   flex-direction: row;
   align-items: center;
 
@@ -176,4 +179,11 @@
     display: inherit;
     margin: 0 10px 0 0;
   }
+}
+
+.mr2 {
+  margin-right: 1rem;
+}
+.mt2 {
+  margin-top: 0.5rem;
 }

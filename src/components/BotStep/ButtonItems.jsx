@@ -41,15 +41,13 @@ const ButtonItems: React.FC<ButtonItemsProps> = (props) => {
   }, [reply]);
 
   return (
-    <div className="card col-10 m-3">
+    <div className="card col-12 mt-2">
       <div className="card-body">
         <h5 className="card-title d-flex justify-content-between">
-          <span className="badge rounded-pill bg-info d-flex align-items-center">
-            {title}
-          </span>
+          <p className={style.botlabel}>{title}</p>
           <div>
             <button
-              className="btn btn-primary mx-1"
+              className="btn btn-primary mx-1 "
               onClick={() => onEditResButtons(title, reply, buttonAction)}
             >
               編輯

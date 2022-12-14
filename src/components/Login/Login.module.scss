@@ -1,13 +1,16 @@
 .login {
   height: 100%;
   box-sizing: border-box;
-  padding: 30px;
   display: flex;
   justify-content: center;
   align-items: center;
   font-size: 12px;
   min-height: 320px;
   background: none;
+  background: url(../../images/robot.jpg) no-repeat center bottom;
+  -webkit-background-size: cover;
+  background-size: cover;
+  background-attachment: fixed;
 
   .title {
 

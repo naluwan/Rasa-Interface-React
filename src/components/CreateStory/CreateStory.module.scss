@@ -5,25 +5,35 @@
   box-sizing: border-box;
   height: 100%;
   width: 100%;
-  background: #f4f4f5;
+  background: #ECECEC;
+
   .title {
     font-weight: bold;
     font-size: 1.8rem;
     color: #000;
   }
+
   .stepsPanel {
     padding: 15px;
-    position: relative;
+    // position: relative;
     overflow-y: scroll;
-    height: 70%;
-    background-color: #f4f4f5;
+    height: calc(100% - 159px);
+    background-color: #ECECEC;
   }
 }
 
 @media (min-width: 1400px) {
   .root {
+
     .stepsPanel {
-      height: 80%;
+    height:calc(100% - 225px);
     }
+  }
+}
+
+@media (max-width: 960px) {
+  .root {
+    height: calc(100% - 197px);
+
   }
 }

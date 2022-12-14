@@ -1,8 +1,8 @@
 .botStepContainer {
-  border-radius: 20px;
-  padding: 1rem;
-  border: 1px solid #B7B7B7;
-  background: #fff;
+  // border-radius: 20px;
+  // padding: 1rem;
+  // border: 1px solid #B7B7B7;
+  // background: #fff;
 
   .botTitle {
     padding: 10px;
@@ -29,9 +29,13 @@
 
 .info {
   border: 1px solid #B7B7B7;
-  border-radius: 20px;
+  border-radius: 10px;
   padding: 1rem;
   background: #fff;
+}
+
+.deleteBtn {
+  float: right;
 }
 
 //editBtn
@@ -98,5 +102,16 @@
 }
 
 .botStep {
-  width: 100% !important;
+  border-radius: 10px;
+  padding: 1rem;
+  border: 1px solid #B7B7B7;
+  background: #fff;
+}
+
+.botlabel {
+  background: #5f79a0;
+  border-radius: 10px;
+  padding: 10px;
+  font-size: 17px;
+  max-width: calc(100% - 129px);
 }

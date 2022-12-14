@@ -81,9 +81,9 @@ const StepControl: React.FC<StepControlType> = (props) => {
   );
 
   return (
-    <div className={cx('d-flex px-3 justify-content-start', style.stepBlock)}>
+    <div className={cx('d-flex px-3 justify-content-start ', style.stepBlock)}>
       <textarea
-        className={cx('col-9', style.stepTextarea)}
+        className={cx(style.stepTextarea)}
         type="text"
         name="conversation"
         placeholder="輸入完對話後，請點擊左側步驟按鈕"
@@ -95,17 +95,22 @@ const StepControl: React.FC<StepControlType> = (props) => {
         }
         onBlur={() => onSetIsInputFocus(undefined)}
       />
-      <div className="col-2 mx-3 d-flex flex-column align-items-center">
-        <div className="col-11 d-flex justify-content-around mb-1">
+      <div
+        className={cx(
+          ' mx-3 d-flex flex-column align-items-center',
+          style.BtnBlock,
+        )}
+      >
+        <div className="col-12 d-flex justify-content-around mb-1">
           <button
-            className="btn btn-success"
+            className={cx('btn btn-success', style.userBtn)}
             onClick={() => atUserStep(conversation)}
             disabled={isUser}
           >
             使用者
           </button>
           <button
-            className="btn btn-primary"
+            className={cx('btn btn-primary', style.botBtn)}
             onClick={() => atBotStep(conversation)}
             disabled={!isUser || hasBranch}
           >
@@ -113,7 +118,10 @@ const StepControl: React.FC<StepControlType> = (props) => {
           </button>
         </div>
         <button
-          className="btn btn-warning mx-1 col-10"
+          className={cx(
+            'btn btn-warning mx-1 col-12',
+            style.createBranchStoryModalBtn,
+          )}
           data-bs-toggle="modal"
           data-bs-target="#createBranchStoryModal"
           disabled={!isUser}

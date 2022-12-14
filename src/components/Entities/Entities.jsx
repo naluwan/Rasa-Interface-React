@@ -215,123 +215,130 @@ const Entities: React.FC<EntitiesProps> = (props) => {
 
   return (
     <div className={style.root}>
-      <div className={cx('col-sm-12 col-lg-6', style.info)}>
-        <div className="py-2">
-          <label htmlFor="entityShowValue" className={style.label}>
-            關鍵字：
-          </label>
-          {showValue ? (
-            <input
-              className={cx(style.formControl)}
-              type="text"
-              id="entityShowValue"
-              name="entityShowValue"
-              defaultValue={entityItem.entityShowValue}
-              ref={refValueInput}
-              onChange={atChange}
-              onKeyDown={(e) =>
-                atEntityShowValueKeyDown(
-                  e,
-                  intent,
-                  entityValue,
-                  entityShowValue,
-                  entityItem.entityShowValue,
-                )
-              }
-              onBlur={(e) =>
-                atEntityShowValueKeyDown(
-                  e,
-                  intent,
-                  entityValue,
-                  entityShowValue,
-                  entityItem.entityShowValue,
-                )
-              }
-            />
-          ) : (
-            <button
-              className={cx('btn', style.keyWordBtn)}
-              id="entityShowValue"
-              onClick={atShowClick}
-            >
-              {entityItem.entityShowValue}
-            </button>
-          )}
-        </div>
-        <div className="py-2">
-          <label htmlFor="entityValue" className={style.label}>
-            儲存槽代表值：
-          </label>
-          {showCurValue ? (
-            <input
-              className={cx(style.formControl)}
-              type="text"
-              id="entityValue"
-              name="entityValue"
-              defaultValue={entityItem.entityValue}
-              ref={refCurValueInput}
-              onChange={(e) => atChange(e)}
-              onKeyDown={(e) =>
-                atEntityValueKeyDown(
-                  e,
-                  intent,
-                  entityValue,
-                  entityItem.entityValue,
-                )
-              }
-              onBlur={(e) =>
-                atEntityValueKeyDown(
-                  e,
-                  intent,
-                  entityValue,
-                  entityItem.entityValue,
-                )
-              }
-            />
-          ) : (
-            <button
-              className={cx('btn', style.saveBtn)}
-              id="entityValue"
-              onClick={atShowClick}
-            >
-              {entityItem.entityValue}
-            </button>
-          )}
-        </div>
-        <div className="py-2">
-          <label htmlFor="entity" className={style.label}>
-            記錄槽名稱：
-          </label>
-          {showEntity ? (
-            <input
-              className={cx(style.formControl)}
-              type="text"
-              id="entity"
-              name="entity"
-              defaultValue={entityItem.entity}
-              ref={refEntityInput}
-              onChange={(e) => atChange(e)}
-              onKeyDown={(e) =>
-                atEntityKeyDown(e, intent, entity, entityItem.entity)
-              }
-              onBlur={(e) =>
-                atEntityKeyDown(e, intent, entity, entityItem.entity)
-              }
-            />
-          ) : (
-            <button
-              className={cx('btn', style.recordBtn)}
-              id="entity"
-              onClick={atShowClick}
-            >
-              {entityItem.entity}
-            </button>
-          )}
+      <div className={cx('col-sm-12 col-md-12 col-lg-12', style.info)}>
+        <div className={style.infoBlock}>
+          <div className="row">
+            <div className="col-12 py-2">
+              <label htmlFor="entityShowValue" className={style.label}>
+                關鍵字：
+              </label>
+              {showValue ? (
+                <input
+                  className={cx(style.formControl)}
+                  type="text"
+                  id="entityShowValue"
+                  name="entityShowValue"
+                  defaultValue={entityItem.entityShowValue}
+                  ref={refValueInput}
+                  onChange={atChange}
+                  onKeyDown={(e) =>
+                    atEntityShowValueKeyDown(
+                      e,
+                      intent,
+                      entityValue,
+                      entityShowValue,
+                      entityItem.entityShowValue,
+                    )
+                  }
+                  onBlur={(e) =>
+                    atEntityShowValueKeyDown(
+                      e,
+                      intent,
+                      entityValue,
+                      entityShowValue,
+                      entityItem.entityShowValue,
+                    )
+                  }
+                />
+              ) : (
+                <button
+                  className={cx('btn', style.keyWordBtn)}
+                  id="entityShowValue"
+                  onClick={atShowClick}
+                >
+                  {entityItem.entityShowValue}
+                </button>
+              )}
+            </div>
+            <div className="col-12 py-2">
+              <label htmlFor="entityValue" className={style.label}>
+                儲存槽代表值：
+              </label>
+              {showCurValue ? (
+                <input
+                  className={cx(style.formControl)}
+                  type="text"
+                  id="entityValue"
+                  name="entityValue"
+                  defaultValue={entityItem.entityValue}
+                  ref={refCurValueInput}
+                  onChange={(e) => atChange(e)}
+                  onKeyDown={(e) =>
+                    atEntityValueKeyDown(
+                      e,
+                      intent,
+                      entityValue,
+                      entityItem.entityValue,
+                    )
+                  }
+                  onBlur={(e) =>
+                    atEntityValueKeyDown(
+                      e,
+                      intent,
+                      entityValue,
+                      entityItem.entityValue,
+                    )
+                  }
+                />
+              ) : (
+                <button
+                  className={cx('btn', style.saveBtn)}
+                  id="entityValue"
+                  onClick={atShowClick}
+                >
+                  {entityItem.entityValue}
+                </button>
+              )}
+            </div>
+            <div className="col-12 py-2">
+              <label htmlFor="entity" className={style.label}>
+                記錄槽名稱：
+              </label>
+              {showEntity ? (
+                <input
+                  className={cx(style.formControl)}
+                  type="text"
+                  id="entity"
+                  name="entity"
+                  defaultValue={entityItem.entity}
+                  ref={refEntityInput}
+                  onChange={(e) => atChange(e)}
+                  onKeyDown={(e) =>
+                    atEntityKeyDown(e, intent, entity, entityItem.entity)
+                  }
+                  onBlur={(e) =>
+                    atEntityKeyDown(e, intent, entity, entityItem.entity)
+                  }
+                />
+              ) : (
+                <button
+                  className={cx('btn', style.recordBtn)}
+                  id="entity"
+                  onClick={atShowClick}
+                >
+                  {entityItem.entity}
+                </button>
+              )}
+            </div>
+          </div>
         </div>
       </div>
       <button
         type="button"
-        className="btn btn-outline-danger align-self-center"
+        className={cx(
+          'btn btn-outline-danger align-self-center',
+          style.deletEntities,
+        )}
         onClick={() => onDeleteEntities(entity, entityValue, intent)}
       >
         刪除關鍵字
