@@ -1149,21 +1149,29 @@ const reducer = (state: CreateStoryState, action: Action): State => {
         checkPointName,
       } = action.payload;
 
-      // console.log('actionName ===> ', actionName);
-      // console.log('title ===> ', title);
-      // console.log('oriPayload ===> ', oriPayload);
-      // console.log('payload ===> ', payload);
-      // console.log('reply ===> ', reply);
-      // console.log('stories ===> ', stories);
-      // console.log('checkPointName ===> ', checkPointName);
       const { newStory } = state;
 
+      // 獲取原title
+      const curOriPayload = oriPayload.replace(/\//g, '');
+
+      // 找出完全無更改的按鈕
       const ownButtonInfo = newStory.steps
         .filter((step) => step.checkpoint)
-        .filter((step) => step.branchStories);
+        .map((step) => step.branchStories)[0]
+        .filter((item) => item.story === checkPointName)
+        .map((item) => item.steps)[0]
+        .filter((step) => step.action)
+        .map((step) => step.buttons)[0]
+        .filter((button) => button.title === title && button.reply === reply);
 
-      console.log('edit res buttons ownButtonInfo ===> ', ownButtonInfo);
+      // 完全相同就返回，不用更改
+      if (ownButtonInfo.length) {
+        return {
+          ...state,
+        };
+      }
 
+      // 比對stories訓練檔中有沒有重複
       const isInStory = stories.some(
         (item) => item.story === `button_${checkPointName}_${title}`,
       );
@@ -1187,7 +1195,8 @@ const reducer = (state: CreateStoryState, action: Action): State => {
         return false;
       });
 
-      if (isExist || isInStory) {
+      // 如果存在stories訓練檔中或是存在新建故事的按鈕中且標題不等於原標題就提示選項已存在
+      if ((isExist && title !== curOriPayload) || isInStory) {
         return Toast.fire({
           icon: 'warning',
           title: '此選項已存在',
