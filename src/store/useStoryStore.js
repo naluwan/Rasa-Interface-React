@@ -245,7 +245,10 @@ const reducer = (state: State, action: Action): State => {
                         button.buttonAction = itemStep.action;
                       }
                       if (itemStep.intent) {
-                        button.title = itemStep.intent;
+                        button.title = itemStep.intent.slice(
+                          itemStep.intent.lastIndexOf('_') + 1,
+                          itemStep.intent.length,
+                        );
                         button.payload = itemStep.intent;
                       }
                       return itemStep;
@@ -331,7 +334,10 @@ const reducer = (state: State, action: Action): State => {
                               button.buttonAction = itemStep.action;
                             }
                             if (itemStep.intent) {
-                              button.title = itemStep.intent;
+                              button.title = itemStep.intent.slice(
+                                itemStep.intent.lastIndexOf('_') + 1,
+                                itemStep.intent.length,
+                              );
                               button.payload = itemStep.intent;
                             }
                             return itemStep;
