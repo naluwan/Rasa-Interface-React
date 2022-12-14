@@ -217,7 +217,9 @@ const Stories = () => {
                     intentArr.push(button.payload);
                   }
                   // 將要刪除的故事名稱放進待刪除故事陣列中，後面一併處理
-                  deleteBranchStories.push(`button_${button.title}`);
+                  deleteBranchStories.push(
+                    `button_${item.story}_${button.title}`,
+                  );
                   return button;
                 });
               }
@@ -238,7 +240,9 @@ const Stories = () => {
                           intentArr.push(button.payload);
                         }
                         // 將要刪除的故事名稱放進待刪除故事陣列中，後面一併處理
-                        deleteBranchStories.push(`button_${button.title}`);
+                        deleteBranchStories.push(
+                          `button_${item.story}_${branchStory.story}_${button.title}`,
+                        );
                         return button;
                       });
                     }
@@ -574,7 +578,12 @@ const Stories = () => {
                   return buttons.push({
                     title: button.title,
                     payload:
-                      isPayload > -1 ? button.payload : `/${button.payload}`,
+                      isPayload > -1
+                        ? `/${branchStory.story}_${button.payload.slice(
+                            1,
+                            button.payload.length,
+                          )}`
+                        : `/${branchStory.story}_${button.payload}`,
                     reply: button.reply,
                   });
                 });
@@ -602,8 +611,13 @@ const Stories = () => {
                           title: button.title,
                           payload:
                             isPayload > -1
-                              ? button.payload
-                              : `/${button.payload}`,
+                              ? `/${branchStory.story}_${
+                                  connectBranchStory.story
+                                }_${button.payload.slice(
+                                  1,
+                                  button.payload.length,
+                                )}`
+                              : `/${branchStory.story}_${connectBranchStory.story}_${button.payload}`,
                           reply: button.reply,
                         });
                       });
