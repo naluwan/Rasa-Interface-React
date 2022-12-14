@@ -915,13 +915,13 @@ const Stories = () => {
                     </option>
                   ))}
               </select>
-              <div>
+              {/* <div>
                 <input
                   type="text"
                   className="form-control"
                   placeholder="搜尋故事流程"
                 />
-              </div>
+              </div> */}
             </div>
             <ul className={cx(style.listmenu)}>
               {storiesOptions &&

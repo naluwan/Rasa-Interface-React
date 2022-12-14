@@ -26,22 +26,27 @@ const Examples: React.FC<ExamplesPropsType> = (props) => {
     [onDeleteExample],
   );
   return (
-    <div className={style.root}>
-      <div className="col-4">{text}</div>
-      <div className="col-4">
-        {entities.length > 0 &&
-          entities.map((entityItem) => {
-            const { entity, value, start, end } = entityItem;
-            return (
-              <div key={entity + value} className="py-2">
-                <div>關鍵字:{text.slice(start, end)}</div>
-                <div>儲存槽:{value}</div>
-                <div>記錄槽:{entity}</div>
-              </div>
-            );
-          })}
-      </div>
-      <div className="col-3 text-end ">
+    <tr className={style.root}>
+      <td className={style.tbltd}>{text}</td>
+      {entities.length > 0 ? (
+        entities.map((entityItem) => {
+          const { entity, value, start, end } = entityItem;
+          return (
+            <>
+              <td className={style.tbltd}>{text.slice(start, end)}</td>
+              <td className={style.tbltd}>{value}</td>
+              <td className={style.tbltd}>{entity}</td>
+            </>
+          );
+        })
+      ) : (
+        <>
+          <td className={style.tbltd} />
+          <td className={style.tbltd} />
+          <td className={style.tbltd} />
+        </>
+      )}
+      <td className={style.tbltd}>
         {/* <button className="btn btn-outline-primary mx-2">關鍵字</button> */}
         <button
           className="btn btn-outline-danger mx-2"
@@ -49,8 +54,8 @@ const Examples: React.FC<ExamplesPropsType> = (props) => {
         >
           刪除
         </button>
-      </div>
-    </div>
+      </td>
+    </tr>
   );
 };
 

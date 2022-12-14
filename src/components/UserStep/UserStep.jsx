@@ -998,25 +998,48 @@ const UserStep: React.FC<UserStepProps> = (props) => {
                   />
                 </div>
                 <div className="modal-body">
-                  {step.examples.length > 0 ? (
-                    step.examples.map((example) => {
-                      const { text, intent, entities } = example;
-                      return (
-                        <Examples
-                          key={text + intent}
-                          text={text}
-                          intent={intent}
-                          entities={entities}
-                          onDeleteExample={atDeleteExample}
-                          entitiesData={entitiesData}
-                        />
-                      );
-                    })
-                  ) : (
-                    <div className="alert alert-warning" role="alert">
-                      沒有例句資料，請先添加例句
-                    </div>
-                  )}
+                  <table>
+                    <thead>
+                      <tr className={cx(style.tblHead, style.tblHeader)}>
+                        <th className={cx(style.tblHead)} rowSpan="2">
+                          例句
+                        </th>
+                        <th className={cx(style.tblHead)} rowSpan="2">
+                          關鍵字
+                        </th>
+                        <th className={cx(style.tblHead)} rowSpan="2">
+                          儲存槽
+                        </th>
+                        <th className={cx(style.tblHead)} rowSpan="2">
+                          紀錄槽
+                        </th>
+                        <th className={cx(style.tblHead)} rowSpan="2">
+                          操作
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {step.examples.length > 0 ? (
+                        step.examples.map((example) => {
+                          const { text, intent, entities } = example;
+                          return (
+                            <Examples
+                              key={text + intent}
+                              text={text}
+                              intent={intent}
+                              entities={entities}
+                              onDeleteExample={atDeleteExample}
+                              entitiesData={entitiesData}
+                            />
+                          );
+                        })
+                      ) : (
+                        <div className="alert alert-warning" role="alert">
+                          沒有例句資料，請先添加例句
+                        </div>
+                      )}
+                    </tbody>
+                  </table>
                 </div>
                 <div className="modal-footer">
                   <button
