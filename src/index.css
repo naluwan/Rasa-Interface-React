@@ -7,9 +7,8 @@ body {
   /* background-color: #ffffff00; */
   height: 100%;
   min-height: 100%;
-  background: #f4f4f5;
+  background: #ECECEC;
 }
-
 code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;

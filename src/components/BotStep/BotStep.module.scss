@@ -29,7 +29,7 @@
 
 .info {
   border: 1px solid #B7B7B7;
-  border-radius: 20px;
+  border-radius: 10px;
   padding: 1rem;
   background: #fff;
 }
@@ -102,8 +102,16 @@
 }
 
 .botStep {
-  border-radius: 20px;
+  border-radius: 10px;
   padding: 1rem;
   border: 1px solid #B7B7B7;
   background: #fff;
+}
+
+.botlabel {
+  background: #5f79a0;
+  border-radius: 10px;
+  padding: 10px;
+  font-size: 17px;
+  max-width: calc(100% - 129px);
 }
