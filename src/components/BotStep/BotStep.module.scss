@@ -1,8 +1,8 @@
 .botStepContainer {
-  border-radius: 20px;
-  padding: 1rem;
-  border: 1px solid #B7B7B7;
-  background: #fff;
+  // border-radius: 20px;
+  // padding: 1rem;
+  // border: 1px solid #B7B7B7;
+  // background: #fff;
 
   .botTitle {
     padding: 10px;
@@ -32,6 +32,10 @@
   border-radius: 20px;
   padding: 1rem;
   background: #fff;
+}
+
+.deleteBtn {
+  float: right;
 }
 
 //editBtn
@@ -98,5 +102,8 @@
 }
 
 .botStep {
-  width: 100% !important;
+  border-radius: 20px;
+  padding: 1rem;
+  border: 1px solid #B7B7B7;
+  background: #fff;
 }

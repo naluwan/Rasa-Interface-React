@@ -20,3 +20,12 @@
     height: 90%;
   }
 }
+
+@media (max-width: 960px) {
+  .root {
+    height: calc(100% - 197px);
+  }
+
+
+
+}

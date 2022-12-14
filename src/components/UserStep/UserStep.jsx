@@ -834,12 +834,14 @@ const UserStep: React.FC<UserStepProps> = (props) => {
 
   return (
     <div className="row pt-2" id="userStep">
-      <div className={cx('col-sm-12 col-lg-6', style.userStepContainer)}>
+      <div
+        className={cx('col-sm-12 col-md-12 col-lg-6', style.userStepContainer)}
+      >
         {!isGetStarted && (
           <div className={cx('py-2')}>
             <button
               type="button"
-              className={cx('btn mx-2', style.editBtn)}
+              className={cx('btn', style.editBtn, style.mr2, style.mt2)}
               onClick={() => atEditUserSay(step.user)}
             >
               <svg
@@ -858,7 +860,7 @@ const UserStep: React.FC<UserStepProps> = (props) => {
             </button>
             <button
               type="button"
-              className={cx('btn mx-2', style.intentionBtn)}
+              className={cx('btn ', style.intentionBtn, style.mr2, style.mt2)}
               onClick={() => atEditIntent(step.intent)}
             >
               <svg
@@ -877,7 +879,7 @@ const UserStep: React.FC<UserStepProps> = (props) => {
             </button>
             <button
               type="button"
-              className={cx('btn mx-2', style.exampleBtn)}
+              className={cx('btn', style.exampleBtn, style.mr2, style.mt2)}
               data-bs-toggle="modal"
               data-bs-target={`#show-${step.intent}-examples`}
             >
@@ -898,7 +900,7 @@ const UserStep: React.FC<UserStepProps> = (props) => {
 
             <button
               type="button"
-              className={cx('btn mx-2', style.keyWordBtn)}
+              className={cx('btn ', style.keyWordBtn, style.mr2, style.mt2)}
               onClick={() =>
                 atCreateEntities(
                   step.user,
@@ -925,7 +927,7 @@ const UserStep: React.FC<UserStepProps> = (props) => {
             {isCreate && (
               <button
                 type="button"
-                className="btn btn-danger mx-2"
+                className={cx('btn btn-danger mx-2 mt-2', style.deleteBtn)}
                 onClick={() => onRemoveUserStep(step.intent, step.user)}
               >
                 刪除

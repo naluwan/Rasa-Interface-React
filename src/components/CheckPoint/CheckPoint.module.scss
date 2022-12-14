@@ -1,17 +1,32 @@
 .root {
   padding-top: 1rem;
+
+  .tablist {
+    border-bottom: none;
+  }
+
   .tabContent {
     color: #fff;
+    background: #ffffff;
+    padding: 20px ;
+    border-radius: 0 10px 10px 10px;
+    border: 1px solid #b7b7b7;
   }
+
   .checkPointNavTab {
     /* :global(className) => 不要被css module轉換掉*/
+
+
     &:not(:global(.active)) {
       color: rgb(0, 0, 0);
     }
+
     &:global(.active) {
       font-weight: bold;
     }
+
     position: relative;
+
     // &:global(.active):hover {
     //   .closeIcon {
     //     display: inline;
@@ -22,6 +37,7 @@
         display: inline;
       }
     }
+
     .closeIcon {
       display: none;
       position: absolute;
@@ -30,5 +46,16 @@
       color: red;
       font-size: 1.2rem;
     }
+
+    &[aria-selected="false"]:hover {
+      border: 1px solid #b7b7b7 !important;
+      border-bottom: 1px solid #fff !important;
+    }
+
+    &[aria-selected="true"] {
+      border: 1px solid #b7b7b7 !important;
+      border-bottom: 1px solid #fff !important;
+    }
+
   }
 }

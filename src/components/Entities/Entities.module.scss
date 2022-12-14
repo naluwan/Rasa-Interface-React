@@ -4,6 +4,7 @@
   justify-content: space-between;
   border-radius: 20px;
   background: #f4f4f5;
+  position: relative;
 
   .label {
     color: rgb(0, 0, 0);
@@ -64,5 +65,13 @@
     border: 1px solid rgb(185, 185, 185);
   }
 
-
+  .deletEntities {
+    transform: translate(0%, -50%);
+    position: absolute;
+    top: 50%;
+    right: 20px;
+  }
+  .infoBlock{
+   width: calc(100% - 130px); 
+  }
 }

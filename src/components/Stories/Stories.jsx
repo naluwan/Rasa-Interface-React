@@ -23,7 +23,8 @@ const Stories = () => {
   /**
    * @type {[string, Function]}
    */
-  // const [defaultValue, setDefaultValue] = React.useState('');
+
+  const [defaultValue, setDefaultValue] = React.useState('');
   // /**
   //  * @type {[StoryType, Function]}
   //  */
@@ -355,7 +356,7 @@ const Stories = () => {
             title: '刪除故事流程成功',
           });
           onSetAllTrainData(res.data);
-          // setDefaultValue('');
+          setDefaultValue('');
           onSetDeleteStory(story);
           return onSetStory('');
         });
@@ -380,7 +381,7 @@ const Stories = () => {
           });
           onSetStory(storyName);
           setCreate(false);
-          // setDefaultValue(storyName);
+          setDefaultValue(storyName);
           onInitialNewStory();
         });
       }
@@ -394,7 +395,7 @@ const Stories = () => {
       });
       onSetStory(storyName);
       setCreate(false);
-      // setDefaultValue(storyName);
+      setDefaultValue(storyName);
       return onInitialNewStory();
     },
     [
@@ -828,90 +829,93 @@ const Stories = () => {
       <div className={style.searchBar}>
         <div>
           <div className={style.senderId}>
-            <h4 className={style.searchTitle}>故事流程</h4>
-            {/* <select
-              id="stories"
-              className={style.storiesSelector}
-              onChange={(e) => atSelectStory(e.target.value)}
-              value={defaultValue}
-            >
-              <option value="" disabled hidden>
-                請選擇
-              </option>
-              {storiesOptions &&
-                storiesOptions.map((item) => (
-                  <option key={item.story} value={item.story}>
-                    {item.story}
-                  </option>
-                ))}
-            </select> */}
-            <div className={cx(style.btn, style.navbar)}>
-              <MyButton variant="third" onClick={atClickCreateStoryBtn}>
-                新增故事流程
-              </MyButton>
-            </div>
-            {Object.keys(deletedStory).length > 0 && (
-              <div className={cx('btn', style.navbar)}>
-                <MyButton
-                  variant="primary"
-                  onClick={() => atRecoverDeletedStory(deletedStory)}
-                >
-                  恢復刪除
+            <div className={cx(style.menuBtnBlock)}>
+              <h4 className={style.searchTitle}>故事流程</h4>
+              <div className={cx(style.btn, style.navbar)}>
+                <MyButton variant="third" onClick={atClickCreateStoryBtn}>
+                  新增故事流程
                 </MyButton>
               </div>
-            )}
-            <div className={cx(style.btn, style.navbar)}>
-              {/* <MyButton variant="secondary">記錄槽</MyButton> */}
-              <button
-                className={cx('btn btn-secondary', style.recordBtn)}
-                type="button"
-                data-bs-toggle="offcanvas"
-                data-bs-target="#showSlotsOffcanvas"
-                aria-controls="offcanvasWithBothOptions"
-              >
-                記錄槽
-              </button>
-
-              {/* offcanvas 左側邊欄 */}
-              <div
-                className={cx('offcanvas offcanvas-start ', style.offcanvas)}
-                data-bs-scroll="true"
-                id="showSlotsOffcanvas"
-                tabIndex="-1"
-                aria-labelledby="showSlotsOffcanvasLabel"
-              >
-                <div className="offcanvas-header">
-                  <h5
-                    className={cx('offcanvas-title')}
-                    id="showSlotsOffcanvasLabel"
+              {Object.keys(deletedStory).length > 0 && (
+                <div className={cx('btn', style.recoverBtn)}>
+                  <MyButton
+                    variant="primary"
+                    onClick={() => atRecoverDeletedStory(deletedStory)}
                   >
-                    記錄槽
-                  </h5>
-                  <button
-                    type="button"
-                    className="btn-close"
-                    data-bs-dismiss="offcanvas"
-                    aria-label="Close"
-                  />
+                    恢復刪除
+                  </MyButton>
                 </div>
-                <Slots slots={slots} domain={domain} />
+              )}
+              <div className={cx(style.btn, style.navbar)}>
+                {/* <MyButton variant="secondary">記錄槽</MyButton> */}
+                <button
+                  className={cx('btn btn-secondary', style.recordBtn)}
+                  type="button"
+                  data-bs-toggle="offcanvas"
+                  data-bs-target="#showSlotsOffcanvas"
+                  aria-controls="offcanvasWithBothOptions"
+                >
+                  記錄槽
+                </button>
+
+                {/* offcanvas 左側邊欄 */}
+                <div
+                  className={cx('offcanvas offcanvas-start ', style.offcanvas)}
+                  data-bs-scroll="true"
+                  id="showSlotsOffcanvas"
+                  tabIndex="-1"
+                  aria-labelledby="showSlotsOffcanvasLabel"
+                >
+                  <div className="offcanvas-header">
+                    <h5
+                      className={cx('offcanvas-title')}
+                      id="showSlotsOffcanvasLabel"
+                    >
+                      記錄槽
+                    </h5>
+                    <button
+                      type="button"
+                      className="btn-close"
+                      data-bs-dismiss="offcanvas"
+                      aria-label="Close"
+                    />
+                  </div>
+                  <Slots slots={slots} domain={domain} />
+                </div>
               </div>
             </div>
-            <div className={cx(style.searchBar)}>
-              <input
-                type="text"
-                className="form-control"
-                placeholder="搜尋故事流程"
-              />
+            <div className={cx(style.menuInputBlock)}>
+              <select
+                id="stories"
+                className={cx('form-control', style.storiesSelector)}
+                onChange={(e) => atSelectStory(e.target.value)}
+                value={defaultValue}
+              >
+                <option value="" disabled hidden>
+                  請選擇
+                </option>
+                {storiesOptions &&
+                  storiesOptions.map((item) => (
+                    <option key={item.story} value={item.story}>
+                      {item.story}
+                    </option>
+                  ))}
+              </select>
+              <div>
+                <input
+                  type="text"
+                  className="form-control"
+                  placeholder="搜尋故事流程"
+                />
+              </div>
             </div>
             <ul className={cx(style.listmenu)}>
               {storiesOptions &&
                 storiesOptions.map((item) => (
-                  <li>
+                  <li key={item.story}>
                     <button
                       className={cx(style.listBtn)}
                       data-check="none"
-                      key={item.story}
                       value={item.story}
                       onClick={(e) => atSelectStory(e.target.value)}
                     >

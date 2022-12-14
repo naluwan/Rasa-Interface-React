@@ -116,7 +116,11 @@ const CheckPoint: React.FC<CheckPointProps> = (props) => {
   return (
     <div className={style.root} id="checkPointStep">
       <nav>
-        <div className="nav nav-tabs" id="nav-tab" role="tablist">
+        <div
+          className={cx('nav nav-tabs', style.tablist)}
+          id="nav-tab"
+          role="tablist"
+        >
           {branch.map((item) => {
             const { story, steps } = item;
             // console.log('branchStory.story:', branchStory.story);

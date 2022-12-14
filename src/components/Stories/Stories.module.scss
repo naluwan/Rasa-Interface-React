@@ -1,15 +1,14 @@
-.searchBar {
-  padding: 10px 30px;
-  justify-content: center;
-  align-items: center;
-  background: #fff;
-  width: 300px;
-  // border-right: 1px solid rgb(65 62 236);
-}
-
 .recordBtn {
   width: 100%;
   display: block;
+}
+
+.recoverBtn {
+  width: 100%;
+  padding: 0 !important;
+  display: block;
+  margin: 10px 0 0 0;
+
 }
 
 .searchTitle {
@@ -23,6 +22,7 @@
   align-items: center;
   width: 100%;
   height: 100%;
+  overflow: hidden;
 
   .btn {
     display: block;
@@ -36,11 +36,33 @@
   }
 }
 
+.menuBtnBlock {
+  display: block;
+  width: 100%;
+  line-height: 1.5;
+  color: #212529;
+  text-align: center;
+}
+
+.menuInputBlock {
+  display: block;
+  width: 100%;
+  text-align: center;
+  place-items: self-end;
+
+  select {
+    display: none;
+  }
+
+  div {
+    margin: 10px 0 0 0;
+  }
+}
+
 .storiesSelector {
-  padding: 0 10px;
   border: 1px solid #ccc;
   font-size: 16px;
-  height: 36px;
+  margin: 10px 0;
   vertical-align: middle;
   background: #f9f9f9;
   display: inline-block;
@@ -53,6 +75,11 @@
 }
 
 .searchBar {
+  padding: 10px 30px;
+  justify-content: center;
+  align-items: center;
+  background: #fff;
+  width: 300px;
   display: block;
 
   >div {
@@ -64,14 +91,16 @@
   }
 }
 
+
+
 .listmenu {
   height: calc(100% - 127px);
   overflow: auto;
   padding-left: 0px;
   list-style-type: none;
   margin-top: 0;
-  width: 247px;
-  padding-right: 12px;
+  width: 283px;
+  margin-left: 40px;
 
   button {
     background: #fff;
@@ -80,4 +109,51 @@
     text-align: left;
     border-bottom: 1px solid #000;
   }
+}
+
+@media (max-width: 960px) {
+  .searchBar {
+    width: 100%;
+    padding: 10px;
+
+  }
+
+  .senderId {
+    flex-direction: column;
+    word-break: keep-all;
+
+    .btn {
+      margin: 0;
+      width: auto;
+
+    }
+
+    button {
+      display: inline;
+      width: auto;
+      margin: 0 5px 0 5px;
+    }
+  }
+
+  .menuInputBlock {
+    display: inline-flex;
+    margin: 10px;
+    align-items: self-end;
+
+    select {
+      display: block;
+      margin: 0 10px 0 0;
+    }
+  }
+
+  .menuBtnBlock {
+    display: flex;
+    margin: 0 auto;
+    justify-content: space-between;
+  }
+
+  .listmenu {
+    display: none;
+  }
+
 }
