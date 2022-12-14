@@ -10,9 +10,10 @@ type ExamplesPropsType = {
 };
 
 const Examples: React.FC<ExamplesPropsType> = (props) => {
-  const { text, intent, entities, entitiesData, onDeleteExample } = props;
+  // const { text, intent, entities, entitiesData, onDeleteExample } = props;
+  const { text, intent, entities, onDeleteExample } = props;
 
-  console.log('entitiesData:', entitiesData);
+  // console.log('entitiesData:', entitiesData);
 
   // 刪除例句
   const atDeleteExample = React.useCallback(

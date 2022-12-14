@@ -352,4 +352,13 @@ export type CreateStoryState = {
     stories: StoryType[],
     checkPointName: string,
   ) => void,
+  // 移除支線故事的機器人回覆按鈕
+  onRemoveBranchStoryResButton: (
+    actionName: string,
+    payload: string,
+    storyName: string,
+    buttonActionName: string,
+    disabled: boolean,
+    checkPointName: string,
+  ) => void,
 };

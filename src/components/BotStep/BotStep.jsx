@@ -170,10 +170,11 @@ const BotStep: React.FC<BotStepProps> = (props) => {
           storyName,
           buttonActionName,
           disabled,
+          checkPointName,
         );
       });
     },
-    [onRemoveResButton, step.action, storyName],
+    [onRemoveResButton, step.action, storyName, checkPointName],
   );
 
   return (

@@ -26,6 +26,7 @@ import {
   actionCreateStoryBranchStoryEditBotRes,
   actionCreateStoryConnectStoryEditBotRes,
   actionCreateStoryBranchStoryAddResButtons,
+  actionCreateStoryBranchStoryRemoveResButton,
 } from 'actions';
 import type {
   NluType,
@@ -1097,10 +1098,38 @@ const reducer = (state: CreateStoryState, action: Action): State => {
                         branchStep.buttons = [{ title, payload, reply }];
                       }
                     }
-                    console.log(
-                      'CREATE_STORY_BRANCH_STORY_ADD_RES_BUTTONS branchStep ===>',
-                      branchStep,
-                    );
+                    // console.log(
+                    //   'CREATE_STORY_BRANCH_STORY_ADD_RES_BUTTONS branchStep ===>',
+                    //   branchStep,
+                    // );
+                    return branchStep;
+                  });
+                }
+                return branchStory;
+              });
+            }
+            return step;
+          }),
+        },
+      };
+    }
+    case 'CREATE_STORY_BRANCH_STORY_REMOVE_RES_BUTTON': {
+      const { actionName, payload, checkPointName } = action.payload;
+
+      return {
+        ...state,
+        newStory: {
+          ...state.newStory,
+          steps: state.newStory.steps.map((step) => {
+            if (step.checkpoint) {
+              step.branchStories = step.branchStories.map((branchStory) => {
+                if (branchStory.story === checkPointName) {
+                  branchStory.steps = branchStory.steps.map((branchStep) => {
+                    if (branchStep.action && branchStep.action === actionName) {
+                      branchStep.buttons = branchStep.buttons.filter(
+                        (button) => button.payload !== payload,
+                      );
+                    }
                     return branchStep;
                   });
                 }
@@ -1399,6 +1428,26 @@ const useCreateStoryStore = create((set) => {
           reply,
           storyName,
           stories,
+          checkPointName,
+        ),
+      );
+    },
+    // 移除支線故事的機器人回覆按鈕
+    onRemoveBranchStoryResButton(
+      actionName: string,
+      payload: string,
+      storyName: string,
+      buttonActionName: string,
+      disabled: boolean,
+      checkPointName: string,
+    ) {
+      dispatch(
+        actionCreateStoryBranchStoryRemoveResButton(
+          actionName,
+          payload,
+          storyName,
+          buttonActionName,
+          disabled,
           checkPointName,
         ),
       );
