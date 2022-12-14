@@ -252,7 +252,7 @@ const BotStep: React.FC<BotStepProps> = (props) => {
                 readOnly
               />
             </div>
-            {step.buttons?.length > 3 &&
+            {step.buttons?.length > 0 &&
               step.buttons.map((button) => {
                 const { title, payload, reply, disabled, buttonAction } =
                   button;
