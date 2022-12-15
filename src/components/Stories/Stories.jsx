@@ -131,15 +131,14 @@ const Stories = () => {
           (item) => item.story === storyName,
         )[0];
 
-        // 篩選出不是要刪除的故事
-        const deleteIdx = cloneData.stories.indexOf(deleteStory);
-        cloneData.stories.splice(deleteIdx, 1);
-
         const intentArr = [];
         const actionArr = [];
         const entitiesArr = [];
         let branchStories = [];
         const deleteStoriesArr = [];
+
+        // 將要刪除的故事放入待刪除故事陣列中
+        deleteStoriesArr.push(deleteStory.story);
 
         // 獲取所有故事名稱
         const allStoryName = cloneData.stories.map((item) => item.story);
@@ -258,13 +257,13 @@ const Stories = () => {
         });
 
         // 刪除故事
-        deleteStoriesArr.map((deleteBranchStory) => {
-          const deleteBranchStoryIdx = allStoryName.indexOf(deleteBranchStory);
-          if (deleteBranchStoryIdx > -1) {
-            allStoryName.splice(deleteIdx, 1);
-            cloneData.stories.splice(deleteIdx, 1);
+        deleteStoriesArr.map((deleteStoryItem) => {
+          const deleteStoryItemIdx = allStoryName.indexOf(deleteStoryItem);
+          if (deleteStoryItemIdx > -1) {
+            allStoryName.splice(deleteStoryItemIdx, 1);
+            cloneData.stories.splice(deleteStoryItemIdx, 1);
           }
-          return deleteBranchStory;
+          return deleteStoryItem;
         });
 
         // 刪除nlu訓練檔中的例句
