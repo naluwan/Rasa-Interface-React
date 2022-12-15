@@ -139,6 +139,10 @@ const Stories = () => {
         const actionArr = [];
         const entitiesArr = [];
         let branchStories = [];
+        const deleteStoriesArr = [];
+
+        // 獲取所有故事名稱
+        const allStoryName = cloneData.stories.map((item) => item.story);
 
         // console.log(story);
         // 將要刪除故事的使用者例句和機器人回覆組回去，並將要刪除故事的action和意圖取出
@@ -158,15 +162,8 @@ const Stories = () => {
                   actionArr.push(button.buttonAction);
                   intentArr.push(button.payload);
                 }
-                const allStoryName = cloneData.stories.map(
-                  (item) => item.story,
-                );
-                const buttonStoryIdx = allStoryName.indexOf(
-                  `button_${button.title}`,
-                );
-                if (buttonStoryIdx !== -1) {
-                  cloneData.stories.splice(buttonStoryIdx, 1);
-                }
+
+                deleteStoriesArr.push(`button_${story.story}_${button.title}`);
                 return button;
               });
             }
@@ -195,72 +192,76 @@ const Stories = () => {
           return step;
         });
 
-        const deleteBranchStories = [];
-        const allStoryName = [];
         // 刪除支線故事的故事流程、支線故事機器人回覆和回覆名稱
-        branchStories.map((item) => {
-          // 獲取所有故事名稱
-          cloneData.stories.map((storyItem) =>
-            allStoryName.push(storyItem.story),
-          );
+        branchStories.map((branchStory) => {
           // 將要刪除的故事名稱放進待刪除故事陣列中，後面一併處理
-          deleteBranchStories.push(item.story);
+          deleteStoriesArr.push(branchStory.story);
 
           // 找到該支線故事的回覆
-          item.steps.map((step, idx) => {
-            if (step.action) {
-              actionArr.push(step.action);
-              if (step.buttons) {
-                step.buttons.map((button) => {
+          branchStory.steps.map((branchStep, idx) => {
+            if (branchStep.action) {
+              actionArr.push(branchStep.action);
+              if (branchStep.buttons) {
+                branchStep.buttons.map((button) => {
                   // 如果是自建的選項才需要此步驟，如果是選項是回覆現有故事流程中的故事就不用
                   if (!button.disabled) {
                     actionArr.push(button.buttonAction);
                     intentArr.push(button.payload);
                   }
                   // 將要刪除的故事名稱放進待刪除故事陣列中，後面一併處理
-                  deleteBranchStories.push(
-                    `button_${item.story}_${button.title}`,
+                  deleteStoriesArr.push(
+                    `button_${branchStory.story}_${button.title}`,
                   );
                   return button;
                 });
               }
             }
-            if (idx !== 0 && step.checkpoint && step.branchStories.length) {
+            if (
+              idx !== 0 &&
+              branchStep.checkpoint &&
+              branchStep.branchStories.length
+            ) {
               // 刪除支線故事內串接的支線故事
-              step.branchStories.map((branchStory) => {
+              branchStep.branchStories.map((connectStory) => {
                 // 將要刪除的故事名稱放進待刪除故事陣列中，後面一併處理
-                deleteBranchStories.push(branchStory.story);
-                return branchStory.steps.map((branchStep) => {
-                  if (branchStep.action) {
-                    actionArr.push(branchStep.action);
-                    if (branchStep.buttons) {
-                      branchStep.buttons.map((button) => {
+                deleteStoriesArr.push(connectStory.story);
+                return connectStory.steps.map((connectStep) => {
+                  if (connectStep.action) {
+                    actionArr.push(connectStep.action);
+                    if (connectStep.buttons) {
+                      connectStep.buttons.map((button) => {
                         // 如果是自建的選項才需要此步驟，如果是選項是回覆現有故事流程中的故事就不用
                         if (!button.disabled) {
                           actionArr.push(button.buttonAction);
                           intentArr.push(button.payload);
                         }
                         // 將要刪除的故事名稱放進待刪除故事陣列中，後面一併處理
-                        deleteBranchStories.push(
-                          `button_${item.story}_${branchStory.story}_${button.title}`,
+                        deleteStoriesArr.push(
+                          `button_${
+                            branchStory.story
+                          }_${connectStory.story.slice(
+                            connectStory.story.lastIndexOf('_') + 1,
+                            connectStory.story.length,
+                          )}_${button.title}`,
                         );
                         return button;
                       });
                     }
                   }
-                  return branchStep;
+                  return connectStep;
                 });
               });
             }
-            return step;
+            return branchStep;
           });
-          return item;
+          return branchStory;
         });
 
         // 刪除故事
-        deleteBranchStories.map((deleteBranchStory) => {
+        deleteStoriesArr.map((deleteBranchStory) => {
           const deleteBranchStoryIdx = allStoryName.indexOf(deleteBranchStory);
           if (deleteBranchStoryIdx > -1) {
+            allStoryName.splice(deleteIdx, 1);
             cloneData.stories.splice(deleteIdx, 1);
           }
           return deleteBranchStory;

@@ -469,7 +469,7 @@ const reducer = (state: CreateStoryState, action: Action): State => {
       const { actionName, title, payload, reply, stories } = action.payload;
       const { newStory } = state;
       const isInStory = stories.some(
-        (item) => item.story === `button_${title}`,
+        (item) => item.story === `button_${newStory.story}_${title}`,
       );
 
       const isExist = newStory.steps.some((step) => {
@@ -509,7 +509,7 @@ const reducer = (state: CreateStoryState, action: Action): State => {
       const { newStory } = state;
 
       const isInStory = stories.some(
-        (item) => item.story === `button_${title}`,
+        (item) => item.story === `button_${newStory.story}_${title}`,
       );
 
       const isExist = newStory.steps.some((step) => {
