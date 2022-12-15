@@ -382,4 +382,17 @@ export type CreateStoryState = {
     checkPointName: string,
     connectStoryName: string,
   ) => void,
+  // 編輯串接故事的機器人按鈕
+  onEditConnectStoryResButtons: (
+    actionName: string,
+    title: string,
+    oriPayload: string,
+    payload: string,
+    reply: string,
+    storyName: string,
+    buttonActionName: string,
+    stories: StoryType[],
+    checkPointName: string,
+    connectStoryName: string,
+  ) => void,
 };

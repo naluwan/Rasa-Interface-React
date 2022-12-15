@@ -29,6 +29,7 @@ const ConnectBranchStory: React.FC<ConnectBranchStoryProps> = (props) => {
     onEditConnectStoryBotRes,
     onAddConnectStoryResButtons,
     onRemoveConnectStoryResButton,
+    onEditConnectStoryResButtons,
   } = useCreateStoryStore((state: CreateStoryState) => {
     return {
       selectedBranchStory: state.selectedBranchStory,
@@ -37,6 +38,7 @@ const ConnectBranchStory: React.FC<ConnectBranchStoryProps> = (props) => {
       onEditConnectStoryBotRes: state.onEditConnectStoryBotRes,
       onAddConnectStoryResButtons: state.onAddConnectStoryResButtons,
       onRemoveConnectStoryResButton: state.onRemoveConnectStoryResButton,
+      onEditConnectStoryResButtons: state.onEditConnectStoryResButtons,
     };
   }, shallow);
 
@@ -156,6 +158,7 @@ const ConnectBranchStory: React.FC<ConnectBranchStoryProps> = (props) => {
                     onEditBotRes={onEditConnectStoryBotRes}
                     onAddResButtons={onAddConnectStoryResButtons}
                     onRemoveResButton={onRemoveConnectStoryResButton}
+                    onEditResButtons={onEditConnectStoryResButtons}
                   />
                 );
               }

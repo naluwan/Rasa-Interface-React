@@ -30,6 +30,7 @@ import {
   actionCreateStoryBranchStoryEditResButtons,
   actionCreateStoryConnectStoryAddResButtons,
   actionCreateStoryConnectStoryRemoveResButton,
+  actionCreateStoryConnectStoryEditResButtons,
 } from 'actions';
 import type {
   NluType,
@@ -1395,6 +1396,144 @@ const reducer = (state: CreateStoryState, action: Action): State => {
         },
       };
     }
+    case 'CREATE_STORY_CONNECT_STORY_EDIT_RES_BUTTONS': {
+      const {
+        actionName,
+        title,
+        oriPayload,
+        payload,
+        reply,
+        stories,
+        checkPointName,
+        connectStoryName,
+      } = action.payload;
+
+      const { newStory } = state;
+
+      // 獲取原title
+      const curOriPayload = oriPayload.replace(/\//g, '');
+
+      // 找出完全無更改的按鈕
+      const ownButtonInfo = newStory.steps
+        .filter((step) => step.checkpoint)
+        .map((step) => step.branchStories)[0]
+        .filter((item) => item.story === checkPointName)
+        .map((item) => item.steps)[0]
+        .filter((step, idx) => idx !== 0 && step.checkpoint)
+        .map((step) => step.branchStories)[0]
+        .filter((item) => item.story === connectStoryName)
+        .map((item) => item.steps)[0]
+        .filter((step) => step.action)
+        .map((step) => step.buttons)[0]
+        .filter((button) => button.title === title && button.reply === reply);
+
+      // 完全相同就返回，不用更改
+      if (ownButtonInfo.length) {
+        return {
+          ...state,
+        };
+      }
+
+      // 比對stories訓練檔中有沒有重複
+      const isInStory = stories.some(
+        (item) =>
+          item.story ===
+          `button_${checkPointName}_${connectStoryName.slice(
+            connectStoryName.lastIndexOf('_') + 1,
+            connectStoryName.length,
+          )}_${title}`,
+      );
+
+      const isExist = newStory.steps.some((step) => {
+        if (step.checkpoint) {
+          return step.branchStories.some((branchStory) => {
+            if (branchStory.story === checkPointName) {
+              return branchStory.steps.some((branchStep, idx) => {
+                if (idx !== 0 && branchStep.checkpoint) {
+                  return branchStep.branchStories.some((connectStory) => {
+                    if (connectStory.story === connectStoryName) {
+                      return connectStory.steps.some((connectStep) => {
+                        if (
+                          connectStep.action &&
+                          connectStep.action === actionName
+                        ) {
+                          return connectStep.buttons.some(
+                            (button) => button.title === title,
+                          );
+                        }
+                        return false;
+                      });
+                    }
+                    return false;
+                  });
+                }
+                return false;
+              });
+            }
+            return false;
+          });
+        }
+        return false;
+      });
+
+      // 如果存在stories訓練檔中或是存在新建故事的按鈕中且標題不等於原標題就提示選項已存在
+      if ((isExist && title !== curOriPayload) || isInStory) {
+        return Toast.fire({
+          icon: 'warning',
+          title: '此選項已存在',
+        });
+      }
+
+      return {
+        ...state,
+        newStory: {
+          ...state.newStory,
+          steps: state.newStory.steps.map((step) => {
+            if (step.checkpoint) {
+              step.branchStories = step.branchStories.map((branchStory) => {
+                if (branchStory.story === checkPointName) {
+                  branchStory.steps = branchStory.steps.map(
+                    (branchStep, idx) => {
+                      if (idx !== 0 && branchStep.checkpoint) {
+                        branchStep.branchStories = branchStep.branchStories.map(
+                          (connectStory) => {
+                            if (connectStory.story === connectStoryName) {
+                              connectStory.steps = connectStory.steps.map(
+                                (connectStep) => {
+                                  if (
+                                    connectStep.action &&
+                                    connectStep.action === actionName
+                                  ) {
+                                    connectStep.buttons =
+                                      connectStep.buttons.map((button) => {
+                                        if (button.payload === oriPayload) {
+                                          button.title = title;
+                                          button.payload = payload;
+                                          button.reply = reply;
+                                        }
+                                        return button;
+                                      });
+                                  }
+                                  return connectStep;
+                                },
+                              );
+                            }
+                            return connectStory;
+                          },
+                        );
+                      }
+                      return branchStep;
+                    },
+                  );
+                }
+                return branchStory;
+              });
+            }
+            return step;
+          }),
+        },
+      };
+    }
     default:
       return state;
   }
@@ -1773,6 +1912,34 @@ const useCreateStoryStore = create((set) => {
           storyName,
           buttonActionName,
           disabled,
+          checkPointName,
+          connectStoryName,
+        ),
+      );
+    },
+    // 編輯串接故事的機器人按鈕
+    onEditConnectStoryResButtons(
+      actionName: string,
+      title: string,
+      oriPayload: string,
+      payload: string,
+      reply: string,
+      storyName: string,
+      buttonActionName: string,
+      stories: StoryType[],
+      checkPointName: string,
+      connectStoryName: string,
+    ) {
+      dispatch(
+        actionCreateStoryConnectStoryEditResButtons(
+          actionName,
+          title,
+          oriPayload,
+          payload,
+          reply,
+          storyName,
+          buttonActionName,
+          stories,
           checkPointName,
           connectStoryName,
         ),
