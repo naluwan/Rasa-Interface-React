@@ -29,6 +29,7 @@ import {
   actionCreateStoryBranchStoryRemoveResButton,
   actionCreateStoryBranchStoryEditResButtons,
   actionCreateStoryConnectStoryAddResButtons,
+  actionCreateStoryConnectStoryRemoveResButton,
 } from 'actions';
 import type {
   NluType,
@@ -1246,19 +1247,13 @@ const reducer = (state: CreateStoryState, action: Action): State => {
       } = action.payload;
       const { newStory } = state;
 
-      console.log('actionName ===> ', actionName);
-      console.log('title ===> ', title);
-      console.log('payload ===> ', payload);
-      console.log('reply ===> ', reply);
-      console.log('stories ===> ', stories);
-      console.log('checkPointName ===> ', checkPointName);
-      console.log('connectStoryName ===> ', connectStoryName);
-      console.log('newStory ===> ', newStory);
-
       const isInStory = stories.some(
         (item) =>
           item.story ===
-          `button_${checkPointName}_${connectStoryName}_${title}`,
+          `button_${checkPointName}_${connectStoryName.slice(
+            connectStoryName.lastIndexOf('_') + 1,
+            connectStoryName.length,
+          )}_${title}`,
       );
 
       const isExist = newStory.steps.some((step) => {
@@ -1266,15 +1261,7 @@ const reducer = (state: CreateStoryState, action: Action): State => {
           return step.branchStories.some((branchStory) => {
             if (branchStory.story === checkPointName) {
               return branchStory.steps.some((branchStep, idx) => {
-                console.log(
-                  'outside connect story add res btn branch step ===> ',
-                  branchStep,
-                );
                 if (idx !== 0 && branchStep.checkpoint) {
-                  console.log(
-                    'connect story add res btn branch step ===> ',
-                    branchStep,
-                  );
                   return branchStep.branchStories.some((connectStory) => {
                     if (connectStory.story === connectStoryName) {
                       return connectStory.steps.some((connectStep) => {
@@ -1338,6 +1325,55 @@ const reducer = (state: CreateStoryState, action: Action): State => {
                                         { title, payload, reply },
                                       ];
                                     }
+                                  }
+                                  return connectStep;
+                                },
+                              );
+                            }
+                            return connectStory;
+                          },
+                        );
+                      }
+                      return branchStep;
+                    },
+                  );
+                }
+                return branchStory;
+              });
+            }
+            return step;
+          }),
+        },
+      };
+    }
+    case 'CREATE_STORY_CONNECT_STORY_REMOVE_RES_BUTTON': {
+      const { actionName, payload, checkPointName, connectStoryName } =
+        action.payload;
+
+      return {
+        ...state,
+        newStory: {
+          ...state.newStory,
+          steps: state.newStory.steps.map((step) => {
+            if (step.checkpoint) {
+              step.branchStories = step.branchStories.map((branchStory) => {
+                if (branchStory.story === checkPointName) {
+                  branchStory.steps = branchStory.steps.map(
+                    (branchStep, idx) => {
+                      if (idx !== 0 && branchStep.checkpoint) {
+                        branchStep.branchStories = branchStep.branchStories.map(
+                          (connectStory) => {
+                            if (connectStory.story === connectStoryName) {
+                              connectStory.steps = connectStory.steps.map(
+                                (connectStep) => {
+                                  if (
+                                    connectStep.action &&
+                                    connectStep.action === actionName
+                                  ) {
+                                    connectStep.buttons =
+                                      connectStep.buttons.filter(
+                                        (button) => button.payload !== payload,
+                                      );
                                   }
                                   return connectStep;
                                 },
@@ -1715,6 +1751,28 @@ const useCreateStoryStore = create((set) => {
           reply,
           storyName,
           stories,
+          checkPointName,
+          connectStoryName,
+        ),
+      );
+    },
+    // 移除串接故事的機器人回覆按鈕
+    onRemoveConnectStoryResButton(
+      actionName: string,
+      payload: string,
+      storyName: string,
+      buttonActionName: string,
+      disabled: boolean,
+      checkPointName: string,
+      connectStoryName: string,
+    ) {
+      dispatch(
+        actionCreateStoryConnectStoryRemoveResButton(
+          actionName,
+          payload,
+          storyName,
+          buttonActionName,
+          disabled,
           checkPointName,
           connectStoryName,
         ),

@@ -361,6 +361,18 @@ export type Action =
         checkPointName: string,
         connectStoryName: string,
       },
+    }
+  | {
+      type: 'CREATE_STORY_CONNECT_STORY_REMOVE_RES_BUTTON',
+      payload: {
+        actionName: string,
+        payload: string,
+        storyName: string,
+        buttonActionName: string,
+        disabled: boolean,
+        checkPointName: string,
+        connectStoryName: string,
+      },
     };
 
 // ====================== query story ======================
@@ -887,6 +899,27 @@ export const actionCreateStoryConnectStoryAddResButtons = (
     reply,
     storyName,
     stories,
+    checkPointName,
+    connectStoryName,
+  },
+});
+
+export const actionCreateStoryConnectStoryRemoveResButton = (
+  actionName: string,
+  payload: string,
+  storyName: string,
+  buttonActionName: string,
+  disabled: boolean,
+  checkPointName: string,
+  connectStoryName: string,
+): Action => ({
+  type: 'CREATE_STORY_CONNECT_STORY_REMOVE_RES_BUTTON',
+  payload: {
+    actionName,
+    payload,
+    storyName,
+    buttonActionName,
+    disabled,
     checkPointName,
     connectStoryName,
   },

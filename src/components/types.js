@@ -372,4 +372,14 @@ export type CreateStoryState = {
     checkPointName: string,
     connectStoryName: string,
   ) => void,
+  // 移除串接故事的機器人回覆按鈕
+  onRemoveConnectStoryResButton: (
+    actionName: string,
+    payload: string,
+    storyName: string,
+    buttonActionName: string,
+    disabled: boolean,
+    checkPointName: string,
+    connectStoryName: string,
+  ) => void,
 };
