@@ -1,14 +1,16 @@
 .root {
 
     &:nth-child(even) {
-      background: #d4d4d4;
+      background: #e8ebff;
+      text-align: center;
     }
-
+     &:nth-child(odd) {
+       background: #fff;
+       text-align: center;
+     }
 
   .tbltd {
-    text-align: left;
     padding: 10px;
-    border-radius: 1px solid #000;
 
 
   }

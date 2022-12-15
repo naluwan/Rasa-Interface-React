@@ -36,18 +36,15 @@ const Slot: React.FC<SlotPropsType> = (props) => {
   return (
     <div
       key={slot.key}
-      className={cx(
-        'mb-2 border border-3 rounded border-secondary d-flex flex-column align-items-center',
-        style.slotContainer,
-      )}
+      className={cx('mb-2 flex-column ', style.slotContainer, style.slot)}
     >
-      <div>名稱：{slot.key}</div>
+      <div className={style.title}>{slot.key}</div>
       {slot.slotInfo.type === 'text' ? (
-        <div>類別：文字</div>
+        <div className={style.type}>類別：文字</div>
       ) : (
-        <div className="d-flex flex-column align-items-center">
-          <div>類別：儲存槽</div>
-          <div className="d-flex flex-wrap justify-content-start">
+        <div>
+          <div className={style.type}>類別：儲存槽</div>
+          <div className={cx(style.SlotValueItemBlock)}>
             {slot.slotInfo.values.map((value) => {
               return (
                 <SlotValueItem

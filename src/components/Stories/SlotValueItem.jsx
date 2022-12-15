@@ -20,7 +20,7 @@ const SlotValueItem: React.FC<SlotValueItemPropsType> = (props) => {
   }, shallow);
 
   return (
-    <span className={cx('badge text-bg-info m-2', style.item)}>
+    <span className={cx(' m-2', style.item)}>
       {slotValue.value}
       <RiCloseCircleFill
         className={style.removeSlotValueIcon}

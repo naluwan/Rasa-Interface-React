@@ -999,25 +999,27 @@ const UserStep: React.FC<UserStepProps> = (props) => {
                 </div>
                 <div className="modal-body">
                   <table>
-                    <thead>
-                      <tr className={cx(style.tblHead, style.tblHeader)}>
-                        <th className={cx(style.tblHead)} rowSpan="2">
-                          例句
-                        </th>
-                        <th className={cx(style.tblHead)} rowSpan="2">
-                          關鍵字
-                        </th>
-                        <th className={cx(style.tblHead)} rowSpan="2">
-                          儲存槽
-                        </th>
-                        <th className={cx(style.tblHead)} rowSpan="2">
-                          紀錄槽
-                        </th>
-                        <th className={cx(style.tblHead)} rowSpan="2">
-                          操作
-                        </th>
-                      </tr>
-                    </thead>
+                    {step.examples.length > 0 && (
+                      <thead>
+                        <tr className={cx(style.tblHead, style.tblHeader)}>
+                          <th className={cx(style.tblHead)} rowSpan="2">
+                            例句
+                          </th>
+                          <th className={cx(style.tblHead)} rowSpan="2">
+                            關鍵字
+                          </th>
+                          <th className={cx(style.tblHead)} rowSpan="2">
+                            儲存槽
+                          </th>
+                          <th className={cx(style.tblHead)} rowSpan="2">
+                            紀錄槽
+                          </th>
+                          <th className={cx(style.tblHead)} rowSpan="2">
+                            操作
+                          </th>
+                        </tr>
+                      </thead>
+                    )}
                     <tbody>
                       {step.examples.length > 0 ? (
                         step.examples.map((example) => {

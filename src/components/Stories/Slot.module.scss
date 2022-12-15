@@ -1,15 +1,57 @@
 .slotContainer {
   position: relative;
   padding: 0.5rem;
-  .dropdownMenu {
-    position: absolute;
-    top: -1.5rem;
-    right: -0.5rem;
-    & :global(.edit) {
-      color: rgb(39, 63, 244);
+  border: 1px solid #dbdbdb;
+  border-radius: 8px;
+  text-align: center;
+
+  .title {
+    font-size: 20px;
+    font-weight: 900;
+  }
+
+  .type {
+    color: #4b4b4b;
+  }
+
+  .SlotValueItemBlock {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    background-color: #ffffff;
+
+    &::after {
+      content: '';
+      flex: auto;
     }
-    & :global(.delete) {
-      color: rgb(227, 8, 8);
+  }
+
+  &.slot {
+
+    .dropdownMenu {
+      position: absolute;
+      top: -1.5rem;
+      right: 0;
+
+      button:focus:not(:focus-visible) {
+        outline: 0;
+        border: 0;
+        color: #743bcf;
+      }
+
+      ul {
+        right: 0px !important;
+        transform: translateX(0%) !important;
+        top: 36px !important;
+      }
+
+      & :global(.edit) {
+        color: #4b4b4b;
+      }
+
+      & :global(.delete) {
+        color: rgb(227, 8, 8);
+      }
     }
   }
 }
