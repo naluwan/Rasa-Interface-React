@@ -485,7 +485,7 @@ const Stories = () => {
 
   // 新增故事點擊儲存按鈕
   const atClickSaveBtn = React.useCallback(
-    (createStory: StoryType) => {
+    (createStory: StoryType, isRecoverDeletedStory: boolean) => {
       const newStories = cloneDeep(cloneData.stories);
       const newNlu = cloneDeep(cloneData.nlu);
       const newDomain = cloneDeep(cloneData.domain);
@@ -576,6 +576,14 @@ const Stories = () => {
               if (step.buttons) {
                 step.buttons.map((button) => {
                   const isPayload = button.payload.indexOf('/');
+                  if (isRecoverDeletedStory) {
+                    return buttons.push({
+                      title: button.title,
+                      payload:
+                        isPayload > -1 ? button.payload : `/${button.payload}`,
+                      reply: button.reply,
+                    });
+                  }
                   return buttons.push({
                     title: button.title,
                     payload:
@@ -608,17 +616,35 @@ const Stories = () => {
                     if (connectStep.buttons) {
                       connectStep.buttons.map((button) => {
                         const isPayload = button.payload.indexOf('/');
+                        if (isRecoverDeletedStory) {
+                          return buttons.push({
+                            title: button.title,
+                            payload:
+                              isPayload > -1
+                                ? button.payload
+                                : `/${button.payload}`,
+                            reply: button.reply,
+                          });
+                        }
                         return buttons.push({
                           title: button.title,
                           payload:
                             isPayload > -1
-                              ? `/${branchStory.story}_${
-                                  connectBranchStory.story
-                                }_${button.payload.slice(
+                              ? `/${
+                                  branchStory.story
+                                }_${connectBranchStory.story.slice(
+                                  connectBranchStory.story.lastIndexOf('_') + 1,
+                                  connectBranchStory.story.length,
+                                )}_${button.payload.slice(
                                   1,
                                   button.payload.length,
                                 )}`
-                              : `/${branchStory.story}_${connectBranchStory.story}_${button.payload}`,
+                              : `/${
+                                  branchStory.story
+                                }_${connectBranchStory.story.slice(
+                                  connectBranchStory.story.lastIndexOf('_') + 1,
+                                  connectBranchStory.story.length,
+                                )}_${button.payload}`,
                           reply: button.reply,
                         });
                       });
@@ -697,15 +723,29 @@ const Stories = () => {
 
       // 組成機器人回覆的訓練檔格式
       createStory.steps
-        .filter((step) => step.action || step.checkpoint)
+        .filter((step) => step.action)
         .map((step) => {
           const buttons = [];
           if (step.buttons) {
             step.buttons.map((button) => {
               const isPayload = button.payload.indexOf('/');
+              if (isRecoverDeletedStory) {
+                return buttons.push({
+                  title: button.title,
+                  payload:
+                    isPayload > -1 ? button.payload : `/${button.payload}`,
+                  reply: button.reply,
+                });
+              }
               return buttons.push({
                 title: button.title,
-                payload: isPayload > -1 ? button.payload : `/${button.payload}`,
+                payload:
+                  isPayload > -1
+                    ? `/${createStory.story}_${button.payload.slice(
+                        1,
+                        button.payload.length,
+                      )}`
+                    : `/${createStory.story}_${button.payload}`,
                 reply: button.reply,
               });
             });
@@ -832,7 +872,7 @@ const Stories = () => {
         });
         return;
       }
-      atClickSaveBtn(deleteStory);
+      atClickSaveBtn(deleteStory, true);
       onSetDeleteStory({});
     },
     [onSetDeleteStory, atClickSaveBtn, stories],

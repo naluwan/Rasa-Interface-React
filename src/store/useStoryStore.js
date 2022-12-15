@@ -294,7 +294,7 @@ const reducer = (state: State, action: Action): State => {
                       );
 
                       // 獲取回覆資料
-                      const botRes = domain.responses[branchStep.action][0];
+                      const botRes = domain.responses[connectStep.action][0];
 
                       // 判斷是否有按鈕
                       if (botRes.buttons) {

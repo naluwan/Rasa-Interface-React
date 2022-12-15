@@ -361,4 +361,15 @@ export type CreateStoryState = {
     disabled: boolean,
     checkPointName: string,
   ) => void,
+  // 串接故事新增機器人回覆按鈕
+  onAddConnectStoryResButtons: (
+    actionName: string,
+    title: string,
+    payload: string,
+    reply: string,
+    storyName: string,
+    stories: StoryType[],
+    checkPointName: string,
+    connectStoryName: string,
+  ) => void,
 };

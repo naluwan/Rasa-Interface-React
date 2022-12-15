@@ -348,6 +348,19 @@ export type Action =
         stories: StoryType[],
         checkPointName: string,
       },
+    }
+  | {
+      type: 'CREATE_STORY_CONNECT_STORY_ADD_RES_BUTTONS',
+      payload: {
+        actionName: string,
+        title: string,
+        payload: string,
+        reply: string,
+        storyName: string,
+        stories: StoryType[],
+        checkPointName: string,
+        connectStoryName: string,
+      },
     };
 
 // ====================== query story ======================
@@ -853,5 +866,28 @@ export const actionCreateStoryBranchStoryEditResButtons = (
     buttonActionName,
     stories,
     checkPointName,
+  },
+});
+
+export const actionCreateStoryConnectStoryAddResButtons = (
+  actionName: string,
+  title: string,
+  payload: string,
+  reply: string,
+  storyName: string,
+  stories: StoryType[],
+  checkPointName: string,
+  connectStoryName: string,
+): Action => ({
+  type: 'CREATE_STORY_CONNECT_STORY_ADD_RES_BUTTONS',
+  payload: {
+    actionName,
+    title,
+    payload,
+    reply,
+    storyName,
+    stories,
+    checkPointName,
+    connectStoryName,
   },
 });

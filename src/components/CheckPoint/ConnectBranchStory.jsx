@@ -27,12 +27,14 @@ const ConnectBranchStory: React.FC<ConnectBranchStoryProps> = (props) => {
     selectedConnectBranchStory,
     onSetSelectedConnectBranchStory,
     onEditConnectStoryBotRes,
+    onAddConnectStoryResButtons,
   } = useCreateStoryStore((state: CreateStoryState) => {
     return {
       selectedBranchStory: state.selectedBranchStory,
       selectedConnectBranchStory: state.selectedConnectBranchStory,
       onSetSelectedConnectBranchStory: state.onSetSelectedConnectBranchStory,
       onEditConnectStoryBotRes: state.onEditConnectStoryBotRes,
+      onAddConnectStoryResButtons: state.onAddConnectStoryResButtons,
     };
   }, shallow);
 
@@ -150,6 +152,7 @@ const ConnectBranchStory: React.FC<ConnectBranchStoryProps> = (props) => {
                     checkPointName={selectedBranchStory.story}
                     connectBranchStoryName={selectedConnectBranchStory.story}
                     onEditBotRes={onEditConnectStoryBotRes}
+                    onAddResButtons={onAddConnectStoryResButtons}
                   />
                 );
               }

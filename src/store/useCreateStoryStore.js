@@ -28,6 +28,7 @@ import {
   actionCreateStoryBranchStoryAddResButtons,
   actionCreateStoryBranchStoryRemoveResButton,
   actionCreateStoryBranchStoryEditResButtons,
+  actionCreateStoryConnectStoryAddResButtons,
 } from 'actions';
 import type {
   NluType,
@@ -1052,7 +1053,7 @@ const reducer = (state: CreateStoryState, action: Action): State => {
       const { newStory } = state;
 
       const isInStory = stories.some(
-        (item) => item.story === `button_${title}`,
+        (item) => item.story === `button_${checkPointName}_${title}`,
       );
 
       const isExist = newStory.steps.some((step) => {
@@ -1224,6 +1225,131 @@ const reducer = (state: CreateStoryState, action: Action): State => {
                     }
                     return branchStep;
                   });
+                }
+                return branchStory;
+              });
+            }
+            return step;
+          }),
+        },
+      };
+    }
+    case 'CREATE_STORY_CONNECT_STORY_ADD_RES_BUTTONS': {
+      const {
+        actionName,
+        title,
+        payload,
+        reply,
+        stories,
+        checkPointName,
+        connectStoryName,
+      } = action.payload;
+      const { newStory } = state;
+
+      console.log('actionName ===> ', actionName);
+      console.log('title ===> ', title);
+      console.log('payload ===> ', payload);
+      console.log('reply ===> ', reply);
+      console.log('stories ===> ', stories);
+      console.log('checkPointName ===> ', checkPointName);
+      console.log('connectStoryName ===> ', connectStoryName);
+      console.log('newStory ===> ', newStory);
+
+      const isInStory = stories.some(
+        (item) =>
+          item.story ===
+          `button_${checkPointName}_${connectStoryName}_${title}`,
+      );
+
+      const isExist = newStory.steps.some((step) => {
+        if (step.checkpoint) {
+          return step.branchStories.some((branchStory) => {
+            if (branchStory.story === checkPointName) {
+              return branchStory.steps.some((branchStep, idx) => {
+                console.log(
+                  'outside connect story add res btn branch step ===> ',
+                  branchStep,
+                );
+                if (idx !== 0 && branchStep.checkpoint) {
+                  console.log(
+                    'connect story add res btn branch step ===> ',
+                    branchStep,
+                  );
+                  return branchStep.branchStories.some((connectStory) => {
+                    if (connectStory.story === connectStoryName) {
+                      return connectStory.steps.some((connectStep) => {
+                        if (
+                          connectStep.action &&
+                          connectStep.action === actionName
+                        ) {
+                          return connectStep.buttons?.some(
+                            (button) => button.title === title,
+                          );
+                        }
+                        return false;
+                      });
+                    }
+                    return false;
+                  });
+                }
+                return false;
+              });
+            }
+            return false;
+          });
+        }
+        return false;
+      });
+
+      if (isExist || isInStory) {
+        return Toast.fire({
+          icon: 'warning',
+          title: '此選項已存在',
+        });
+      }
+
+      return {
+        ...state,
+        newStory: {
+          ...state.newStory,
+          steps: state.newStory.steps.map((step) => {
+            if (step.checkpoint) {
+              step.branchStories = step.branchStories.map((branchStory) => {
+                if (branchStory.story === checkPointName) {
+                  branchStory.steps = branchStory.steps.map(
+                    (branchStep, idx) => {
+                      if (idx !== 0 && branchStep.checkpoint) {
+                        branchStep.branchStories = branchStep.branchStories.map(
+                          (connectStory) => {
+                            if (connectStory.story === connectStoryName) {
+                              connectStory.steps = connectStory.steps.map(
+                                (connectStep) => {
+                                  if (
+                                    connectStep.action &&
+                                    connectStep.action === actionName
+                                  ) {
+                                    if (connectStep.buttons) {
+                                      connectStep.buttons =
+                                        connectStep.buttons.concat([
+                                          { title, payload, reply },
+                                        ]);
+                                    } else {
+                                      connectStep.buttons = [
+                                        { title, payload, reply },
+                                      ];
+                                    }
+                                  }
+                                  return connectStep;
+                                },
+                              );
+                            }
+                            return connectStory;
+                          },
+                        );
+                      }
+                      return branchStep;
+                    },
+                  );
                 }
                 return branchStory;
               });
@@ -1567,6 +1693,30 @@ const useCreateStoryStore = create((set) => {
           buttonActionName,
           stories,
           checkPointName,
+        ),
+      );
+    },
+    // 串接故事新增機器人回覆按鈕
+    onAddConnectStoryResButtons(
+      actionName: string,
+      title: string,
+      payload: string,
+      reply: string,
+      storyName: string,
+      stories: StoryType[],
+      checkPointName: string,
+      connectStoryName: string,
+    ) {
+      dispatch(
+        actionCreateStoryConnectStoryAddResButtons(
+          actionName,
+          title,
+          payload,
+          reply,
+          storyName,
+          stories,
+          checkPointName,
+          connectStoryName,
         ),
       );
     },
