@@ -8,16 +8,22 @@ type ButtonItemsProps = {
   reply: string,
   disabled: boolean,
   buttonAction: string,
+  checkPointName: string,
+  connectBranchStoryName: string,
   onEditResButtons: (
     title: string,
     reply: string,
-    buttonActionName?: string,
+    buttonActionName: string,
+    currentCheckPointName: string,
+    currentConnectBranchStoryName: string,
   ) => void,
   onRemoveResButton: (
     title: string,
     payload: string,
     buttonActionName?: string,
     disabled?: boolean,
+    currentCheckPointName: string,
+    currentConnectBranchStoryName: string,
   ) => void,
 };
 
@@ -28,6 +34,8 @@ const ButtonItems: React.FC<ButtonItemsProps> = (props) => {
     reply,
     disabled,
     buttonAction,
+    checkPointName,
+    connectBranchStoryName,
     onEditResButtons,
     onRemoveResButton,
   } = props;
@@ -48,14 +56,29 @@ const ButtonItems: React.FC<ButtonItemsProps> = (props) => {
           <div>
             <button
               className="btn btn-primary mx-1 "
-              onClick={() => onEditResButtons(title, reply, buttonAction)}
+              onClick={() =>
+                onEditResButtons(
+                  title,
+                  reply,
+                  buttonAction,
+                  checkPointName,
+                  connectBranchStoryName,
+                )
+              }
             >
               編輯
             </button>
             <button
               className="btn btn-danger"
               onClick={() =>
-                onRemoveResButton(title, payload, buttonAction, disabled)
+                onRemoveResButton(
+                  title,
+                  payload,
+                  buttonAction,
+                  disabled,
+                  checkPointName,
+                  connectBranchStoryName,
+                )
               }
             >
               刪除
