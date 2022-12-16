@@ -219,19 +219,15 @@ const CheckPoint: React.FC<CheckPointProps> = (props) => {
             selectedBranchStory.steps.every(
               (step) => !step.action || step.checkpoint,
             ) && (
-              <div className="d-flex justify-content-end mt-3">
-                <div className="col-6">
-                  <button
-                    className="btn btn-warning"
-                    data-bs-toggle="modal"
-                    data-bs-target="#createBranchStoryModal"
-                    onClick={() =>
-                      atClickCreateBranch(selectedBranchStory.story)
-                    }
-                  >
-                    串接支線故事
-                  </button>
-                </div>
+              <div className="d-flex justify-content-center mt-3">
+                <button
+                  className="btn btn-warning"
+                  data-bs-toggle="modal"
+                  data-bs-target="#createBranchStoryModal"
+                  onClick={() => atClickCreateBranch(selectedBranchStory.story)}
+                >
+                  串接支線故事
+                </button>
               </div>
             )}
         </div>
