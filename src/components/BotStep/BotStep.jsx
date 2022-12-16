@@ -193,11 +193,8 @@ const BotStep: React.FC<BotStepProps> = (props) => {
 
   return (
     <div className="col-12">
-      <div
-        className={cx('row justify-content-end pt-2', style.botStep)}
-        id="botStep"
-      >
-        <div className={cx('col-6', style.botStepContainer)}>
+      <div className={cx('row justify-content-end pt-2')} id="botStep">
+        <div className={cx('col-6', style.botStepContainer, style.botStep)}>
           <div className="py-2">
             <button
               type="button"
