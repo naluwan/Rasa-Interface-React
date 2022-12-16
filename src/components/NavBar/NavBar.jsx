@@ -5,9 +5,9 @@ import { Link } from 'react-router-dom';
 import cx from 'classnames';
 import { CgSpinner } from 'react-icons/cg';
 import yaml from 'js-yaml';
-import NavItem from './NavItem';
+// import NavItem from './NavItem';
 import style from './NavBar.module.scss';
-import Authenticate from '../../containers/Authenticate';
+// import Authenticate from '../../containers/Authenticate';
 import useStoryStore from '../../store/useStoryStore';
 import type { State } from '../types';
 
@@ -15,8 +15,8 @@ type NavBarProps = {
   navItems: NavItemType[],
 };
 
-const NavBar: React.FC<NavBarProps> = (props) => {
-  const { navItems } = props;
+const NavBar: React.FC<NavBarProps> = () => {
+  // const { navItems } = props;
   const {
     user,
     rasaTrainState,
@@ -134,7 +134,7 @@ const NavBar: React.FC<NavBarProps> = (props) => {
         </button>
         <div className="collapse navbar-collapse" id="navbarCollapse">
           <ul className="navbar-nav me-auto mb-2 mb-lg-0">
-            <Authenticate>
+            {/* <Authenticate>
               {navItems.map((navItem) => {
                 return (
                   <NavItem
@@ -145,7 +145,7 @@ const NavBar: React.FC<NavBarProps> = (props) => {
                   />
                 );
               })}
-            </Authenticate>
+            </Authenticate> */}
           </ul>
           {user ? (
             <>

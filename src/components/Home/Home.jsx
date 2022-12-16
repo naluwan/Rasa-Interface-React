@@ -1,8 +1,10 @@
 /* eslint-disable jsx-a11y/no-static-element-interactions */
 import * as React from 'react';
 import { Link } from 'react-router-dom';
+import useStoryStore from 'store/useStoryStore';
 import style from './Home.module.scss';
 import Slider from '../Slider';
+import type { State } from '../types';
 
 const slideData = [
   {
@@ -81,12 +83,22 @@ const Home: React.FC<HomeProps> = () => {
       .querySelector('[data-videoblock]')
       .setAttribute('data-videoblock', 'open');
   };
+
+  const { onSetCurrentPage } = useStoryStore((state: State) => {
+    return {
+      onSetCurrentPage: state.onSetCurrentPage,
+    };
+  });
   return (
     <div className={style.root}>
       <div className={style.container}>
         <h1>開始訓練你的機器人吧！</h1>
         <div className={style.Button}>
-          <Link className="nav-link" to="/stories">
+          <Link
+            className="nav-link"
+            to="/stories"
+            onClick={() => onSetCurrentPage('故事流程')}
+          >
             <div>故事流程</div>
           </Link>
         </div>
