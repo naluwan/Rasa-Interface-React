@@ -754,6 +754,11 @@ const Stories = () => {
               text: step.response,
               buttons,
             });
+          } else {
+            currentAction.push({
+              action: step.action,
+              text: step.response,
+            });
           }
           return step;
         });
@@ -767,7 +772,7 @@ const Stories = () => {
           JSON.stringify(actionItem.text).replace(/\\n/g, '  \\n'),
         );
         // 放進按鈕回覆
-        if (actionItem.buttons.length) {
+        if (actionItem.buttons?.length) {
           actionItem.buttons.map((button) => delete button.reply);
           newDomain.responses[actionItem.action] = [
             { text: responseText, buttons: actionItem.buttons },
@@ -780,7 +785,7 @@ const Stories = () => {
 
       // 將按鈕意圖加入nlu訓練檔中
       currentAction.map((actionItem) => {
-        if (actionItem.buttons.length) {
+        if (actionItem.buttons?.length) {
           actionItem.buttons.map((button) => {
             const intent = button.payload.replace(/\//g, '');
 
