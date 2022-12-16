@@ -1,10 +1,17 @@
-/* eslint-disable no-unused-vars */
-/* eslint-disable func-names */
 /* eslint-disable array-callback-return */
-/* eslint-disable react/no-unstable-nested-components */
 import * as React from 'react';
 import style from './Examples.module.scss';
 import { confirmWidget } from '../../utils/swalInput';
+
+// RecordElement;
+type RecordElementProps = {
+  name: Object,
+};
+
+const RecordElement: React.FC<RecordElementProps> = (props) => {
+  const { name } = props;
+  return name.map((el) => <div>{el}</div>);
+};
 
 type ExamplesPropsType = {
   text: string,
@@ -27,39 +34,42 @@ const Examples: React.FC<ExamplesPropsType> = (props) => {
     },
     [onDeleteExample],
   );
+
   return (
     <tr className={style.root}>
       <td className={style.tbltd}>{text}</td>
       {entities.length > 0 ? (
-        (function () {
+        (() => {
           const keyValue = [];
-          let entitys = '';
-          let textSlice = '';
-          const recordElement = ({ key }) => {
-            console.log(key);
-            return <div>{key[0]}</div>;
-          };
-          entities.map((entityItem, index) => {
+          const entitys = [];
+          const textSlice = [];
+
+          entities.map((entityItem: any, index: any): void => {
             const { entity, value, start, end } = entityItem;
 
             if (index === 0) {
               keyValue.push(value);
-              entitys += `${entity}`;
-              textSlice += text.slice(start, end);
+              entitys.push(entity);
+              textSlice.push(text.slice(start, end));
+
               return;
             }
 
             keyValue.push(value);
-            entitys += `,${entity}`;
-            textSlice += `,${text.slice(start, end)}`;
+            entitys.push(entity);
+            textSlice.push(text.slice(start, end));
           });
           return (
             <>
-              <td className={style.tbltd}>{textSlice}</td>
               <td className={style.tbltd}>
-                <recordElement name={keyValue} />
+                <RecordElement name={textSlice} />
               </td>
-              <td className={style.tbltd}>{entitys}</td>
+              <td className={style.tbltd}>
+                <RecordElement name={keyValue} />
+              </td>
+              <td className={style.tbltd}>
+                <RecordElement name={entitys} />
+              </td>
             </>
           );
         })()
