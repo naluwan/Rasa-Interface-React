@@ -900,7 +900,13 @@ const UserStep: React.FC<UserStepProps> = (props) => {
 
             <button
               type="button"
-              className={cx('btn ', style.keyWordBtn, style.mr2, style.mt2)}
+              className={cx(
+                'btn ',
+                style.keyWordBtn,
+                style.mr2,
+                style.mt2,
+                style.keyWordBtnMr,
+              )}
               onClick={() =>
                 atCreateEntities(
                   step.user,
