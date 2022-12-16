@@ -1,10 +1,7 @@
-/* eslint-disable no-undef */
-/* eslint-disable array-callback-return */
-/* eslint-disable func-names */
-/* eslint-disable block-scoped-var */
-/* eslint-disable vars-on-top */
-/* eslint-disable no-var */
 /* eslint-disable no-unused-vars */
+/* eslint-disable func-names */
+/* eslint-disable array-callback-return */
+/* eslint-disable react/no-unstable-nested-components */
 import * as React from 'react';
 import style from './Examples.module.scss';
 import { confirmWidget } from '../../utils/swalInput';
@@ -19,7 +16,6 @@ type ExamplesPropsType = {
 const Examples: React.FC<ExamplesPropsType> = (props) => {
   // const { text, intent, entities, entitiesData, onDeleteExample } = props;
   const { text, intent, entities, onDeleteExample } = props;
-  // console.log('entitiesData:', entitiesData);
 
   // 刪除例句
   const atDeleteExample = React.useCallback(
@@ -31,33 +27,38 @@ const Examples: React.FC<ExamplesPropsType> = (props) => {
     },
     [onDeleteExample],
   );
-  console.log(entities);
   return (
     <tr className={style.root}>
       <td className={style.tbltd}>{text}</td>
       {entities.length > 0 ? (
         (function () {
-          const keyValue = document.createElement('div');
+          const keyValue = [];
           let entitys = '';
           let textSlice = '';
+          const recordElement = ({ key }) => {
+            console.log(key);
+            return <div>{key[0]}</div>;
+          };
           entities.map((entityItem, index) => {
             const { entity, value, start, end } = entityItem;
+
             if (index === 0) {
-              keyValue.innerHTML += `${value}`;
+              keyValue.push(value);
               entitys += `${entity}`;
               textSlice += text.slice(start, end);
+              return;
             }
-            if (index !== 0) {
-              keyValue.innerHTML += `${value}`;
-              entitys += `,${entity}`;
-              textSlice += `,${text.slice(start, end)}`;
-            }
-            console.log(keyValue);
+
+            keyValue.push(value);
+            entitys += `,${entity}`;
+            textSlice += `,${text.slice(start, end)}`;
           });
           return (
             <>
               <td className={style.tbltd}>{textSlice}</td>
-              <td className={style.tbltd}>{keyValue.innerHTML}</td>
+              <td className={style.tbltd}>
+                <recordElement name={keyValue} />
+              </td>
               <td className={style.tbltd}>{entitys}</td>
             </>
           );
