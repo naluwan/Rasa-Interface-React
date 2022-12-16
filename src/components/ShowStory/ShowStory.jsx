@@ -10,11 +10,12 @@ import CheckPoint from '../CheckPoint';
 
 type ShowStoryProps = {
   story: StoryType,
+  isCreate: boolean,
   onDeleteStory: (storyName: string) => void,
 };
 
 const ShowStory: React.FC<ShowStoryProps> = (props) => {
-  const { story, onDeleteStory } = props;
+  const { story, isCreate, onDeleteStory } = props;
   const {
     onEditBotRes,
     onEditUserSay,
@@ -107,7 +108,13 @@ const ShowStory: React.FC<ShowStoryProps> = (props) => {
             );
           }
 
-          return <CheckPoint key={checkpoint} branch={branchStories} />;
+          return (
+            <CheckPoint
+              isCreate={isCreate}
+              key={checkpoint}
+              branch={branchStories}
+            />
+          );
         })}
         {/* <StepControl /> */}
       </div>

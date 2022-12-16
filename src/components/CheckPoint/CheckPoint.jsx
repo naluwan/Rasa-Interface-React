@@ -13,11 +13,12 @@ import ConnectBranchStory from './ConnectBranchStory';
 
 type CheckPointProps = {
   branch: StoryType[],
+  isCreate: boolean,
   onDeleteBranchStory: (checkPointName: string, branchName: string) => void,
 };
 
 const CheckPoint: React.FC<CheckPointProps> = (props) => {
-  const { branch, onDeleteBranchStory } = props;
+  const { branch, isCreate, onDeleteBranchStory } = props;
   // console.log('inside CheckPoint branchStories:', branch);
   // const [branchStory, setBranchStory] = React.useState({
   //   story: '',
@@ -36,6 +37,7 @@ const CheckPoint: React.FC<CheckPointProps> = (props) => {
     onAddBranchStoryResButtons,
     onRemoveBranchStoryResButton,
     onEditBranchStoryResButtons,
+    onSetMainStep,
   } = useCreateStoryStore((state: CreateStoryState) => {
     return {
       selectedBranchStory: state.selectedBranchStory,
@@ -48,6 +50,7 @@ const CheckPoint: React.FC<CheckPointProps> = (props) => {
       onAddBranchStoryResButtons: state.onAddBranchStoryResButtons,
       onRemoveBranchStoryResButton: state.onRemoveBranchStoryResButton,
       onEditBranchStoryResButtons: state.onEditBranchStoryResButtons,
+      onSetMainStep: state.onSetMainStep,
     };
   }, shallow);
   /* 
@@ -139,6 +142,18 @@ const CheckPoint: React.FC<CheckPointProps> = (props) => {
               />
             );
           })}
+          {!isCreate && (
+            <button
+              className={cx('nav-link', style.checkPointNavTab)}
+              id="createBranchStoryBtn"
+              data-bs-toggle="modal"
+              data-bs-target="#createBranchStoryModal"
+              onClick={() => onSetMainStep()}
+              type="button"
+            >
+              +
+            </button>
+          )}
         </div>
       </nav>
       <div className={cx('tab-content', style.tabContent)} id="nav-tabContent">

@@ -132,14 +132,18 @@ const UserStep: React.FC<UserStepProps> = (props) => {
     onCreateBranchStory,
   } = props;
 
-  const { nlu, domain, actions, stories } = useStoryStore((state: State) => {
-    return {
-      nlu: state.nlu,
-      domain: state.domain,
-      actions: state.actions,
-      stories: state.stories,
-    };
-  }, shallow);
+  const { nlu, domain, actions, stories, onAddBranchStory } = useStoryStore(
+    (state: State) => {
+      return {
+        nlu: state.nlu,
+        domain: state.domain,
+        actions: state.actions,
+        stories: state.stories,
+        onAddBranchStory: state.onAddBranchStory,
+      };
+    },
+    shallow,
+  );
 
   const { currentStep, checkPointName, onConnectBranchStory } =
     useCreateStoryStore((state: State) => {
@@ -690,6 +694,7 @@ const UserStep: React.FC<UserStepProps> = (props) => {
       storiesData: StoryType[],
       newStoryData: StoryType,
       currentCheckPointName: string,
+      currentStoryName: string,
     ) => {
       // 全部資料沒填，就關閉視窗
       if (
@@ -748,74 +753,83 @@ const UserStep: React.FC<UserStepProps> = (props) => {
         return;
       }
 
-      isRepeat = newStoryData.story === newBranchStoryInfo.branchName;
+      if (isCreate) {
+        isRepeat = newStoryData.story === newBranchStoryInfo.branchName;
 
-      if (isRepeat) {
-        newBranchStoryInfo.branchName = '';
-        setNewBranchStory((prev) => {
-          return {
-            ...prev,
-            branchName: '',
-          };
-        });
-        Toast.fire({
-          icon: 'warning',
-          title: '支線故事名稱重複',
-        });
-        document.querySelector('#createBranchStoryModal #branchName').focus();
-        return;
-      }
-
-      isRepeat = newStoryData.steps.some((newStoryStep) => {
-        if (newStoryStep.checkpoint && newStoryStep.branchStories.length) {
-          return newStoryStep.branchStories.some((branchStory) => {
-            const curBranchStoryName = branchStory.story.slice(
-              branchStory.story.lastIndexOf('_') + 1,
-              branchStory.story.length,
-            );
-            if (curBranchStoryName === newBranchStoryInfo.branchName) {
-              return true;
-            }
-            if (branchStory.story === currentCheckPointName) {
-              return branchStory.steps.some((branchStep, idx) => {
-                if (idx === 2 && branchStep?.branchStories?.length) {
-                  return branchStep.branchStories.some((connectStory) => {
-                    const curConnectStoryName = connectStory.story.slice(
-                      connectStory.story.lastIndexOf('_') + 1,
-                      connectStory.story.length,
-                    );
-                    if (curConnectStoryName === newBranchStoryInfo.branchName) {
-                      return true;
-                    }
-                    return false;
-                  });
-                }
-                return false;
-              });
-            }
-            return false;
+        if (isRepeat) {
+          newBranchStoryInfo.branchName = '';
+          setNewBranchStory((prev) => {
+            return {
+              ...prev,
+              branchName: '',
+            };
           });
+          Toast.fire({
+            icon: 'warning',
+            title: '支線故事名稱重複',
+          });
+          document.querySelector('#createBranchStoryModal #branchName').focus();
+          return;
         }
-        return false;
-      });
 
-      if (isRepeat) {
-        newBranchStoryInfo.branchName = '';
-        setNewBranchStory((prev) => {
-          return {
-            ...prev,
-            branchName: '',
-          };
+        isRepeat = newStoryData.steps.some((newStoryStep) => {
+          if (newStoryStep.checkpoint && newStoryStep.branchStories.length) {
+            return newStoryStep.branchStories.some((branchStory) => {
+              const curBranchStoryName = branchStory.story.slice(
+                branchStory.story.lastIndexOf('_') + 1,
+                branchStory.story.length,
+              );
+              if (curBranchStoryName === newBranchStoryInfo.branchName) {
+                return true;
+              }
+              if (branchStory.story === currentCheckPointName) {
+                return branchStory.steps.some((branchStep, idx) => {
+                  if (idx === 2 && branchStep?.branchStories?.length) {
+                    return branchStep.branchStories.some((connectStory) => {
+                      const curConnectStoryName = connectStory.story.slice(
+                        connectStory.story.lastIndexOf('_') + 1,
+                        connectStory.story.length,
+                      );
+                      if (
+                        curConnectStoryName === newBranchStoryInfo.branchName
+                      ) {
+                        return true;
+                      }
+                      return false;
+                    });
+                  }
+                  return false;
+                });
+              }
+              return false;
+            });
+          }
+          return false;
         });
-        Toast.fire({
-          icon: 'warning',
-          title: '支線故事名稱重複',
-        });
-        document.querySelector('#createBranchStoryModal #branchName').focus();
-        return;
+
+        if (isRepeat) {
+          newBranchStoryInfo.branchName = '';
+          setNewBranchStory((prev) => {
+            return {
+              ...prev,
+              branchName: '',
+            };
+          });
+          Toast.fire({
+            icon: 'warning',
+            title: '支線故事名稱重複',
+          });
+          document.querySelector('#createBranchStoryModal #branchName').focus();
+          return;
+        }
       }
+
       if (currentStep === 'main') {
-        onCreateBranchStory(newBranchStoryInfo);
+        if (!isCreate) {
+          onAddBranchStory(currentStoryName, newBranchStoryInfo);
+        } else {
+          onCreateBranchStory(newBranchStoryInfo);
+        }
       }
 
       if (currentStep === 'branchStory') {
@@ -825,7 +839,14 @@ const UserStep: React.FC<UserStepProps> = (props) => {
       setResSelect('botRes');
       document.querySelector('#createBranchStoryModal .btn-close').click();
     },
-    [onCreateBranchStory, onConnectBranchStory, resSelect, currentStep],
+    [
+      onCreateBranchStory,
+      onConnectBranchStory,
+      onAddBranchStory,
+      resSelect,
+      currentStep,
+      isCreate,
+    ],
   );
 
   // console.log('entitiesData:', entitiesData);
@@ -1342,6 +1363,7 @@ const UserStep: React.FC<UserStepProps> = (props) => {
                         stories,
                         newStory,
                         checkPointName,
+                        storyName,
                       )
                     }
                   >

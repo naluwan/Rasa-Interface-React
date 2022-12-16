@@ -43,6 +43,7 @@ import {
   actionRemoveSlot,
   actionAddSlotValue,
   actionRemoveSlotValue,
+  actionAddBranchStory,
 } from 'actions';
 // import { computed } from 'zustand-middleware-computed-state';
 import { Toast } from 'utils/swalInput';
@@ -1602,6 +1603,68 @@ const reducer = (state: State, action: Action): State => {
         return onSetAllTrainData(res.data);
       });
     }
+    case 'ADD_BRANCH_STORY': {
+      const { storyName, newBranchStory } = action.payload;
+      const { stories, nlu, domain } = cloneDeep(state.cloneData);
+      const { onSetStory, onSetAllTrainData } = state;
+
+      // 將支線故事組成stories訓練檔格式
+      const newBranchStoryData = newBranchStory.botRes
+        ? {
+            story: `${storyName}_${newBranchStory.branchName}`,
+            steps: [
+              { checkpoint: `${storyName}_主線` },
+              {
+                slot_was_set: newBranchStory.slotValues.map((item) => ({
+                  [item.slotName]: item.slotValue,
+                })),
+              },
+              { action: newBranchStory.botRes.action },
+            ],
+          }
+        : {
+            story: `${storyName}_${newBranchStory.branchName}`,
+            steps: [
+              { checkpoint: `${storyName}_主線` },
+              {
+                slot_was_set: newBranchStory.slotValues.map((item) => ({
+                  [item.slotName]: item.slotValue,
+                })),
+              },
+            ],
+          };
+
+      stories.push(newBranchStoryData);
+
+      // 將機器人回覆放進domain訓練檔中
+      if (newBranchStory.botRes) {
+        domain.actions.push(newBranchStory.botRes.action);
+        domain.responses[newBranchStory.botRes.action] = [
+          { text: newBranchStory.botRes.response },
+        ];
+      }
+
+      const cloneData = {
+        stories,
+        nlu,
+        domain,
+      };
+      return postAllTrainData(cloneData).then((res) => {
+        if (res.status !== 'success') {
+          return Toast.fire({
+            icon: 'error',
+            title: '新增支線故事失敗',
+            text: res.message,
+          });
+        }
+        Toast.fire({
+          icon: 'success',
+          title: '新增支線故事成功',
+        });
+        onSetAllTrainData(res.data);
+        return onSetStory(storyName);
+      });
+    }
     default:
       return state;
   }
@@ -1680,6 +1743,7 @@ const useStoryStore = create((set) => {
           });
       }
     },
+    // 登入
     onLogin(email: string, password: string) {
       set({ loading: true });
       fetchLogin(email, password).then((res) => {
@@ -1697,11 +1761,13 @@ const useStoryStore = create((set) => {
         });
       });
     },
+    // 登出
     onLogout() {
       cleanToken();
       set({ user: null });
       window.location.reload();
     },
+    // 註冊
     onRegister(userInfo: RegisterUserInfoType) {
       set({ loading: true });
       return fetchRegister(userInfo)
@@ -1711,18 +1777,23 @@ const useStoryStore = create((set) => {
         })
         .catch((err) => console.log(err));
     },
+    // 設定目前頁面
     onSetCurrentPage(pageName: string) {
       set({ currentPage: pageName });
     },
+    // 設定全部訓練檔
     onSetAllTrainData(data: TrainDataType) {
       dispatch(actionSetAllData(data));
     },
+    // 設定目前選擇的故事
     onSetStory(storyName: string) {
       dispatch(actionSetStory(storyName));
     },
+    // 編輯使用者對話
     onEditUserSay(oriWord: string, newWord: string, storyName: string) {
       dispatch(actionEditUserSay(oriWord, newWord, storyName));
     },
+    // 編輯機器人對話
     onEditBotRes(
       oreWord: string,
       newWord: string,
@@ -1731,6 +1802,7 @@ const useStoryStore = create((set) => {
     ) {
       dispatch(actionEditBotRes(oreWord, newWord, actionName, storyName));
     },
+    // 新增或編輯例句
     onCreateExample(
       userSay: string,
       stepIntent: string,
@@ -1748,12 +1820,15 @@ const useStoryStore = create((set) => {
         ),
       );
     },
+    // 暫存刪除的故事(最後一筆刪除)
     onSetDeleteStory(deleteStory: StoryType) {
       dispatch(actionSetDeleteStory(deleteStory));
     },
+    // 獲取domain訓練檔中的所有action name
     onSetAllAction(action: string[]) {
       dispatch(actionSetAllAction(action));
     },
+    // 編輯機器人回覆按鈕
     onEditResButtons(
       actionName: string,
       title: string,
@@ -1775,6 +1850,7 @@ const useStoryStore = create((set) => {
         ),
       );
     },
+    // 移除機器人回覆按鈕
     onRemoveResButton(
       actionName: string,
       payload: string,
@@ -1792,6 +1868,7 @@ const useStoryStore = create((set) => {
         ),
       );
     },
+    // 新增機器人回覆按鈕
     onAddResButtons(
       actionName: string,
       title: string,
@@ -1803,12 +1880,15 @@ const useStoryStore = create((set) => {
         actionAddResButtons(actionName, title, payload, reply, storyName),
       );
     },
+    // 獲取rasa訓練狀態
     onSetRasaTrainState(state: number) {
       dispatch(actionSetRasaTrainState(state));
     },
+    // 編輯意圖
     onEditIntent(oriIntent: string, intent: string, storyName: string) {
       dispatch(actionEditIntent(oriIntent, intent, storyName));
     },
+    // 新增關鍵字
     onCreateEntities(
       entities: NluEntitiesType,
       intent: string,
@@ -1816,9 +1896,11 @@ const useStoryStore = create((set) => {
     ) {
       dispatch(actionCreateEntities(entities, intent, storyName));
     },
+    // 刪除關鍵字
     onDeleteEntities(entity: string, intent: string, storyName: string) {
       dispatch(actionDeleteEntities(entity, intent, storyName));
     },
+    // 編輯關鍵字例句
     onEditEntityShowValue(
       stepIntent: string,
       currentEntityValue: string,
@@ -1834,6 +1916,7 @@ const useStoryStore = create((set) => {
         ),
       );
     },
+    // 編輯關鍵字
     onEditEntity(
       stepIntent: string,
       oriEntity: string,
@@ -1842,6 +1925,7 @@ const useStoryStore = create((set) => {
     ) {
       dispatch(actionEditEntity(stepIntent, oriEntity, newEntity, storyName));
     },
+    // 編輯關鍵字代表值
     onEditEntityValue(
       stepIntent: string,
       oriEntityValue: string,
@@ -1857,9 +1941,11 @@ const useStoryStore = create((set) => {
         ),
       );
     },
+    // 刪除例句
     onDeleteExample(userSay: string, stepIntent: string, storyName: string) {
       dispatch(actionDeleteExample(userSay, stepIntent, storyName));
     },
+    // 新增記錄槽
     onCreateSlot(formValue: {
       slotName: string,
       slotType: string,
@@ -1867,17 +1953,36 @@ const useStoryStore = create((set) => {
     }) {
       dispatch(actionCreateSlot(formValue));
     },
+    // 移除記錄槽
     onRemoveSlot(slotKey: string) {
       dispatch(actionRemoveSlot(slotKey));
     },
+    // 新增記錄槽中的儲存槽值
     onAddSlotValue(slotValues: {
       slotName: string,
       slotValueItems: { name: string, id: string }[],
     }) {
       dispatch(actionAddSlotValue(slotValues));
     },
+    // 移除記錄槽中的儲存槽值
     onRemoveSlotValue(slotValue: { key: string, value: string }) {
       dispatch(actionRemoveSlotValue(slotValue));
+    },
+    // 新增支線故事
+    onAddBranchStory(
+      storyName: string,
+      newBranchStory: {
+        branchName: string,
+        slotValues: {
+          slotName: string,
+          slotValue: string,
+          id: string,
+          hasSlotValues: boolean,
+        }[],
+        botRes?: { action: string, response: string },
+      },
+    ) {
+      dispatch(actionAddBranchStory(storyName, newBranchStory));
     },
   };
 });

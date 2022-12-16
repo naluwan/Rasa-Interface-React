@@ -988,18 +988,16 @@ const Stories = () => {
       </div>
       {Object.keys(story).length > 0 && (
         <ShowStory
+          isCreate={create}
           story={story}
           onDeleteStory={atDeleteStory}
-          onRecoverDeletedStory={atClickSaveBtn}
         />
       )}
       {create && (
         <CreateStory
           isCreate={create}
-          // newStory={newStory}
           nlu={nlu.rasa_nlu_data.common_examples}
           actions={actions}
-          // onSetNewStory={setNewStory}
           onClickSaveBtn={atClickSaveBtn}
         />
       )}

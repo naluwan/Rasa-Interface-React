@@ -388,6 +388,22 @@ export type Action =
         checkPointName: string,
         connectStoryName: string,
       },
+    }
+  | {
+      type: 'ADD_BRANCH_STORY',
+      payload: {
+        storyName: string,
+        newBranchStory: {
+          branchName: string,
+          slotValues: {
+            slotName: string,
+            slotValue: string,
+            id: string,
+            hasSlotValues: boolean,
+          }[],
+          botRes?: { action: string, response: string },
+        },
+      },
     };
 
 // ====================== query story ======================
@@ -583,6 +599,23 @@ export const actionRemoveSlotValue = (slotValue: {
 }): Action => ({
   type: 'REMOVE_SLOT_VALUE',
   payload: slotValue,
+});
+
+export const actionAddBranchStory = (
+  storyName: string,
+  newBranchStory: {
+    branchName: string,
+    slotValues: {
+      slotName: string,
+      slotValue: string,
+      id: string,
+      hasSlotValues: boolean,
+    }[],
+    botRes?: { action: string, response: string },
+  },
+): Action => ({
+  type: 'ADD_BRANCH_STORY',
+  payload: { storyName, newBranchStory },
 });
 
 // ====================== create story ======================

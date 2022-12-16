@@ -194,6 +194,35 @@ export type State = {
     stepIntent: string,
     storyName: string,
   ) => void,
+  // 新增記錄槽
+  onCreateSlot: (formValue: {
+    slotName: string,
+    slotType: string,
+    slotValues: { name: string, id: string }[],
+  }) => void,
+  // 移除記錄槽
+  onRemoveSlot: (slotKey: string) => void,
+  // 新增記錄槽中的儲存槽值
+  onAddSlotValue: (slotValues: {
+    slotName: string,
+    slotValueItems: { name: string, id: string }[],
+  }) => void,
+  // 移除記錄槽中的儲存槽值
+  onRemoveSlotValue: (slotValue: { key: string, value: string }) => void,
+  // 新增支線故事
+  onAddBranchStory: (
+    storyName: string,
+    newBranchStory: {
+      branchName: string,
+      slotValues: {
+        slotName: string,
+        slotValue: string,
+        id: string,
+        hasSlotValues: boolean,
+      }[],
+      botRes?: { action: string, response: string },
+    },
+  ) => void,
 };
 
 export type CreateStoryState = {
@@ -359,6 +388,18 @@ export type CreateStoryState = {
     storyName: string,
     buttonActionName: string,
     disabled: boolean,
+    checkPointName: string,
+  ) => void,
+  // 編輯支線故事的機器人按鈕
+  onEditBranchStoryResButtons: (
+    actionName: string,
+    title: string,
+    oriPayload: string,
+    payload: string,
+    reply: string,
+    storyName: string,
+    buttonActionName: string,
+    stories: StoryType[],
     checkPointName: string,
   ) => void,
   // 串接故事新增機器人回覆按鈕
