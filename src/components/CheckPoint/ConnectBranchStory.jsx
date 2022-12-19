@@ -12,6 +12,7 @@ import BotStep from '../BotStep';
 import type { CreateStoryState } from '../types';
 
 type ConnectBranchStoryProps = {
+  isCreate: boolean,
   branch: StoryType[],
   onDeleteConnectBranchStory: (
     checkPointName: string,
@@ -20,7 +21,7 @@ type ConnectBranchStoryProps = {
 };
 
 const ConnectBranchStory: React.FC<ConnectBranchStoryProps> = (props) => {
-  const { branch, domTarget, onDeleteConnectBranchStory } = props;
+  const { branch, domTarget, isCreate, onDeleteConnectBranchStory } = props;
 
   const {
     selectedBranchStory,
@@ -30,6 +31,7 @@ const ConnectBranchStory: React.FC<ConnectBranchStoryProps> = (props) => {
     onAddConnectStoryResButtons,
     onRemoveConnectStoryResButton,
     onEditConnectStoryResButtons,
+    onSetBranchStep,
   } = useCreateStoryStore((state: CreateStoryState) => {
     return {
       selectedBranchStory: state.selectedBranchStory,
@@ -39,6 +41,7 @@ const ConnectBranchStory: React.FC<ConnectBranchStoryProps> = (props) => {
       onAddConnectStoryResButtons: state.onAddConnectStoryResButtons,
       onRemoveConnectStoryResButton: state.onRemoveConnectStoryResButton,
       onEditConnectStoryResButtons: state.onEditConnectStoryResButtons,
+      onSetBranchStep: state.onSetBranchStep,
     };
   }, shallow);
 
@@ -61,7 +64,7 @@ const ConnectBranchStory: React.FC<ConnectBranchStoryProps> = (props) => {
       const { target } = e;
 
       // 刪除支線故事
-      if (target.id !== 'nav-home-tab') {
+      if (!target.id.includes('tab')) {
         const idx = storyName.lastIndexOf('_');
         const checkPointName = `${storyName.slice(0, idx)}_主線`;
 
@@ -119,6 +122,18 @@ const ConnectBranchStory: React.FC<ConnectBranchStoryProps> = (props) => {
               />
             );
           })}
+          {!isCreate && (
+            <button
+              className={cx('nav-link', style.checkPointNavTab)}
+              id="createBranchStoryBtn"
+              data-bs-toggle="modal"
+              data-bs-target="#createBranchStoryModal"
+              onClick={() => onSetBranchStep()}
+              type="button"
+            >
+              +串接
+            </button>
+          )}
         </div>
       </nav>
       <div

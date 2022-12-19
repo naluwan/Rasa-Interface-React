@@ -225,6 +225,21 @@ export type State = {
   ) => void,
   // 刪除支線故事
   onRemoveBranchStory: (checkPointName: string, storyName: string) => void,
+  // 新增串接故事
+  onAddConnectStory: (
+    storyName: string,
+    branchStoryName: string,
+    newBranchStory: {
+      branchName: string,
+      slotValues: {
+        slotName: string,
+        slotValue: string,
+        id: string,
+        hasSlotValues: boolean,
+      }[],
+      botRes?: { action: string, response: string },
+    },
+  ) => void,
 };
 
 export type CreateStoryState = {

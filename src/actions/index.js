@@ -408,6 +408,23 @@ export type Action =
   | {
       type: 'REMOVE_BRANCH_STORY',
       payload: { checkPointName: string, storyName: string },
+    }
+  | {
+      type: 'ADD_CONNECT_STORY',
+      payload: {
+        storyName: string,
+        branchStoryName: string,
+        newBranchStory: {
+          branchName: string,
+          slotValues: {
+            slotName: string,
+            slotValue: string,
+            id: string,
+            hasSlotValues: boolean,
+          }[],
+          botRes?: { action: string, response: string },
+        },
+      },
     };
 
 // ====================== query story ======================
@@ -628,6 +645,24 @@ export const actionRemoveBranchStory = (
 ): Action => ({
   type: 'REMOVE_BRANCH_STORY',
   payload: { checkPointName, storyName },
+});
+
+export const actionAddConnectStory = (
+  storyName: string,
+  branchStoryName: string,
+  newBranchStory: {
+    branchName: string,
+    slotValues: {
+      slotName: string,
+      slotValue: string,
+      id: string,
+      hasSlotValues: boolean,
+    }[],
+    botRes?: { action: string, response: string },
+  },
+): Action => ({
+  type: 'ADD_CONNECT_STORY',
+  payload: { storyName, branchStoryName, newBranchStory },
 });
 
 // ====================== create story ======================

@@ -19,6 +19,8 @@ import type {
   NluEntitiesType,
 } from 'components/types';
 
+import type { Action } from 'actions';
+
 import {
   actionSetAllData,
   actionSetStory,
@@ -44,6 +46,7 @@ import {
   actionRemoveSlotValue,
   actionAddBranchStory,
   actionRemoveBranchStory,
+  actionAddConnectStory,
 } from 'actions';
 // import { computed } from 'zustand-middleware-computed-state';
 import { Toast } from 'utils/swalInput';
@@ -377,6 +380,8 @@ const reducer = (state: State, action: Action): State => {
         }
         return step;
       });
+
+      console.log('SET STORY ===> ', story);
       return {
         ...state,
         story,
@@ -1631,6 +1636,7 @@ const reducer = (state: State, action: Action): State => {
                   [item.slotName]: item.slotValue,
                 })),
               },
+              { checkpoint: `${storyName}_${newBranchStory.branchName}_主線` },
             ],
           };
 
@@ -1745,6 +1751,67 @@ const reducer = (state: State, action: Action): State => {
         onSetAllTrainData(res.data);
         return onSetStory(currentStoryName);
       });
+    }
+    case 'ADD_CONNECT_STORY': {
+      const { storyName, branchStoryName, newBranchStory } = action.payload;
+      const { stories, nlu, domain } = cloneDeep(state.cloneData);
+      const { onSetStory, onSetAllTrainData } = state;
+
+      // 組成串接故事格式
+      const connectStory = {
+        story: `${branchStoryName}_${newBranchStory.branchName}`,
+        steps: [
+          { checkpoint: `${branchStoryName}_主線` },
+          {
+            slot_was_set: newBranchStory.slotValues.map((item) => ({
+              [item.slotName]: item.slotValue,
+            })),
+          },
+          { action: newBranchStory.botRes.action },
+        ],
+      };
+
+      // 新增串接故事至stories訓練檔中
+      stories.push(connectStory);
+
+      // 將串接故事的機器人回覆和action新增至domain訓練檔中
+      domain.actions.push(newBranchStory.botRes.action);
+      domain.responses[newBranchStory.botRes.action] = [
+        { text: newBranchStory.botRes.response },
+      ];
+
+      const cloneData = {
+        stories,
+        nlu,
+        domain,
+      };
+
+      return postAllTrainData(cloneData)
+        .then((res) => {
+          if (res.status !== 'success') {
+            return Toast.fire({
+              icon: 'error',
+              title: '新增串接故事失敗',
+              text: res.message,
+            });
+          }
+          Toast.fire({
+            icon: 'success',
+            title: '新增串接故事成功',
+          });
+          onSetAllTrainData(res.data);
+          return onSetStory(storyName);
+        })
+        .then(() => {
+          return document
+            .querySelector(
+              `#${branchStoryName.slice(
+                branchStoryName.indexOf('_') + 1,
+                branchStoryName.length,
+              )}_tab`,
+            )
+            .click();
+        });
     }
     default:
       return state;
@@ -2068,6 +2135,25 @@ const useStoryStore = create((set) => {
     // 刪除支線故事
     onRemoveBranchStory(checkPointName: string, storyName: string) {
       dispatch(actionRemoveBranchStory(checkPointName, storyName));
+    },
+    // 新增串接故事
+    onAddConnectStory(
+      storyName: string,
+      branchStoryName: string,
+      newBranchStory: {
+        branchName: string,
+        slotValues: {
+          slotName: string,
+          slotValue: string,
+          id: string,
+          hasSlotValues: boolean,
+        }[],
+        botRes?: { action: string, response: string },
+      },
+    ) {
+      dispatch(
+        actionAddConnectStory(storyName, branchStoryName, newBranchStory),
+      );
     },
   };
 });

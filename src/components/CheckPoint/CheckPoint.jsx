@@ -79,7 +79,7 @@ const CheckPoint: React.FC<CheckPointProps> = (props) => {
       const { target } = e;
 
       // 刪除支線故事
-      if (target.id !== 'nav-home-tab') {
+      if (!target.id.includes('tab')) {
         const idx = storyName.lastIndexOf('_');
         const checkPointName = `${storyName.slice(0, idx)}_主線`;
 
@@ -141,14 +141,13 @@ const CheckPoint: React.FC<CheckPointProps> = (props) => {
           role="tablist"
         >
           {branch.map((item) => {
-            const { story, steps } = item;
+            const { story } = item;
             // console.log('branchStory.story:', branchStory.story);
             // console.log('story:', story);
             return (
               <NavTab
                 key={`${uuid()}-${item.story}`}
                 story={story}
-                steps={steps}
                 isActive={selectedBranchStory?.story === story}
                 onClickTab={atClickTab}
               />
@@ -163,7 +162,7 @@ const CheckPoint: React.FC<CheckPointProps> = (props) => {
               onClick={() => onSetMainStep()}
               type="button"
             >
-              +
+              +支線
             </button>
           )}
         </div>
@@ -221,6 +220,7 @@ const CheckPoint: React.FC<CheckPointProps> = (props) => {
                 return (
                   <ConnectBranchStory
                     key={`${uuid()}-${checkpoint}`}
+                    isCreate={isCreate}
                     branch={branchStories}
                     onDeleteConnectBranchStory={onDeleteConnectBranchStory}
                   />

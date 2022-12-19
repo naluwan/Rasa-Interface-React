@@ -13,6 +13,7 @@ import type {
   State,
   DomainType,
   StoryType,
+  CreateStoryState,
 } from '../types';
 import { swalInput, Toast, confirmWidget } from '../../utils/swalInput';
 import Entities from '../Entities';
@@ -132,27 +133,31 @@ const UserStep: React.FC<UserStepProps> = (props) => {
     onCreateBranchStory,
   } = props;
 
-  const { nlu, domain, actions, stories, onAddBranchStory } = useStoryStore(
-    (state: State) => {
+  const { nlu, domain, actions, stories, onAddBranchStory, onAddConnectStory } =
+    useStoryStore((state: State) => {
       return {
         nlu: state.nlu,
         domain: state.domain,
         actions: state.actions,
         stories: state.stories,
         onAddBranchStory: state.onAddBranchStory,
-      };
-    },
-    shallow,
-  );
-
-  const { currentStep, checkPointName, onConnectBranchStory } =
-    useCreateStoryStore((state: State) => {
-      return {
-        currentStep: state.currentStep,
-        onConnectBranchStory: state.onConnectBranchStory,
-        checkPointName: state.checkPointName,
+        onAddConnectStory: state.onAddConnectStory,
       };
     }, shallow);
+
+  const {
+    currentStep,
+    checkPointName,
+    selectedBranchStory,
+    onConnectBranchStory,
+  } = useCreateStoryStore((state: CreateStoryState) => {
+    return {
+      currentStep: state.currentStep,
+      checkPointName: state.checkPointName,
+      selectedBranchStory: state.selectedBranchStory,
+      onConnectBranchStory: state.onConnectBranchStory,
+    };
+  }, shallow);
 
   /**
    * @type {[{branchName:string, slotValues:{slotName:string,slotValue:string,id:string,hasSlotValues: boolean}[],botRes?:{action:string,response:string}}, Function]}
@@ -695,6 +700,7 @@ const UserStep: React.FC<UserStepProps> = (props) => {
       newStoryData: StoryType,
       currentCheckPointName: string,
       currentStoryName: string,
+      branchStoryName: string,
     ) => {
       // 全部資料沒填，就關閉視窗
       if (
@@ -732,9 +738,15 @@ const UserStep: React.FC<UserStepProps> = (props) => {
       }
 
       let isRepeat = false;
+      let checkBranchStoryName = '';
+      if (currentStep === 'main') {
+        checkBranchStoryName = `${currentStoryName}_${newBranchStoryInfo.branchName}`;
+      } else {
+        checkBranchStoryName = `${branchStoryName}_${newBranchStoryInfo.branchName}`;
+      }
 
       isRepeat = storiesData.some(
-        (item) => item.story === newBranchStoryInfo.branchName,
+        (item) => item.story === checkBranchStoryName,
       );
 
       if (isRepeat) {
@@ -833,7 +845,15 @@ const UserStep: React.FC<UserStepProps> = (props) => {
       }
 
       if (currentStep === 'branchStory') {
-        onConnectBranchStory(newStoryData, newBranchStoryInfo);
+        if (!isCreate) {
+          onAddConnectStory(
+            currentStoryName,
+            branchStoryName,
+            newBranchStoryInfo,
+          );
+        } else {
+          onConnectBranchStory(newStoryData, newBranchStoryInfo);
+        }
       }
 
       setResSelect('botRes');
@@ -843,6 +863,7 @@ const UserStep: React.FC<UserStepProps> = (props) => {
       onCreateBranchStory,
       onConnectBranchStory,
       onAddBranchStory,
+      onAddConnectStory,
       resSelect,
       currentStep,
       isCreate,
@@ -852,6 +873,7 @@ const UserStep: React.FC<UserStepProps> = (props) => {
   // console.log('entitiesData:', entitiesData);
   // console.log('newBranchStory:', newBranchStory);
   // console.log('resSelect ========================>', resSelect);
+  // console.log('story ======> ', story);
 
   return (
     <div className="row pt-2" id="userStep">
@@ -1370,6 +1392,7 @@ const UserStep: React.FC<UserStepProps> = (props) => {
                         newStory,
                         checkPointName,
                         storyName,
+                        selectedBranchStory.story,
                       )
                     }
                   >
