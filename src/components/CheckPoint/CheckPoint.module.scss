@@ -8,7 +8,7 @@
   .tabContent {
     color: #fff;
     background: #ffffff;
-    padding: 20px ;
+    padding: 20px;
     border-radius: 0 10px 10px 10px;
     border: 1px solid #b7b7b7;
   }
@@ -33,7 +33,8 @@
     //   }
     // }
     &:hover {
-        background: #ffffff;
+      background: #ffffff;
+
       .closeIcon {
         display: inline;
       }
@@ -47,6 +48,11 @@
       color: red;
       font-size: 1.2rem;
     }
+
+    // &[aria-selected]:nth-of-type(1) {
+    //   border: 1px solid #b7b7b7 !important;
+    //   border-bottom: 1px solid #fff !important;
+    // }
 
     &[aria-selected="false"]:hover {
       border: 1px solid #b7b7b7 !important;

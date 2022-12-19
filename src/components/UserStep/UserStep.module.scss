@@ -193,9 +193,11 @@
 .mt2 {
   margin-top: 0.5rem;
 }
-
 .keyWordBtnMr {
   margin-right: 62px;
+}
+[data-showstory] .keyWordBtnMr {
+  margin-right: 0;
 }
 
 table {

@@ -1,9 +1,12 @@
+/* eslint-disable no-use-before-define */
+/* eslint-disable react-hooks/exhaustive-deps */
 import * as React from 'react';
 import cx from 'classnames';
 import Swal from 'sweetalert2';
 import shallow from 'zustand/shallow';
 import uuid from 'react-uuid';
 import { CgAddR } from 'react-icons/cg';
+import { createRoot } from 'react-dom/client';
 import { BsTrashFill } from 'react-icons/bs';
 import style from './UserStep.module.scss';
 import type {
@@ -133,6 +136,8 @@ const UserStep: React.FC<UserStepProps> = (props) => {
     onCreateBranchStory,
   } = props;
 
+  const { examples } = step;
+
   const { nlu, domain, actions, stories, onAddBranchStory, onAddConnectStory } =
     useStoryStore((state: State) => {
       return {
@@ -216,19 +221,22 @@ const UserStep: React.FC<UserStepProps> = (props) => {
     [onEditIntent, storyName, nlu],
   );
 
-  // 新增例句
+  // 例句檢核
   const atCreateExample = React.useCallback(
     (
       intent: string,
       parentEntitiesData: NluEntitiesType[],
       currentStoryName: string,
     ) => {
+      console.log(intent);
       const exampleValue = document.querySelector(
         `#input-${intent}-example`,
       ).value;
+      console.log(exampleValue);
       const entityKeys = parentEntitiesData.map(
         (entityItem) => entityItem.entity,
       );
+      console.log(entityKeys);
       const entitiesValue = entityKeys.map((key) => {
         const { value } = document.querySelector(
           `#input-${key}-entities-value`,
@@ -244,7 +252,7 @@ const UserStep: React.FC<UserStepProps> = (props) => {
           showValue,
         };
       });
-
+      console.log(entitiesValue);
       // console.log('entitiesValue:', entitiesValue);
       // 所有輸入空的值都為空就返回
       if (
@@ -373,7 +381,11 @@ const UserStep: React.FC<UserStepProps> = (props) => {
         document.querySelector(`#input-${key}-entities-show-value`).value = '';
         return key;
       });
+      setTimeout(() => {
+        document.querySelector('#examplesBtn').click();
+      }, 1000);
     },
+
     [onCreateExample, nlu],
   );
 
@@ -381,10 +393,173 @@ const UserStep: React.FC<UserStepProps> = (props) => {
   const atDeleteExample = React.useCallback(
     (userSay: string, intent: string) => {
       onDeleteExample(userSay, intent, storyName);
+
+      setTimeout(() => {
+        document.querySelector('#examplesBtn').click();
+      }, 1000);
     },
     [onDeleteExample, storyName],
   );
+  // steven start
+  // 新增例句
+  const atCreateExamples = () => {
+    Swal.fire({
+      title: '新增例句',
+      html: "<div id='CreateExample'></div>",
+      showCloseButton: true,
+      showCancelButton: true,
+      focusConfirm: false,
+      confirmButtonText: '儲存',
+      cancelButtonText: '返回',
+      confirmButtonAriaLabel: 'Thumbs up, great!',
+      cancelButtonAriaLabel: 'Thumbs down',
+      closeOnConfirm: false,
+      reverseButtons: true,
+      closeOnCancel: false,
+    }).then((result) => {
+      if (result.isConfirmed) {
+        atCreateExample(step.intent, entitiesData, storyName);
+      } else {
+        setTimeout(() => {
+          document.querySelector('#examplesBtn').click();
+        }, 0);
+      }
+    });
 
+    setTimeout(() => {
+      let CreateExamples = '';
+      CreateExamples = (
+        <div className="modal-body">
+          <div className="mb-3">
+            <input
+              type="text"
+              className="form-control"
+              id={`input-${step.intent}-example`}
+              placeholder="請輸入例句"
+            />
+          </div>
+          {entitiesData.length > 0 && (
+            <div className="d-flex flex-column">
+              {entitiesData.map((entityItem) => {
+                return (
+                  <div
+                    className="mb-3 p-2 border border-success rounded"
+                    key={`${entityItem.start}-${entityItem.start}-${entityItem.entity} + ${entityItem.value}`}
+                  >
+                    <input
+                      type="text"
+                      className="form-control mb-2"
+                      id={`input-${entityItem.entity}-entities-show-value`}
+                      placeholder={`請輸入關鍵字代表值為『${entityItem.entity}』的關鍵字`}
+                    />
+                    <input
+                      type="text"
+                      className="form-control"
+                      id={`input-${entityItem.entity}-entities-value`}
+                      placeholder={`請輸入關鍵字代表值為『${entityItem.entity}』的儲存槽值`}
+                    />
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </div>
+      );
+      createRoot(document.getElementById('CreateExample')).render(
+        CreateExamples,
+      );
+    }, 0);
+  };
+  // 編輯例句
+  const atexampleBtn = React.useCallback((examplesData) => {
+    Swal.fire({
+      title: '例句',
+      html: "<div id='examplesTable'> 沒有例句資料，請先添加例句</div>",
+      width: 1000,
+      showCloseButton: true,
+      showCancelButton: true,
+      focusConfirm: false,
+      confirmButtonText: '新增例句',
+      cancelButtonText: '取消',
+      confirmButtonAriaLabel: 'Thumbs up, great!',
+      cancelButtonAriaLabel: 'Thumbs down',
+      preConfirm: () => {
+        atCreateExamples();
+      },
+    });
+    // inner Dynamic Content
+    setTimeout(() => {
+      console.log('setTimeout');
+
+      let extable = '';
+      let render = false;
+      if (examples.length > 0) {
+        extable = (
+          <div>
+            <table>
+              <thead>
+                <tr className={cx(style.tblHead, style.tblHeader)}>
+                  <th className={cx(style.tblHead)} rowSpan="2">
+                    例句
+                  </th>
+                  <th className={cx(style.tblHead)} rowSpan="2">
+                    關鍵字
+                  </th>
+                  <th className={cx(style.tblHead)} rowSpan="2">
+                    儲存槽
+                  </th>
+                  <th className={cx(style.tblHead)} rowSpan="2">
+                    紀錄槽
+                  </th>
+                  <th className={cx(style.tblHead)} rowSpan="2">
+                    操作
+                  </th>
+                </tr>
+              </thead>
+
+              <tbody>
+                {examplesData.map((example) => {
+                  const { text, intent, entities } = example;
+                  return (
+                    <Examples
+                      key={text + intent}
+                      text={text}
+                      intent={intent}
+                      entities={entities}
+                      onDeleteExample={atDeleteExample}
+                      entitiesData={entitiesData}
+                    />
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        );
+        render = true;
+      } else {
+        extable = (
+          <div className="alert alert-warning" role="alert">
+            沒有例句資料，請先添加例句
+          </div>
+        );
+        render = true;
+      }
+      if (render === true) {
+        console.log('render');
+        let examplesTable = '';
+        examplesTable = document.getElementById('examplesTable');
+        if (examplesTable) {
+          createRoot(examplesTable).render(extable);
+        } else {
+          document.querySelector('#examplesBtn').click();
+        }
+      } else {
+        document.querySelector('#examplesBtn').click();
+      }
+    }, 0);
+  }, []);
+
+  // steven end
   // 新增關鍵字
   const atCreateEntities = React.useCallback(
     async (
@@ -920,7 +1095,7 @@ const UserStep: React.FC<UserStepProps> = (props) => {
               </svg>
               意圖
             </button>
-            <button
+            {/* <button
               type="button"
               className={cx('btn', style.exampleBtn, style.mr2, style.mt2)}
               data-bs-toggle="modal"
@@ -939,8 +1114,29 @@ const UserStep: React.FC<UserStepProps> = (props) => {
                 />
               </svg>
               例句
+            </button> */}
+            {/* steven測試-start */}
+            <button
+              type="button"
+              className={cx('btn', style.exampleBtn, style.mr2, style.mt2)}
+              id="examplesBtn"
+              onClick={() => atexampleBtn(examples)}
+            >
+              <svg
+                width="32"
+                height="32"
+                viewBox="0 0 32 32"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M11.0002 24H21.0002V26H11.0002V24ZM13.0002 28H19.0002V30H13.0002V28ZM16.0002 2C13.348 2 10.8045 3.05357 8.9291 4.92893C7.05374 6.8043 6.00017 9.34784 6.00017 12C5.93254 13.4533 6.21094 14.902 6.81246 16.2267C7.41399 17.5514 8.32144 18.7144 9.46017 19.62C10.4602 20.55 11.0002 21.08 11.0002 22H13.0002C13.0002 20.16 11.8902 19.13 10.8102 18.14C9.87553 17.4243 9.13064 16.4903 8.64075 15.4198C8.15086 14.3494 7.93091 13.1752 8.00017 12C8.00017 9.87827 8.84302 7.84344 10.3433 6.34315C11.8436 4.84285 13.8784 4 16.0002 4C18.1219 4 20.1567 4.84285 21.657 6.34315C23.1573 7.84344 24.0002 9.87827 24.0002 12C24.0683 13.176 23.8468 14.3508 23.3551 15.4213C22.8635 16.4918 22.1166 17.4253 21.1802 18.14C20.1102 19.14 19.0002 20.14 19.0002 22H21.0002C21.0002 21.08 21.5302 20.55 22.5402 19.61C23.6781 18.706 24.5851 17.5447 25.1867 16.2217C25.7882 14.8987 26.067 13.4518 26.0002 12C26.0002 10.6868 25.7415 9.38642 25.239 8.17317C24.7364 6.95991 23.9998 5.85752 23.0712 4.92893C22.1426 4.00035 21.0403 3.26375 19.827 2.7612C18.6137 2.25866 17.3134 2 16.0002 2V2Z"
+                  fill="black"
+                />
+              </svg>
+              例句
             </button>
-
+            {/* steven測試-End */}
             <button
               type="button"
               className={cx(
@@ -1022,7 +1218,7 @@ const UserStep: React.FC<UserStepProps> = (props) => {
             </div>
           )}
           {/* show examples modal */}
-          <div
+          {/* <div
             className="modal fade"
             id={`show-${step.intent}-examples`}
             tabIndex="-1"
@@ -1110,10 +1306,10 @@ const UserStep: React.FC<UserStepProps> = (props) => {
                 </div>
               </div>
             </div>
-          </div>
+          </div> */}
 
           {/* add example input modal */}
-          <div
+          {/* <div
             className="modal fade"
             id={`add-${step.intent}-example`}
             tabIndex="-1"
@@ -1194,7 +1390,7 @@ const UserStep: React.FC<UserStepProps> = (props) => {
                 </div>
               </div>
             </div>
-          </div>
+          </div> */}
 
           {/* add branch story */}
           <div
