@@ -4,12 +4,13 @@ import ReactDom from 'react-dom';
 import uuid from 'react-uuid';
 import cx from 'classnames';
 import shallow from 'zustand/shallow';
+import useStoryStore from 'store/useStoryStore';
 import useCreateStoryStore from '../../store/useCreateStoryStore';
 import NavTab from './NavTab';
 import style from './CheckPoint.module.scss';
 import ShowSlots from './ShowSlots';
 import BotStep from '../BotStep';
-import type { CreateStoryState } from '../types';
+import type { CreateStoryState, State } from '../types';
 
 type ConnectBranchStoryProps = {
   isCreate: boolean,
@@ -22,6 +23,12 @@ type ConnectBranchStoryProps = {
 
 const ConnectBranchStory: React.FC<ConnectBranchStoryProps> = (props) => {
   const { branch, domTarget, isCreate, onDeleteConnectBranchStory } = props;
+
+  const { onRemoveConnectStory } = useStoryStore((state: State) => {
+    return {
+      onRemoveConnectStory: state.onRemoveConnectStory,
+    };
+  });
 
   const {
     selectedBranchStory,
@@ -81,6 +88,9 @@ const ConnectBranchStory: React.FC<ConnectBranchStoryProps> = (props) => {
             });
           }
         }
+        if (!isCreate) {
+          return onRemoveConnectStory(checkPointName, storyName);
+        }
         return onDeleteConnectBranchStory(checkPointName, storyName);
       }
 
@@ -95,6 +105,8 @@ const ConnectBranchStory: React.FC<ConnectBranchStoryProps> = (props) => {
       onDeleteConnectBranchStory,
       branch,
       selectedConnectBranchStory,
+      isCreate,
+      onRemoveConnectStory,
     ],
   );
 

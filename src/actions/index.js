@@ -425,6 +425,10 @@ export type Action =
           botRes?: { action: string, response: string },
         },
       },
+    }
+  | {
+      type: 'REMOVE_CONNECT_STORY',
+      payload: { checkPointName: string, storyName: string },
     };
 
 // ====================== query story ======================
@@ -663,6 +667,14 @@ export const actionAddConnectStory = (
 ): Action => ({
   type: 'ADD_CONNECT_STORY',
   payload: { storyName, branchStoryName, newBranchStory },
+});
+
+export const actionRemoveConnectStory = (
+  checkPointName: string,
+  storyName: string,
+): Action => ({
+  type: 'REMOVE_CONNECT_STORY',
+  payload: { checkPointName, storyName },
 });
 
 // ====================== create story ======================

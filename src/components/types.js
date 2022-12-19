@@ -240,6 +240,8 @@ export type State = {
       botRes?: { action: string, response: string },
     },
   ) => void,
+  // 刪除串接故事
+  onRemoveConnectStory: (checkPointName: string, storyName: string) => void,
 };
 
 export type CreateStoryState = {

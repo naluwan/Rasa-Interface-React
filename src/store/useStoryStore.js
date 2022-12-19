@@ -47,6 +47,7 @@ import {
   actionAddBranchStory,
   actionRemoveBranchStory,
   actionAddConnectStory,
+  actionRemoveConnectStory,
 } from 'actions';
 // import { computed } from 'zustand-middleware-computed-state';
 import { Toast } from 'utils/swalInput';
@@ -1813,6 +1814,62 @@ const reducer = (state: State, action: Action): State => {
             .click();
         });
     }
+    case 'REMOVE_CONNECT_STORY': {
+      const { storyName } = action.payload;
+      const { stories, nlu, domain } = cloneDeep(state.cloneData);
+      const { onSetStory, onSetAllTrainData } = state;
+
+      // 獲取原始的故事名稱
+      const currentStoryName = storyName.slice(0, storyName.indexOf('_'));
+
+      // 篩選出要刪除的串接故事
+      const deleteConnectStory = stories.filter(
+        (item) => item.story === storyName,
+      )[0];
+
+      // 串接故事刪除
+      deleteConnectStory.steps.map((step) => {
+        // 刪除串接故事的機器人回覆和action name
+        if (step.action) {
+          domain.actions.splice(domain.actions.indexOf(step.action), 1);
+          delete domain.responses[step.action];
+        }
+        return step;
+      });
+
+      const cloneData = {
+        // 刪除串接故事
+        stories: stories.filter((item) => item.story !== storyName),
+        nlu,
+        domain,
+      };
+      return postAllTrainData(cloneData)
+        .then((res) => {
+          if (res.status !== 'success') {
+            return Toast.fire({
+              icon: 'error',
+              title: '刪除串接故事失敗',
+              text: res.message,
+            });
+          }
+          Toast.fire({
+            icon: 'success',
+            title: '刪除串接故事成功',
+          });
+          onSetAllTrainData(res.data);
+          return onSetStory(currentStoryName);
+        })
+        .then(() => {
+          return document
+            .querySelector(
+              `#${storyName.slice(
+                storyName.indexOf('_') + 1,
+                storyName.lastIndexOf('_'),
+              )}_tab`,
+            )
+            .click();
+        });
+    }
     default:
       return state;
   }
@@ -2154,6 +2211,10 @@ const useStoryStore = create((set) => {
       dispatch(
         actionAddConnectStory(storyName, branchStoryName, newBranchStory),
       );
+    },
+    // 刪除串接故事
+    onRemoveConnectStory(checkPointName: string, storyName: string) {
+      dispatch(actionRemoveConnectStory(checkPointName, storyName));
     },
   };
 });
