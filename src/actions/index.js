@@ -404,6 +404,10 @@ export type Action =
           botRes?: { action: string, response: string },
         },
       },
+    }
+  | {
+      type: 'REMOVE_BRANCH_STORY',
+      payload: { checkPointName: string, storyName: string },
     };
 
 // ====================== query story ======================
@@ -616,6 +620,14 @@ export const actionAddBranchStory = (
 ): Action => ({
   type: 'ADD_BRANCH_STORY',
   payload: { storyName, newBranchStory },
+});
+
+export const actionRemoveBranchStory = (
+  checkPointName: string,
+  storyName: string,
+): Action => ({
+  type: 'REMOVE_BRANCH_STORY',
+  payload: { checkPointName, storyName },
 });
 
 // ====================== create story ======================

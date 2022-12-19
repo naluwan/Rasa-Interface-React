@@ -19,7 +19,6 @@ import type {
   NluEntitiesType,
 } from 'components/types';
 
-import type { Action } from 'actions';
 import {
   actionSetAllData,
   actionSetStory,
@@ -44,6 +43,7 @@ import {
   actionAddSlotValue,
   actionRemoveSlotValue,
   actionAddBranchStory,
+  actionRemoveBranchStory,
 } from 'actions';
 // import { computed } from 'zustand-middleware-computed-state';
 import { Toast } from 'utils/swalInput';
@@ -1665,6 +1665,87 @@ const reducer = (state: State, action: Action): State => {
         return onSetStory(storyName);
       });
     }
+    case 'REMOVE_BRANCH_STORY': {
+      const { storyName } = action.payload;
+      const { stories, nlu, domain } = cloneDeep(state.cloneData);
+      const { onSetStory, onSetAllTrainData } = state;
+
+      // 獲取原始的故事名稱
+      const currentStoryName = storyName.slice(0, storyName.indexOf('_'));
+
+      // 篩選出要被刪除的支線故事
+      const deleteBranchStory = stories.filter(
+        (item) => item.story === storyName,
+      )[0];
+
+      // 將要被刪除的支線故事從stories訓練檔中刪除
+      let newStories = stories.filter((item) => item.story !== storyName);
+
+      const connectStories = [];
+      // 支線故事處理
+      deleteBranchStory.steps.map((step, stepIdx) => {
+        // 刪除支線故事的機器人回覆
+        if (step.action) {
+          domain.actions.splice(domain.actions.indexOf(step.action), 1);
+          delete domain.responses[step.action];
+        }
+
+        // 如果支線線故事有串接故事，就將串接故事放入connectStories陣列中待處理
+        if (stepIdx !== 0 && step.checkpoint) {
+          newStories.map((item) => {
+            return item.steps.map((branchStep, branchStepIdx) => {
+              if (
+                branchStepIdx === 0 &&
+                branchStep.checkpoint === step.checkpoint
+              ) {
+                connectStories.push(item);
+              }
+              return branchStep;
+            });
+          });
+        }
+        return step;
+      });
+
+      // 串接故事處理
+      if (connectStories.length) {
+        connectStories.map((connectStory) => {
+          // 將串接故事從stories訓練檔中刪除
+          newStories = newStories.filter(
+            (item) => item.story !== connectStory.story,
+          );
+          return connectStory.steps.map((connectStep) => {
+            // 刪除串接故事的機器人回覆
+            if (connectStep.action) {
+              domain.actions.splice(domain.actions.indexOf(connectStep.action));
+              delete domain.responses[connectStep.action];
+            }
+            return connectStep;
+          });
+        });
+      }
+
+      const cloneData = {
+        stories: newStories,
+        nlu,
+        domain,
+      };
+      return postAllTrainData(cloneData).then((res) => {
+        if (res.status !== 'success') {
+          return Toast.fire({
+            icon: 'error',
+            title: '刪除支線故事失敗',
+            text: res.message,
+          });
+        }
+        Toast.fire({
+          icon: 'success',
+          title: '刪除支線故事成功',
+        });
+        onSetAllTrainData(res.data);
+        return onSetStory(currentStoryName);
+      });
+    }
     default:
       return state;
   }
@@ -1983,6 +2064,10 @@ const useStoryStore = create((set) => {
       },
     ) {
       dispatch(actionAddBranchStory(storyName, newBranchStory));
+    },
+    // 刪除支線故事
+    onRemoveBranchStory(checkPointName: string, storyName: string) {
+      dispatch(actionRemoveBranchStory(checkPointName, storyName));
     },
   };
 });

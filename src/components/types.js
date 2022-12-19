@@ -223,6 +223,8 @@ export type State = {
       botRes?: { action: string, response: string },
     },
   ) => void,
+  // 刪除支線故事
+  onRemoveBranchStory: (checkPointName: string, storyName: string) => void,
 };
 
 export type CreateStoryState = {

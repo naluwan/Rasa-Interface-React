@@ -3,8 +3,9 @@ import cx from 'classnames';
 // import { RiCloseCircleFill } from 'react-icons/ri';
 import shallow from 'zustand/shallow';
 import uuid from 'react-uuid';
+import useStoryStore from 'store/useStoryStore';
 import style from './CheckPoint.module.scss';
-import type { StoryType, CreateStoryState } from '../types';
+import type { StoryType, CreateStoryState, State } from '../types';
 import NavTab from './NavTab';
 import BotStep from '../BotStep';
 import ShowSlots from './ShowSlots';
@@ -25,6 +26,12 @@ const CheckPoint: React.FC<CheckPointProps> = (props) => {
   //   steps: [],
   // });
   // console.log('branchStory first:', branchStory);
+
+  const { onRemoveBranchStory } = useStoryStore((state: State) => {
+    return {
+      onRemoveBranchStory: state.onRemoveBranchStory,
+    };
+  });
 
   const {
     selectedBranchStory,
@@ -89,6 +96,9 @@ const CheckPoint: React.FC<CheckPointProps> = (props) => {
             });
           }
         }
+        if (!isCreate) {
+          return onRemoveBranchStory(checkPointName, storyName);
+        }
         return onDeleteBranchStory(checkPointName, storyName);
       }
 
@@ -108,6 +118,8 @@ const CheckPoint: React.FC<CheckPointProps> = (props) => {
       branch,
       selectedBranchStory,
       onSetSelectedConnectBranchStory,
+      onRemoveBranchStory,
+      isCreate,
     ],
   );
 
