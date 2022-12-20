@@ -232,7 +232,7 @@ const UserStep: React.FC<UserStepProps> = (props) => {
       const exampleValue = document.querySelector(
         `#input-${intent}-example`,
       ).value;
-      console.log(exampleValue);
+      console.log('exampleValue ===> ', exampleValue);
       const entityKeys = parentEntitiesData.map(
         (entityItem) => entityItem.entity,
       );
@@ -400,9 +400,10 @@ const UserStep: React.FC<UserStepProps> = (props) => {
     },
     [onDeleteExample, storyName],
   );
+
   // steven start
   // 新增例句
-  const atCreateExamples = () => {
+  const atCreateExamples = React.useCallback(() => {
     Swal.fire({
       title: '新增例句',
       html: "<div id='CreateExample'></div>",
@@ -444,7 +445,7 @@ const UserStep: React.FC<UserStepProps> = (props) => {
                 return (
                   <div
                     className="mb-3 p-2 border border-success rounded"
-                    key={`${entityItem.start}-${entityItem.start}-${entityItem.entity} + ${entityItem.value}`}
+                    key={`${entityItem.start}-${entityItem.start}-${entityItem.entity}-${entityItem.value}`}
                   >
                     <input
                       type="text"
@@ -469,9 +470,10 @@ const UserStep: React.FC<UserStepProps> = (props) => {
         CreateExamples,
       );
     }, 0);
-  };
+  }, []);
+
   // 編輯例句
-  const atexampleBtn = React.useCallback((examplesData) => {
+  const atexampleBtn = React.useCallback(() => {
     Swal.fire({
       title: '例句',
       html: "<div id='examplesTable'> 沒有例句資料，請先添加例句</div>",
@@ -518,8 +520,11 @@ const UserStep: React.FC<UserStepProps> = (props) => {
               </thead>
 
               <tbody>
-                {examplesData.map((example) => {
+                {examples.map((example) => {
                   const { text, intent, entities } = example;
+                  console.log('example text ===> ', text);
+                  console.log('example intent ===> ', intent);
+                  console.log('example entities ===> ', entities);
                   return (
                     <Examples
                       key={text + intent}
@@ -557,7 +562,7 @@ const UserStep: React.FC<UserStepProps> = (props) => {
         document.querySelector('#examplesBtn').click();
       }
     }, 0);
-  }, []);
+  }, [examples]);
 
   // steven end
   // 新增關鍵字
