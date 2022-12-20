@@ -124,7 +124,7 @@ const StepControl: React.FC<StepControlType> = (props) => {
           )}
           data-bs-toggle="modal"
           data-bs-target="#createBranchStoryModal"
-          disabled={!isUser}
+          disabled={!isUser || hasBranch}
           onClick={() => onSetMainStep()}
         >
           新增支線故事

@@ -20,7 +20,7 @@ const NavTab: React.FC<NavTabProps> = (props) => {
   return (
     <button
       className={cx('nav-link', { active: isActive }, style.checkPointNavTab)}
-      id={`${storyName}_tab`}
+      id={`story_nav_tab_${storyName}`}
       data-bs-toggle="tab"
       data-bs-target="#nav-home"
       type="button"

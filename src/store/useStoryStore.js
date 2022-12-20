@@ -382,7 +382,6 @@ const reducer = (state: State, action: Action): State => {
         return step;
       });
 
-      console.log('SET STORY ===> ', story);
       return {
         ...state,
         story,
@@ -1656,21 +1655,27 @@ const reducer = (state: State, action: Action): State => {
         nlu,
         domain,
       };
-      return postAllTrainData(cloneData).then((res) => {
-        if (res.status !== 'success') {
-          return Toast.fire({
-            icon: 'error',
-            title: '新增支線故事失敗',
-            text: res.message,
+      return postAllTrainData(cloneData)
+        .then((res) => {
+          if (res.status !== 'success') {
+            return Toast.fire({
+              icon: 'error',
+              title: '新增支線故事失敗',
+              text: res.message,
+            });
+          }
+          Toast.fire({
+            icon: 'success',
+            title: '新增支線故事成功',
           });
-        }
-        Toast.fire({
-          icon: 'success',
-          title: '新增支線故事成功',
+          onSetAllTrainData(res.data);
+          return onSetStory(storyName);
+        })
+        .then(() => {
+          document
+            .querySelector(`#story_nav_tab_${newBranchStory.branchName}`)
+            .click();
         });
-        onSetAllTrainData(res.data);
-        return onSetStory(storyName);
-      });
     }
     case 'REMOVE_BRANCH_STORY': {
       const { storyName } = action.payload;
@@ -1806,13 +1811,18 @@ const reducer = (state: State, action: Action): State => {
         .then(() => {
           return document
             .querySelector(
-              `#${branchStoryName.slice(
+              `#story_nav_tab_${branchStoryName.slice(
                 branchStoryName.indexOf('_') + 1,
                 branchStoryName.length,
-              )}_tab`,
+              )}`,
             )
             .click();
-        });
+        })
+        .then(() =>
+          document
+            .querySelector(`#story_nav_tab_${newBranchStory.branchName}`)
+            .click(),
+        );
     }
     case 'REMOVE_CONNECT_STORY': {
       const { storyName } = action.payload;
@@ -1862,10 +1872,10 @@ const reducer = (state: State, action: Action): State => {
         .then(() => {
           return document
             .querySelector(
-              `#${storyName.slice(
+              `#story_nav_tab_${storyName.slice(
                 storyName.indexOf('_') + 1,
                 storyName.lastIndexOf('_'),
-              )}_tab`,
+              )}`,
             )
             .click();
         });

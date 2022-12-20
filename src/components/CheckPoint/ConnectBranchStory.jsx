@@ -1,6 +1,5 @@
 import * as React from 'react';
-import ReactDom from 'react-dom';
-// import shallow from 'zustand/shallow';
+// import ReactDom from 'react-dom';
 import uuid from 'react-uuid';
 import cx from 'classnames';
 import shallow from 'zustand/shallow';
@@ -19,10 +18,12 @@ type ConnectBranchStoryProps = {
     checkPointName: string,
     branchName: string,
   ) => void,
+  onClickCreateBranch: (checkPointName: string) => void,
 };
 
 const ConnectBranchStory: React.FC<ConnectBranchStoryProps> = (props) => {
-  const { branch, domTarget, isCreate, onDeleteConnectBranchStory } = props;
+  const { branch, isCreate, onDeleteConnectBranchStory, onClickCreateBranch } =
+    props;
 
   const { onRemoveConnectStory } = useStoryStore((state: State) => {
     return {
@@ -38,7 +39,6 @@ const ConnectBranchStory: React.FC<ConnectBranchStoryProps> = (props) => {
     onAddConnectStoryResButtons,
     onRemoveConnectStoryResButton,
     onEditConnectStoryResButtons,
-    onSetBranchStep,
   } = useCreateStoryStore((state: CreateStoryState) => {
     return {
       selectedBranchStory: state.selectedBranchStory,
@@ -48,7 +48,6 @@ const ConnectBranchStory: React.FC<ConnectBranchStoryProps> = (props) => {
       onAddConnectStoryResButtons: state.onAddConnectStoryResButtons,
       onRemoveConnectStoryResButton: state.onRemoveConnectStoryResButton,
       onEditConnectStoryResButtons: state.onEditConnectStoryResButtons,
-      onSetBranchStep: state.onSetBranchStep,
     };
   }, shallow);
 
@@ -71,7 +70,7 @@ const ConnectBranchStory: React.FC<ConnectBranchStoryProps> = (props) => {
       const { target } = e;
 
       // 刪除支線故事
-      if (!target.id.includes('tab')) {
+      if (!target.id.includes('story_nav_tab')) {
         const idx = storyName.lastIndexOf('_');
         const checkPointName = `${storyName.slice(0, idx)}_主線`;
 
@@ -110,9 +109,16 @@ const ConnectBranchStory: React.FC<ConnectBranchStoryProps> = (props) => {
     ],
   );
 
-  const portalTarget = domTarget || document.querySelector('#nav-tabContent');
+  // const portalTarget =
+  //   domTarget || document.querySelector('#connectStoryContainer');
+  // console.log(
+  //   'selectedBranchStory.steps.some((branchStep, idx) => idx !== 0 && branchStep.checkpoint) ===>',
+  //   selectedBranchStory.steps.some(
+  //     (branchStep, idx) => idx !== 0 && branchStep.checkpoint,
+  //   ),
+  // );
 
-  return ReactDom.createPortal(
+  return (
     <div className={style.root} id="checkPointStep">
       <nav>
         <div
@@ -120,32 +126,29 @@ const ConnectBranchStory: React.FC<ConnectBranchStoryProps> = (props) => {
           id="nav-tab"
           role="tablist"
         >
-          {branch.map((item) => {
-            const { story, steps } = item;
+          {branch?.map((item) => {
+            const { story } = item;
             // console.log('branchStory.story:', branchStory.story);
             // console.log('story:', story);
             return (
               <NavTab
                 key={`${uuid()}-${item.story}`}
                 story={story}
-                steps={steps}
                 isActive={selectedConnectBranchStory?.story === story}
                 onClickTab={atClickTab}
               />
             );
           })}
-          {!isCreate && (
-            <button
-              className={cx('nav-link', style.checkPointNavTab)}
-              id="createBranchStoryBtn"
-              data-bs-toggle="modal"
-              data-bs-target="#createBranchStoryModal"
-              onClick={() => onSetBranchStep()}
-              type="button"
-            >
-              +串接
-            </button>
-          )}
+          <button
+            className={cx('nav-link', style.checkPointNavTab)}
+            id="createBranchStoryBtn"
+            data-bs-toggle="modal"
+            data-bs-target="#createBranchStoryModal"
+            onClick={() => onClickCreateBranch(selectedBranchStory.story)}
+            type="button"
+          >
+            +串接
+          </button>
         </div>
       </nav>
       <div
@@ -196,8 +199,7 @@ const ConnectBranchStory: React.FC<ConnectBranchStoryProps> = (props) => {
             })}
         </div>
       </div>
-    </div>,
-    portalTarget,
+    </div>
   );
 };
 

@@ -79,7 +79,7 @@ const CheckPoint: React.FC<CheckPointProps> = (props) => {
       const { target } = e;
 
       // 刪除支線故事
-      if (!target.id.includes('tab')) {
+      if (!target.id.includes('story_nav_tab')) {
         const idx = storyName.lastIndexOf('_');
         const checkPointName = `${storyName.slice(0, idx)}_主線`;
 
@@ -153,7 +153,7 @@ const CheckPoint: React.FC<CheckPointProps> = (props) => {
               />
             );
           })}
-          {!isCreate && (
+          {branch.length > 0 && (
             <button
               className={cx('nav-link', style.checkPointNavTab)}
               id="createBranchStoryBtn"
@@ -177,12 +177,10 @@ const CheckPoint: React.FC<CheckPointProps> = (props) => {
         >
           {selectedBranchStory?.steps?.length > 0 &&
             // eslint-disable-next-line array-callback-return, consistent-return
-            selectedBranchStory.steps.map((step, idx) => {
+            selectedBranchStory.steps.map((step) => {
               const {
                 // eslint-disable-next-line camelcase
                 slot_was_set,
-                checkpoint,
-                branchStories,
                 action,
                 response,
                 buttons,
@@ -215,33 +213,34 @@ const CheckPoint: React.FC<CheckPointProps> = (props) => {
                   />
                 );
               }
-
-              if (idx !== 0 && step.checkpoint && branchStories.length) {
-                return (
-                  <ConnectBranchStory
-                    key={`${uuid()}-${checkpoint}`}
-                    isCreate={isCreate}
-                    branch={branchStories}
-                    onDeleteConnectBranchStory={onDeleteConnectBranchStory}
-                  />
-                );
-              }
             })}
-          {selectedBranchStory?.steps?.length > 0 &&
-            selectedBranchStory.steps.every(
-              (step) => !step.action || step.checkpoint,
-            ) && (
-              <div className="d-flex justify-content-center mt-3">
-                <button
-                  className="btn btn-warning"
-                  data-bs-toggle="modal"
-                  data-bs-target="#createBranchStoryModal"
-                  onClick={() => atClickCreateBranch(selectedBranchStory.story)}
-                >
-                  串接支線故事
-                </button>
-              </div>
-            )}
+          {
+            selectedBranchStory?.steps?.length >= 2 &&
+              selectedBranchStory.steps.every((step) => !step.action) &&
+              selectedBranchStory.steps.map(
+                (step, idx) =>
+                  idx !== 0 &&
+                  step.checkpoint && (
+                    <ConnectBranchStory
+                      key={`${uuid()}-${step.checkpoint}`}
+                      isCreate={isCreate}
+                      branch={step.branchStories}
+                      onDeleteConnectBranchStory={onDeleteConnectBranchStory}
+                      onClickCreateBranch={atClickCreateBranch}
+                    />
+                  ),
+              )
+            // <div className="d-flex justify-content-center mt-3">
+            //   <button
+            //     className="btn btn-warning"
+            //     data-bs-toggle="modal"
+            //     data-bs-target="#createBranchStoryModal"
+            //     onClick={() => atClickCreateBranch(selectedBranchStory.story)}
+            //   >
+            //     串接支線故事
+            //   </button>
+            // </div>
+          }
         </div>
       </div>
     </div>
