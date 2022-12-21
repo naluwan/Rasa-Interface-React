@@ -860,33 +860,12 @@ const reducer = (state: CreateStoryState, action: Action): State => {
                 return step;
               }),
             },
-            selectedBranchStory: {
-              ...state.selectedBranchStory,
-              steps: state.selectedBranchStory.steps.concat([
-                {
-                  checkpoint: `${checkPointName}_主線`,
-                  branchStories: [
-                    {
-                      story: `${checkPointName}_${newBranchStory.branchName}`,
-                      steps: [
-                        { checkpoint: `${checkPointName}_主線` },
-                        {
-                          slot_was_set: newBranchStory.slotValues.map(
-                            (item) => ({
-                              [item.slotName]: item.slotValue,
-                            }),
-                          ),
-                        },
-                        {
-                          action: newBranchStory.botRes.action,
-                          response: newBranchStory.botRes.response,
-                        },
-                      ],
-                    },
-                  ],
-                },
-              ]),
-            },
+            selectedBranchStory: state.newStory.steps
+              .filter((step) => step.checkpoint)[0]
+              .branchStories.filter(
+                (branchStory) =>
+                  branchStory.story === state.selectedBranchStory.story,
+              )[0],
             selectedConnectBranchStory: {
               story: `${checkPointName}_${newBranchStory.branchName}`,
               steps: [
@@ -939,47 +918,20 @@ const reducer = (state: CreateStoryState, action: Action): State => {
               return step;
             }),
           },
-          selectedBranchStory: {
-            ...state.selectedBranchStory,
-            steps: state.selectedBranchStory.steps.concat([
-              {
-                checkpoint: `${checkPointName}_主線`,
-                branchStories: [
-                  {
-                    checkpoint: `${checkPointName}_主線`,
-                    branchStories: [
-                      {
-                        story: `${checkPointName}_${newBranchStory.branchName}`,
-                        steps: [
-                          { checkpoint: `${checkPointName}_主線` },
-                          {
-                            slot_was_set: newBranchStory.slotValues.map(
-                              (item) => ({
-                                [item.slotName]: item.slotValue,
-                              }),
-                            ),
-                          },
-                        ],
-                      },
-                    ],
-                  },
-                ],
-              },
-            ]),
-          },
+          selectedBranchStory: state.newStory.steps
+            .filter((step) => step.checkpoint)[0]
+            .branchStories.filter(
+              (branchStory) =>
+                branchStory.story === state.selectedBranchStory.story,
+            )[0],
           selectedConnectBranchStory: {
-            checkpoint: `${checkPointName}_主線`,
-            branchStories: [
+            story: `${checkPointName}_${newBranchStory.branchName}`,
+            steps: [
+              { checkpoint: `${checkPointName}_主線` },
               {
-                story: `${checkPointName}_${newBranchStory.branchName}`,
-                steps: [
-                  { checkpoint: `${checkPointName}_主線` },
-                  {
-                    slot_was_set: newBranchStory.slotValues.map((item) => ({
-                      [item.slotName]: item.slotValue,
-                    })),
-                  },
-                ],
+                slot_was_set: newBranchStory.slotValues.map((item) => ({
+                  [item.slotName]: item.slotValue,
+                })),
               },
             ],
           },
@@ -1036,38 +988,12 @@ const reducer = (state: CreateStoryState, action: Action): State => {
               return step;
             }),
           },
-          selectedBranchStory: {
-            ...state.selectedBranchStory,
-            steps: state.selectedBranchStory.steps.map((branchStep, idx) => {
-              if (
-                idx !== 0 &&
-                branchStep.checkpoint &&
-                branchStep.checkpoint.slice(
-                  0,
-                  branchStep.checkpoint.lastIndexOf('_'),
-                ) === checkPointName
-              ) {
-                branchStep.branchStories = branchStep.branchStories.concat([
-                  {
-                    story: `${checkPointName}_${newBranchStory.branchName}`,
-                    steps: [
-                      { checkpoint: `${checkPointName}_主線` },
-                      {
-                        slot_was_set: newBranchStory.slotValues.map((item) => ({
-                          [item.slotName]: item.slotValue,
-                        })),
-                      },
-                      {
-                        action: newBranchStory.botRes.action,
-                        response: newBranchStory.botRes.response,
-                      },
-                    ],
-                  },
-                ]);
-              }
-              return branchStep;
-            }),
-          },
+          selectedBranchStory: state.newStory.steps
+            .filter((step) => step.checkpoint)[0]
+            .branchStories.filter(
+              (branchStory) =>
+                branchStory.story === state.selectedBranchStory.story,
+            )[0],
           selectedConnectBranchStory: {
             story: `${checkPointName}_${newBranchStory.branchName}`,
             steps: [
@@ -1129,34 +1055,12 @@ const reducer = (state: CreateStoryState, action: Action): State => {
             return step;
           }),
         },
-        selectedBranchStory: {
-          ...state.selectedBranchStory,
-          steps: state.selectedBranchStory.steps.map((branchStep, idx) => {
-            if (
-              idx !== 0 &&
-              branchStep.checkpoint &&
-              branchStep.checkpoint.slice(
-                0,
-                branchStep.checkpoint.lastIndexOf('_'),
-              ) === checkPointName
-            ) {
-              branchStep.branchStories = branchStep.branchStories.concat([
-                {
-                  story: `${checkPointName}_${newBranchStory.branchName}`,
-                  steps: [
-                    { checkpoint: `${checkPointName}_主線` },
-                    {
-                      slot_was_set: newBranchStory.slotValues.map((item) => ({
-                        [item.slotName]: item.slotValue,
-                      })),
-                    },
-                  ],
-                },
-              ]);
-            }
-            return branchStep;
-          }),
-        },
+        selectedBranchStory: state.newStory.steps
+          .filter((step) => step.checkpoint)[0]
+          .branchStories.filter(
+            (branchStory) =>
+              branchStory.story === state.selectedBranchStory.story,
+          )[0],
         selectedConnectBranchStory: {
           story: `${checkPointName}_${newBranchStory.branchName}`,
           steps: [
@@ -1199,50 +1103,18 @@ const reducer = (state: CreateStoryState, action: Action): State => {
         return step;
       });
 
-      // steps = steps.map((step) => {
-      //   if (step.checkpoint) {
-      //     step.branchStories.map((branchStory) => {
-      //       if (
-      //         branchStory.story ===
-      //         checkPointName.slice(0, checkPointName.lastIndexOf('_'))
-      //       ) {
-      //         branchStory.steps = branchStory.steps.filter((branchStep, idx) =>
-      //           idx !== 0 && branchStep.checkpoint
-      //             ? branchStep.branchStories.length > 0
-      //             : branchStep,
-      //         );
-      //       }
-      //       return branchStory;
-      //     });
-      //   }
-      //   return step;
-      // });
-
       return {
         ...state,
         newStory: {
           ...state.newStory,
           steps,
         },
-        selectedBranchStory: {
-          ...state.selectedBranchStory,
-          steps: state.selectedBranchStory.steps.map((branchStep) => {
-            if (
-              branchStep.checkpoint &&
-              branchStep.checkpoint === checkPointName
-            ) {
-              branchStep.branchStories = branchStep.branchStories.filter(
-                (item) => item.story !== branchName,
-              );
-            }
-            return branchStep;
-          }),
-          // .filter((branchStep, idx) =>
-          //   idx !== 0 && branchStep.checkpoint
-          //     ? branchStep.branchStories.length > 0
-          //     : branchStep,
-          // ),
-        },
+        selectedBranchStory: state.newStory.steps
+          .filter((step) => step.checkpoint)[0]
+          .branchStories.filter(
+            (branchStory) =>
+              branchStory.story === state.selectedBranchStory.story,
+          )[0],
       };
     }
     case 'CREATE_STORY_BRANCH_STORY_EDIT_BOT_RES': {
@@ -1272,6 +1144,12 @@ const reducer = (state: CreateStoryState, action: Action): State => {
             return step;
           }),
         },
+        selectedBranchStory: state.newStory.steps
+          .filter((step) => step.checkpoint)[0]
+          .branchStories.filter(
+            (branchStory) =>
+              branchStory.story === state.selectedBranchStory.story,
+          )[0],
       };
     }
     case 'CREATE_STORY_CONNECT_STORY_EDIT_BOT_RES': {
@@ -1323,6 +1201,19 @@ const reducer = (state: CreateStoryState, action: Action): State => {
             return step;
           }),
         },
+        selectedConnectBranchStory: state.newStory.steps
+          .filter((step) => step.checkpoint)[0]
+          .branchStories.filter(
+            (branchStory) =>
+              branchStory.story === state.selectedBranchStory.story,
+          )[0]
+          .steps.filter(
+            (branchStep, idx) => idx !== 0 && branchStep.checkpoint,
+          )[0]
+          .branchStories.filter(
+            (connectStory) =>
+              connectStory.story === state.selectedConnectBranchStory.story,
+          )[0],
       };
     }
     case 'CREATE_STORY_BRANCH_STORY_ADD_RES_BUTTONS': {
@@ -1387,6 +1278,13 @@ const reducer = (state: CreateStoryState, action: Action): State => {
             return step;
           }),
         },
+        // 不需要將selectedBranchStory再次處理，只需要從更新後的newStory中找出該支線故事在設定回去即可，否則新增選項動作會執行兩次
+        selectedBranchStory: state.newStory.steps
+          .filter((step) => step.checkpoint)[0]
+          .branchStories.filter(
+            (branchStory) =>
+              branchStory.story === state.selectedBranchStory.story,
+          )[0],
       };
     }
     case 'CREATE_STORY_BRANCH_STORY_REMOVE_RES_BUTTON': {
@@ -1415,6 +1313,12 @@ const reducer = (state: CreateStoryState, action: Action): State => {
             return step;
           }),
         },
+        selectedBranchStory: state.newStory.steps
+          .filter((step) => step.checkpoint)[0]
+          .branchStories.filter(
+            (branchStory) =>
+              branchStory.story === state.selectedBranchStory.story,
+          )[0],
       };
     }
     case 'CREATE_STORY_BRANCH_STORY_EDIT_RES_BUTTONS': {
@@ -1510,6 +1414,12 @@ const reducer = (state: CreateStoryState, action: Action): State => {
             return step;
           }),
         },
+        selectedBranchStory: state.newStory.steps
+          .filter((step) => step.checkpoint)[0]
+          .branchStories.filter(
+            (branchStory) =>
+              branchStory.story === state.selectedBranchStory.story,
+          )[0],
       };
     }
     case 'CREATE_STORY_CONNECT_STORY_ADD_RES_BUTTONS': {
@@ -1621,6 +1531,19 @@ const reducer = (state: CreateStoryState, action: Action): State => {
             return step;
           }),
         },
+        selectedConnectBranchStory: state.newStory.steps
+          .filter((step) => step.checkpoint)[0]
+          .branchStories.filter(
+            (branchStory) =>
+              branchStory.story === state.selectedBranchStory.story,
+          )[0]
+          .steps.filter(
+            (branchStep, idx) => idx !== 0 && branchStep.checkpoint,
+          )[0]
+          .branchStories.filter(
+            (connectStory) =>
+              connectStory.story === state.selectedConnectBranchStory.story,
+          )[0],
       };
     }
     case 'CREATE_STORY_CONNECT_STORY_REMOVE_RES_BUTTON': {
@@ -1670,6 +1593,19 @@ const reducer = (state: CreateStoryState, action: Action): State => {
             return step;
           }),
         },
+        selectedConnectBranchStory: state.newStory.steps
+          .filter((step) => step.checkpoint)[0]
+          .branchStories.filter(
+            (branchStory) =>
+              branchStory.story === state.selectedBranchStory.story,
+          )[0]
+          .steps.filter(
+            (branchStep, idx) => idx !== 0 && branchStep.checkpoint,
+          )[0]
+          .branchStories.filter(
+            (connectStory) =>
+              connectStory.story === state.selectedConnectBranchStory.story,
+          )[0],
       };
     }
     case 'CREATE_STORY_CONNECT_STORY_EDIT_RES_BUTTONS': {
@@ -1808,6 +1744,19 @@ const reducer = (state: CreateStoryState, action: Action): State => {
             return step;
           }),
         },
+        selectedConnectBranchStory: state.newStory.steps
+          .filter((step) => step.checkpoint)[0]
+          .branchStories.filter(
+            (branchStory) =>
+              branchStory.story === state.selectedBranchStory.story,
+          )[0]
+          .steps.filter(
+            (branchStep, idx) => idx !== 0 && branchStep.checkpoint,
+          )[0]
+          .branchStories.filter(
+            (connectStory) =>
+              connectStory.story === state.selectedConnectBranchStory.story,
+          )[0],
       };
     }
     default:

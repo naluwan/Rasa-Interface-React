@@ -40,6 +40,14 @@ const CreateStory: React.FC<CreateStoryProps> = (props) => {
     onRemoveResButton,
     onCreateBranchStory,
     onDeleteBranchStory,
+    onEditBranchStoryBotRes,
+    onEditConnectStoryBotRes,
+    onAddBranchStoryResButtons,
+    onRemoveBranchStoryResButton,
+    onEditBranchStoryResButtons,
+    onAddConnectStoryResButtons,
+    onRemoveConnectStoryResButton,
+    onEditConnectStoryResButtons,
   } = useCreateStoryStore((state: CreateStoryState) => {
     return {
       newStory: state.newStory,
@@ -60,6 +68,14 @@ const CreateStory: React.FC<CreateStoryProps> = (props) => {
       onRemoveResButton: state.onRemoveResButton,
       onCreateBranchStory: state.onCreateBranchStory,
       onDeleteBranchStory: state.onDeleteBranchStory,
+      onEditBranchStoryBotRes: state.onEditBranchStoryBotRes,
+      onEditConnectStoryBotRes: state.onEditConnectStoryBotRes,
+      onAddBranchStoryResButtons: state.onAddBranchStoryResButtons,
+      onRemoveBranchStoryResButton: state.onRemoveBranchStoryResButton,
+      onEditBranchStoryResButtons: state.onEditBranchStoryResButtons,
+      onAddConnectStoryResButtons: state.onAddConnectStoryResButtons,
+      onRemoveConnectStoryResButton: state.onRemoveConnectStoryResButton,
+      onEditConnectStoryResButtons: state.onEditConnectStoryResButtons,
     };
   }, shallow);
   /**
@@ -176,6 +192,14 @@ const CreateStory: React.FC<CreateStoryProps> = (props) => {
                 isCreate={isCreate}
                 branch={branchStories}
                 onDeleteBranchStory={onDeleteBranchStory}
+                onEditBranchStoryBotRes={onEditBranchStoryBotRes}
+                onEditConnectStoryBotRes={onEditConnectStoryBotRes}
+                onAddBranchStoryResButtons={onAddBranchStoryResButtons}
+                onRemoveBranchStoryResButton={onRemoveBranchStoryResButton}
+                onEditBranchStoryResButtons={onEditBranchStoryResButtons}
+                onAddConnectStoryResButtons={onAddConnectStoryResButtons}
+                onRemoveConnectStoryResButton={onRemoveConnectStoryResButton}
+                onEditConnectStoryResButtons={onEditConnectStoryResButtons}
               />
             );
           })}

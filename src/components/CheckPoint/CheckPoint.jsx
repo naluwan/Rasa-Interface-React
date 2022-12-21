@@ -16,16 +16,96 @@ type CheckPointProps = {
   branch: StoryType[],
   isCreate: boolean,
   onDeleteBranchStory: (checkPointName: string, branchName: string) => void,
+  onEditBranchStoryBotRes: (
+    oriBotRes: string,
+    botRes: string,
+    actionName: string,
+    storyName: string,
+    checkPointName: string,
+  ) => void,
+  onEditConnectStoryBotRes: (
+    oriBotRes: string,
+    botRes: string,
+    actionName: string,
+    storyName: string,
+    checkPointName: String,
+    connectStoryName: string,
+  ) => void,
+  onAddBranchStoryResButtons: (
+    actionName: string,
+    title: string,
+    payload: string,
+    reply: string,
+    storyName: string,
+    stories: StoryType[],
+    checkPointName: string,
+  ) => void,
+  onRemoveBranchStoryResButton: (
+    actionName: string,
+    payload: string,
+    storyName: string,
+    buttonActionName: string,
+    disabled: boolean,
+    checkPointName: string,
+  ) => void,
+  onEditBranchStoryResButtons: (
+    actionName: string,
+    title: string,
+    oriPayload: string,
+    payload: string,
+    reply: string,
+    storyName: string,
+    buttonActionName: string,
+    stories: StoryType[],
+    checkPointName: string,
+  ) => void,
+  onAddConnectStoryResButtons: (
+    actionName: string,
+    title: string,
+    payload: string,
+    reply: string,
+    storyName: string,
+    stories: StoryType[],
+    checkPointName: string,
+    connectStoryName: string,
+  ) => void,
+  onRemoveConnectStoryResButton: (
+    actionName: string,
+    payload: string,
+    storyName: string,
+    buttonActionName: string,
+    disabled: boolean,
+    checkPointName: string,
+    connectStoryName: string,
+  ) => void,
+  onEditConnectStoryResButtons: (
+    actionName: string,
+    title: string,
+    oriPayload: string,
+    payload: string,
+    reply: string,
+    storyName: string,
+    buttonActionName: string,
+    stories: StoryType[],
+    checkPointName: string,
+    connectStoryName: string,
+  ) => void,
 };
 
 const CheckPoint: React.FC<CheckPointProps> = (props) => {
-  const { branch, isCreate, onDeleteBranchStory } = props;
-  // console.log('inside CheckPoint branchStories:', branch);
-  // const [branchStory, setBranchStory] = React.useState({
-  //   story: '',
-  //   steps: [],
-  // });
-  // console.log('branchStory first:', branchStory);
+  const {
+    branch,
+    isCreate,
+    onDeleteBranchStory,
+    onEditBranchStoryBotRes,
+    onAddBranchStoryResButtons,
+    onRemoveBranchStoryResButton,
+    onEditBranchStoryResButtons,
+    onEditConnectStoryBotRes,
+    onAddConnectStoryResButtons,
+    onRemoveConnectStoryResButton,
+    onEditConnectStoryResButtons,
+  } = props;
 
   const { onRemoveBranchStory } = useStoryStore((state: State) => {
     return {
@@ -36,27 +116,17 @@ const CheckPoint: React.FC<CheckPointProps> = (props) => {
   const {
     selectedBranchStory,
     onSetSelectedBranchStory,
+    onSetSelectedConnectBranchStory,
     onSetBranchStep,
     onSetCheckPointName,
-    onDeleteConnectBranchStory,
-    onSetSelectedConnectBranchStory,
-    onEditBranchStoryBotRes,
-    onAddBranchStoryResButtons,
-    onRemoveBranchStoryResButton,
-    onEditBranchStoryResButtons,
     onSetMainStep,
   } = useCreateStoryStore((state: CreateStoryState) => {
     return {
       selectedBranchStory: state.selectedBranchStory,
       onSetBranchStep: state.onSetBranchStep,
       onSetCheckPointName: state.onSetCheckPointName,
-      onDeleteConnectBranchStory: state.onDeleteConnectBranchStory,
       onSetSelectedBranchStory: state.onSetSelectedBranchStory,
       onSetSelectedConnectBranchStory: state.onSetSelectedConnectBranchStory,
-      onEditBranchStoryBotRes: state.onEditBranchStoryBotRes,
-      onAddBranchStoryResButtons: state.onAddBranchStoryResButtons,
-      onRemoveBranchStoryResButton: state.onRemoveBranchStoryResButton,
-      onEditBranchStoryResButtons: state.onEditBranchStoryResButtons,
       onSetMainStep: state.onSetMainStep,
     };
   }, shallow);
@@ -214,33 +284,26 @@ const CheckPoint: React.FC<CheckPointProps> = (props) => {
                 );
               }
             })}
-          {
-            selectedBranchStory?.steps?.length >= 2 &&
-              selectedBranchStory.steps.every((step) => !step.action) &&
-              selectedBranchStory.steps.map(
-                (step, idx) =>
-                  idx !== 0 &&
-                  step.checkpoint && (
-                    <ConnectBranchStory
-                      key={`${uuid()}-${step.checkpoint}`}
-                      isCreate={isCreate}
-                      branch={step.branchStories}
-                      onDeleteConnectBranchStory={onDeleteConnectBranchStory}
-                      onClickCreateBranch={atClickCreateBranch}
-                    />
-                  ),
-              )
-            // <div className="d-flex justify-content-center mt-3">
-            //   <button
-            //     className="btn btn-warning"
-            //     data-bs-toggle="modal"
-            //     data-bs-target="#createBranchStoryModal"
-            //     onClick={() => atClickCreateBranch(selectedBranchStory.story)}
-            //   >
-            //     串接支線故事
-            //   </button>
-            // </div>
-          }
+          {selectedBranchStory?.steps?.length >= 2 &&
+            selectedBranchStory.steps.every((step) => !step.action) &&
+            selectedBranchStory.steps.map(
+              (step, idx) =>
+                idx !== 0 &&
+                step.checkpoint && (
+                  <ConnectBranchStory
+                    key={`${uuid()}-${step.checkpoint}`}
+                    isCreate={isCreate}
+                    branch={step.branchStories}
+                    onClickCreateBranch={atClickCreateBranch}
+                    onEditConnectStoryBotRes={onEditConnectStoryBotRes}
+                    onAddConnectStoryResButtons={onAddConnectStoryResButtons}
+                    onRemoveConnectStoryResButton={
+                      onRemoveConnectStoryResButton
+                    }
+                    onEditConnectStoryResButtons={onEditConnectStoryResButtons}
+                  />
+                ),
+            )}
         </div>
       </div>
     </div>

@@ -49,7 +49,7 @@ const ShowStory: React.FC<ShowStoryProps> = (props) => {
   }, shallow);
 
   return (
-    <div data-ShowStory className={style.root}>
+    <div data-showstory className={style.root}>
       <div className="col d-flex align-items-center">
         <div className={style.title}>{story.story}</div>
         {story.story !== '問候語' && (

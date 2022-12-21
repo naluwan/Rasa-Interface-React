@@ -19,11 +19,57 @@ type ConnectBranchStoryProps = {
     branchName: string,
   ) => void,
   onClickCreateBranch: (checkPointName: string) => void,
+  onAddConnectStoryResButtons: (
+    actionName: string,
+    title: string,
+    payload: string,
+    reply: string,
+    storyName: string,
+    stories: StoryType[],
+    checkPointName: string,
+    connectStoryName: string,
+  ) => void,
+  onRemoveConnectStoryResButton: (
+    actionName: string,
+    payload: string,
+    storyName: string,
+    buttonActionName: string,
+    disabled: boolean,
+    checkPointName: string,
+    connectStoryName: string,
+  ) => void,
+  onEditConnectStoryResButtons: (
+    actionName: string,
+    title: string,
+    oriPayload: string,
+    payload: string,
+    reply: string,
+    storyName: string,
+    buttonActionName: string,
+    stories: StoryType[],
+    checkPointName: string,
+    connectStoryName: string,
+  ) => void,
+  onEditConnectStoryBotRes: (
+    oriBotRes: string,
+    botRes: string,
+    actionName: string,
+    storyName: string,
+    checkPointName: String,
+    connectStoryName: string,
+  ) => void,
 };
 
 const ConnectBranchStory: React.FC<ConnectBranchStoryProps> = (props) => {
-  const { branch, isCreate, onDeleteConnectBranchStory, onClickCreateBranch } =
-    props;
+  const {
+    branch,
+    isCreate,
+    onClickCreateBranch,
+    onAddConnectStoryResButtons,
+    onRemoveConnectStoryResButton,
+    onEditConnectStoryResButtons,
+    onEditConnectStoryBotRes,
+  } = props;
 
   const { onRemoveConnectStory } = useStoryStore((state: State) => {
     return {
@@ -35,19 +81,13 @@ const ConnectBranchStory: React.FC<ConnectBranchStoryProps> = (props) => {
     selectedBranchStory,
     selectedConnectBranchStory,
     onSetSelectedConnectBranchStory,
-    onEditConnectStoryBotRes,
-    onAddConnectStoryResButtons,
-    onRemoveConnectStoryResButton,
-    onEditConnectStoryResButtons,
+    onDeleteConnectBranchStory,
   } = useCreateStoryStore((state: CreateStoryState) => {
     return {
       selectedBranchStory: state.selectedBranchStory,
       selectedConnectBranchStory: state.selectedConnectBranchStory,
       onSetSelectedConnectBranchStory: state.onSetSelectedConnectBranchStory,
-      onEditConnectStoryBotRes: state.onEditConnectStoryBotRes,
-      onAddConnectStoryResButtons: state.onAddConnectStoryResButtons,
-      onRemoveConnectStoryResButton: state.onRemoveConnectStoryResButton,
-      onEditConnectStoryResButtons: state.onEditConnectStoryResButtons,
+      onDeleteConnectBranchStory: state.onDeleteConnectBranchStory,
     };
   }, shallow);
 

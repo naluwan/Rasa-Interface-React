@@ -16,7 +16,6 @@
   .checkPointNavTab {
     /* :global(className) => 不要被css module轉換掉*/
 
-
     &:not(:global(.active)) {
       color: rgb(0, 0, 0);
     }
@@ -43,10 +42,13 @@
     .closeIcon {
       display: none;
       position: absolute;
-      top: 0;
-      right: 0;
+      top: -8px;
+      right: -8px;
       color: red;
       font-size: 1.2rem;
+      &:hover {
+        transform: scale(1.5);
+      }
     }
 
     // &[aria-selected]:nth-of-type(1) {
@@ -54,15 +56,14 @@
     //   border-bottom: 1px solid #fff !important;
     // }
 
-    &[aria-selected="false"]:hover {
+    &[aria-selected='false']:hover {
       border: 1px solid #b7b7b7 !important;
       border-bottom: 1px solid #fff !important;
     }
 
-    &[aria-selected="true"] {
+    &[aria-selected='true'] {
       border: 1px solid #b7b7b7 !important;
       border-bottom: 1px solid #fff !important;
     }
-
   }
 }
