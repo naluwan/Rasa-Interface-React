@@ -31,6 +31,7 @@ const ShowStory: React.FC<ShowStoryProps> = (props) => {
     onEditEntityValue,
     onDeleteExample,
     onEditBranchStoryBotRes,
+    onEditConnectStoryBotRes,
   } = useStoryStore((state: State) => {
     return {
       onEditBotRes: state.onEditBotRes,
@@ -47,6 +48,7 @@ const ShowStory: React.FC<ShowStoryProps> = (props) => {
       onEditEntityValue: state.onEditEntityValue,
       onDeleteExample: state.onDeleteExample,
       onEditBranchStoryBotRes: state.onEditBranchStoryBotRes,
+      onEditConnectStoryBotRes: state.onEditConnectStoryBotRes,
     };
   }, shallow);
 
@@ -116,6 +118,7 @@ const ShowStory: React.FC<ShowStoryProps> = (props) => {
               key={checkpoint}
               branch={branchStories}
               onEditBranchStoryBotRes={onEditBranchStoryBotRes}
+              onEditConnectStoryBotRes={onEditConnectStoryBotRes}
             />
           );
         })}

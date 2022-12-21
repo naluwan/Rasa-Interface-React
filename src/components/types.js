@@ -250,6 +250,15 @@ export type State = {
     storyName: string,
     checkPointName: string,
   ) => void,
+  // 編輯串接故事的機器人回覆
+  onEditConnectStoryBotRes: (
+    oriBotRes: string,
+    botRes: string,
+    actionName: string,
+    storyName: string,
+    checkPointName: String,
+    connectStoryName: string,
+  ) => void,
 };
 
 export type CreateStoryState = {
