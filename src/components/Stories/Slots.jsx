@@ -536,7 +536,7 @@ const Slots: React.FC<SlotsPropsType> = (props) => {
       />
       {/* 新增記錄槽 modal */}
       <div
-        className="modal fade"
+        className="modal"
         id="addSlotModal"
         data-bs-backdrop="false"
         data-bs-keyboard="false"
@@ -544,19 +544,21 @@ const Slots: React.FC<SlotsPropsType> = (props) => {
         aria-labelledby="addSlotModalLabel"
         aria-hidden="true"
       >
-        <div className="modal-dialog modal-dialog-centered modal-dialog-scrollable">
-          <div className="modal-content">
-            <div className="modal-header">
-              <h5 className="modal-title" id="addSlotModalLabel">
+        <div className="modal-dialog modal-dialog-centered modal-dialog-scrollable ">
+          <div className={cx('modal-content swal2-show', style.swtOut)}>
+            <div>
+              <h2 className="swal2-title" id="addSlotModalLabel">
                 新增記錄槽
-              </h5>
+              </h2>
               <button
                 type="button"
-                className="btn-close"
+                className={cx('swal2-close', style.swetClose)}
                 data-bs-dismiss="modal"
                 aria-label="Close"
                 onClick={() => atCancelAddSlot()}
-              />
+              >
+                ×
+              </button>
             </div>
             <div className="modal-body">
               <div className="mb-3">
@@ -617,10 +619,10 @@ const Slots: React.FC<SlotsPropsType> = (props) => {
                 </div>
               )}
             </div>
-            <div className="modal-footer">
+            <div className="swal2-actions d-flex">
               <button
                 type="button"
-                className="btn btn-secondary"
+                className="swal2-cancel swal2-styled"
                 data-bs-dismiss="modal"
                 onClick={() => atCancelAddSlot()}
               >
@@ -628,7 +630,7 @@ const Slots: React.FC<SlotsPropsType> = (props) => {
               </button>
               <button
                 type="button"
-                className="btn btn-primary"
+                className="swal2-confirm swal2-styled"
                 onClick={() => atSubmitFormValue(formValue, domain)}
               >
                 儲存
@@ -640,7 +642,7 @@ const Slots: React.FC<SlotsPropsType> = (props) => {
 
       {/* 新增儲存槽 modal */}
       <div
-        className="modal fade"
+        className="modal "
         id="addSlotValueModal"
         data-bs-backdrop="false"
         data-bs-keyboard="false"
@@ -649,18 +651,20 @@ const Slots: React.FC<SlotsPropsType> = (props) => {
         aria-hidden="true"
       >
         <div className="modal-dialog modal-dialog-centered modal-dialog-scrollable">
-          <div className="modal-content">
-            <div className="modal-header">
-              <h5 className="modal-title" id="addSlotValueModalLabel">
+          <div className={cx('modal-content swal2-show', style.swtOut)}>
+            <div>
+              <h2 className="swal2-title" id="addSlotValueModalLabel">
                 新增「{newSlotValues.slotName}」的儲存槽值
-              </h5>
+              </h2>
               <button
                 type="button"
-                className="btn-close"
+                className={cx('swal2-close', style.swetClose)}
                 data-bs-dismiss="modal"
                 aria-label="Close"
                 onClick={() => atCancelAddSlotValues()}
-              />
+              >
+                ×
+              </button>
             </div>
             <div className="modal-body">
               {newSlotValues.slotValueItems.map((slotValue) => {
@@ -690,10 +694,10 @@ const Slots: React.FC<SlotsPropsType> = (props) => {
                 onClick={() => atAddSlotValuesInput()}
               />
             </div>
-            <div className="modal-footer">
+            <div className="swal2-actions d-flex">
               <button
                 type="button"
-                className="btn btn-secondary"
+                className="swal2-cancel swal2-styled"
                 data-bs-dismiss="modal"
                 onClick={() => atCancelAddSlotValues()}
               >
@@ -701,7 +705,7 @@ const Slots: React.FC<SlotsPropsType> = (props) => {
               </button>
               <button
                 type="button"
-                className="btn btn-primary"
+                className="swal2-confirm swal2-styled"
                 onClick={() => atSubmitSlotValues(newSlotValues, domain)}
               >
                 儲存

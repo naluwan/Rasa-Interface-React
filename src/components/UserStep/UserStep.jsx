@@ -1399,7 +1399,7 @@ const UserStep: React.FC<UserStepProps> = (props) => {
 
           {/* add branch story */}
           <div
-            className="modal fade"
+            className="modal"
             id="createBranchStoryModal"
             tabIndex="-1"
             aria-labelledby="createBranchStoryModalLabel"
@@ -1407,21 +1407,20 @@ const UserStep: React.FC<UserStepProps> = (props) => {
             data-bs-backdrop="false"
           >
             <div className="modal-dialog  modal-lg modal-dialog-scrollable">
-              <div className="modal-content">
-                <div className="modal-header">
-                  <h1
-                    className="modal-title fs-5"
-                    id="createBranchStoryModalLabel"
-                  >
+              <div className={cx('modal-content swal2-show', style.swtOut)}>
+                <div>
+                  <h2 className="swal2-title" id="createBranchStoryModalLabel">
                     新增支線故事
-                  </h1>
+                  </h2>
                   <button
                     type="button"
-                    className="btn-close"
+                    className={cx('swal2-close', style.swetClose)}
                     data-bs-dismiss="modal"
                     aria-label="Close"
                     onClick={() => atCancelCreateBranchStory(actions)}
-                  />
+                  >
+                    ×
+                  </button>
                 </div>
                 <div className="modal-body">
                   <div className="mb-3">
@@ -1575,17 +1574,17 @@ const UserStep: React.FC<UserStepProps> = (props) => {
                     </div>
                   )}
                 </div>
-                <div className="modal-footer">
+                <div className="swal2-actions d-flex">
                   <button
                     type="button"
-                    className="btn btn-secondary"
+                    className="swal2-cancel swal2-styled"
                     data-bs-dismiss="modal"
                     onClick={() => atCancelCreateBranchStory(actions)}
                   >
                     取消
                   </button>
                   <button
-                    className="btn btn-primary"
+                    className="swal2-confirm swal2-styled"
                     onClick={() =>
                       atSubmitNewBranchStory(
                         newBranchStory,

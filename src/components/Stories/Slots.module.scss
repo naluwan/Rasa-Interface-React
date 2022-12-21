@@ -1,6 +1,7 @@
 .add,
 .addSlotInput {
   font-size: 1.5rem;
+
   &:hover {
     font-size: 1.5rem;
   }
@@ -10,7 +11,29 @@
   font-size: 1.5rem;
   margin-left: 1rem;
   color: rgb(195, 48, 48);
+
   &:hover {
     color: rgb(255, 0, 0);
   }
+}
+
+.swtOut {
+  position: relative;
+  box-sizing: border-box;
+  grid-template-columns: minmax(0, 100%);
+  width: 32em;
+  max-width: 100%;
+  padding: 0 0 1.25em;
+  border: none;
+  border-radius: 5px;
+  background: #fff;
+  color: #545454;
+  font-family: inherit;
+  font-size: 1rem;
+}
+
+.swetClose {
+  position: absolute;
+  top: 0;
+  right: 0;
 }
