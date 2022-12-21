@@ -242,6 +242,14 @@ export type State = {
   ) => void,
   // 刪除串接故事
   onRemoveConnectStory: (checkPointName: string, storyName: string) => void,
+  // 編輯支線故事的機器人回覆
+  onEditBranchStoryBotRes: (
+    oriBotRes: string,
+    botRes: string,
+    actionName: string,
+    storyName: string,
+    checkPointName: string,
+  ) => void,
 };
 
 export type CreateStoryState = {

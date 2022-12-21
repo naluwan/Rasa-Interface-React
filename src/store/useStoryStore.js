@@ -48,6 +48,7 @@ import {
   actionRemoveBranchStory,
   actionAddConnectStory,
   actionRemoveConnectStory,
+  actionEditBranchStoryBotRes,
 } from 'actions';
 // import { computed } from 'zustand-middleware-computed-state';
 import { Toast } from 'utils/swalInput';
@@ -1624,7 +1625,10 @@ const reducer = (state: State, action: Action): State => {
                   [item.slotName]: item.slotValue,
                 })),
               },
-              { action: newBranchStory.botRes.action },
+              {
+                action: newBranchStory.botRes.action,
+                response: newBranchStory.botRes.response,
+              },
             ],
           }
         : {
@@ -1640,7 +1644,14 @@ const reducer = (state: State, action: Action): State => {
             ],
           };
 
-      stories.push(newBranchStoryData);
+      const currentBranchStory = cloneDeep(newBranchStoryData);
+      currentBranchStory.steps.map((step) => {
+        if (step.action) {
+          delete step.response;
+        }
+        return step;
+      });
+      stories.push(currentBranchStory);
 
       // 將機器人回覆放進domain訓練檔中
       if (newBranchStory.botRes) {
@@ -1879,6 +1890,50 @@ const reducer = (state: State, action: Action): State => {
             )
             .click();
         });
+    }
+    case 'EDIT_BRANCH_STORY_BOT_RES': {
+      const { oriBotRes, botRes, actionName, checkPointName } = action.payload;
+      const { stories, nlu, domain } = cloneDeep(state.cloneData);
+      const { onSetStory, onSetAllTrainData } = state;
+
+      const currentStoryName = checkPointName.slice(
+        0,
+        checkPointName.indexOf('_'),
+      );
+
+      const tabName = `#story_nav_tab_${checkPointName.slice(
+        checkPointName.indexOf('_') + 1,
+        checkPointName.length,
+      )}`;
+
+      if (domain.responses[actionName][0].text === oriBotRes) {
+        domain.responses[actionName][0].text = botRes;
+      }
+
+      const cloneData = {
+        // 刪除串接故事
+        stories,
+        nlu,
+        domain,
+      };
+
+      return postAllTrainData(cloneData)
+        .then((res) => {
+          if (res.status !== 'success') {
+            return Toast.fire({
+              icon: 'error',
+              title: '編輯支線故事機器人回覆失敗',
+              text: res.message,
+            });
+          }
+          Toast.fire({
+            icon: 'success',
+            title: '編輯支線故事機器人回覆成功',
+          });
+          onSetAllTrainData(res.data);
+          return onSetStory(currentStoryName);
+        })
+        .then(() => document.querySelector(tabName).click());
     }
     default:
       return state;
@@ -2225,6 +2280,24 @@ const useStoryStore = create((set) => {
     // 刪除串接故事
     onRemoveConnectStory(checkPointName: string, storyName: string) {
       dispatch(actionRemoveConnectStory(checkPointName, storyName));
+    },
+    // 編輯支線故事的機器人回覆
+    onEditBranchStoryBotRes(
+      oriBotRes: string,
+      botRes: string,
+      actionName: string,
+      storyName: string,
+      checkPointName: string,
+    ) {
+      dispatch(
+        actionEditBranchStoryBotRes(
+          oriBotRes,
+          botRes,
+          actionName,
+          storyName,
+          checkPointName,
+        ),
+      );
     },
   };
 });
