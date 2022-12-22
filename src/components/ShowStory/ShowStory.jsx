@@ -32,6 +32,7 @@ const ShowStory: React.FC<ShowStoryProps> = (props) => {
     onDeleteExample,
     onEditBranchStoryBotRes,
     onEditConnectStoryBotRes,
+    onAddBranchStoryResButtons,
   } = useStoryStore((state: State) => {
     return {
       onEditBotRes: state.onEditBotRes,
@@ -49,6 +50,7 @@ const ShowStory: React.FC<ShowStoryProps> = (props) => {
       onDeleteExample: state.onDeleteExample,
       onEditBranchStoryBotRes: state.onEditBranchStoryBotRes,
       onEditConnectStoryBotRes: state.onEditConnectStoryBotRes,
+      onAddBranchStoryResButtons: state.onAddBranchStoryResButtons,
     };
   }, shallow);
 
@@ -119,6 +121,7 @@ const ShowStory: React.FC<ShowStoryProps> = (props) => {
               branch={branchStories}
               onEditBranchStoryBotRes={onEditBranchStoryBotRes}
               onEditConnectStoryBotRes={onEditConnectStoryBotRes}
+              onAddBranchStoryResButtons={onAddBranchStoryResButtons}
             />
           );
         })}

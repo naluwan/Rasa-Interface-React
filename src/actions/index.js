@@ -450,6 +450,18 @@ export type Action =
         checkPointName: String,
         connectStoryName: string,
       },
+    }
+  | {
+      type: 'BRANCH_STORY_ADD_BOT_RES',
+      payload: {
+        actionName: string,
+        title: string,
+        payload: string,
+        reply: string,
+        storyName: string,
+        storiesData: StoryType[],
+        checkPointName: string,
+      },
     };
 
 // ====================== query story ======================
@@ -725,6 +737,27 @@ export const actionEditConnectStoryBotRes = (
     storyName,
     checkPointName,
     connectStoryName,
+  },
+});
+
+export const actionBranchStoryAddResButtons = (
+  actionName: string,
+  title: string,
+  payload: string,
+  reply: string,
+  storyName: string,
+  storiesData: StoryType[],
+  checkPointName: string,
+): Action => ({
+  type: 'BRANCH_STORY_ADD_BOT_RES',
+  payload: {
+    actionName,
+    title,
+    payload,
+    reply,
+    storyName,
+    storiesData,
+    checkPointName,
   },
 });
 
