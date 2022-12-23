@@ -2145,7 +2145,7 @@ const reducer = (state: State, action: Action): State => {
       };
     }
     case 'BRANCH_STORY_REMOVE_RES_BUTTON': {
-      const { actionName, payload, buttonActionName, disabled } =
+      const { actionName, payload, storyName, buttonActionName, disabled } =
         action.payload;
       const { onSetAllTrainData, onSetStory } = state;
       const cloneData = {
@@ -2153,12 +2153,12 @@ const reducer = (state: State, action: Action): State => {
       };
 
       // 獲取正確故事名稱
-      const storyName = payload.slice(0, payload.indexOf('_'));
+      const currentStoryName = storyName.slice(0, storyName.indexOf('_'));
 
       // 獲取正確支線故事tab名稱
-      const branchStoryTabName = `#story_nav_tab_${payload.slice(
-        payload.indexOf('_') + 1,
-        payload.lastIndexOf('_'),
+      const branchStoryTabName = `#story_nav_tab_${storyName.slice(
+        storyName.indexOf('_') + 1,
+        storyName.length,
       )}`;
 
       // 獲取正確按鈕名稱
@@ -2243,7 +2243,7 @@ const reducer = (state: State, action: Action): State => {
             title: '刪除按鈕選項成功',
           });
           onSetAllTrainData(res.data);
-          return onSetStory(storyName);
+          return onSetStory(currentStoryName);
         })
         .then(() => document.querySelector(branchStoryTabName).click());
     }

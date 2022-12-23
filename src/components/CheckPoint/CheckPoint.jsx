@@ -276,6 +276,7 @@ const CheckPoint: React.FC<CheckPointProps> = (props) => {
                     key={action}
                     step={{ action, response, buttons }}
                     checkPointName={selectedBranchStory.story}
+                    storyName={selectedBranchStory.story}
                     onEditBotRes={onEditBranchStoryBotRes}
                     onAddResButtons={onAddBranchStoryResButtons}
                     onRemoveResButton={onRemoveBranchStoryResButton}
