@@ -471,6 +471,7 @@ export type Action =
         storyName: string,
         buttonActionName: string,
         disabled: boolean,
+        checkPointName: string,
       },
     };
 
@@ -777,9 +778,17 @@ export const actionBranchStoryRemoveResButton = (
   storyName: string,
   buttonActionName: string,
   disabled: boolean,
+  checkPointName: string,
 ): Action => ({
   type: 'BRANCH_STORY_REMOVE_RES_BUTTON',
-  payload: { actionName, payload, storyName, buttonActionName, disabled },
+  payload: {
+    actionName,
+    payload,
+    storyName,
+    buttonActionName,
+    disabled,
+    checkPointName,
+  },
 });
 
 // ====================== create story ======================

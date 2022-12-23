@@ -2145,20 +2145,28 @@ const reducer = (state: State, action: Action): State => {
       };
     }
     case 'BRANCH_STORY_REMOVE_RES_BUTTON': {
-      const { actionName, payload, storyName, buttonActionName, disabled } =
-        action.payload;
+      const {
+        actionName,
+        payload,
+        buttonActionName,
+        disabled,
+        checkPointName,
+      } = action.payload;
       const { onSetAllTrainData, onSetStory } = state;
       const cloneData = {
         ...state.cloneData,
       };
 
       // 獲取正確故事名稱
-      const currentStoryName = storyName.slice(0, storyName.indexOf('_'));
+      const currentStoryName = checkPointName.slice(
+        0,
+        checkPointName.indexOf('_'),
+      );
 
       // 獲取正確支線故事tab名稱
-      const branchStoryTabName = `#story_nav_tab_${storyName.slice(
-        storyName.indexOf('_') + 1,
-        storyName.length,
+      const branchStoryTabName = `#story_nav_tab_${checkPointName.slice(
+        checkPointName.indexOf('_') + 1,
+        checkPointName.length,
       )}`;
 
       // 獲取正確按鈕名稱
@@ -2660,6 +2668,7 @@ const useStoryStore = create((set) => {
       storyName: string,
       buttonActionName: string,
       disabled: boolean,
+      checkPointName: string,
     ) {
       dispatch(
         actionBranchStoryRemoveResButton(
@@ -2668,6 +2677,7 @@ const useStoryStore = create((set) => {
           storyName,
           buttonActionName,
           disabled,
+          checkPointName,
         ),
       );
     },
