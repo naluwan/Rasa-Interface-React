@@ -462,6 +462,16 @@ export type Action =
         storiesData: StoryType[],
         checkPointName: string,
       },
+    }
+  | {
+      type: 'BRANCH_STORY_REMOVE_RES_BUTTON',
+      payload: {
+        actionName: string,
+        payload: string,
+        storyName: string,
+        buttonActionName: string,
+        disabled: boolean,
+      },
     };
 
 // ====================== query story ======================
@@ -759,6 +769,17 @@ export const actionBranchStoryAddResButtons = (
     storiesData,
     checkPointName,
   },
+});
+
+export const actionBranchStoryRemoveResButton = (
+  actionName: string,
+  payload: string,
+  storyName: string,
+  buttonActionName: string,
+  disabled: boolean,
+): Action => ({
+  type: 'BRANCH_STORY_REMOVE_RES_BUTTON',
+  payload: { actionName, payload, storyName, buttonActionName, disabled },
 });
 
 // ====================== create story ======================
