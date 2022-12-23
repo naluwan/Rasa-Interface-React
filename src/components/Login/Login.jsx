@@ -118,6 +118,7 @@ const Login = () => {
         </div>
         <div className={style.inputBlock}>
           <MyButton
+            id="loginBtn"
             className="btn"
             variant="primary"
             onClick={() => atLogin(accountInfo.email, accountInfo.password)}

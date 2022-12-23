@@ -7,6 +7,7 @@ type MyButtonProps = {
   disabled: boolean,
   onClick: (e: React.MouseEvent) => void,
   rounded: boolean,
+  id: string,
   type: string,
   color?: string,
   className?: string,
@@ -22,6 +23,7 @@ const MyButton: React.FC<MyButtonProps> = (props) => {
     rounded,
     className,
     color,
+    id,
     variant,
   } = props;
   const attrStyle = {
@@ -29,6 +31,7 @@ const MyButton: React.FC<MyButtonProps> = (props) => {
   };
   return (
     <button
+      id={id}
       style={attrStyle}
       disabled={disabled}
       data-variant={variant}
