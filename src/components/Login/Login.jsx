@@ -99,6 +99,7 @@ const Login = () => {
         <div className={style.inputBlock}>
           <label htmlFor="login-Email">帳號</label>
           <MyInput
+            data-testid="login-Email"
             id="login-Email"
             required=""
             variant="email"
@@ -109,6 +110,7 @@ const Login = () => {
         <div className={style.inputBlock}>
           <label htmlFor="login-password">密碼</label>
           <MyInput
+            data-testid="login-password"
             id="login-password"
             required=""
             variant="password"
@@ -118,6 +120,7 @@ const Login = () => {
         </div>
         <div className={style.inputBlock}>
           <MyButton
+            dataTestId="loginBtn"
             id="loginBtn"
             className="btn"
             variant="primary"
@@ -134,6 +137,7 @@ const Login = () => {
         <div className={style.account}>
           還沒有帳號?
           <NavLink
+            data-testid="registerBtn"
             to="/register"
             variant="nostyle"
             className={cx('btn', style.accountBtn)}

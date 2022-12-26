@@ -5,6 +5,7 @@ import style from './MyButton.module.scss';
 type MyButtonProps = {
   icon: string,
   disabled: boolean,
+  dataTestId: string,
   onClick: (e: React.MouseEvent) => void,
   rounded: boolean,
   id: string,
@@ -20,6 +21,7 @@ const MyButton: React.FC<MyButtonProps> = (props) => {
     onClick,
     disabled,
     children,
+    dataTestId,
     rounded,
     className,
     color,
@@ -32,6 +34,7 @@ const MyButton: React.FC<MyButtonProps> = (props) => {
   return (
     <button
       id={id}
+      data-testid={dataTestId}
       style={attrStyle}
       disabled={disabled}
       data-variant={variant}
