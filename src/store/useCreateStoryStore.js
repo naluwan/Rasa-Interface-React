@@ -65,12 +65,13 @@ const reducer = (state: CreateStoryState, action: Action): State => {
     }
     case 'CREATE_STORY_CREATE_USER_STEP': {
       const userSay = action.payload;
+      const intent = userSay.replace(/\?|!|？|！/g, '');
       return {
         ...state,
         newStory: {
           ...state.newStory,
           steps: state.newStory.steps.concat([
-            { user: userSay, intent: userSay, entities: [], examples: [] },
+            { user: userSay, intent, entities: [], examples: [] },
           ]),
         },
       };
@@ -79,6 +80,8 @@ const reducer = (state: CreateStoryState, action: Action): State => {
       const { oriUserSay, userSay, nlu } = action.payload;
       const { newStory } = state;
       const repeat = [];
+      const oriIntent = oriUserSay.replace(/\?|!|？|！/g, '');
+      const intent = userSay.replace(/\?|!|？|！/g, '');
       nlu.rasa_nlu_data.common_examples.map((nluItem) =>
         nluItem.text === userSay ? repeat.push(userSay) : nluItem,
       );
@@ -96,9 +99,9 @@ const reducer = (state: CreateStoryState, action: Action): State => {
         newStory: {
           ...state.newStory,
           steps: state.newStory.steps.map((step) => {
-            if (step.user === oriUserSay && step.intent === oriUserSay) {
+            if (step.user === oriUserSay && step.intent === oriIntent) {
               step.user = userSay;
-              step.intent = userSay;
+              step.intent = intent;
             } else {
               step.user = userSay;
             }
@@ -111,6 +114,7 @@ const reducer = (state: CreateStoryState, action: Action): State => {
       const { oriIntent, intent, nlu } = action.payload;
       const { newStory } = state;
       const repeat = [];
+      const currentIntent = intent.replace(/\?|!|？|！/g, '');
       nlu.rasa_nlu_data.common_examples.map((nluItem) =>
         nluItem.intent === intent ? repeat.push(intent) : nluItem,
       );
@@ -129,10 +133,10 @@ const reducer = (state: CreateStoryState, action: Action): State => {
           ...state.newStory,
           steps: state.newStory.steps.map((step) => {
             if (step.intent === oriIntent) {
-              step.intent = intent;
+              step.intent = currentIntent;
               if (step.examples.length) {
                 step.examples.map((example) => {
-                  example.intent = intent;
+                  example.intent = currentIntent;
                   return example;
                 });
               }
