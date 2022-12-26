@@ -951,6 +951,7 @@ const reducer = (state: State, action: Action): State => {
       const { oriIntent, intent, storyName } = action.payload;
       const { stories, nlu, domain } = cloneDeep(state.cloneData);
       const { onSetStory, onSetAllTrainData } = state;
+      const currentIntent = intent.replace(/\?|!|？|！/g, '');
       // 驗證意圖是否重複
       const isRepeat = domain.intents.includes(intent);
       if (isRepeat) {
@@ -965,7 +966,7 @@ const reducer = (state: State, action: Action): State => {
         if (item.story === storyName) {
           item.steps.map((step) => {
             if (step.intent === oriIntent) {
-              step.intent = intent;
+              step.intent = currentIntent;
             }
             return step;
           });
@@ -976,37 +977,49 @@ const reducer = (state: State, action: Action): State => {
       // 將nlu訓練檔內的意圖更新
       nlu.rasa_nlu_data.common_examples.map((nluItem) => {
         if (nluItem.intent === oriIntent) {
-          nluItem.intent = intent;
+          nluItem.intent = currentIntent;
         }
         return nluItem;
       });
 
       // 更新domain訓練檔內的intents，刪除就的意圖，新增新的意圖
-      domain.intents.splice(domain.intents.indexOf(oriIntent), 1, intent);
+      domain.intents.splice(
+        domain.intents.indexOf(oriIntent),
+        1,
+        currentIntent,
+      );
 
       // 確認目前故事流程中所有的按鈕是否有串接到此故事
       const responses = Object.entries(domain.responses);
-      let actionName = '';
+
       const isInButton = responses.some((response) => {
         return response[1].some((item) => {
-          return item.buttons?.some((button) => {
-            if (button.title === oriIntent) {
-              [actionName] = response;
-              return true;
-            }
-            return false;
-          });
+          return item.buttons?.some((button) => button.title === oriIntent);
         });
       });
 
       // 如果按鈕有串接到此故事，就把按鈕資料也一起更改
       if (isInButton) {
-        domain.responses[actionName][0].buttons.map((button) => {
-          if (button.title === oriIntent) {
-            button.title = intent;
-            button.payload = `/${intent}`;
-          }
-          return button;
+        const actionNames = [];
+        responses.map((response) => {
+          return response[1].map((item) => {
+            return item.buttons?.map((button) => {
+              if (button.title === oriIntent) {
+                actionNames.push(response[0]);
+              }
+              return button;
+            });
+          });
+        });
+
+        actionNames.map((actionName) => {
+          return domain.responses[actionName][0].buttons.map((button) => {
+            if (button.title === oriIntent) {
+              button.title = currentIntent;
+              button.payload = `/${currentIntent}`;
+            }
+            return button;
+          });
         });
       }
 
