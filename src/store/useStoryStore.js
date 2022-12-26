@@ -1760,11 +1760,31 @@ const reducer = (state: State, action: Action): State => {
       let newStories = stories.filter((item) => item.story !== storyName);
 
       const connectStories = [];
+      const buttonStories = [];
       // 支線故事處理
       deleteBranchStory.steps.map((step, stepIdx) => {
         // 刪除支線故事的機器人回覆
         if (step.action) {
           domain.actions.splice(domain.actions.indexOf(step.action), 1);
+
+          if (domain.responses[step.action][0].buttons) {
+            domain.responses[step.action][0].buttons.map((button) => {
+              const buttonStory = newStories.filter(
+                (item) =>
+                  item.story === `button_${button.payload.replace(/\//g, '')}`,
+              )[0];
+              return buttonStory.steps.map((buttonStep) => {
+                if (buttonStep.action) {
+                  buttonStories.push({
+                    name: buttonStory.story,
+                    payload: button.payload.replace(/\//g, ''),
+                    actionName: buttonStep.action,
+                  });
+                }
+                return buttonStep;
+              });
+            });
+          }
           delete domain.responses[step.action];
         }
 
@@ -1796,10 +1816,50 @@ const reducer = (state: State, action: Action): State => {
             // 刪除串接故事的機器人回覆
             if (connectStep.action) {
               domain.actions.splice(domain.actions.indexOf(connectStep.action));
+
+              if (domain.responses[connectStep.action][0].buttons) {
+                domain.responses[connectStep.action][0].buttons.map(
+                  (button) => {
+                    const buttonStory = newStories.filter(
+                      (item) =>
+                        item.story ===
+                        `button_${button.payload.replace(/\//g, '')}`,
+                    )[0];
+                    return buttonStory.steps.map((buttonStep) => {
+                      if (buttonStep.action) {
+                        buttonStories.push({
+                          name: buttonStory.story,
+                          payload: button.payload.replace(/\//g, ''),
+                          actionName: buttonStep.action,
+                        });
+                      }
+                      return buttonStep;
+                    });
+                  },
+                );
+              }
+
               delete domain.responses[connectStep.action];
             }
             return connectStep;
           });
+        });
+      }
+
+      if (buttonStories.length) {
+        buttonStories.map((buttonStory) => {
+          newStories = newStories.filter(
+            (item) => item.story !== buttonStory.name,
+          );
+          domain.actions.splice(domain.actions.indexOf(buttonStory.actionName));
+          domain.intents.splice(domain.intents.indexOf(buttonStory.payload), 1);
+          delete domain.responses[buttonStory.actionName];
+          console.log('button payload ===> ', buttonStory.payload);
+          nlu.rasa_nlu_data.common_examples =
+            nlu.rasa_nlu_data.common_examples.filter(
+              (nluItem) => nluItem.intent !== buttonStory.payload,
+            );
+          return buttonStory;
         });
       }
 
