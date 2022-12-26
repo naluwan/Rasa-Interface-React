@@ -10,12 +10,10 @@
     font-weight: 500;
     word-break: keep-all;
     color: rgb(0, 0, 0);
-
   }
 
   .botResponse {
-
-    background: #ECECEC;
+    background: #ececec;
     border-radius: 10px;
     padding: 10px;
     width: 100%;
@@ -28,7 +26,7 @@
 }
 
 .info {
-  border: 1px solid #B7B7B7;
+  border: 1px solid #b7b7b7;
   border-radius: 10px;
   padding: 1rem;
   background: #fff;
@@ -42,24 +40,22 @@
 .editBtn {
   background: #fff !important;
   color: #000 !important;
-  border: 1px solid #B7B7B7 !important;
+  border: 1px solid #b7b7b7 !important;
   display: inline-flex !important;
   flex-direction: row;
   align-items: center;
 
   &:hover {
-    background: #E14D2A !important;
+    background: #e14d2a !important;
     color: #fff !important;
     fill: #fff !important;
-    border: 1px solid #E14D2A !important;
+    border: 1px solid #e14d2a !important;
 
     svg {
       path {
         fill: #fff;
       }
     }
-
-
   }
 
   svg {
@@ -74,15 +70,15 @@
 .addBtn {
   background-color: #fff !important;
   color: #000 !important;
-  border: 1px solid #B7B7B7 !important;
+  border: 1px solid #b7b7b7 !important;
   display: inline-flex !important;
   flex-direction: row;
   align-items: center;
 
   &:hover {
-    background: #FD841F !important;
+    background: #fd841f !important;
     color: #fff !important;
-    border: 1px solid #FD841F !important;
+    border: 1px solid #fd841f !important;
 
     svg {
       path {
@@ -97,14 +93,12 @@
     display: inherit;
     margin: 0 10px 0 0;
   }
-
-
 }
 
 .botStep {
   border-radius: 10px;
   padding: 1rem;
-  border: 1px solid #B7B7B7;
+  border: 1px solid #b7b7b7;
   background: #fff;
 }
 

@@ -54,20 +54,23 @@ const ButtonItems: React.FC<ButtonItemsProps> = (props) => {
         <h5 className="card-title d-flex justify-content-between">
           <p className={style.botlabel}>{title}</p>
           <div>
-            <button
-              className="btn btn-primary mx-1 "
-              onClick={() =>
-                onEditResButtons(
-                  title,
-                  reply,
-                  buttonAction,
-                  checkPointName,
-                  connectBranchStoryName,
-                )
-              }
-            >
-              編輯
-            </button>
+            {!disabled && (
+              <button
+                className="btn btn-primary mx-1"
+                onClick={() =>
+                  onEditResButtons(
+                    title,
+                    reply,
+                    buttonAction,
+                    checkPointName,
+                    connectBranchStoryName,
+                  )
+                }
+              >
+                編輯
+              </button>
+            )}
+
             <button
               className="btn btn-danger"
               onClick={() =>
