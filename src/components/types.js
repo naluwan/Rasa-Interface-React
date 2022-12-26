@@ -277,6 +277,18 @@ export type State = {
     buttonActionName: string,
     disabled: boolean,
   ) => void,
+  // 編輯支線故事機器人回覆按鈕
+  onEditBranchStoryResButtons: (
+    actionName: string,
+    title: string,
+    oriPayload: string,
+    payload: string,
+    reply: string,
+    storyName: string,
+    buttonActionName: string,
+    stories: StoryType[],
+    checkPointName: string,
+  ) => void,
 };
 
 export type CreateStoryState = {
