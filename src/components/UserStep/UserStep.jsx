@@ -1037,7 +1037,7 @@ const UserStep: React.FC<UserStepProps> = (props) => {
       }
 
       setResSelect('botRes');
-      document.querySelector('#createBranchStoryModal .btn-close').click();
+      document.querySelector('#createBranchStoryModal .swal2-close').click();
     },
     [
       onCreateBranchStory,
