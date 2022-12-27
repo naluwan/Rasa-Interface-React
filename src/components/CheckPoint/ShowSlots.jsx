@@ -20,7 +20,9 @@ const ShowSlots: React.FC<ShowSlotsProps> = (props) => {
             </div>
             <div className={cx('slotContainer', style.slotValue)}>
               <span>儲存槽：</span>
-              <span>{slotInfo.slotValue}</span>
+              <span>
+                {slotInfo.slotValue === null ? 'null' : slotInfo.slotValue}
+              </span>
             </div>
           </div>
           <div className={cx('slotContainer', style.slotBtnBlock)}>

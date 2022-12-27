@@ -1482,6 +1482,7 @@ const UserStep: React.FC<UserStepProps> = (props) => {
                             <option value="" hidden>
                               請選擇儲存槽值
                             </option>
+                            <option value="null">null</option>
                             {domain.slots[slot.slotName]?.type ===
                               'categorical' &&
                               domain.slots[slot.slotName].values.map((item) => {
