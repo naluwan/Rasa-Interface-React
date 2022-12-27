@@ -55,6 +55,7 @@ import {
   actionBranchStoryEditResButtons,
   actionConnectStoryAddResButtons,
   actionConnectStoryRemoveResButton,
+  actionConnectStoryEditResButtons,
 } from 'actions';
 // import { computed } from 'zustand-middleware-computed-state';
 import { Toast } from 'utils/swalInput';
@@ -2397,13 +2398,22 @@ const reducer = (state: State, action: Action): State => {
       } = action.payload;
       const { onSetAllTrainData, onSetStory } = state;
 
+      // 重組成正確的原始payload
       const curOriPayload = `${checkPointName}_${oriPayload.replace(
         /\//g,
         '',
       )}`;
+
+      // 重組成正確的按鈕title
       const currentTitle = `${checkPointName}_${title}`;
+
+      // 重組成正確的新payload
       const currentPayload = `/${checkPointName}_${payload.replace(/\//g, '')}`;
+
+      // 獲取正確的故事名稱
       const storyName = checkPointName.slice(0, checkPointName.indexOf('_'));
+
+      // 獲取正確的支線故事tab名稱
       const branchStoryTabName = `#story_nav_tab_${checkPointName.slice(
         checkPointName.indexOf('_') + 1,
         checkPointName.length,
@@ -2801,6 +2811,199 @@ const reducer = (state: State, action: Action): State => {
         })
         .then(() => document.querySelector(branchStoryTabName).click())
         .then(() => document.querySelector(connectStoryTabName).click());
+    }
+    case 'CONNECT_STORY_EDIT_RES_BUTTONS': {
+      const {
+        actionName,
+        title,
+        oriPayload,
+        payload,
+        reply,
+        buttonActionName,
+        connectStoryName,
+      } = action.payload;
+
+      const { onSetAllTrainData, onSetStory } = state;
+
+      // 重組成正確的原始payload
+      const curOriPayload = `${connectStoryName}_${oriPayload.replace(
+        /\//g,
+        '',
+      )}`;
+
+      // 重組成正確的按鈕title
+      const currentTitle = `${connectStoryName}_${title}`;
+
+      // 重組成正確的新payload
+      const currentPayload = `/${connectStoryName}_${payload.replace(
+        /\//g,
+        '',
+      )}`;
+
+      // 獲取正確的故事名稱
+      const storyName = connectStoryName.slice(
+        0,
+        connectStoryName.indexOf('_'),
+      );
+
+      // 獲取正確的支線故事tab名稱
+      const branchStoryTabName = `#story_nav_tab_${connectStoryName.slice(
+        connectStoryName.indexOf('_') + 1,
+        connectStoryName.lastIndexOf('_'),
+      )}`;
+
+      // 獲取正確的串接故事tab名稱
+      const connectStoryTabName = `#story_nav_tab_${connectStoryName.slice(
+        connectStoryName.lastIndexOf('_') + 1,
+        connectStoryName.length,
+      )}`;
+
+      const cloneData = {
+        ...state.cloneData,
+      };
+
+      const isRepeat = cloneData.domain.intents.includes(currentTitle);
+
+      if (isRepeat && currentTitle !== curOriPayload) {
+        return Toast.fire({
+          icon: 'warning',
+          title: `按鈕『${title}』重複`,
+        });
+      }
+
+      // 驗證是否是新建按鈕或是串接別的故事
+      const isButton = cloneData.stories.some((item) => {
+        return item.steps.some((step) => {
+          if (step.intent === curOriPayload && item.story.includes('button_')) {
+            return true;
+          }
+          return false;
+        });
+      });
+
+      const currentReply = JSON.parse(
+        JSON.stringify(reply).replace(/\\r\\n/g, '  \\n'),
+      );
+
+      // 如果按鈕標題有更改
+      if (currentTitle !== curOriPayload) {
+        const newStories = cloneData.stories.map((item) => {
+          // 將stories訓練檔中按鈕故事更改意圖與對話
+          if (isButton) {
+            if (item.story === `button_${curOriPayload}`) {
+              item.story = `button_${currentTitle}`;
+              item.steps.map((step) => {
+                if (step.intent) {
+                  step.user = title;
+                  step.intent = currentTitle;
+                }
+                return step;
+              });
+            }
+          } else {
+            item.steps.map((step) => {
+              if (step.intent === oriPayload.replace(/\//g, '')) {
+                // step.user = title;
+                step.intent = title;
+              }
+              return step;
+            });
+          }
+
+          return item;
+        });
+
+        // 將nlu訓練檔中的按鈕例句更改
+        const nlu = {
+          rasa_nlu_data: {
+            common_examples: cloneData.nlu.rasa_nlu_data.common_examples.map(
+              (nluItem) => {
+                if (nluItem.intent === curOriPayload && isButton) {
+                  nluItem.text = title;
+                  nluItem.intent = currentTitle;
+                }
+                if (
+                  nluItem.intent === oriPayload.replace(/\//g, '') &&
+                  !isButton
+                ) {
+                  nluItem.intent = title;
+                }
+                return nluItem;
+              },
+            ),
+          },
+        };
+
+        // 更改domain按鈕內容
+        const { domain } = cloneData;
+        domain.responses[actionName][0].buttons.map((button) => {
+          if (isButton && button.payload === `/${curOriPayload}`) {
+            button.title = title;
+            button.payload = currentPayload;
+          }
+          if (!isButton && button.payload === oriPayload) {
+            button.title = title;
+            button.payload = payload;
+          }
+          return button;
+        });
+
+        // 將domain訓練檔中intents的按鈕意圖更改
+        let intentIdx;
+
+        if (isButton) {
+          intentIdx = domain.intents.indexOf(curOriPayload);
+          domain.intents.splice(
+            intentIdx,
+            1,
+            currentPayload.replace(/\//g, ''),
+          );
+        } else {
+          intentIdx = domain.intents.indexOf(oriPayload.replace(/\//g, ''));
+          domain.intents.splice(intentIdx, 1, title);
+        }
+
+        cloneData.stories = newStories;
+        cloneData.nlu = nlu;
+        cloneData.domain = domain;
+      }
+
+      // 將domain訓練檔中responses的按鈕回覆做更改
+      const { domain } = cloneData;
+
+      if (domain.responses[buttonActionName][0].text !== currentReply) {
+        domain.responses[buttonActionName][0].text = currentReply;
+      }
+
+      cloneData.domain = domain;
+
+      // 如果有按鈕標題或回覆內容有更改才送API
+      if (
+        title !== curOriPayload ||
+        state.domain.responses[buttonActionName][0].text !== currentReply
+      ) {
+        return postAllTrainData(cloneData)
+          .then((res) => {
+            if (res.status !== 'success') {
+              return Toast.fire({
+                icon: 'error',
+                title: '編輯按鈕選項失敗',
+                text: res.message,
+              });
+            }
+            Toast.fire({
+              icon: 'success',
+              title: '編輯按鈕選項成功',
+            });
+            onSetAllTrainData(res.data);
+            return onSetStory(storyName);
+          })
+          .then(() => document.querySelector(branchStoryTabName).click())
+          .then(() => document.querySelector(connectStoryTabName).click());
+      }
+      return {
+        ...state,
+      };
     }
     default:
       return state;
@@ -3295,6 +3498,34 @@ const useStoryStore = create((set) => {
           storyName,
           buttonActionName,
           disabled,
+          checkPointName,
+          connectStoryName,
+        ),
+      );
+    },
+    // 編輯串接故事機器人回覆按鈕
+    onEditConnectStoryResButtons(
+      actionName: string,
+      title: string,
+      oriPayload: string,
+      payload: string,
+      reply: string,
+      storyName: string,
+      buttonActionName: string,
+      stories: StoryType[],
+      checkPointName: string,
+      connectStoryName: string,
+    ) {
+      dispatch(
+        actionConnectStoryEditResButtons(
+          actionName,
+          title,
+          oriPayload,
+          payload,
+          reply,
+          storyName,
+          buttonActionName,
+          stories,
           checkPointName,
           connectStoryName,
         ),
