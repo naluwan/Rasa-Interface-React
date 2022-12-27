@@ -53,6 +53,7 @@ import {
   actionBranchStoryAddResButtons,
   actionBranchStoryRemoveResButton,
   actionBranchStoryEditResButtons,
+  actionConnectStoryAddResButtons,
 } from 'actions';
 // import { computed } from 'zustand-middleware-computed-state';
 import { Toast } from 'utils/swalInput';
@@ -1676,9 +1677,12 @@ const reducer = (state: State, action: Action): State => {
             steps: [
               { checkpoint: `${storyName}_主線` },
               {
-                slot_was_set: newBranchStory.slotValues.map((item) => ({
-                  [item.slotName]: item.slotValue,
-                })),
+                slot_was_set: newBranchStory.slotValues.map((item) => {
+                  if (item.slotValue === 'null') {
+                    return { [item.slotName]: null };
+                  }
+                  return { [item.slotName]: item.slotValue };
+                }),
               },
               {
                 action: newBranchStory.botRes.action,
@@ -1767,6 +1771,7 @@ const reducer = (state: State, action: Action): State => {
         if (step.action) {
           domain.actions.splice(domain.actions.indexOf(step.action), 1);
 
+          // 如果機器人回覆有按鈕，篩選出按鈕資訊
           if (domain.responses[step.action][0].buttons) {
             domain.responses[step.action][0].buttons.map((button) => {
               const buttonStory = newStories.filter(
@@ -1846,6 +1851,7 @@ const reducer = (state: State, action: Action): State => {
         });
       }
 
+      // 按鈕故事處理
       if (buttonStories.length) {
         buttonStories.map((buttonStory) => {
           newStories = newStories.filter(
@@ -1854,7 +1860,7 @@ const reducer = (state: State, action: Action): State => {
           domain.actions.splice(domain.actions.indexOf(buttonStory.actionName));
           domain.intents.splice(domain.intents.indexOf(buttonStory.payload), 1);
           delete domain.responses[buttonStory.actionName];
-          console.log('button payload ===> ', buttonStory.payload);
+
           nlu.rasa_nlu_data.common_examples =
             nlu.rasa_nlu_data.common_examples.filter(
               (nluItem) => nluItem.intent !== buttonStory.payload,
@@ -1895,9 +1901,12 @@ const reducer = (state: State, action: Action): State => {
         steps: [
           { checkpoint: `${branchStoryName}_主線` },
           {
-            slot_was_set: newBranchStory.slotValues.map((item) => ({
-              [item.slotName]: item.slotValue,
-            })),
+            slot_was_set: newBranchStory.slotValues.map((item) => {
+              if (item.slotValue === 'null') {
+                return { [item.slotName]: null };
+              }
+              return { [item.slotName]: item.slotValue };
+            }),
           },
           { action: newBranchStory.botRes.action },
         ],
@@ -1963,19 +1972,62 @@ const reducer = (state: State, action: Action): State => {
         (item) => item.story === storyName,
       )[0];
 
+      // 將要被刪除的支線故事從stories訓練檔中刪除
+      let newStories = stories.filter((item) => item.story !== storyName);
+
+      const buttonStories = [];
       // 串接故事刪除
       deleteConnectStory.steps.map((step) => {
         // 刪除串接故事的機器人回覆和action name
         if (step.action) {
           domain.actions.splice(domain.actions.indexOf(step.action), 1);
+
+          // 如果機器人回覆有按鈕，篩選出按鈕資訊
+          if (domain.responses[step.action][0].buttons) {
+            domain.responses[step.action][0].buttons.map((button) => {
+              const buttonStory = newStories.filter(
+                (item) =>
+                  item.story === `button_${button.payload.replace(/\//g, '')}`,
+              )[0];
+              return buttonStory.steps.map((buttonStep) => {
+                if (buttonStep.action) {
+                  buttonStories.push({
+                    name: buttonStory.story,
+                    payload: button.payload.replace(/\//g, ''),
+                    actionName: buttonStep.action,
+                  });
+                }
+                return buttonStep;
+              });
+            });
+          }
+
           delete domain.responses[step.action];
         }
         return step;
       });
 
+      // 按鈕故事處理
+      if (buttonStories.length) {
+        buttonStories.map((buttonStory) => {
+          newStories = newStories.filter(
+            (item) => item.story !== buttonStory.name,
+          );
+          domain.actions.splice(domain.actions.indexOf(buttonStory.actionName));
+          domain.intents.splice(domain.intents.indexOf(buttonStory.payload), 1);
+          delete domain.responses[buttonStory.actionName];
+
+          nlu.rasa_nlu_data.common_examples =
+            nlu.rasa_nlu_data.common_examples.filter(
+              (nluItem) => nluItem.intent !== buttonStory.payload,
+            );
+          return buttonStory;
+        });
+      }
+
       const cloneData = {
         // 刪除串接故事
-        stories: stories.filter((item) => item.story !== storyName),
+        stories: newStories,
         nlu,
         domain,
       };
@@ -2106,7 +2158,7 @@ const reducer = (state: State, action: Action): State => {
         .then(() => document.querySelector(branchStoryTabName).click())
         .then(() => document.querySelector(connectStoryTabName).click());
     }
-    case 'BRANCH_STORY_ADD_BOT_RES': {
+    case 'BRANCH_STORY_ADD_RES_BUTTONS': {
       const { actionName, title, payload, reply, checkPointName } =
         action.payload;
       const { onSetAllTrainData, onSetStory } = state;
@@ -2497,6 +2549,133 @@ const reducer = (state: State, action: Action): State => {
             return onSetStory(storyName);
           })
           .then(() => document.querySelector(branchStoryTabName).click());
+      }
+      return {
+        ...state,
+      };
+    }
+    case 'CONNECT_STORY_ADD_RES_BUTTONS': {
+      const { actionName, title, payload, reply, connectStoryName } =
+        action.payload;
+
+      const { onSetAllTrainData, onSetStory } = state;
+      const cloneData = {
+        ...state.cloneData,
+      };
+      const { stories, nlu, domain } = cloneData;
+
+      const currentStoryName = connectStoryName.slice(
+        0,
+        connectStoryName.indexOf('_'),
+      );
+
+      const currentPayload = `/${connectStoryName}_${payload.replace(
+        /\//,
+        '',
+      )}`;
+
+      const branchStoryTabName = `#story_nav_tab_${connectStoryName.slice(
+        connectStoryName.indexOf('_') + 1,
+        connectStoryName.lastIndexOf('_'),
+      )}`;
+
+      const connectStoryTabName = `#story_nav_tab_${connectStoryName.slice(
+        connectStoryName.lastIndexOf('_') + 1,
+        connectStoryName.length,
+      )}`;
+
+      const intentStory = [];
+      stories.map((item) => {
+        return item.steps.map((step) =>
+          step.intent === title &&
+          item.story !== `button_${connectStoryName}_${title}`
+            ? intentStory.push(item)
+            : step,
+        );
+      });
+      const isExist = stories.some(
+        (item) => item.story === `button_${connectStoryName}_${title}`,
+      );
+
+      if (intentStory.length) {
+        if (domain.responses[actionName][0].buttons) {
+          domain.responses[actionName][0].buttons.push({
+            title,
+            payload,
+          });
+        } else {
+          domain.responses[actionName][0].buttons = [
+            {
+              title,
+              payload,
+            },
+          ];
+        }
+        cloneData.domain = domain;
+      } else {
+        if (isExist) {
+          Toast.fire({
+            icon: 'warning',
+            title: '此按鈕已存在',
+          });
+        } else {
+          const buttonActionName = randomBotResAction(state.actions);
+          stories.push({
+            story: `button_${connectStoryName}_${title}`,
+            steps: [
+              {
+                user: title,
+                intent: `${connectStoryName}_${title}`,
+                entities: [],
+              },
+              { action: buttonActionName },
+            ],
+          });
+          nlu.rasa_nlu_data.common_examples.push({
+            text: title,
+            intent: `${connectStoryName}_${title}`,
+            entities: [],
+          });
+
+          if (domain.responses[actionName][0].buttons) {
+            domain.responses[actionName][0].buttons.push({
+              title,
+              payload: currentPayload,
+            });
+          } else {
+            domain.responses[actionName][0].buttons = [
+              { title, payload: currentPayload },
+            ];
+          }
+
+          domain.actions.push(buttonActionName);
+          domain.responses[buttonActionName] = [{ text: reply }];
+          domain.intents.push(`${connectStoryName}_${title}`);
+        }
+        cloneData.stories = stories;
+        cloneData.nlu = nlu;
+        cloneData.domain = domain;
+      }
+
+      if (intentStory.length || !isExist) {
+        return postAllTrainData(cloneData)
+          .then((res) => {
+            if (res.status !== 'success') {
+              return Toast.fire({
+                icon: 'error',
+                title: '新增按鈕選項失敗',
+                text: res.message,
+              });
+            }
+            Toast.fire({
+              icon: 'success',
+              title: '新增按鈕選項成功',
+            });
+            onSetAllTrainData(res.data);
+            return onSetStory(currentStoryName);
+          })
+          .then(() => document.querySelector(branchStoryTabName).click())
+          .then(() => document.querySelector(connectStoryTabName).click());
       }
       return {
         ...state,
@@ -2951,6 +3130,30 @@ const useStoryStore = create((set) => {
           buttonActionName,
           stories,
           checkPointName,
+        ),
+      );
+    },
+    // 串接故事新增機器人回覆按鈕
+    onAddConnectStoryResButtons(
+      actionName: string,
+      title: string,
+      payload: string,
+      reply: string,
+      storyName: string,
+      storiesData: StoryType[],
+      checkPointName: string,
+      connectStoryName: string,
+    ) {
+      dispatch(
+        actionConnectStoryAddResButtons(
+          actionName,
+          title,
+          payload,
+          reply,
+          storyName,
+          storiesData,
+          checkPointName,
+          connectStoryName,
         ),
       );
     },

@@ -35,6 +35,7 @@ const ShowStory: React.FC<ShowStoryProps> = (props) => {
     onAddBranchStoryResButtons,
     onRemoveBranchStoryResButton,
     onEditBranchStoryResButtons,
+    onAddConnectStoryResButtons,
   } = useStoryStore((state: State) => {
     return {
       onEditBotRes: state.onEditBotRes,
@@ -55,6 +56,7 @@ const ShowStory: React.FC<ShowStoryProps> = (props) => {
       onAddBranchStoryResButtons: state.onAddBranchStoryResButtons,
       onRemoveBranchStoryResButton: state.onRemoveBranchStoryResButton,
       onEditBranchStoryResButtons: state.onEditBranchStoryResButtons,
+      onAddConnectStoryResButtons: state.onAddConnectStoryResButtons,
     };
   }, shallow);
 
@@ -128,6 +130,7 @@ const ShowStory: React.FC<ShowStoryProps> = (props) => {
               onAddBranchStoryResButtons={onAddBranchStoryResButtons}
               onRemoveBranchStoryResButton={onRemoveBranchStoryResButton}
               onEditBranchStoryResButtons={onEditBranchStoryResButtons}
+              onAddConnectStoryResButtons={onAddConnectStoryResButtons}
             />
           );
         })}

@@ -289,6 +289,17 @@ export type State = {
     stories: StoryType[],
     checkPointName: string,
   ) => void,
+  // 串接故事新增機器人回覆按鈕
+  onAddConnectStoryResButtons: (
+    actionName: string,
+    title: string,
+    payload: string,
+    reply: string,
+    storyName: string,
+    storiesData: StoryType[],
+    checkPointName: string,
+    connectStoryName: string,
+  ) => void,
 };
 
 export type CreateStoryState = {
