@@ -54,6 +54,7 @@ import {
   actionBranchStoryRemoveResButton,
   actionBranchStoryEditResButtons,
   actionConnectStoryAddResButtons,
+  actionConnectStoryRemoveResButton,
 } from 'actions';
 // import { computed } from 'zustand-middleware-computed-state';
 import { Toast } from 'utils/swalInput';
@@ -779,12 +780,12 @@ const reducer = (state: State, action: Action): State => {
         cloneData.stories.splice(storyNames.indexOf(`button_${payload}`), 1);
 
         const nluItems = cloneData.nlu.rasa_nlu_data.common_examples.map(
-          (nluItem) => nluItem.text,
+          (nluItem) => nluItem.intent,
         );
 
-        if (nluItems.indexOf(currentPayload) > -1) {
+        if (nluItems.indexOf(payload) > -1) {
           cloneData.nlu.rasa_nlu_data.common_examples.splice(
-            nluItems.indexOf(currentPayload),
+            nluItems.indexOf(payload),
             1,
           );
         }
@@ -2313,11 +2314,11 @@ const reducer = (state: State, action: Action): State => {
 
         // 從nlu訓練檔刪除按鈕例句
         const nluItems = cloneData.nlu.rasa_nlu_data.common_examples.map(
-          (nluItem) => nluItem.text,
+          (nluItem) => nluItem.intent,
         );
-        if (nluItems.indexOf(currentTitle) > -1) {
+        if (nluItems.indexOf(payload) > -1) {
           cloneData.nlu.rasa_nlu_data.common_examples.splice(
-            nluItems.indexOf(currentTitle),
+            nluItems.indexOf(payload),
             1,
           );
         }
@@ -2680,6 +2681,126 @@ const reducer = (state: State, action: Action): State => {
       return {
         ...state,
       };
+    }
+    case 'CONNECT_STORY_REMOVE_RES_BUTTON': {
+      const {
+        actionName,
+        payload,
+        buttonActionName,
+        disabled,
+        checkPointName,
+        connectStoryName,
+      } = action.payload;
+
+      const { onSetAllTrainData, onSetStory } = state;
+      const cloneData = {
+        ...state.cloneData,
+      };
+
+      // 獲取正確故事名稱
+      const currentStoryName = checkPointName.slice(
+        0,
+        checkPointName.indexOf('_'),
+      );
+
+      // 獲取正確支線故事tab名稱
+      const branchStoryTabName = `#story_nav_tab_${checkPointName.slice(
+        checkPointName.indexOf('_') + 1,
+        checkPointName.length,
+      )}`;
+
+      // 獲取正確串接故事tab名稱
+      const connectStoryTabName = `#story_nav_tab_${connectStoryName.slice(
+        connectStoryName.lastIndexOf('_') + 1,
+        connectStoryName.length,
+      )}`;
+
+      // 獲取正確按鈕名稱
+      const currentTitle = payload.slice(
+        payload.lastIndexOf('_') + 1,
+        payload.length,
+      );
+
+      if (!disabled) {
+        // 從stories訓練檔刪除按鈕故事
+        const storyNames = cloneData.stories.map((item) => item.story);
+        if (storyNames.indexOf(`button_${payload}`) > -1) {
+          cloneData.stories.splice(storyNames.indexOf(`button_${payload}`), 1);
+        }
+
+        // 從nlu訓練檔刪除按鈕例句
+        const nluItems = cloneData.nlu.rasa_nlu_data.common_examples.map(
+          (nluItem) => nluItem.intent,
+        );
+        if (nluItems.indexOf(payload) > -1) {
+          cloneData.nlu.rasa_nlu_data.common_examples.splice(
+            nluItems.indexOf(payload),
+            1,
+          );
+        }
+
+        // 從domain訓練檔刪除按鈕回覆
+        delete cloneData.domain.responses[buttonActionName];
+
+        // 從domain訓練檔刪除按鈕
+        const buttonTexts = cloneData.domain.responses[
+          actionName
+        ][0].buttons.map((button) => button.title);
+        if (buttonTexts.indexOf(currentTitle) > -1) {
+          cloneData.domain.responses[actionName][0].buttons.splice(
+            buttonTexts.indexOf(currentTitle),
+            1,
+          );
+        }
+
+        // 從domain訓練檔刪除按鈕回覆名稱
+        if (cloneData.domain.actions.indexOf(buttonActionName) > -1) {
+          cloneData.domain.actions.splice(
+            cloneData.domain.actions.indexOf(buttonActionName),
+            1,
+          );
+        }
+
+        // 從domain訓練檔刪除按鈕意圖
+        if (cloneData.domain.intents.indexOf(payload) > -1) {
+          cloneData.domain.intents.splice(
+            cloneData.domain.intents.indexOf(payload),
+            1,
+          );
+        }
+      } else {
+        // 如果有disabled，代表此按鈕是串接其他故事，僅需刪除按鈕即可，不用刪除故事和例句
+        const buttonTexts = cloneData.domain.responses[
+          actionName
+        ][0].buttons.map((button) => button.title);
+
+        // 從domain訓練檔刪除按鈕
+        if (buttonTexts.indexOf(payload) > -1) {
+          cloneData.domain.responses[actionName][0].buttons.splice(
+            buttonTexts.indexOf(payload),
+            1,
+          );
+        }
+      }
+
+      return postAllTrainData(cloneData)
+        .then((res) => {
+          if (res.status !== 'success') {
+            return Toast.fire({
+              icon: 'error',
+              title: '刪除按鈕選項失敗',
+              text: res.message,
+            });
+          }
+          Toast.fire({
+            icon: 'success',
+            title: '刪除按鈕選項成功',
+          });
+          onSetAllTrainData(res.data);
+          return onSetStory(currentStoryName);
+        })
+        .then(() => document.querySelector(branchStoryTabName).click())
+        .then(() => document.querySelector(connectStoryTabName).click());
     }
     default:
       return state;
@@ -3152,6 +3273,28 @@ const useStoryStore = create((set) => {
           reply,
           storyName,
           storiesData,
+          checkPointName,
+          connectStoryName,
+        ),
+      );
+    },
+    // 刪除串接故事機器人回覆按鈕
+    onRemoveConnectStoryResButton(
+      actionName: string,
+      payload: string,
+      storyName: string,
+      buttonActionName: string,
+      disabled: boolean,
+      checkPointName: string,
+      connectStoryName: string,
+    ) {
+      dispatch(
+        actionConnectStoryRemoveResButton(
+          actionName,
+          payload,
+          storyName,
+          buttonActionName,
+          disabled,
           checkPointName,
           connectStoryName,
         ),
