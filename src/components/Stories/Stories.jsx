@@ -396,9 +396,10 @@ const Stories = () => {
       storyName: string,
       e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
     ) => {
-      console.log('2');
-      e.parentNode.parentNode.setAttribute('data-open', 'open');
-      console.log(e.parentNode.parentNode);
+      setTimeout(() => {
+        e.parentNode.parentNode.setAttribute('data-open', 'open');
+        e.setAttribute('data-check', 'check');
+      }, 0);
 
       if (Object.keys(newStory).length !== 0) {
         return confirmWidget(newStory.story, null).then((result) => {
@@ -415,7 +416,6 @@ const Stories = () => {
           setCreate(false);
           setDefaultValue(storyName);
           onInitialNewStory();
-          e.originalEvent.stopPropagation();
         });
       }
       onSetSelectedBranchStory({
@@ -429,7 +429,6 @@ const Stories = () => {
       onSetStory(storyName);
       setCreate(false);
       setDefaultValue(storyName);
-      e.originalEvent.stopPropagation();
       return onInitialNewStory();
     },
     [
@@ -444,10 +443,13 @@ const Stories = () => {
   const saveMenu = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
   ) => {
-    console.log('1');
     const senderId = document.querySelectorAll('#senderId > div > ul');
+    const button = document.querySelectorAll('#senderId > div > ul button');
     senderId.forEach((key) => {
       key.setAttribute('data-open', 'noopen');
+    });
+    button.forEach((item) => {
+      item.setAttribute('data-check', 'none');
     });
     e.setAttribute('data-open', 'open');
   };
