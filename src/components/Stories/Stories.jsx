@@ -1165,11 +1165,13 @@ const Stories = () => {
                         {category.name}
                       </option>
                       {storiesOptions &&
-                        storiesOptions.map((item) => (
-                          <option key={item.story} value={item.story}>
-                            {item.story}
-                          </option>
-                        ))}
+                        storiesOptions.map((item) =>
+                          item.metadata.category === category.name ? (
+                            <option key={item.story} value={item.story}>
+                              {item.story}
+                            </option>
+                          ) : null,
+                        )}
                     </>
                   ))}
               </select>
