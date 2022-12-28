@@ -116,6 +116,8 @@ export type State = {
   storiesOptions: StoryType[],
   rasaTrainState: number,
   currentPage: string,
+  selectedCategory: string,
+  selectedStory: string,
   // actions
   init: () => void,
   trainRasa: (currentData: ApiTrainDataType) => void,
@@ -323,6 +325,10 @@ export type State = {
     checkPointName: string,
     connectStoryName: string,
   ) => void,
+  // 選擇故事類別
+  onSetSelectedCategory: (categoryName: string) => void,
+  // 選擇故事
+  onSetSelectedStory: (storyName: string) => void,
 };
 
 export type CreateStoryState = {

@@ -527,6 +527,14 @@ export type Action =
         checkPointName: string,
         connectStoryName: string,
       },
+    }
+  | {
+      type: 'SELECT_CATEGORY',
+      payload: string,
+    }
+  | {
+      type: 'SELECTED_STORY',
+      payload: straing,
     };
 
 // ====================== query story ======================
@@ -939,6 +947,16 @@ export const actionConnectStoryEditResButtons = (
     checkPointName,
     connectStoryName,
   },
+});
+
+export const actionSelectedCategory = (categoryName: string): Action => ({
+  type: 'SELECTED_CATEGORY',
+  payload: categoryName,
+});
+
+export const actionSelectedStory = (storyName: string): Action => ({
+  type: 'SELECTED_STORY',
+  payload: storyName,
 });
 
 // ====================== create story ======================

@@ -57,6 +57,8 @@ import {
   actionConnectStoryAddResButtons,
   actionConnectStoryRemoveResButton,
   actionConnectStoryEditResButtons,
+  actionSelectedCategory,
+  actionSelectedStory,
 } from 'actions';
 // import { computed } from 'zustand-middleware-computed-state';
 import { Toast } from 'utils/swalInput';
@@ -79,6 +81,8 @@ const initialState = {
   categories: [],
   rasaTrainState: 1,
   currentPage: null,
+  selectedCategory: '',
+  selectedStory: '',
 };
 
 const reducer = (state: State, action: Action): State => {
@@ -3007,6 +3011,27 @@ const reducer = (state: State, action: Action): State => {
         ...state,
       };
     }
+    case 'SELECTED_CATEGORY': {
+      let categoryName = action.payload;
+
+      if (categoryName === state.selectedCategory) {
+        categoryName = '';
+      }
+
+      return {
+        ...state,
+        selectedCategory: categoryName,
+        // selectedStory: '',
+      };
+    }
+    case 'SELECTED_STORY': {
+      const storyName = action.payload;
+
+      return {
+        ...state,
+        selectedStory: storyName,
+      };
+    }
     default:
       return state;
   }
@@ -3134,6 +3159,14 @@ const useStoryStore = create((set) => {
     // 設定全部故事類別
     onSetAllCategories(categories: Categories[]) {
       set({ categories });
+    },
+    // 選擇故事類別
+    onSetSelectedCategory(categoryName: string) {
+      dispatch(actionSelectedCategory(categoryName));
+    },
+    // 選擇故事
+    onSetSelectedStory(storyName: string) {
+      dispatch(actionSelectedStory(storyName));
     },
     // 編輯使用者對話
     onEditUserSay(oriWord: string, newWord: string, storyName: string) {
