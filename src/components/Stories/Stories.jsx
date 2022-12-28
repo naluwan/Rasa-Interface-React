@@ -1157,11 +1157,25 @@ const Stories = () => {
                 <option value="" disabled hidden>
                   請選擇
                 </option>
-                {storiesOptions &&
-                  storiesOptions.map((item) => (
-                    <option key={item.story} value={item.story}>
-                      {item.story}
-                    </option>
+                {categories &&
+                  categories.map((category) => (
+                    <>
+                      <option
+                        className={cx(style.categoryDisabled)}
+                        disabled
+                        key={category.name}
+                      >
+                        {category.name}
+                      </option>
+                      {storiesOptions &&
+                        storiesOptions.map((item) =>
+                          item.metadata.category === category.name ? (
+                            <option key={item.story} value={item.story}>
+                              {item.story}
+                            </option>
+                          ) : null,
+                        )}
+                    </>
                   ))}
               </select>
               {/* <div>
@@ -1212,21 +1226,6 @@ const Stories = () => {
                     </ul>
                   );
                 })}
-              {/* <ul className={cx(style.listmenu)}>
-                {storiesOptions &&
-                  storiesOptions.map((item) => (
-                    <li key={item.story}>
-                      <button
-                        className={cx(style.listBtn)}
-                        data-check="none"
-                        value={item.story}
-                        onClick={(e) => atSelectStory(e.target.value)}
-                      >
-                        {item.story}
-                      </button>
-                    </li>
-                  ))}
-              </ul> */}
             </div>
           </div>
         </div>
