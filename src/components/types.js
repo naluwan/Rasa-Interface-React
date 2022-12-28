@@ -346,7 +346,7 @@ export type CreateStoryState = {
     selectedConnectBranchStory: StoryType,
   ) => void,
   // 建立新故事
-  onCreateNewStory: (storyName: string) => void,
+  onCreateNewStory: (newStoryInfo: StoryType) => void,
   // 新增使用者步驟
   onCreateUserStep: (userSay: string) => void,
   // 編輯使用者對話

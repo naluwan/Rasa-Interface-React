@@ -232,7 +232,22 @@ export type Categories = {
 
 // 獲取故事類別
 export const fetchAllCategories = (): Promise<Categories[]> => {
-  return axiosInstance.get(`${API_URL}/train/categories`).then((categories) => {
-    return categories.data.data;
-  });
+  return axiosInstance
+    .get(`${API_URL}/train/categories`)
+    .then((categories) => {
+      return categories.data.data;
+    })
+    .catch((err) => console.log(err));
+};
+
+// 創建故事類別
+export const postCategory = (category: string): Promise<Categories[]> => {
+  const payload = { name: category };
+  return axiosInstance
+    .post(`${API_URL}/train/category`, payload)
+    .then((categories) => {
+      console.log('update categories ===> ', categories);
+      return categories.data.categories;
+    })
+    .catch((err) => console.log(err));
 };

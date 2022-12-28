@@ -5,6 +5,8 @@ import {
   postAllTrainData,
   fetchAllAction,
   fetchAllCategories,
+  postCategory,
+  Categories,
 } from 'services/api';
 import shallow from 'zustand/shallow';
 import type { State, StoryType, CreateStoryState } from 'components/types';
@@ -81,10 +83,9 @@ const Stories = () => {
   const {
     newStory,
     onSetSelectedBranchStory,
-    // onCreateNewStory,
+    onCreateNewStory,
     onInitialNewStory,
     onSetSelectedConnectBranchStory,
-    // onChangeCreateStory,
   } = useCreateStoryStore((state: CreateStoryState) => {
     return {
       newStory: state.newStory,
@@ -92,7 +93,6 @@ const Stories = () => {
       onCreateNewStory: state.onCreateNewStory,
       onSetSelectedBranchStory: state.onSetSelectedBranchStory,
       onSetSelectedConnectBranchStory: state.onSetSelectedConnectBranchStory,
-      onChangeCreateStory: state.onChangeCreateStory,
     };
   }, shallow);
 
@@ -507,7 +507,11 @@ const Stories = () => {
 
   // 新增故事點擊儲存按鈕
   const atClickSaveBtn = React.useCallback(
-    (createStory: StoryType, isRecoverDeletedStory: boolean) => {
+    (
+      createStory: StoryType,
+      isRecoverDeletedStory: boolean,
+      categoriesData: Categories,
+    ) => {
       const newStories = cloneDeep(cloneData.stories);
       const newNlu = cloneDeep(cloneData.nlu);
       const newDomain = cloneDeep(cloneData.domain);
@@ -849,6 +853,17 @@ const Stories = () => {
         domain: newDomain,
       };
 
+      const isNewCategory = categoriesData.every(
+        (category) => category.name !== createStory.metadata.category,
+      );
+
+      if (isNewCategory) {
+        postCategory(createStory.metadata.category).then((updateCategories) => {
+          console.log('update categories ===> ', updateCategories);
+          onSetAllTrainData(updateCategories);
+        });
+      }
+
       return postAllTrainData(newData).then((res) => {
         if (res.status !== 'success') {
           return Toast.fire({
@@ -1018,10 +1033,19 @@ const Stories = () => {
         }
       }
 
+      // if (newStoryData.metadata.create) {
+      //   postCategory(newStoryData.metadata.category).then((updateCategories) =>
+      //     console.log(updateCategories),
+      //   );
+      // }
       delete newStoryData.metadata.create;
       console.log('final new story data ===> ', newStoryData);
+      onCreateNewStory(newStoryData);
+      setCreate(true);
+      onSetStory('');
+      document.querySelector('#cancelCreateStoryBtn').click();
     },
-    [setNewStoryInfo],
+    [setNewStoryInfo, onCreateNewStory, onSetStory],
   );
 
   return (
@@ -1272,6 +1296,7 @@ const Stories = () => {
               <button
                 type="button"
                 className="swal2-cancel swal2-styled"
+                id="cancelCreateStoryBtn"
                 data-bs-dismiss="modal"
                 onClick={() =>
                   setNewStoryInfo({
