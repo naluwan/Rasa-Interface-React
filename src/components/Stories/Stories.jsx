@@ -402,7 +402,7 @@ const Stories = () => {
         button.forEach((item) => {
           item.setAttribute('data-check', 'none');
         });
-        const elemt = document.querySelector(`[name=${storyName}]`);
+        const elemt = document.querySelector(`[name="${storyName}"]`);
         elemt.setAttribute('data-check', 'check');
         elemt.parentNode.parentNode.setAttribute('data-open', 'open');
       }, 0);
