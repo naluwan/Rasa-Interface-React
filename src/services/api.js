@@ -245,9 +245,6 @@ export const postCategory = (category: string): Promise<Categories[]> => {
   const payload = { name: category };
   return axiosInstance
     .post(`${API_URL}/train/category`, payload)
-    .then((categories) => {
-      console.log('update categories ===> ', categories);
-      return categories.data.categories;
-    })
+    .then((categories) => categories.data.categories)
     .catch((err) => console.log(err));
 };

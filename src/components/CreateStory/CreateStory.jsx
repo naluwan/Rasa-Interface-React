@@ -2,12 +2,11 @@ import * as React from 'react';
 // import { Toast } from 'utils/swalInput';
 import shallow from 'zustand/shallow';
 import CheckPoint from 'components/CheckPoint';
-import useStoryStore from 'store/useStoryStore';
 import style from './CreateStory.module.scss';
 import StepControl from './StepControl';
 import UserStep from '../UserStep';
 import BotStep from '../BotStep';
-import type { StoryType, ExampleType, CreateStoryState, State } from '../types';
+import type { StoryType, ExampleType, CreateStoryState } from '../types';
 import StepAlert from './StepAlert';
 import useCreateStoryStore from '../../store/useCreateStoryStore';
 
@@ -21,12 +20,6 @@ type CreateStoryProps = {
 
 const CreateStory: React.FC<CreateStoryProps> = (props) => {
   const { isCreate, nlu, actions, onClickSaveBtn } = props;
-
-  const { categories } = useStoryStore((state: State) => {
-    return {
-      categories: state.categories,
-    };
-  }, shallow);
 
   const {
     newStory,
@@ -134,7 +127,7 @@ const CreateStory: React.FC<CreateStoryProps> = (props) => {
         <button
           type="button"
           className="btn btn-secondary mx-4"
-          onClick={() => onClickSaveBtn(newStory, false, categories)}
+          onClick={() => onClickSaveBtn(newStory)}
         >
           儲存
         </button>

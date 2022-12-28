@@ -6,7 +6,6 @@ import {
   fetchAllAction,
   fetchAllCategories,
   postCategory,
-  Categories,
 } from 'services/api';
 import shallow from 'zustand/shallow';
 import type { State, StoryType, CreateStoryState } from 'components/types';
@@ -516,11 +515,7 @@ const Stories = () => {
 
   // 新增故事點擊儲存按鈕
   const atClickSaveBtn = React.useCallback(
-    (
-      createStory: StoryType,
-      isRecoverDeletedStory: boolean,
-      categoriesData: Categories,
-    ) => {
+    (createStory: StoryType, isRecoverDeletedStory: boolean) => {
       const newStories = cloneDeep(cloneData.stories);
       const newNlu = cloneDeep(cloneData.nlu);
       const newDomain = cloneDeep(cloneData.domain);
@@ -856,22 +851,23 @@ const Stories = () => {
         return actionItem;
       });
 
+      const isNewCategory = categories.every(
+        (category) => category.name !== createStory.metadata.category,
+      );
+
+      // 判斷是否為新類別，如果是就新增類別
+      if (isNewCategory) {
+        postCategory(createStory.metadata.category).then((updateCategories) => {
+          console.log('update categories ===> ', updateCategories);
+          onSetAllCategories(updateCategories);
+        });
+      }
+
       const newData = {
         stories: newStories,
         nlu: newNlu,
         domain: newDomain,
       };
-
-      const isNewCategory = categoriesData.every(
-        (category) => category.name !== createStory.metadata.category,
-      );
-
-      if (isNewCategory) {
-        postCategory(createStory.metadata.category).then((updateCategories) => {
-          console.log('update categories ===> ', updateCategories);
-          onSetAllTrainData(updateCategories);
-        });
-      }
 
       return postAllTrainData(newData).then((res) => {
         if (res.status !== 'success') {
@@ -906,9 +902,11 @@ const Stories = () => {
       onSetAllTrainData,
       cloneData,
       actions,
+      categories,
       onInitialNewStory,
       onSetSelectedBranchStory,
       onSetSelectedConnectBranchStory,
+      onSetAllCategories,
     ],
   );
 
@@ -989,6 +987,7 @@ const Stories = () => {
     [setNewStoryInfo],
   );
 
+  // 創建新增故事資訊
   const atCreateNewStory = React.useCallback(
     (newStoryData, storiesData, categoriesData) => {
       if (newStoryData.story === '' || newStoryData.metadata.category === '') {
