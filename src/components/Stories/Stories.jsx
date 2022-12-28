@@ -432,7 +432,16 @@ const Stories = () => {
       onSetSelectedConnectBranchStory,
     ],
   );
-
+  // 側邊攔收藏
+  const saveMenu = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
+  ) => {
+    const senderId = document.querySelectorAll('#senderId > ul');
+    senderId.forEach((key) => {
+      key.setAttribute('data-open', 'noopen');
+    });
+    e.setAttribute('data-open', 'open');
+  };
   // 新增故事
   // const atClickCreateStoryBtn = React.useCallback(() => {
   //   if (Object.keys(newStory).length !== 0) {
@@ -1028,7 +1037,7 @@ const Stories = () => {
     <>
       <div className={style.searchBar}>
         <div>
-          <div className={style.senderId}>
+          <div id="senderId" className={style.senderId}>
             <div className={cx(style.menuBtnBlock)}>
               <h4 className={style.searchTitle}>故事流程</h4>
               <div className={cx(style.btn, style.navbar)}>
@@ -1119,8 +1128,14 @@ const Stories = () => {
             {categories &&
               categories.map((category) => {
                 return (
-                  <ul key={category.name} className={cx(style.listmenu)}>
+                  <ul
+                    data-open="noopen"
+                    key={category.name}
+                    className={cx(style.listmenu)}
+                    onClick={(e) => saveMenu(e.target)}
+                  >
                     {category.name}
+                    <hr />
                     {storiesOptions &&
                       storiesOptions.map((item) => {
                         if (item.metadata.category === category.name) {
