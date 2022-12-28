@@ -57,10 +57,10 @@ const initialState = {
 const reducer = (state: CreateStoryState, action: Action): State => {
   switch (action.type) {
     case 'CREATE_NEW_STORY': {
-      const storyName = action.payload;
+      const newStoryInfo = action.payload;
       return {
         ...state,
-        newStory: { story: storyName, steps: [] },
+        newStory: newStoryInfo,
       };
     }
     case 'CREATE_STORY_CREATE_USER_STEP': {
@@ -1802,8 +1802,8 @@ const useCreateStoryStore = create((set) => {
       set({ selectedConnectBranchStory });
     },
     // 建立新故事
-    onCreateNewStory(storyName: string) {
-      dispatch(actionCreateNewStory(storyName));
+    onCreateNewStory(newStoryInfo: StoryType) {
+      dispatch(actionCreateNewStory(newStoryInfo));
     },
     // 新增使用者步驟
     onCreateUserStep(userSay: string) {

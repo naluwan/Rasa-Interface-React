@@ -1,11 +1,16 @@
 import * as React from 'react';
 import useSWR from 'swr';
-import { fetchAllData, postAllTrainData, fetchAllAction } from 'services/api';
+import {
+  fetchAllData,
+  postAllTrainData,
+  fetchAllAction,
+  fetchAllCategories,
+} from 'services/api';
 import shallow from 'zustand/shallow';
 import type { State, StoryType, CreateStoryState } from 'components/types';
 import ShowStory from 'components/ShowStory';
 import cx from 'classnames';
-import { Toast, confirmWidget, swalInput } from 'utils/swalInput';
+import { Toast, confirmWidget } from 'utils/swalInput';
 import MyButton from 'components/MyButton';
 import CreateStory from 'components/CreateStory';
 import { cloneDeep } from 'lodash-es';
@@ -25,10 +30,14 @@ const Stories = () => {
    */
 
   const [defaultValue, setDefaultValue] = React.useState('');
-  // /**
-  //  * @type {[StoryType, Function]}
-  //  */
-  // const [newStory, setNewStory] = React.useState({});
+  /**
+   * @type {[StoryType, Function]}
+   */
+  const [newStoryInfo, setNewStoryInfo] = React.useState({
+    story: '',
+    steps: [],
+    metadata: { category: '', create: false },
+  });
   /**
    * @type {[{key:string,slotInfo:{type:string,values?:string[]}}[], Function]}
    */
@@ -47,6 +56,8 @@ const Stories = () => {
     onSetAllTrainData,
     onSetAllAction,
     onSetRasaTrainState,
+    onSetAllCategories,
+    categories,
   } = useStoryStore((state: State) => {
     return {
       story: state.story,
@@ -62,15 +73,18 @@ const Stories = () => {
       onSetAllTrainData: state.onSetAllTrainData,
       onSetAllAction: state.onSetAllAction,
       onSetRasaTrainState: state.onSetRasaTrainState,
+      onSetAllCategories: state.onSetAllCategories,
+      categories: state.categories,
     };
   }, shallow);
 
   const {
     newStory,
     onSetSelectedBranchStory,
-    onCreateNewStory,
+    // onCreateNewStory,
     onInitialNewStory,
     onSetSelectedConnectBranchStory,
+    // onChangeCreateStory,
   } = useCreateStoryStore((state: CreateStoryState) => {
     return {
       newStory: state.newStory,
@@ -78,15 +92,23 @@ const Stories = () => {
       onCreateNewStory: state.onCreateNewStory,
       onSetSelectedBranchStory: state.onSetSelectedBranchStory,
       onSetSelectedConnectBranchStory: state.onSetSelectedConnectBranchStory,
+      onChangeCreateStory: state.onChangeCreateStory,
     };
   }, shallow);
 
   // 進入頁面打API要所有訓練資料
   const { data } = useSWR('/api/getAllTrainData', fetchAllData);
+  const allCategories = useSWR('/api/getAllCategories', fetchAllCategories);
+
   // 進入頁面獲取設定資料
   React.useEffect(() => {
     onSetAllTrainData(data);
   }, [data, onSetAllTrainData]);
+
+  // 進入頁面設定故事類別
+  React.useEffect(() => {
+    onSetAllCategories(allCategories.data);
+  }, [allCategories.data, onSetAllCategories]);
 
   // 只要資料有更新，就更新全部機器人回覆action name
   React.useEffect(() => {
@@ -412,76 +434,76 @@ const Stories = () => {
   );
 
   // 新增故事
-  const atClickCreateStoryBtn = React.useCallback(() => {
-    if (Object.keys(newStory).length !== 0) {
-      return confirmWidget(newStory.story, null).then((result) => {
-        if (!result.isConfirmed) return;
-        swalInput('設定故事名稱', 'text', '請輸入故事名稱', '', true).then(
-          (createStoryName) => {
-            if (!createStoryName) return;
-            const repeat = [];
-            stories.map((item) => {
-              return item.story === createStoryName ? repeat.push(item) : item;
-            });
-            if (repeat.length) {
-              Toast.fire({
-                icon: 'warning',
-                title: '故事名稱重複',
-              });
-              return;
-            }
-            onSetSelectedBranchStory({
-              story: '',
-              steps: [],
-            });
-            onSetSelectedConnectBranchStory({
-              story: '',
-              steps: [],
-            });
-            onCreateNewStory(createStoryName);
-            onSetStory('');
-            setCreate(true);
-            // setDefaultValue('');
-          },
-        );
-      });
-    }
-    return swalInput('設定故事名稱', 'text', '請輸入故事名稱', '', true).then(
-      (createStoryName) => {
-        if (!createStoryName) return;
-        const repeat = [];
-        stories.map((item) => {
-          return item.story === createStoryName ? repeat.push(item) : item;
-        });
-        if (repeat.length) {
-          Toast.fire({
-            icon: 'warning',
-            title: '故事名稱重複',
-          });
-          return;
-        }
-        onSetSelectedBranchStory({
-          story: '',
-          steps: [],
-        });
-        onSetSelectedConnectBranchStory({
-          story: '',
-          steps: [],
-        });
-        onCreateNewStory(createStoryName);
-        onSetStory('');
-        setCreate(true);
-        // setDefaultValue('');
-      },
-    );
-  }, [
-    newStory,
-    onSetStory,
-    stories,
-    onCreateNewStory,
-    onSetSelectedBranchStory,
-    onSetSelectedConnectBranchStory,
-  ]);
+  // const atClickCreateStoryBtn = React.useCallback(() => {
+  //   if (Object.keys(newStory).length !== 0) {
+  //     return confirmWidget(newStory.story, null).then((result) => {
+  //       if (!result.isConfirmed) return;
+  //       swalInput('設定故事名稱', 'text', '請輸入故事名稱', '', true).then(
+  //         (createStoryName) => {
+  //           if (!createStoryName) return;
+  //           const repeat = [];
+  //           stories.map((item) => {
+  //             return item.story === createStoryName ? repeat.push(item) : item;
+  //           });
+  //           if (repeat.length) {
+  //             Toast.fire({
+  //               icon: 'warning',
+  //               title: '故事名稱重複',
+  //             });
+  //             return;
+  //           }
+  //           onSetSelectedBranchStory({
+  //             story: '',
+  //             steps: [],
+  //           });
+  //           onSetSelectedConnectBranchStory({
+  //             story: '',
+  //             steps: [],
+  //           });
+  //           onCreateNewStory(createStoryName);
+  //           onSetStory('');
+  //           setCreate(true);
+  //           // setDefaultValue('');
+  //         },
+  //       );
+  //     });
+  //   }
+  //   return swalInput('設定故事名稱', 'text', '請輸入故事名稱', '', true).then(
+  //     (createStoryName) => {
+  //       if (!createStoryName) return;
+  //       const repeat = [];
+  //       stories.map((item) => {
+  //         return item.story === createStoryName ? repeat.push(item) : item;
+  //       });
+  //       if (repeat.length) {
+  //         Toast.fire({
+  //           icon: 'warning',
+  //           title: '故事名稱重複',
+  //         });
+  //         return;
+  //       }
+  //       onSetSelectedBranchStory({
+  //         story: '',
+  //         steps: [],
+  //       });
+  //       onSetSelectedConnectBranchStory({
+  //         story: '',
+  //         steps: [],
+  //       });
+  //       onCreateNewStory(createStoryName);
+  //       onSetStory('');
+  //       setCreate(true);
+  //       // setDefaultValue('');
+  //     },
+  //   );
+  // }, [
+  //   newStory,
+  //   onSetStory,
+  //   stories,
+  //   onCreateNewStory,
+  //   onSetSelectedBranchStory,
+  //   onSetSelectedConnectBranchStory,
+  // ]);
 
   // 新增故事點擊儲存按鈕
   const atClickSaveBtn = React.useCallback(
@@ -883,6 +905,125 @@ const Stories = () => {
     [onSetDeleteStory, atClickSaveBtn, stories],
   );
 
+  // 更新新故事資訊
+  const atChangeNewStoryInfo = React.useCallback(
+    (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+      // 獲取使用者輸入的資訊
+      const { name, value } = e.target;
+
+      // 更新故事名稱
+      if (name === 'story') {
+        setNewStoryInfo((prev) => {
+          return {
+            ...prev,
+            [name]: value,
+          };
+        });
+      }
+
+      // 使用者選擇建立新類別
+      if (name === 'category' && value === 'createNewCategory') {
+        setNewStoryInfo((prev) => {
+          return {
+            ...prev,
+            metadata: {
+              ...prev.metadata,
+              category: '',
+              create: true,
+            },
+          };
+        });
+      }
+
+      // 使用者選擇已建好的類別
+      if (name === 'category' && value !== 'createNewCategory') {
+        setNewStoryInfo((prev) => {
+          return {
+            ...prev,
+            metadata: {
+              ...prev.metadata,
+              [name]: value,
+              create: false,
+            },
+          };
+        });
+      }
+
+      // 輸入新類別
+      if (name === 'newCategory') {
+        setNewStoryInfo((prev) => {
+          return {
+            ...prev,
+            metadata: {
+              ...prev.metadata,
+              category: value,
+            },
+          };
+        });
+      }
+    },
+    [setNewStoryInfo],
+  );
+
+  const atCreateNewStory = React.useCallback(
+    (newStoryData, storiesData, categoriesData) => {
+      if (newStoryData.story === '' || newStoryData.metadata.category === '') {
+        Toast.fire({
+          icon: 'warning',
+          title: '所有欄位都是必填的',
+        });
+        return;
+      }
+
+      let isRepeat = false;
+
+      isRepeat = storiesData.some((item) => item.story === newStoryData.story);
+
+      if (isRepeat) {
+        setNewStoryInfo((prev) => {
+          return {
+            ...prev,
+            story: '',
+          };
+        });
+        Toast.fire({
+          icon: 'warning',
+          title: '故事名稱重複',
+        });
+        document.querySelector('.form-control#story').focus();
+        return;
+      }
+
+      if (newStoryData.metadata.create) {
+        isRepeat = categoriesData.some(
+          (category) => category.name === newStoryData.metadata.category,
+        );
+
+        if (isRepeat) {
+          setNewStoryInfo((prev) => {
+            return {
+              ...prev,
+              metadata: {
+                ...prev.metadata,
+                category: '',
+              },
+            };
+          });
+          Toast.fire({
+            icon: 'warning',
+            title: '類別名稱重複',
+          });
+          document.querySelector('.form-control#newCategory').focus();
+          return;
+        }
+      }
+
+      delete newStoryData.metadata.create;
+      console.log('final new story data ===> ', newStoryData);
+    },
+    [setNewStoryInfo],
+  );
+
   return (
     <>
       <div className={style.searchBar}>
@@ -891,7 +1032,14 @@ const Stories = () => {
             <div className={cx(style.menuBtnBlock)}>
               <h4 className={style.searchTitle}>故事流程</h4>
               <div className={cx(style.btn, style.navbar)}>
-                <MyButton variant="third" onClick={atClickCreateStoryBtn}>
+                <MyButton
+                  variant="third"
+                  id="createNewStoryBtn"
+                  dataBsToggle="modal"
+                  dataBsTarget="#createNewStoryModal"
+                  // onClick={() => onSetMainStep()}
+                  type="button"
+                >
                   新增故事流程
                 </MyButton>
               </div>
@@ -968,7 +1116,33 @@ const Stories = () => {
                 />
               </div> */}
             </div>
-            <ul className={cx(style.listmenu)}>
+            {categories &&
+              categories.map((category) => {
+                return (
+                  <ul key={category.name} className={cx(style.listmenu)}>
+                    {category.name}
+                    {storiesOptions &&
+                      storiesOptions.map((item) => {
+                        if (item.metadata.category === category.name) {
+                          return (
+                            <li key={item.story}>
+                              <button
+                                className={cx(style.listBtn)}
+                                data-check="none"
+                                value={item.story}
+                                onClick={(e) => atSelectStory(e.target.value)}
+                              >
+                                {item.story}
+                              </button>
+                            </li>
+                          );
+                        }
+                        return null;
+                      })}
+                  </ul>
+                );
+              })}
+            {/* <ul className={cx(style.listmenu)}>
               {storiesOptions &&
                 storiesOptions.map((item) => (
                   <li key={item.story}>
@@ -982,7 +1156,7 @@ const Stories = () => {
                     </button>
                   </li>
                 ))}
-            </ul>
+            </ul> */}
           </div>
         </div>
       </div>
@@ -1001,6 +1175,126 @@ const Stories = () => {
           onClickSaveBtn={atClickSaveBtn}
         />
       )}
+
+      {/* add branch story modal */}
+      <div
+        className="modal"
+        id="createNewStoryModal"
+        tabIndex="-1"
+        aria-labelledby="createBranchStoryModalLabel"
+        aria-hidden="true"
+        data-bs-backdrop="false"
+      >
+        <div className="modal-dialog  modal-lg modal-dialog-scrollable">
+          <div className={cx('modal-content swal2-show', style.swtOut)}>
+            <div>
+              <h2 className="swal2-title" id="createBranchStoryModalLabel">
+                建立新故事
+              </h2>
+              <button
+                type="button"
+                className={cx('swal2-close', style.swetClose)}
+                data-bs-dismiss="modal"
+                aria-label="Close"
+                onClick={() =>
+                  setNewStoryInfo({
+                    story: '',
+                    steps: [],
+                    metadata: { category: '', create: false },
+                  })
+                }
+              >
+                ×
+              </button>
+            </div>
+            <div className="modal-body">
+              <div className="mb-3">
+                <label htmlFor="story" className="form-label">
+                  故事名稱
+                </label>
+                <input
+                  className="form-control"
+                  id="story"
+                  name="story"
+                  placeholder="請輸入故事名稱"
+                  value={newStoryInfo.story}
+                  onChange={(e) => atChangeNewStoryInfo(e)}
+                />
+              </div>
+              <div className="mb-3">
+                <label htmlFor="category" className="form-label">
+                  故事類別
+                </label>
+                <select
+                  className="form-control"
+                  id="category"
+                  name="category"
+                  value={
+                    newStoryInfo.metadata?.create
+                      ? 'createNewCategory'
+                      : newStoryInfo.metadata?.category
+                  }
+                  onChange={(e) => atChangeNewStoryInfo(e)}
+                >
+                  <option value="" hidden>
+                    請選擇故事類別
+                  </option>
+                  <option value="createNewCategory">建立新類別</option>
+                  {categories?.map((category) => {
+                    return (
+                      <option
+                        key={`${category.id}-${category.name}`}
+                        value={category.name}
+                      >
+                        {category.name}
+                      </option>
+                    );
+                  })}
+                </select>
+              </div>
+              {newStoryInfo.metadata?.create && (
+                <div className="mb-3">
+                  <label htmlFor="newCategory" className="form-label">
+                    類別名稱
+                  </label>
+                  <input
+                    className="form-control"
+                    id="newCategory"
+                    name="newCategory"
+                    placeholder="請輸入類別名稱"
+                    value={newStoryInfo.metadata?.category}
+                    onChange={(e) => atChangeNewStoryInfo(e)}
+                  />
+                </div>
+              )}
+            </div>
+            <div className="swal2-actions d-flex">
+              <button
+                type="button"
+                className="swal2-cancel swal2-styled"
+                data-bs-dismiss="modal"
+                onClick={() =>
+                  setNewStoryInfo({
+                    story: '',
+                    steps: [],
+                    metadata: { category: '', create: false },
+                  })
+                }
+              >
+                取消
+              </button>
+              <button
+                className="swal2-confirm swal2-styled"
+                onClick={() =>
+                  atCreateNewStory(newStoryInfo, stories, categories)
+                }
+              >
+                儲存
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
     </>
   );
 };

@@ -9,6 +9,7 @@ import {
   fetchRasaTrainState,
   postTrainDataToRasa,
   loadedNewModel,
+  Categories,
 } from 'services/api';
 import type {
   RegisterUserInfoType,
@@ -75,6 +76,7 @@ const initialState = {
   deletedStory: {},
   actions: [],
   storiesOptions: [],
+  categories: [],
   rasaTrainState: 1,
   currentPage: null,
 };
@@ -3128,6 +3130,10 @@ const useStoryStore = create((set) => {
     // 設定目前選擇的故事
     onSetStory(storyName: string) {
       dispatch(actionSetStory(storyName));
+    },
+    // 設定全部故事類別
+    onSetAllCategories(categories: Categories[]) {
+      set({ categories });
     },
     // 編輯使用者對話
     onEditUserSay(oriWord: string, newWord: string, storyName: string) {

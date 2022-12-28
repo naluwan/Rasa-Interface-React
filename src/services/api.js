@@ -221,3 +221,18 @@ export const loadedNewModel = (fileName: string) => {
     .then((res) => res)
     .catch((err) => console.log(err));
 };
+
+export type Categories = {
+  id: string,
+  name: string,
+  cpnyId: string,
+  createdAt: string,
+  updatedAt: string,
+};
+
+// 獲取故事類別
+export const fetchAllCategories = (): Promise<Categories[]> => {
+  return axiosInstance.get(`${API_URL}/train/categories`).then((categories) => {
+    return categories.data.data;
+  });
+};

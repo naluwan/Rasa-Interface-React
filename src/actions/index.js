@@ -157,7 +157,7 @@ export type Action =
     }
   | {
       type: 'CREATE_NEW_STORY',
-      payload: string,
+      payload: StoryType,
     }
   | {
       type: 'CREATE_STORY_EDIT_INTENT',
@@ -943,9 +943,9 @@ export const actionConnectStoryEditResButtons = (
 
 // ====================== create story ======================
 
-export const actionCreateNewStory = (storyName: string): Action => ({
+export const actionCreateNewStory = (newStoryInfo: StoryType): Action => ({
   type: 'CREATE_NEW_STORY',
-  payload: storyName,
+  payload: newStoryInfo,
 });
 
 export const actionCreateStoryCreateUserStep = (userSay: string): Action => ({

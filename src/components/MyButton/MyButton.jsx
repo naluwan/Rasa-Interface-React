@@ -9,10 +9,11 @@ type MyButtonProps = {
   onClick: (e: React.MouseEvent) => void,
   rounded: boolean,
   id: string,
-  type: string,
   color?: string,
   className?: string,
   variant: 'primary' | 'secondary' | 'nostyle' | 'third',
+  dataBsToggle: string,
+  dataBsTarget: string,
 };
 
 const MyButton: React.FC<MyButtonProps> = (props) => {
@@ -27,6 +28,8 @@ const MyButton: React.FC<MyButtonProps> = (props) => {
     color,
     id,
     variant,
+    dataBsToggle,
+    dataBsTarget,
   } = props;
   const attrStyle = {
     color,
@@ -42,6 +45,8 @@ const MyButton: React.FC<MyButtonProps> = (props) => {
       type="button"
       data-rounded={rounded}
       onClick={onClick}
+      data-bs-toggle={dataBsToggle}
+      data-bs-target={dataBsTarget}
     >
       {icon}
       {children}

@@ -1397,7 +1397,7 @@ const UserStep: React.FC<UserStepProps> = (props) => {
             </div>
           </div> */}
 
-          {/* add branch story */}
+          {/* add branch story modal */}
           <div
             className="modal"
             id="createBranchStoryModal"
