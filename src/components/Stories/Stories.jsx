@@ -392,15 +392,20 @@ const Stories = () => {
 
   // 選擇故事
   const atSelectStory = React.useCallback(
-    (
-      storyName: string,
-      e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
-    ) => {
+    (storyName: string) => {
       setTimeout(() => {
-        e.parentNode.parentNode.setAttribute('data-open', 'open');
-        e.setAttribute('data-check', 'check');
+        const senderId = document.querySelectorAll('#senderId > div > ul');
+        senderId.forEach((key) => {
+          key.setAttribute('data-open', 'noopen');
+        });
+        const button = document.querySelectorAll('#senderId > div > ul button');
+        button.forEach((item) => {
+          item.setAttribute('data-check', 'none');
+        });
+        const elemt = document.querySelector(`[name=${storyName}]`);
+        elemt.setAttribute('data-check', 'check');
+        elemt.parentNode.parentNode.setAttribute('data-open', 'open');
       }, 0);
-
       if (Object.keys(newStory).length !== 0) {
         return confirmWidget(newStory.story, null).then((result) => {
           if (!result.isConfirmed) return;
@@ -445,12 +450,8 @@ const Stories = () => {
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
   ) => {
     const senderId = document.querySelectorAll('#senderId > div > ul');
-    const button = document.querySelectorAll('#senderId > div > ul button');
     senderId.forEach((key) => {
       key.setAttribute('data-open', 'noopen');
-    });
-    button.forEach((item) => {
-      item.setAttribute('data-check', 'none');
     });
     e.setAttribute('data-open', 'open');
   };
@@ -1185,10 +1186,9 @@ const Stories = () => {
                                 <button
                                   className={cx(style.listBtn)}
                                   data-check="none"
+                                  name={item.story}
                                   value={item.story}
-                                  onClick={(e) =>
-                                    atSelectStory(e.target.value, e.target)
-                                  }
+                                  onClick={(e) => atSelectStory(e.target.value)}
                                 >
                                   {item.story}
                                 </button>
