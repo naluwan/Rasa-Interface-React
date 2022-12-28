@@ -392,7 +392,14 @@ const Stories = () => {
 
   // 選擇故事
   const atSelectStory = React.useCallback(
-    (storyName: string) => {
+    (
+      storyName: string,
+      e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
+    ) => {
+      console.log('2');
+      e.parentNode.parentNode.setAttribute('data-open', 'open');
+      console.log(e.parentNode.parentNode);
+
       if (Object.keys(newStory).length !== 0) {
         return confirmWidget(newStory.story, null).then((result) => {
           if (!result.isConfirmed) return;
@@ -408,6 +415,7 @@ const Stories = () => {
           setCreate(false);
           setDefaultValue(storyName);
           onInitialNewStory();
+          e.originalEvent.stopPropagation();
         });
       }
       onSetSelectedBranchStory({
@@ -421,6 +429,7 @@ const Stories = () => {
       onSetStory(storyName);
       setCreate(false);
       setDefaultValue(storyName);
+      e.originalEvent.stopPropagation();
       return onInitialNewStory();
     },
     [
@@ -435,6 +444,7 @@ const Stories = () => {
   const saveMenu = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
   ) => {
+    console.log('1');
     const senderId = document.querySelectorAll('#senderId > div > ul');
     senderId.forEach((key) => {
       key.setAttribute('data-open', 'noopen');
@@ -1169,7 +1179,9 @@ const Stories = () => {
                                   className={cx(style.listBtn)}
                                   data-check="none"
                                   value={item.story}
-                                  onClick={(e) => atSelectStory(e.target.value)}
+                                  onClick={(e) =>
+                                    atSelectStory(e.target.value, e.target)
+                                  }
                                 >
                                   {item.story}
                                 </button>

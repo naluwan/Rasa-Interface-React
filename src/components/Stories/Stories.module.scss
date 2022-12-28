@@ -89,23 +89,25 @@
     width: 100%;
   }
 }
-.listBlock{
+
+.listBlock {
   overflow-y: auto;
   width: 100%;
   height: calc(100% - 127px);
+
   .listmenu {
     padding-bottom: 0;
     cursor: pointer;
     display: grid;
-    padding-left: 10px;
+    padding-left: 0;
     list-style-type: none;
     width: 100%;
-    margin: 10px;
-  
+    margin: 10px 0;
+
     hr {
       margin-top: 0;
     }
-  
+
     button {
       background: #fff;
       border: none;
@@ -115,20 +117,20 @@
       border-radius: 5px;
       padding: 10px;
       pointer-events: none;
-  
+
       &:hover {
-  
+
         background: #e0e0e0;
       }
     }
-  
+
     li {
       transition: all .3s;
       opacity: 0;
       height: 0;
-  
+
     }
-  
+
     &[data-open="noopen"] {
       li {
         transition: all .3s;
@@ -136,13 +138,13 @@
         height: 0;
       }
     }
-  
+
     &[data-open="open"] {
       li {
         transition: all .3s;
         opacity: 1;
         height: auto;
-  
+
         button {
           pointer-events: all;
         }
