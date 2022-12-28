@@ -440,88 +440,92 @@ const Stories = () => {
       onSetSelectedConnectBranchStory,
     ],
   );
+
   // 側邊攔收藏
-  const saveMenu = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
-  ) => {
-    console.log('1');
-    const senderId = document.querySelectorAll('#senderId > div > ul');
-    senderId.forEach((key) => {
-      key.setAttribute('data-open', 'noopen');
-    });
-    e.setAttribute('data-open', 'open');
-  };
+  const saveMenu = React.useCallback(
+    (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+      console.log('1');
+      const senderId = document.querySelectorAll('#senderId > div > ul');
+      senderId.forEach((key) => {
+        key.setAttribute('data-open', 'noopen');
+      });
+      e.setAttribute('data-open', 'open');
+    },
+    [],
+  );
+
   // 新增故事
-  // const atClickCreateStoryBtn = React.useCallback(() => {
-  //   if (Object.keys(newStory).length !== 0) {
-  //     return confirmWidget(newStory.story, null).then((result) => {
-  //       if (!result.isConfirmed) return;
-  //       swalInput('設定故事名稱', 'text', '請輸入故事名稱', '', true).then(
-  //         (createStoryName) => {
-  //           if (!createStoryName) return;
-  //           const repeat = [];
-  //           stories.map((item) => {
-  //             return item.story === createStoryName ? repeat.push(item) : item;
-  //           });
-  //           if (repeat.length) {
-  //             Toast.fire({
-  //               icon: 'warning',
-  //               title: '故事名稱重複',
-  //             });
-  //             return;
-  //           }
-  //           onSetSelectedBranchStory({
-  //             story: '',
-  //             steps: [],
-  //           });
-  //           onSetSelectedConnectBranchStory({
-  //             story: '',
-  //             steps: [],
-  //           });
-  //           onCreateNewStory(createStoryName);
-  //           onSetStory('');
-  //           setCreate(true);
-  //           // setDefaultValue('');
-  //         },
-  //       );
-  //     });
-  //   }
-  //   return swalInput('設定故事名稱', 'text', '請輸入故事名稱', '', true).then(
-  //     (createStoryName) => {
-  //       if (!createStoryName) return;
-  //       const repeat = [];
-  //       stories.map((item) => {
-  //         return item.story === createStoryName ? repeat.push(item) : item;
-  //       });
-  //       if (repeat.length) {
-  //         Toast.fire({
-  //           icon: 'warning',
-  //           title: '故事名稱重複',
-  //         });
-  //         return;
-  //       }
-  //       onSetSelectedBranchStory({
-  //         story: '',
-  //         steps: [],
-  //       });
-  //       onSetSelectedConnectBranchStory({
-  //         story: '',
-  //         steps: [],
-  //       });
-  //       onCreateNewStory(createStoryName);
-  //       onSetStory('');
-  //       setCreate(true);
-  //       // setDefaultValue('');
-  //     },
-  //   );
-  // }, [
-  //   newStory,
-  //   onSetStory,
-  //   stories,
-  //   onCreateNewStory,
-  //   onSetSelectedBranchStory,
-  //   onSetSelectedConnectBranchStory,
-  // ]);
+  /* const atClickCreateStoryBtn = React.useCallback(() => {
+  if (Object.keys(newStory).length !== 0) {
+    return confirmWidget(newStory.story, null).then((result) => {
+      if (!result.isConfirmed) return;
+      swalInput('設定故事名稱', 'text', '請輸入故事名稱', '', true).then(
+        (createStoryName) => {
+          if (!createStoryName) return;
+          const repeat = [];
+          stories.map((item) => {
+            return item.story === createStoryName ? repeat.push(item) : item;
+          });
+          if (repeat.length) {
+            Toast.fire({
+              icon: 'warning',
+              title: '故事名稱重複',
+            });
+            return;
+          }
+          onSetSelectedBranchStory({
+            story: '',
+            steps: [],
+          });
+          onSetSelectedConnectBranchStory({
+            story: '',
+            steps: [],
+          });
+          onCreateNewStory(createStoryName);
+          onSetStory('');
+          setCreate(true);
+          // setDefaultValue('');
+        },
+      );
+    });
+  }
+    return swalInput('設定故事名稱', 'text', '請輸入故事名稱', '', true).then(
+      (createStoryName) => {
+        if (!createStoryName) return;
+        const repeat = [];
+        stories.map((item) => {
+          return item.story === createStoryName ? repeat.push(item) : item;
+        });
+        if (repeat.length) {
+          Toast.fire({
+            icon: 'warning',
+            title: '故事名稱重複',
+          });
+          return;
+        }
+        onSetSelectedBranchStory({
+          story: '',
+          steps: [],
+        });
+        onSetSelectedConnectBranchStory({
+          story: '',
+          steps: [],
+        });
+        onCreateNewStory(createStoryName);
+        onSetStory('');
+        setCreate(true);
+        // setDefaultValue('');
+      },
+    );
+  }, [
+    newStory,
+    onSetStory,
+    stories,
+    onCreateNewStory,
+    onSetSelectedBranchStory,
+    onSetSelectedConnectBranchStory,
+  ]);
+  */
 
   // 新增故事點擊儲存按鈕
   const atClickSaveBtn = React.useCallback(
@@ -727,8 +731,6 @@ const Stories = () => {
         }
         return step;
       });
-
-      // console.log('cloneNewStory:', cloneNewStory);
 
       cloneNewStory.steps.map((step) => {
         if (step.intent) {
@@ -1051,13 +1053,7 @@ const Stories = () => {
         }
       }
 
-      // if (newStoryData.metadata.create) {
-      //   postCategory(newStoryData.metadata.category).then((updateCategories) =>
-      //     console.log(updateCategories),
-      //   );
-      // }
       delete newStoryData.metadata.create;
-      console.log('final new story data ===> ', newStoryData);
       onCreateNewStory(newStoryData);
       setCreate(true);
       onSetStory('');
@@ -1065,6 +1061,17 @@ const Stories = () => {
     },
     [setNewStoryInfo, onCreateNewStory, onSetStory],
   );
+
+  // 提示使用者新增的故事尚未儲存
+  const atClickCreateStoryBtn = React.useCallback(() => {
+    if (Object.keys(newStory).length !== 0) {
+      confirmWidget(newStory.story, null).then((result) => {
+        if (!result.isConfirmed) {
+          document.querySelector('#cancelCreateStoryBtn').click();
+        }
+      });
+    }
+  }, [newStory]);
 
   return (
     <>
@@ -1079,7 +1086,7 @@ const Stories = () => {
                   id="createNewStoryBtn"
                   dataBsToggle="modal"
                   dataBsTarget="#createNewStoryModal"
-                  // onClick={() => onSetMainStep()}
+                  onClick={() => atClickCreateStoryBtn()}
                   type="button"
                 >
                   新增故事流程
