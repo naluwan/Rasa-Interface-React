@@ -1159,23 +1159,29 @@ const Stories = () => {
                 </option>
                 {categories &&
                   categories.map((category) => (
-                    <>
+                    <React.Fragment
+                      key={`${category.createdAt}-${category.id}-${category.name}`}
+                    >
                       <option
                         className={cx(style.categoryDisabled)}
                         disabled
-                        key={category.name}
+                        key={`${category.name}-${category.id}`}
                       >
                         {category.name}
                       </option>
                       {storiesOptions &&
-                        storiesOptions.map((item) =>
-                          item.metadata.category === category.name ? (
-                            <option key={item.story} value={item.story}>
-                              {item.story}
-                            </option>
-                          ) : null,
+                        storiesOptions.map(
+                          (item) =>
+                            item.metadata.category === category.name && (
+                              <option
+                                key={`${item.metadata.category}-${item.story}`}
+                                value={item.story}
+                              >
+                                {item.story}
+                              </option>
+                            ),
                         )}
-                    </>
+                    </React.Fragment>
                   ))}
               </select>
               {/* <div>
@@ -1204,7 +1210,9 @@ const Stories = () => {
                         storiesOptions.map((item) => {
                           if (item.metadata.category === category.name) {
                             return (
-                              <li key={item.story}>
+                              <li
+                                key={`${item.story}-${item.metadata.category}`}
+                              >
                                 <button
                                   className={cx(style.listBtn)}
                                   data-check={
