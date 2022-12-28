@@ -436,7 +436,7 @@ const Stories = () => {
   const saveMenu = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
   ) => {
-    const senderId = document.querySelectorAll('#senderId > ul');
+    const senderId = document.querySelectorAll('#senderId > div > ul');
     senderId.forEach((key) => {
       key.setAttribute('data-open', 'noopen');
     });
@@ -1125,53 +1125,55 @@ const Stories = () => {
                 />
               </div> */}
             </div>
-            {categories &&
-              categories.map((category) => {
-                return (
-                  <ul
-                    data-open="noopen"
-                    key={category.name}
-                    className={cx(style.listmenu)}
-                    onClick={(e) => saveMenu(e.target)}
-                  >
-                    {category.name}
-                    <hr />
-                    {storiesOptions &&
-                      storiesOptions.map((item) => {
-                        if (item.metadata.category === category.name) {
-                          return (
-                            <li key={item.story}>
-                              <button
-                                className={cx(style.listBtn)}
-                                data-check="none"
-                                value={item.story}
-                                onClick={(e) => atSelectStory(e.target.value)}
-                              >
-                                {item.story}
-                              </button>
-                            </li>
-                          );
-                        }
-                        return null;
-                      })}
-                  </ul>
-                );
-              })}
-            {/* <ul className={cx(style.listmenu)}>
-              {storiesOptions &&
-                storiesOptions.map((item) => (
-                  <li key={item.story}>
-                    <button
-                      className={cx(style.listBtn)}
-                      data-check="none"
-                      value={item.story}
-                      onClick={(e) => atSelectStory(e.target.value)}
+            <div className={cx(style.listBlock)}>
+              {categories &&
+                categories.map((category) => {
+                  return (
+                    <ul
+                      data-open="noopen"
+                      key={category.name}
+                      className={cx(style.listmenu)}
+                      onClick={(e) => saveMenu(e.target)}
                     >
-                      {item.story}
-                    </button>
-                  </li>
-                ))}
-            </ul> */}
+                      {category.name}
+                      <hr />
+                      {storiesOptions &&
+                        storiesOptions.map((item) => {
+                          if (item.metadata.category === category.name) {
+                            return (
+                              <li key={item.story}>
+                                <button
+                                  className={cx(style.listBtn)}
+                                  data-check="none"
+                                  value={item.story}
+                                  onClick={(e) => atSelectStory(e.target.value)}
+                                >
+                                  {item.story}
+                                </button>
+                              </li>
+                            );
+                          }
+                          return null;
+                        })}
+                    </ul>
+                  );
+                })}
+              {/* <ul className={cx(style.listmenu)}>
+                {storiesOptions &&
+                  storiesOptions.map((item) => (
+                    <li key={item.story}>
+                      <button
+                        className={cx(style.listBtn)}
+                        data-check="none"
+                        value={item.story}
+                        onClick={(e) => atSelectStory(e.target.value)}
+                      >
+                        {item.story}
+                      </button>
+                    </li>
+                  ))}
+              </ul> */}
+            </div>
           </div>
         </div>
       </div>
