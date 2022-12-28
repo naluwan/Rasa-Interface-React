@@ -113,10 +113,13 @@
       border: none;
       text-align: left;
       width: 100%;
-      // border-bottom: 1px solid #949494;
       border-radius: 5px;
       padding: 10px;
       pointer-events: none;
+
+      &[data-check="check"] {
+        background: #e0e0e0;
+      }
 
       &:hover {
 
