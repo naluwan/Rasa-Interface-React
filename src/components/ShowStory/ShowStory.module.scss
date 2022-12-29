@@ -15,9 +15,13 @@
   }
 
   .tilteBlock {
-    padding:  10px 0;
-  }
+    padding: 10px 0;
+    flex-wrap: wrap;
 
+  }
+  .editBlock{
+    flex-wrap: wrap;
+  }
   .title {
     color: #000000;
     font-weight: bold;

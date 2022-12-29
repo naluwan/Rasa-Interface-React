@@ -215,13 +215,15 @@ const ShowStory: React.FC<ShowStoryProps> = (props) => {
 
   return (
     <div data-showstory className={style.root}>
-      <div className={cx('col d-flex align-items-center', style.tilteBlock)}>
+      <div className={cx('d-flex align-items-center', style.tilteBlock)}>
         <div className={style.title}>{story.story}</div>
         {story.story !== '問候語' && (
-          <div className="col-2 mx-4 d-flex justify-content-between">
+          <div
+            className={cx(' d-flex justify-content-between', style.editBlock)}
+          >
             <button
               type="button"
-              className="btn btn-primary"
+              className={cx('btn btn-primary mx-4', style.deletStory)}
               data-bs-toggle="modal"
               data-bs-target="#editStoryModal"
             >
