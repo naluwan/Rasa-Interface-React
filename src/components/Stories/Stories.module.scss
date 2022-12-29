@@ -59,6 +59,7 @@
 }
 
 .storiesSelector {
+
   border: 1px solid #ccc;
   font-size: 16px;
   margin: 10px 0;
@@ -67,7 +68,11 @@
   display: inline-block;
   width: 100%;
   border-radius: 5px;
-
+  -webkit-appearance: none;
+  option {
+      width: 100%;
+      -webkit-appearance: none;
+    }
   .categoryDisabled {
     font-weight: 900;
     font-size: 16px;
@@ -97,9 +102,10 @@
 }
 
 .listBlock {
-  overflow-y: auto;
-  width: 100%;
+  overflow-y: scroll;
+  width: calc(100% + 30px);
   height: calc(100% - 127px);
+  margin-right: -30px;
 
   .listmenu {
     padding-bottom: 0;
@@ -114,6 +120,7 @@
       position: relative;
       opacity: .5;
       overflow: initial;
+
       &::before {
         content: "";
         position: absolute;
@@ -121,7 +128,7 @@
         width: 15px;
         height: 15px;
         opacity: 1;
-        right: 0;
+        right: 20px;
         transform: rotate(90deg);
         display: block;
         z-index: 130;
@@ -134,10 +141,11 @@
       background: #fff;
       border: none;
       text-align: left;
-      width: 100%;
+      width: calc(100% - 15px);
       border-radius: 5px;
       padding: 10px;
       pointer-events: none;
+
 
       &[data-check="check"] {
         background: #e0e0e0;
@@ -173,7 +181,7 @@
           width: 10px;
           height: 15px;
           opacity: 1;
-          right: 0;
+          right: 20px;
           transform: rotate(-90deg);
           display: block;
           z-index: 130;
@@ -233,6 +241,7 @@
     display: flex;
     margin: 0 auto;
     justify-content: space-between;
+    flex-wrap: wrap;
   }
 
   .listBlock {

@@ -2,11 +2,21 @@
   // transform: translate(-50%, -50%);
   backdrop-filter: blur(20px);
   display: block;
-  padding: 20px;
+  padding: 0 20px 20px 20px;
   box-sizing: border-box;
   background: #ececec;
   width: 100%;
   height: 100%;
+  overflow: hidden;
+  flex-wrap: wrap;
+
+  .deletStory {
+    word-break: keep-all;
+  }
+
+  .tilteBlock {
+    padding:  10px 0;
+  }
 
   .title {
     color: #000000;
@@ -17,13 +27,13 @@
   .stepsPanel {
     padding: 15px;
     overflow-y: scroll;
-    height: 90%;
+    height: calc(90% - 70px);
   }
 }
 
 @media (max-width: 960px) {
   .root {
-    height: calc(100% - 197px);
+    height: calc(100% - 186px);
   }
 }
 

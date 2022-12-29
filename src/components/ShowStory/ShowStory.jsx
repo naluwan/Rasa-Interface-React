@@ -215,7 +215,7 @@ const ShowStory: React.FC<ShowStoryProps> = (props) => {
 
   return (
     <div data-showstory className={style.root}>
-      <div className="col d-flex align-items-center">
+      <div className={cx('col d-flex align-items-center', style.tilteBlock)}>
         <div className={style.title}>{story.story}</div>
         {story.story !== '問候語' && (
           <div className="col-2 mx-4 d-flex justify-content-between">
@@ -229,7 +229,7 @@ const ShowStory: React.FC<ShowStoryProps> = (props) => {
             </button>
             <button
               type="button"
-              className="btn btn-danger"
+              className={cx('btn btn-danger mx-4', style.deletStory)}
               onClick={() => onDeleteStory(story.story)}
             >
               刪除故事

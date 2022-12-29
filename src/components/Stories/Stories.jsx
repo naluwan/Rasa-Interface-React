@@ -26,12 +26,11 @@ const Stories = () => {
    * @type {[boolean, Function]}
    */
   const [create, setCreate] = React.useState(false);
-
   /**
    * @type {[string, Function]}
    */
-  const [defaultValue, setDefaultValue] = React.useState('');
 
+  const [defaultValue, setDefaultValue] = React.useState('');
   /**
    * @type {[StoryType, Function]}
    */
@@ -40,12 +39,10 @@ const Stories = () => {
     steps: [],
     metadata: { category: '', create: false },
   });
-
   /**
    * @type {[{key:string,slotInfo:{type:string,values?:string[]}}[], Function]}
    */
   const [slots, setSlots] = React.useState([]);
-
   const {
     story,
     stories,
@@ -62,10 +59,6 @@ const Stories = () => {
     onSetRasaTrainState,
     onSetAllCategories,
     categories,
-    onSetSelectedCategory,
-    selectedCategory,
-    onSetSelectedStory,
-    selectedStory,
   } = useStoryStore((state: State) => {
     return {
       story: state.story,
@@ -83,10 +76,6 @@ const Stories = () => {
       onSetRasaTrainState: state.onSetRasaTrainState,
       onSetAllCategories: state.onSetAllCategories,
       categories: state.categories,
-      onSetSelectedCategory: state.onSetSelectedCategory,
-      selectedCategory: state.selectedCategory,
-      onSetSelectedStory: state.onSetSelectedStory,
-      selectedStory: state.selectedStory,
     };
   }, shallow);
 
@@ -404,6 +393,19 @@ const Stories = () => {
   // 選擇故事
   const atSelectStory = React.useCallback(
     (storyName: string) => {
+      setTimeout(() => {
+        const senderId = document.querySelectorAll('#senderId > div > ul');
+        senderId.forEach((key) => {
+          key.setAttribute('data-open', 'noopen');
+        });
+        const button = document.querySelectorAll('#senderId > div > ul button');
+        button.forEach((item) => {
+          item.setAttribute('data-check', 'none');
+        });
+        const elemt = document.querySelector(`[name="${storyName}"]`);
+        elemt.setAttribute('data-check', 'check');
+        elemt.parentNode.parentNode.setAttribute('data-open', 'open');
+      }, 0);
       if (Object.keys(newStory).length !== 0) {
         return confirmWidget(newStory.story, null).then((result) => {
           if (!result.isConfirmed) return;
@@ -415,11 +417,9 @@ const Stories = () => {
             story: '',
             steps: [],
           });
+          onSetStory(storyName);
           setCreate(false);
           setDefaultValue(storyName);
-          onSetSelectedCategory(story.metadata?.category);
-          onSetSelectedStory(storyName);
-          onSetStory(storyName);
           onInitialNewStory();
         });
       }
@@ -431,12 +431,9 @@ const Stories = () => {
         story: '',
         steps: [],
       });
-
+      onSetStory(storyName);
       setCreate(false);
       setDefaultValue(storyName);
-      onSetSelectedCategory(story.metadata?.category);
-      onSetSelectedStory(storyName);
-      onSetStory(storyName);
       return onInitialNewStory();
     },
     [
@@ -445,22 +442,22 @@ const Stories = () => {
       onInitialNewStory,
       onSetSelectedBranchStory,
       onSetSelectedConnectBranchStory,
-      onSetSelectedCategory,
-      story.metadata?.category,
-      onSetSelectedStory,
     ],
   );
 
   // 側邊攔收藏
-  // const saveMenu = React.useCallback((categoryName: string) => {
-  //   setSelectedCategory(categoryName);
-  // const senderId = document.querySelectorAll('#senderId > div > ul');
-  // senderId.forEach((key) => {
-  //   key.setAttribute('data-open', 'noopen');
-  // });
-  // target.setAttribute('data-open', 'open');
-  // }, []);
+  const saveMenu = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
+  ) => {
+    const senderId = document.querySelectorAll('#senderId > div > ul');
+    senderId.forEach((key) => {
+      key.setAttribute('data-open', 'noopen');
+    });
 
+    if (e.name === undefined) {
+      e.setAttribute('data-open', 'open');
+    }
+  };
   // 新增故事
   /* const atClickCreateStoryBtn = React.useCallback(() => {
   if (Object.keys(newStory).length !== 0) {
@@ -1176,7 +1173,7 @@ const Stories = () => {
                                 key={`${item.metadata.category}-${item.story}`}
                                 value={item.story}
                               >
-                                {item.story}
+                                &nbsp;&nbsp;&nbsp;&nbsp;{item.story}
                               </option>
                             ),
                         )}
@@ -1196,12 +1193,10 @@ const Stories = () => {
                 categories.map((category) => {
                   return (
                     <ul
-                      data-open={
-                        selectedCategory === category.name ? 'open' : 'noopen'
-                      }
-                      key={category.name}
+                      data-open="noopen"
+                      key={`list-${category.name}`}
                       className={cx(style.listmenu)}
-                      onClick={() => onSetSelectedCategory(category.name)}
+                      onClick={(e) => saveMenu(e.target)}
                     >
                       {category.name}
                       <hr />
@@ -1210,15 +1205,11 @@ const Stories = () => {
                           if (item.metadata.category === category.name) {
                             return (
                               <li
-                                key={`${item.story}-${item.metadata.category}`}
+                                key={`list-${item.metadata.category}-${item.story}`}
                               >
                                 <button
                                   className={cx(style.listBtn)}
-                                  data-check={
-                                    selectedStory === item.story
-                                      ? 'check'
-                                      : 'none'
-                                  }
+                                  data-check="none"
                                   name={item.story}
                                   value={item.story}
                                   onClick={(e) => atSelectStory(e.target.value)}
