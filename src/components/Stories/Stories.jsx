@@ -6,6 +6,7 @@ import {
   fetchAllAction,
   fetchAllCategories,
   postCategory,
+  deleteCategory,
 } from 'services/api';
 import shallow from 'zustand/shallow';
 import type { State, StoryType, CreateStoryState } from 'components/types';
@@ -116,6 +117,21 @@ const Stories = () => {
   React.useEffect(() => {
     onSetAllCategories(allCategories.data);
   }, [allCategories.data, onSetAllCategories]);
+
+  // 故事類別或stories更新時，判斷類別下是否有故事
+  React.useEffect(() => {
+    categories?.map((category) => {
+      const hasStory = stories.some(
+        (item) => item.metadata?.category === category.name,
+      );
+      if (!hasStory) {
+        deleteCategory(category.name).then((updateCategories) =>
+          onSetAllCategories(updateCategories),
+        );
+      }
+      return category;
+    });
+  }, [categories, stories, onSetAllCategories]);
 
   // 只要資料有更新，就更新全部機器人回覆action name
   React.useEffect(() => {
@@ -856,17 +872,6 @@ const Stories = () => {
         return actionItem;
       });
 
-      const isNewCategory = categories.every(
-        (category) => category.name !== createStory.metadata.category,
-      );
-
-      // 判斷是否為新類別，如果是就新增類別
-      if (isNewCategory) {
-        postCategory(createStory.metadata.category).then((updateCategories) =>
-          onSetAllCategories(updateCategories),
-        );
-      }
-
       const newData = {
         stories: newStories,
         nlu: newNlu,
@@ -881,6 +886,7 @@ const Stories = () => {
             text: res.message,
           });
         }
+        onSetAllTrainData(res.data);
         // 導回故事瀏覽頁面
         Toast.fire({
           icon: 'success',
@@ -894,7 +900,19 @@ const Stories = () => {
           story: '',
           steps: [],
         });
-        onSetAllTrainData(res.data);
+        const isNewCategory = categories.every(
+          (category) => category.name !== createStory.metadata.category,
+        );
+
+        // 判斷是否為新類別，如果是就新增類別
+        if (isNewCategory) {
+          postCategory(createStory.metadata.category).then((updateCategories) =>
+            onSetAllCategories(updateCategories),
+          );
+        }
+
+        onSetSelectedCategory(createStory.metadata.category);
+        onSetSelectedStory(createStory.story);
         setCreate(false);
         onInitialNewStory();
         // setDefaultValue(createStory.story);
@@ -911,6 +929,8 @@ const Stories = () => {
       onSetSelectedBranchStory,
       onSetSelectedConnectBranchStory,
       onSetAllCategories,
+      onSetSelectedCategory,
+      onSetSelectedStory,
     ],
   );
 

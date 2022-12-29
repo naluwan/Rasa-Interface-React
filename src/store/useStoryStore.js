@@ -3056,16 +3056,6 @@ const reducer = (state: State, action: Action): State => {
         return item;
       });
 
-      const isNewCategory = categories.every(
-        (category) => category.name !== storyInfo.new.category,
-      );
-
-      if (isNewCategory) {
-        postCategory(storyInfo.new.category).then((updateCategories) =>
-          onSetAllCategories(updateCategories),
-        );
-      }
-
       const cloneData = {
         stories: newStories,
         nlu,
@@ -3092,6 +3082,17 @@ const reducer = (state: State, action: Action): State => {
           if (storyInfo.ori.story !== storyInfo.new.story) {
             onSetSelectedStory(storyInfo.new.story);
           }
+
+          const isNewCategory = categories.every(
+            (category) => category.name !== storyInfo.new.category,
+          );
+
+          if (isNewCategory) {
+            postCategory(storyInfo.new.category).then((updateCategories) =>
+              onSetAllCategories(updateCategories),
+            );
+          }
+
           return onSetStory(storyInfo.new.story);
         })
         .then(() => document.querySelector('#cancelEditStoryBtn').click());

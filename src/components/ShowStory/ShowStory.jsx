@@ -29,6 +29,17 @@ const ShowStory: React.FC<ShowStoryProps> = (props) => {
       category: story.metadata.category,
     },
   });
+
+  React.useEffect(() => {
+    setStoryInfo({
+      ori: { story: story.story, category: story.metadata.category },
+      new: {
+        story: story.story,
+        category: story.metadata.category,
+      },
+    });
+  }, [story]);
+
   const {
     onEditBotRes,
     onEditUserSay,
@@ -225,7 +236,7 @@ const ShowStory: React.FC<ShowStoryProps> = (props) => {
               type="button"
               className={cx('btn btn-primary mx-4', style.deletStory)}
               data-bs-toggle="modal"
-              data-bs-target="#editStoryModal"
+              data-bs-target={`#edit${story.story}StoryModal`}
             >
               編輯
             </button>
@@ -306,16 +317,19 @@ const ShowStory: React.FC<ShowStoryProps> = (props) => {
       {/* edit story modal */}
       <div
         className="modal"
-        id="editStoryModal"
+        id={`edit${story.story}StoryModal`}
         tabIndex="-1"
-        aria-labelledby="editStoryModalLabel"
+        aria-labelledby={`edit${story.story}StoryModalLabel`}
         aria-hidden="true"
         data-bs-backdrop="false"
       >
         <div className="modal-dialog  modal-lg modal-dialog-scrollable">
           <div className={cx('modal-content swal2-show', style.swtOut)}>
             <div>
-              <h2 className="swal2-title" id="editStoryModalLabel">
+              <h2
+                className="swal2-title"
+                id={`edit${story.story}StoryModalLabel`}
+              >
                 編輯故事資訊
               </h2>
               <button

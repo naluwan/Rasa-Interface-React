@@ -245,6 +245,16 @@ export const postCategory = (category: string): Promise<Categories[]> => {
   const payload = { name: category };
   return axiosInstance
     .post(`${API_URL}/train/category`, payload)
-    .then((categories) => categories.data.categories)
+    .then((categories) => categories.data.data)
+    .catch((err) => console.log(err));
+};
+
+// 刪除故事類別
+export const deleteCategory = (category: string): Promise<Categories[]> => {
+  console.log('category name ===> ', category);
+  const payload = { name: category };
+  return axiosInstance
+    .delete(`${API_URL}/train/category`, { data: payload })
+    .then((categories) => categories.data.data)
     .catch((err) => console.log(err));
 };
