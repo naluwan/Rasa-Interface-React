@@ -876,10 +876,9 @@ const Stories = () => {
 
       // 判斷是否為新類別，如果是就新增類別
       if (isNewCategory) {
-        postCategory(createStory.metadata.category).then((updateCategories) => {
-          console.log('update categories ===> ', updateCategories);
-          onSetAllCategories(updateCategories);
-        });
+        postCategory(createStory.metadata.category).then((updateCategories) =>
+          onSetAllCategories(updateCategories),
+        );
       }
 
       const newData = {
@@ -1254,19 +1253,19 @@ const Stories = () => {
         />
       )}
 
-      {/* add branch story modal */}
+      {/* create story modal */}
       <div
         className="modal"
         id="createNewStoryModal"
         tabIndex="-1"
-        aria-labelledby="createBranchStoryModalLabel"
+        aria-labelledby="createNewStoryModalLabel"
         aria-hidden="true"
         data-bs-backdrop="false"
       >
         <div className="modal-dialog  modal-lg modal-dialog-scrollable">
           <div className={cx('modal-content swal2-show', style.swtOut)}>
             <div>
-              <h2 className="swal2-title" id="createBranchStoryModalLabel">
+              <h2 className="swal2-title" id="createNewStoryModalLabel">
                 建立新故事
               </h2>
               <button

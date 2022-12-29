@@ -1,3 +1,5 @@
+import { Categories } from 'services/api';
+
 export type NavItemType = {
   id: number,
   name: string,
@@ -58,6 +60,7 @@ export type StepsType =
 export type StoryType = {
   story: string,
   steps: StepsType[],
+  metadata: { category: string },
 };
 
 export type ResponseType = {
@@ -114,6 +117,7 @@ export type State = {
   deletedStory: StoryType,
   actions: string[],
   storiesOptions: StoryType[],
+  categories: Categories,
   rasaTrainState: number,
   currentPage: string,
   selectedCategory: string,
@@ -329,6 +333,13 @@ export type State = {
   onSetSelectedCategory: (categoryName: string) => void,
   // 選擇故事
   onSetSelectedStory: (storyName: string) => void,
+  // 編輯故事資訊(名稱和類別)
+  onEditStoryInfo: (storyInfo: {
+    ori: { story: string, category: string },
+    new: { story: string, category: string, create?: boolean },
+  }) => void,
+  // 設定所有故事類別
+  onSetAllCategories: (categories: Categories[]) => void,
 };
 
 export type CreateStoryState = {

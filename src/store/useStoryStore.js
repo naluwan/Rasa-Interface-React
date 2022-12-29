@@ -10,6 +10,7 @@ import {
   postTrainDataToRasa,
   loadedNewModel,
   Categories,
+  postCategory,
 } from 'services/api';
 import type {
   RegisterUserInfoType,
@@ -59,6 +60,7 @@ import {
   actionConnectStoryEditResButtons,
   actionSelectedCategory,
   actionSelectedStory,
+  actionEditStoryInfo,
 } from 'actions';
 // import { computed } from 'zustand-middleware-computed-state';
 import { Toast } from 'utils/swalInput';
@@ -3032,6 +3034,68 @@ const reducer = (state: State, action: Action): State => {
         selectedStory: storyName,
       };
     }
+    case 'EDIT_STORY_INFO': {
+      const storyInfo = action.payload;
+      const { stories, nlu, domain } = cloneDeep(state.cloneData);
+      const {
+        categories,
+        onSetStory,
+        onSetAllTrainData,
+        onSetSelectedCategory,
+        onSetSelectedStory,
+        onSetAllCategories,
+      } = state;
+
+      const newStories = stories.map((item) => {
+        if (item.story === storyInfo.ori.story) {
+          item.story = storyInfo.new.story;
+          if (item.metadata.category === storyInfo.ori.category) {
+            item.metadata.category = storyInfo.new.category;
+          }
+        }
+        return item;
+      });
+
+      const isNewCategory = categories.every(
+        (category) => category.name !== storyInfo.new.category,
+      );
+
+      if (isNewCategory) {
+        postCategory(storyInfo.new.category).then((updateCategories) =>
+          onSetAllCategories(updateCategories),
+        );
+      }
+
+      const cloneData = {
+        stories: newStories,
+        nlu,
+        domain,
+      };
+
+      return postAllTrainData(cloneData)
+        .then((res) => {
+          if (res.status !== 'success') {
+            return Toast.fire({
+              icon: 'error',
+              title: '編輯故事資訊失敗',
+              text: res.message,
+            });
+          }
+          Toast.fire({
+            icon: 'success',
+            title: '編輯故事資訊成功',
+          });
+          onSetAllTrainData(res.data);
+          if (storyInfo.ori.category !== storyInfo.new.category) {
+            onSetSelectedCategory(storyInfo.new.category);
+          }
+          if (storyInfo.ori.story !== storyInfo.new.story) {
+            onSetSelectedStory(storyInfo.new.story);
+          }
+          return onSetStory(storyInfo.new.story);
+        })
+        .then(() => document.querySelector('#cancelEditStoryBtn').click());
+    }
     default:
       return state;
   }
@@ -3569,6 +3633,13 @@ const useStoryStore = create((set) => {
           connectStoryName,
         ),
       );
+    },
+    // 編輯故事資訊(名稱和類別)
+    onEditStoryInfo(storyInfo: {
+      ori: { story: string, category: string },
+      new: { story: string, category: string, create?: boolean },
+    }) {
+      dispatch(actionEditStoryInfo(storyInfo));
     },
   };
 });

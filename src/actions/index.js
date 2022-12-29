@@ -535,6 +535,13 @@ export type Action =
   | {
       type: 'SELECTED_STORY',
       payload: straing,
+    }
+  | {
+      type: 'EDIT_STORY_INFO',
+      payload: {
+        ori: { story: string, category: string },
+        new: { story: string, category: string, create?: boolean },
+      },
     };
 
 // ====================== query story ======================
@@ -957,6 +964,14 @@ export const actionSelectedCategory = (categoryName: string): Action => ({
 export const actionSelectedStory = (storyName: string): Action => ({
   type: 'SELECTED_STORY',
   payload: storyName,
+});
+
+export const actionEditStoryInfo = (storyInfo: {
+  ori: { story: string, category: string },
+  new: { story: string, category: string, create?: boolean },
+}): Action => ({
+  type: 'EDIT_STORY_INFO',
+  payload: storyInfo,
 });
 
 // ====================== create story ======================
