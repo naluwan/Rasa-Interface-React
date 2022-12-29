@@ -59,6 +59,10 @@ const Stories = () => {
     onSetRasaTrainState,
     onSetAllCategories,
     categories,
+    onSetSelectedCategory,
+    selectedCategory,
+    onSetSelectedStory,
+    selectedStory,
   } = useStoryStore((state: State) => {
     return {
       story: state.story,
@@ -76,6 +80,10 @@ const Stories = () => {
       onSetRasaTrainState: state.onSetRasaTrainState,
       onSetAllCategories: state.onSetAllCategories,
       categories: state.categories,
+      onSetSelectedCategory: state.onSetSelectedCategory,
+      selectedCategory: state.selectedCategory,
+      onSetSelectedStory: state.onSetSelectedStory,
+      selectedStory: state.selectedStory,
     };
   }, shallow);
 
@@ -393,19 +401,6 @@ const Stories = () => {
   // 選擇故事
   const atSelectStory = React.useCallback(
     (storyName: string) => {
-      setTimeout(() => {
-        const senderId = document.querySelectorAll('#senderId > div > ul');
-        senderId.forEach((key) => {
-          key.setAttribute('data-open', 'noopen');
-        });
-        const button = document.querySelectorAll('#senderId > div > ul button');
-        button.forEach((item) => {
-          item.setAttribute('data-check', 'none');
-        });
-        const elemt = document.querySelector(`[name="${storyName}"]`);
-        elemt.setAttribute('data-check', 'check');
-        elemt.parentNode.parentNode.setAttribute('data-open', 'open');
-      }, 0);
       if (Object.keys(newStory).length !== 0) {
         return confirmWidget(newStory.story, null).then((result) => {
           if (!result.isConfirmed) return;
@@ -417,9 +412,11 @@ const Stories = () => {
             story: '',
             steps: [],
           });
-          onSetStory(storyName);
           setCreate(false);
           setDefaultValue(storyName);
+          onSetSelectedCategory(story.metadata?.category);
+          onSetSelectedStory(storyName);
+          onSetStory(storyName);
           onInitialNewStory();
         });
       }
@@ -431,9 +428,11 @@ const Stories = () => {
         story: '',
         steps: [],
       });
-      onSetStory(storyName);
       setCreate(false);
       setDefaultValue(storyName);
+      onSetSelectedCategory(story.metadata?.category);
+      onSetSelectedStory(storyName);
+      onSetStory(storyName);
       return onInitialNewStory();
     },
     [
@@ -442,22 +441,12 @@ const Stories = () => {
       onInitialNewStory,
       onSetSelectedBranchStory,
       onSetSelectedConnectBranchStory,
+      onSetSelectedCategory,
+      story.metadata?.category,
+      onSetSelectedStory,
     ],
   );
 
-  // 側邊攔收藏
-  const saveMenu = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
-  ) => {
-    const senderId = document.querySelectorAll('#senderId > div > ul');
-    senderId.forEach((key) => {
-      key.setAttribute('data-open', 'noopen');
-    });
-
-    if (e.name === undefined) {
-      e.setAttribute('data-open', 'open');
-    }
-  };
   // 新增故事
   /* const atClickCreateStoryBtn = React.useCallback(() => {
   if (Object.keys(newStory).length !== 0) {
@@ -1193,10 +1182,12 @@ const Stories = () => {
                 categories.map((category) => {
                   return (
                     <ul
-                      data-open="noopen"
+                      data-open={
+                        selectedCategory === category.name ? 'open' : 'noopen'
+                      }
                       key={`list-${category.name}`}
                       className={cx(style.listmenu)}
-                      onClick={(e) => saveMenu(e.target)}
+                      onClick={() => onSetSelectedCategory(category.name)}
                     >
                       {category.name}
                       <hr />
@@ -1209,7 +1200,11 @@ const Stories = () => {
                               >
                                 <button
                                   className={cx(style.listBtn)}
-                                  data-check="none"
+                                  data-check={
+                                    selectedStory === item.story
+                                      ? 'check'
+                                      : 'none'
+                                  }
                                   name={item.story}
                                   value={item.story}
                                   onClick={(e) => atSelectStory(e.target.value)}
