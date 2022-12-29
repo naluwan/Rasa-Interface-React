@@ -67,7 +67,8 @@
   display: inline-block;
   width: 100%;
   border-radius: 5px;
-  .categoryDisabled{
+
+  .categoryDisabled {
     font-weight: 900;
     font-size: 16px;
     background: #ccc;
@@ -110,7 +111,23 @@
     margin: 10px 0;
 
     hr {
-      margin-top: 0;
+      position: relative;
+      opacity: .5;
+      overflow: initial;
+      &::before {
+        content: "";
+        position: absolute;
+        top: -2rem;
+        width: 15px;
+        height: 15px;
+        opacity: 1;
+        right: 0;
+        transform: rotate(90deg);
+        display: block;
+        z-index: 130;
+        background: url(../../images/Control.svg) no-repeat;
+        transition: all .3s;
+      }
     }
 
     button {
@@ -148,10 +165,28 @@
     }
 
     &[data-open="open"] {
+      hr {
+        &::before {
+          content: "";
+          position: absolute;
+          top: -2rem;
+          width: 10px;
+          height: 15px;
+          opacity: 1;
+          right: 0;
+          transform: rotate(-90deg);
+          display: block;
+          z-index: 130;
+          background: url(../../images/Control.svg) no-repeat;
+          transition: all .3s;
+        }
+      }
+
       li {
         transition: all .3s;
         opacity: 1;
         height: auto;
+        margin: 5px 0;
 
         button {
           pointer-events: all;
