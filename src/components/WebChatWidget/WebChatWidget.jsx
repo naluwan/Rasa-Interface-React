@@ -74,8 +74,7 @@ const WebChatWidget = () => {
         }}
       />
       {base64Url && (
-        <audio autoPlay="autoPlay">
-          <source src={`data:audio/wav;base64,${base64Url}`} />
+        <audio src={`data:audio/wav;base64,${base64Url}`} autoPlay="true">
           <track src="botResponse_zh.vtt" kind="captions" />
         </audio>
       )}
