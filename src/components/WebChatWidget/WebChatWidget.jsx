@@ -1,14 +1,14 @@
 import * as React from 'react';
 import Widget from 'rasa-webchat';
-// import style from './WebChatWidget.module.scss';
 import type { State } from 'components/types';
 import shallow from 'zustand/shallow';
 import axios from 'axios';
+import style from './WebChatWidget.module.scss';
 import useStoryStore from '../../store/useStoryStore';
 
 const WebChatWidget = () => {
-  // eslint-disable-next-line no-unused-vars
   const [base64Url, setBase64Url] = React.useState('');
+  const [voice, setVoice] = React.useState(true);
   const { user } = useStoryStore((state: State) => {
     return {
       user: state.user,
@@ -27,11 +27,14 @@ const WebChatWidget = () => {
     }
   };
 
-  console.log('base64Url ==> ', base64Url);
+  const title = document.querySelector('title').innerText;
+
+  // 重整就消除對話紀錄
+  window.sessionStorage.clear();
 
   return (
     // eslint-disable-next-line jsx-a11y/no-static-element-interactions
-    <div onKeyDown={handleKeyDown}>
+    <div onKeyDown={handleKeyDown} className={style.root}>
       <Widget
         interval={2000}
         initPayload="/get_started"
@@ -40,7 +43,7 @@ const WebChatWidget = () => {
         customData={{ language: 'zh', userId: user.cpnyId }}
         profileAvatar={user.image}
         inputTextFieldHint="請輸入內容...."
-        title={user.chatbotName}
+        title={user.chatbotName ? user.chatbotName : title}
         params={{ storage: 'session' }}
         showFullScreenButton
         showCloseButton
@@ -48,33 +51,40 @@ const WebChatWidget = () => {
         mainColor="#2d304c"
         onSocketEvent={{
           bot_uttered: (res) => {
+            setBase64Url('');
             if (res.text) {
               const { text } = res;
-              console.log('bot res ==> ', text);
               axios
                 .post(`http://192.168.10.105:8010/tts/offline`, { text })
                 .then((base64) => {
-                  console.log('get text2voice base64 ==> ', base64.data.result);
                   setBase64Url(base64.data.result);
-                  // if (document.querySelector('#botResVoice')) {
-                  //   document.querySelector('#botResVoice').remove();
-                  // }
-                  // // const audioHtml = ;
-                  // document.querySelector('.rw-chat-open').appendChild(
-                  //   <audio id="botResVoice" autoPlay="autoPlay">
-                  //     <source src={`data:audio/wav;base64,${base64Url}`} />
-                  //     <track src="botResponse_zh.vtt" kind="captions" />
-                  //   </audio>,
-                  // );
                 })
-                // .then(() => setBase64Url(''))
                 .catch((err) => console.log(err));
             }
           },
         }}
+        onWidgetEvent={{
+          onChatOpen() {
+            const voiceBtn = document.createElement('button');
+            voiceBtn.id = 'voiceBtn';
+            voiceBtn.onclick = function clickVoiceBtn(event) {
+              event.target.classList.toggle('close');
+              setVoice((prev) => !prev);
+            };
+            setTimeout(() => {
+              document
+                .querySelector('.rw-toggle-fullscreen-button')
+                .insertAdjacentElement('beforebegin', voiceBtn);
+            }, 0);
+          },
+        }}
       />
-      {base64Url && (
-        <audio src={`data:audio/wav;base64,${base64Url}`} autoPlay="true">
+      {base64Url && voice && (
+        <audio
+          id="botResVoice"
+          src={`data:audio/wav;base64,${base64Url}`}
+          autoPlay
+        >
           <track src="botResponse_zh.vtt" kind="captions" />
         </audio>
       )}

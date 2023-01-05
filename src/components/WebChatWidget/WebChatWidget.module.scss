@@ -1,3 +1,15 @@
 .root {
-  
+  :global(#voiceBtn) {
+    background: url('../../images/btnIcon/voiceOpen.svg') center/80% no-repeat;
+    border: none;
+    width: 40px;
+    display: inline-block;
+    vertical-align: middle;
+  }
+  :global(#voiceBtn:hover) {
+    background: url('../../images/btnIcon/voiceOpen.svg') center/90% no-repeat;
+  }
+  :global(#voiceBtn.close) {
+    background: url('../../images/btnIcon/voiceClose.svg') center/80% no-repeat;
+  }
 }
