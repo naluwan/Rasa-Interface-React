@@ -258,3 +258,21 @@ export const deleteCategory = (category: string): Promise<Categories[]> => {
     .then((categories) => categories.data.data)
     .catch((err) => console.log(err));
 };
+
+export const fetchTextToVoice = (text: string) => {
+  console.log('fetch text ===> ', text);
+  axios
+    .get(`http://192.168.10.105:8888/text2voice?text=${text}`)
+    .then((res) => console.log('res ===> ', res))
+    .catch((err) => console.log(err));
+};
+
+export const paddleSpeech = (text: string) => {
+  axios
+    .post(`http://192.168.10.105:8010/tts/offline`, { text })
+    .then((res) => {
+      console.log('get text2voice base64 ==> ', res.data.result);
+      return res.data.result;
+    })
+    .catch((err) => console.log(err));
+};
