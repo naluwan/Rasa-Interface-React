@@ -1288,9 +1288,11 @@ const UserStep: React.FC<UserStepProps> = (props) => {
                           );
                         })
                       ) : (
-                        <div className="alert alert-warning" role="alert">
-                          沒有例句資料，請先添加例句
-                        </div>
+                        <tr>
+                          <td className="alert alert-warning" role="alert">
+                            沒有例句資料，請先添加例句
+                          </td>
+                        </tr>
                       )}
                     </tbody>
                   </table>

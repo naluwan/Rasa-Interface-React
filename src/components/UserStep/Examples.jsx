@@ -3,16 +3,6 @@ import * as React from 'react';
 import style from './Examples.module.scss';
 import { confirmWidget } from '../../utils/swalInput';
 
-// RecordElement;
-type RecordElementProps = {
-  name: Object,
-};
-
-const RecordElement: React.FC<RecordElementProps> = (props) => {
-  const { name } = props;
-  return name.map((el) => <div>{el}</div>);
-};
-
 type ExamplesPropsType = {
   text: string,
   intent: string,
@@ -44,16 +34,8 @@ const Examples: React.FC<ExamplesPropsType> = (props) => {
           const entitys = [];
           const textSlice = [];
 
-          entities.map((entityItem: any, index: any): void => {
+          entities.map((entityItem: any): void => {
             const { entity, value, start, end } = entityItem;
-
-            if (index === 0) {
-              keyValue.push(value);
-              entitys.push(entity);
-              textSlice.push(text.slice(start, end));
-
-              return;
-            }
 
             keyValue.push(value);
             entitys.push(entity);
@@ -61,15 +43,9 @@ const Examples: React.FC<ExamplesPropsType> = (props) => {
           });
           return (
             <>
-              <td className={style.tbltd}>
-                <RecordElement name={textSlice} />
-              </td>
-              <td className={style.tbltd}>
-                <RecordElement name={keyValue} />
-              </td>
-              <td className={style.tbltd}>
-                <RecordElement name={entitys} />
-              </td>
+              <td className={style.tbltd}>{textSlice}</td>
+              <td className={style.tbltd}>{keyValue}</td>
+              <td className={style.tbltd}>{entitys}</td>
             </>
           );
         })()
