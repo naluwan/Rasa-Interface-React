@@ -288,7 +288,7 @@ const Slots: React.FC<SlotsPropsType> = (props) => {
       // 將資料送進store並操作資料庫
       onCreateSlot(slotValue);
       // 關閉新增視窗
-      document.querySelector('#addSlotModal .modal-header button').click();
+      document.querySelector('#addSlotModal .swal2-close').click();
     },
     [onCreateSlot],
   );
@@ -512,7 +512,7 @@ const Slots: React.FC<SlotsPropsType> = (props) => {
 
       onAddSlotValue(slotValues);
       // 關閉新增儲存槽視窗
-      document.querySelector('#addSlotValueModal .btn-close').click();
+      document.querySelector('#addSlotValueModal .swal2-close').click();
     },
     [setNewSlotValues, onAddSlotValue],
   );
