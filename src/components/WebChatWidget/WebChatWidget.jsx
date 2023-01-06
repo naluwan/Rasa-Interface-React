@@ -21,6 +21,9 @@ const WebChatWidget = () => {
         // @ts-ignore
         // eslint-disable-next-line
         document.querySelector(".rw-send").click();
+
+        // 清空輸入框
+        document.querySelector('.rw-new-message').innerHTML = '';
       } catch (e) {
         console.log(e);
       }
