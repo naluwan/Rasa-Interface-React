@@ -6,7 +6,7 @@ import Swal from 'sweetalert2';
 import shallow from 'zustand/shallow';
 import uuid from 'react-uuid';
 import { CgAddR } from 'react-icons/cg';
-import { createRoot } from 'react-dom/client';
+// import { createRoot } from 'react-dom/client';
 import { BsTrashFill } from 'react-icons/bs';
 import style from './UserStep.module.scss';
 import type {
@@ -136,7 +136,7 @@ const UserStep: React.FC<UserStepProps> = (props) => {
     onCreateBranchStory,
   } = props;
 
-  const { examples } = step;
+  // const { examples } = step;
 
   const { nlu, domain, actions, stories, onAddBranchStory, onAddConnectStory } =
     useStoryStore((state: State) => {
@@ -403,166 +403,166 @@ const UserStep: React.FC<UserStepProps> = (props) => {
 
   // steven start
   // 新增例句
-  const atCreateExamples = React.useCallback(() => {
-    Swal.fire({
-      title: '新增例句',
-      html: "<div id='CreateExample'></div>",
-      showCloseButton: true,
-      showCancelButton: true,
-      focusConfirm: false,
-      confirmButtonText: '儲存',
-      cancelButtonText: '返回',
-      confirmButtonAriaLabel: 'Thumbs up, great!',
-      cancelButtonAriaLabel: 'Thumbs down',
-      closeOnConfirm: false,
-      reverseButtons: true,
-      closeOnCancel: false,
-    }).then((result) => {
-      if (result.isConfirmed) {
-        atCreateExample(step.intent, entitiesData, storyName);
-      } else {
-        setTimeout(() => {
-          document.querySelector('#examplesBtn').click();
-        }, 0);
-      }
-    });
+  // const atCreateExamples = React.useCallback(() => {
+  //   Swal.fire({
+  //     title: '新增例句',
+  //     html: "<div id='CreateExample'></div>",
+  //     showCloseButton: true,
+  //     showCancelButton: true,
+  //     focusConfirm: false,
+  //     confirmButtonText: '儲存',
+  //     cancelButtonText: '返回',
+  //     confirmButtonAriaLabel: 'Thumbs up, great!',
+  //     cancelButtonAriaLabel: 'Thumbs down',
+  //     closeOnConfirm: false,
+  //     reverseButtons: true,
+  //     closeOnCancel: false,
+  //   }).then((result) => {
+  //     if (result.isConfirmed) {
+  //       atCreateExample(step.intent, entitiesData, storyName);
+  //     } else {
+  //       setTimeout(() => {
+  //         document.querySelector('#examplesBtn').click();
+  //       }, 0);
+  //     }
+  //   });
 
-    setTimeout(() => {
-      let CreateExamples = '';
-      CreateExamples = (
-        <div className="modal-body">
-          <div className="mb-3">
-            <input
-              type="text"
-              className="form-control"
-              id={`input-${step.intent}-example`}
-              placeholder="請輸入例句"
-            />
-          </div>
-          {entitiesData.length > 0 && (
-            <div className="d-flex flex-column">
-              {entitiesData.map((entityItem) => {
-                return (
-                  <div
-                    className="mb-3 p-2 border border-success rounded"
-                    key={`${entityItem.start}-${entityItem.start}-${entityItem.entity}-${entityItem.value}`}
-                  >
-                    <input
-                      type="text"
-                      className="form-control mb-2"
-                      id={`input-${entityItem.entity}-entities-show-value`}
-                      placeholder={`請輸入關鍵字代表值為『${entityItem.entity}』的關鍵字`}
-                    />
-                    <input
-                      type="text"
-                      className="form-control"
-                      id={`input-${entityItem.entity}-entities-value`}
-                      placeholder={`請輸入關鍵字代表值為『${entityItem.entity}』的儲存槽值`}
-                    />
-                  </div>
-                );
-              })}
-            </div>
-          )}
-        </div>
-      );
-      createRoot(document.getElementById('CreateExample')).render(
-        CreateExamples,
-      );
-    }, 0);
-  }, []);
+  //   setTimeout(() => {
+  //     let CreateExamples = '';
+  //     CreateExamples = (
+  //       <div className="modal-body">
+  //         <div className="mb-3">
+  //           <input
+  //             type="text"
+  //             className="form-control"
+  //             id={`input-${step.intent}-example`}
+  //             placeholder="請輸入例句"
+  //           />
+  //         </div>
+  //         {entitiesData.length > 0 && (
+  //           <div className="d-flex flex-column">
+  //             {entitiesData.map((entityItem) => {
+  //               return (
+  //                 <div
+  //                   className="mb-3 p-2 border border-success rounded"
+  //                   key={`${entityItem.start}-${entityItem.start}-${entityItem.entity}-${entityItem.value}`}
+  //                 >
+  //                   <input
+  //                     type="text"
+  //                     className="form-control mb-2"
+  //                     id={`input-${entityItem.entity}-entities-show-value`}
+  //                     placeholder={`請輸入關鍵字代表值為『${entityItem.entity}』的關鍵字`}
+  //                   />
+  //                   <input
+  //                     type="text"
+  //                     className="form-control"
+  //                     id={`input-${entityItem.entity}-entities-value`}
+  //                     placeholder={`請輸入關鍵字代表值為『${entityItem.entity}』的儲存槽值`}
+  //                   />
+  //                 </div>
+  //               );
+  //             })}
+  //           </div>
+  //         )}
+  //       </div>
+  //     );
+  //     createRoot(document.getElementById('CreateExample')).render(
+  //       CreateExamples,
+  //     );
+  //   }, 0);
+  // }, []);
 
   // 編輯例句
-  const atexampleBtn = React.useCallback(() => {
-    Swal.fire({
-      title: '例句',
-      html: "<div id='examplesTable'> 沒有例句資料，請先添加例句</div>",
-      width: 1000,
-      showCloseButton: true,
-      showCancelButton: true,
-      focusConfirm: false,
-      confirmButtonText: '新增例句',
-      cancelButtonText: '取消',
-      confirmButtonAriaLabel: 'Thumbs up, great!',
-      cancelButtonAriaLabel: 'Thumbs down',
-      preConfirm: () => {
-        atCreateExamples();
-      },
-    });
-    // inner Dynamic Content
-    setTimeout(() => {
-      console.log('setTimeout');
+  // const atexampleBtn = React.useCallback(() => {
+  //   Swal.fire({
+  //     title: '例句',
+  //     html: "<div id='examplesTable'> 沒有例句資料，請先添加例句</div>",
+  //     width: 1000,
+  //     showCloseButton: true,
+  //     showCancelButton: true,
+  //     focusConfirm: false,
+  //     confirmButtonText: '新增例句',
+  //     cancelButtonText: '取消',
+  //     confirmButtonAriaLabel: 'Thumbs up, great!',
+  //     cancelButtonAriaLabel: 'Thumbs down',
+  //     preConfirm: () => {
+  //       atCreateExamples();
+  //     },
+  //   });
+  //   // inner Dynamic Content
+  //   setTimeout(() => {
+  //     console.log('setTimeout');
 
-      let extable = '';
-      let render = false;
-      if (examples.length > 0) {
-        extable = (
-          <div>
-            <table>
-              <thead>
-                <tr className={cx(style.tblHead, style.tblHeader)}>
-                  <th className={cx(style.tblHead)} rowSpan="2">
-                    例句
-                  </th>
-                  <th className={cx(style.tblHead)} rowSpan="2">
-                    關鍵字
-                  </th>
-                  <th className={cx(style.tblHead)} rowSpan="2">
-                    儲存槽
-                  </th>
-                  <th className={cx(style.tblHead)} rowSpan="2">
-                    紀錄槽
-                  </th>
-                  <th className={cx(style.tblHead)} rowSpan="2">
-                    操作
-                  </th>
-                </tr>
-              </thead>
+  //     let extable = '';
+  //     let render = false;
+  //     if (examples.length > 0) {
+  //       extable = (
+  //         <div>
+  //           <table>
+  //             <thead>
+  //               <tr className={cx(style.tblHead, style.tblHeader)}>
+  //                 <th className={cx(style.tblHead)} rowSpan="2">
+  //                   例句
+  //                 </th>
+  //                 <th className={cx(style.tblHead)} rowSpan="2">
+  //                   關鍵字
+  //                 </th>
+  //                 <th className={cx(style.tblHead)} rowSpan="2">
+  //                   儲存槽
+  //                 </th>
+  //                 <th className={cx(style.tblHead)} rowSpan="2">
+  //                   紀錄槽
+  //                 </th>
+  //                 <th className={cx(style.tblHead)} rowSpan="2">
+  //                   操作
+  //                 </th>
+  //               </tr>
+  //             </thead>
 
-              <tbody>
-                {examples.map((example) => {
-                  const { text, intent, entities } = example;
-                  console.log('example text ===> ', text);
-                  console.log('example intent ===> ', intent);
-                  console.log('example entities ===> ', entities);
-                  return (
-                    <Examples
-                      key={text + intent}
-                      text={text}
-                      intent={intent}
-                      entities={entities}
-                      onDeleteExample={atDeleteExample}
-                      entitiesData={entitiesData}
-                    />
-                  );
-                })}
-              </tbody>
-            </table>
-          </div>
-        );
-        render = true;
-      } else {
-        extable = (
-          <div className="alert alert-warning" role="alert">
-            沒有例句資料，請先添加例句
-          </div>
-        );
-        render = true;
-      }
-      if (render === true) {
-        console.log('render');
-        let examplesTable = '';
-        examplesTable = document.getElementById('examplesTable');
-        if (examplesTable) {
-          createRoot(examplesTable).render(extable);
-        } else {
-          document.querySelector('#examplesBtn').click();
-        }
-      } else {
-        document.querySelector('#examplesBtn').click();
-      }
-    }, 0);
-  }, [examples]);
+  //             <tbody>
+  //               {examples.map((example) => {
+  //                 const { text, intent, entities } = example;
+  //                 console.log('example text ===> ', text);
+  //                 console.log('example intent ===> ', intent);
+  //                 console.log('example entities ===> ', entities);
+  //                 return (
+  //                   <Examples
+  //                     key={text + intent}
+  //                     text={text}
+  //                     intent={intent}
+  //                     entities={entities}
+  //                     onDeleteExample={atDeleteExample}
+  //                     entitiesData={entitiesData}
+  //                   />
+  //                 );
+  //               })}
+  //             </tbody>
+  //           </table>
+  //         </div>
+  //       );
+  //       render = true;
+  //     } else {
+  //       extable = (
+  //         <div className="alert alert-warning" role="alert">
+  //           沒有例句資料，請先添加例句
+  //         </div>
+  //       );
+  //       render = true;
+  //     }
+  //     if (render === true) {
+  //       console.log('render');
+  //       let examplesTable = '';
+  //       examplesTable = document.getElementById('examplesTable');
+  //       if (examplesTable) {
+  //         createRoot(examplesTable).render(extable);
+  //       } else {
+  //         document.querySelector('#examplesBtn').click();
+  //       }
+  //     } else {
+  //       document.querySelector('#examplesBtn').click();
+  //     }
+  //   }, 0);
+  // }, [examples]);
 
   // steven end
   // 新增關鍵字
@@ -1100,7 +1100,7 @@ const UserStep: React.FC<UserStepProps> = (props) => {
               </svg>
               意圖
             </button>
-            {/* <button
+            <button
               type="button"
               className={cx('btn', style.exampleBtn, style.mr2, style.mt2)}
               data-bs-toggle="modal"
@@ -1119,9 +1119,9 @@ const UserStep: React.FC<UserStepProps> = (props) => {
                 />
               </svg>
               例句
-            </button> */}
+            </button>
             {/* steven測試-start */}
-            <button
+            {/* <button
               type="button"
               className={cx('btn', style.exampleBtn, style.mr2, style.mt2)}
               id="examplesBtn"
@@ -1140,7 +1140,7 @@ const UserStep: React.FC<UserStepProps> = (props) => {
                 />
               </svg>
               例句
-            </button>
+            </button> */}
             {/* steven測試-End */}
             <button
               type="button"
@@ -1223,8 +1223,8 @@ const UserStep: React.FC<UserStepProps> = (props) => {
             </div>
           )}
           {/* show examples modal */}
-          {/* <div
-            className="modal fade"
+          <div
+            className="modal"
             id={`show-${step.intent}-examples`}
             tabIndex="-1"
             aria-labelledby={`show-${step.intent}-ExamplesLabel`}
@@ -1232,20 +1232,22 @@ const UserStep: React.FC<UserStepProps> = (props) => {
             data-bs-backdrop="false"
           >
             <div className="modal-dialog  modal-lg modal-dialog-scrollable">
-              <div className="modal-content">
-                <div className="modal-header">
+              <div className={cx('modal-content swal2-show', style.swtOut)}>
+                <div>
                   <h1
-                    className="modal-title fs-5"
+                    className="swal2-title"
                     id={`show-${step.intent}-ExamplesLabel`}
                   >
                     例句
                   </h1>
                   <button
                     type="button"
-                    className="btn-close"
+                    className={cx('swal2-close', style.swetClose)}
                     data-bs-dismiss="modal"
                     aria-label="Close"
-                  />
+                  >
+                    ×
+                  </button>
                 </div>
                 <div className="modal-body">
                   <table>
@@ -1293,28 +1295,30 @@ const UserStep: React.FC<UserStepProps> = (props) => {
                     </tbody>
                   </table>
                 </div>
-                <div className="modal-footer">
-                  <button
-                    type="button"
-                    className="btn btn-secondary"
-                    data-bs-dismiss="modal"
-                  >
-                    取消
-                  </button>
-                  <button
-                    className="btn btn-primary"
-                    data-bs-target={`#add-${step.intent}-example`}
-                    data-bs-toggle="modal"
-                  >
-                    新增例句
-                  </button>
+                <div className="swal2-actions d-flex">
+                  <div className="modal-footer">
+                    <button
+                      type="button"
+                      className="swal2-cancel swal2-styled"
+                      data-bs-dismiss="modal"
+                    >
+                      取消
+                    </button>
+                    <button
+                      className="swal2-cancel swal2-styled"
+                      data-bs-target={`#add-${step.intent}-example`}
+                      data-bs-toggle="modal"
+                    >
+                      新增例句
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>
-          </div> */}
+          </div>
 
           {/* add example input modal */}
-          {/* <div
+          <div
             className="modal fade"
             id={`add-${step.intent}-example`}
             tabIndex="-1"
@@ -1395,7 +1399,7 @@ const UserStep: React.FC<UserStepProps> = (props) => {
                 </div>
               </div>
             </div>
-          </div> */}
+          </div>
 
           {/* add branch story modal */}
           <div
