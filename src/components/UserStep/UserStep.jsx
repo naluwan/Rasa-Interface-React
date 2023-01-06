@@ -381,9 +381,6 @@ const UserStep: React.FC<UserStepProps> = (props) => {
         document.querySelector(`#input-${key}-entities-show-value`).value = '';
         return key;
       });
-      setTimeout(() => {
-        document.querySelector('#examplesBtn').click();
-      }, 1000);
     },
 
     [onCreateExample, nlu],
@@ -393,10 +390,6 @@ const UserStep: React.FC<UserStepProps> = (props) => {
   const atDeleteExample = React.useCallback(
     (userSay: string, intent: string) => {
       onDeleteExample(userSay, intent, storyName);
-
-      setTimeout(() => {
-        document.querySelector('#examplesBtn').click();
-      }, 1000);
     },
     [onDeleteExample, storyName],
   );
