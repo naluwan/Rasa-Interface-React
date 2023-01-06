@@ -72,9 +72,12 @@ const WebChatWidget = () => {
               setVoice((prev) => !prev);
             };
             setTimeout(() => {
-              document
-                .querySelector('.rw-toggle-fullscreen-button')
-                .insertAdjacentElement('beforebegin', voiceBtn);
+              // 如果聊天室窗打開才執行
+              if (document.querySelector('.rw-chat-open')) {
+                document
+                  .querySelector('.rw-toggle-fullscreen-button')
+                  .insertAdjacentElement('beforebegin', voiceBtn);
+              }
             }, 0);
           },
         }}
