@@ -581,6 +581,17 @@ const Stories = () => {
         });
       }
 
+      const checkExamples = createStory.steps
+        .filter((step) => step.intent)
+        .map((step) => step.examples)[0];
+
+      if (!checkExamples.length) {
+        return Toast.fire({
+          icon: 'error',
+          title: '最少需要新增一個例句',
+        });
+      }
+
       // 在完成儲存動作之前還需要newStory，所以需要深層複製，否則後面某些物件資料後，會有問題
       const cloneNewStory = cloneDeep(createStory);
 
