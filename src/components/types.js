@@ -330,7 +330,10 @@ export type State = {
     connectStoryName: string,
   ) => void,
   // 選擇故事類別
-  onSetSelectedCategory: (categoryName: string) => void,
+  onSetSelectedCategory: (
+    categoryName: string,
+    isRecoverDeletedStory: boolean,
+  ) => void,
   // 選擇故事
   onSetSelectedStory: (storyName: string) => void,
   // 編輯故事資訊(名稱和類別)

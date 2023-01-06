@@ -529,8 +529,8 @@ export type Action =
       },
     }
   | {
-      type: 'SELECT_CATEGORY',
-      payload: string,
+      type: 'SELECTED_CATEGORY',
+      payload: { categoryName: string, isRecoverDeletedStory: boolean },
     }
   | {
       type: 'SELECTED_STORY',
@@ -956,9 +956,12 @@ export const actionConnectStoryEditResButtons = (
   },
 });
 
-export const actionSelectedCategory = (categoryName: string): Action => ({
+export const actionSelectedCategory = (
+  categoryName: string,
+  isRecoverDeletedStory: boolean,
+): Action => ({
   type: 'SELECTED_CATEGORY',
-  payload: categoryName,
+  payload: { categoryName, isRecoverDeletedStory },
 });
 
 export const actionSelectedStory = (storyName: string): Action => ({

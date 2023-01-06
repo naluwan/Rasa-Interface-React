@@ -911,7 +911,10 @@ const Stories = () => {
           );
         }
 
-        onSetSelectedCategory(createStory.metadata.category);
+        onSetSelectedCategory(
+          createStory.metadata.category,
+          isRecoverDeletedStory,
+        );
         onSetSelectedStory(createStory.story);
         setCreate(false);
         onInitialNewStory();

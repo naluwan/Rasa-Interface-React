@@ -3014,9 +3014,10 @@ const reducer = (state: State, action: Action): State => {
       };
     }
     case 'SELECTED_CATEGORY': {
-      let categoryName = action.payload;
+      let { categoryName } = action.payload;
+      const { isRecoverDeletedStory } = action.payload;
 
-      if (categoryName === state.selectedCategory) {
+      if (categoryName === state.selectedCategory && !isRecoverDeletedStory) {
         categoryName = '';
       }
 
@@ -3226,8 +3227,11 @@ const useStoryStore = create((set) => {
       set({ categories });
     },
     // 選擇故事類別
-    onSetSelectedCategory(categoryName: string) {
-      dispatch(actionSelectedCategory(categoryName));
+    onSetSelectedCategory(
+      categoryName: string,
+      isRecoverDeletedStory: boolean,
+    ) {
+      dispatch(actionSelectedCategory(categoryName, isRecoverDeletedStory));
     },
     // 選擇故事
     onSetSelectedStory(storyName: string) {
