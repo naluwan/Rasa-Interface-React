@@ -474,6 +474,12 @@ const reducer = (state: CreateStoryState, action: Action): State => {
     case 'CREATE_STORY_ADD_RES_BUTTONS': {
       const { actionName, title, payload, reply, stories } = action.payload;
       const { newStory } = state;
+      if (title.indexOf('_') > -1) {
+        return Toast.fire({
+          icon: 'warning',
+          title: '按鈕名稱不能含有底線',
+        });
+      }
       const isInStory = stories.some(
         (item) => item.story === `button_${newStory.story}_${title}`,
       );
@@ -1225,6 +1231,13 @@ const reducer = (state: CreateStoryState, action: Action): State => {
         action.payload;
       const { newStory } = state;
 
+      if (title.indexOf('_') > -1) {
+        return Toast.fire({
+          icon: 'warning',
+          title: '按鈕名稱不能含有底線',
+        });
+      }
+
       const isInStory = stories.some(
         (item) => item.story === `button_${checkPointName}_${title}`,
       );
@@ -1437,6 +1450,13 @@ const reducer = (state: CreateStoryState, action: Action): State => {
         connectStoryName,
       } = action.payload;
       const { newStory } = state;
+
+      if (title.indexOf('_') > -1) {
+        return Toast.fire({
+          icon: 'warning',
+          title: '按鈕名稱不能含有底線',
+        });
+      }
 
       const isInStory = stories.some(
         (item) =>

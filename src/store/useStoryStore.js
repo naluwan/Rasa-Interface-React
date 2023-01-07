@@ -863,6 +863,13 @@ const reducer = (state: State, action: Action): State => {
       const { stories, nlu, domain } = cloneData;
       const currentPayload = `/${storyName}_${payload.replace(/\//g, '')}`;
 
+      if (title.indexOf('_') > -1) {
+        return Toast.fire({
+          icon: 'warning',
+          title: '按鈕名稱不能含有底線',
+        });
+      }
+
       const intentStory = [];
       stories.map((item) => {
         return item.steps.map((step) =>
@@ -2177,6 +2184,13 @@ const reducer = (state: State, action: Action): State => {
       };
       const { stories, nlu, domain } = cloneData;
 
+      if (title.indexOf('_') > -1) {
+        return Toast.fire({
+          icon: 'warning',
+          title: '按鈕名稱不能含有底線',
+        });
+      }
+
       const currentStoryName = checkPointName.slice(
         0,
         checkPointName.indexOf('_'),
@@ -2582,6 +2596,13 @@ const reducer = (state: State, action: Action): State => {
         ...state.cloneData,
       };
       const { stories, nlu, domain } = cloneData;
+
+      if (title.indexOf('_') > -1) {
+        return Toast.fire({
+          icon: 'warning',
+          title: '按鈕名稱不能含有底線',
+        });
+      }
 
       const currentStoryName = connectStoryName.slice(
         0,
