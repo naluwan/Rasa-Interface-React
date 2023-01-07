@@ -910,6 +910,22 @@ const UserStep: React.FC<UserStepProps> = (props) => {
         return;
       }
 
+      if (newBranchStoryInfo.branchName.indexOf('_') > -1) {
+        newBranchStoryInfo.branchName = '';
+        setNewBranchStory((prev) => {
+          return {
+            ...prev,
+            branchName: '',
+          };
+        });
+        Toast.fire({
+          icon: 'warning',
+          title: '支線故事名稱不能含有底線',
+        });
+        document.querySelector('#createBranchStoryModal #branchName').focus();
+        return;
+      }
+
       let isRepeat = false;
       let checkBranchStoryName = '';
       if (currentStep === 'main') {

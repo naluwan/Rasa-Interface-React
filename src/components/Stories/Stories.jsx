@@ -1036,6 +1036,21 @@ const Stories = () => {
         return;
       }
 
+      if (newStoryData.story.indexOf('_') > -1) {
+        setNewStoryInfo((prev) => {
+          return {
+            ...prev,
+            story: '',
+          };
+        });
+        Toast.fire({
+          icon: 'warning',
+          title: '故事名稱不能含有底線',
+        });
+        document.querySelector('.form-control#story').focus();
+        return;
+      }
+
       let isRepeat = false;
 
       isRepeat = storiesData.some((item) => item.story === newStoryData.story);
