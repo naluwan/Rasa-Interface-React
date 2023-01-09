@@ -9,6 +9,8 @@ import useStoryStore from '../../store/useStoryStore';
 const WebChatWidget = () => {
   const [base64Url, setBase64Url] = React.useState('');
   const [voice, setVoice] = React.useState(true);
+  const [autoPlay, setAutoPlay] = React.useState(false);
+  const [muted, setMuted] = React.useState(true);
   const { user } = useStoryStore((state: State) => {
     return {
       user: state.user,
@@ -29,6 +31,21 @@ const WebChatWidget = () => {
       }
     }
   };
+
+  const clickVoiceBtn = React.useCallback(
+    (e: React.MouseEvent<HTMLButtonElement>) => {
+      e.target.classList.toggle('close');
+      setMuted((prev) => {
+        if (prev) {
+          setVoice(true);
+          return false;
+        }
+        setVoice(false);
+        return true;
+      });
+    },
+    [],
+  );
 
   const title = document.querySelector('title').innerText;
 
@@ -55,12 +72,14 @@ const WebChatWidget = () => {
         onSocketEvent={{
           bot_uttered: (res) => {
             setBase64Url('');
+            setAutoPlay(false);
             if (res.text) {
               const { text } = res;
               axios
                 .post(`http://192.168.10.105:8010/tts/offline`, { text })
                 .then((base64) => {
                   setBase64Url(base64.data.result);
+                  setAutoPlay(true);
                 })
                 .catch((err) => console.log(err));
             }
@@ -70,10 +89,8 @@ const WebChatWidget = () => {
           onChatOpen() {
             const voiceBtn = document.createElement('button');
             voiceBtn.id = 'voiceBtn';
-            voiceBtn.onclick = function clickVoiceBtn(event) {
-              event.target.classList.toggle('close');
-              setVoice((prev) => !prev);
-            };
+            voiceBtn.setAttribute('class', 'close');
+            voiceBtn.onclick = (e) => clickVoiceBtn(e, muted);
             setTimeout(() => {
               // 如果聊天室窗打開才執行
               if (document.querySelector('.rw-chat-open')) {
@@ -85,11 +102,12 @@ const WebChatWidget = () => {
           },
         }}
       />
-      {base64Url && voice && (
+      {voice && (
         <audio
           id="botResVoice"
           src={`data:audio/wav;base64,${base64Url}`}
-          autoPlay
+          autoPlay={autoPlay}
+          muted={muted}
         >
           <track src="botResponse_zh.vtt" kind="captions" />
         </audio>
