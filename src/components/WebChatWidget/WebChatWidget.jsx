@@ -66,7 +66,6 @@ const WebChatWidget = () => {
         title={user.chatbotName ? user.chatbotName : title}
         params={{ storage: 'session' }}
         showFullScreenButton
-        showCloseButton
         showMessageDate
         mainColor="#2d304c"
         onSocketEvent={{
@@ -86,11 +85,11 @@ const WebChatWidget = () => {
           },
         }}
         onWidgetEvent={{
-          onChatOpen() {
+          onChatOpen: () => {
             const voiceBtn = document.createElement('button');
             voiceBtn.id = 'voiceBtn';
             voiceBtn.setAttribute('class', 'close');
-            voiceBtn.onclick = (e) => clickVoiceBtn(e, muted);
+            voiceBtn.onclick = (e) => clickVoiceBtn(e);
             setTimeout(() => {
               // 如果聊天室窗打開才執行
               if (document.querySelector('.rw-chat-open')) {
@@ -99,6 +98,11 @@ const WebChatWidget = () => {
                   .insertAdjacentElement('beforebegin', voiceBtn);
               }
             }, 0);
+          },
+          onChatClose: () => {
+            // 關閉聊天室時，將audio設為隱藏，開啟靜音
+            setVoice(false);
+            setMuted(true);
           },
         }}
       />
