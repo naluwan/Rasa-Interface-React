@@ -73,7 +73,7 @@ type UserStepProps = {
   ) => void,
   onDeleteExample: (
     userSay: string,
-    intent: String,
+    intent: string,
     storyName?: string,
   ) => void,
   onCreateBranchStory: (newBranchStory: {

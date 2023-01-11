@@ -72,16 +72,36 @@ const WebChatWidget = () => {
           bot_uttered: (res) => {
             setBase64Url('');
             setAutoPlay(false);
+            let botResText = '';
+
+            // 機器人回覆文字
             if (res.text) {
               const { text } = res;
-              axios
-                .post(`http://192.168.10.105:8010/tts/offline`, { text })
-                .then((base64) => {
-                  setBase64Url(base64.data.result);
-                  setAutoPlay(true);
-                })
-                .catch((err) => console.log(err));
+              botResText += text;
             }
+
+            // 機器人回覆按鈕選項，將按鈕選項組進語音字串中
+            if (res.buttons) {
+              const { buttons } = res;
+              buttons.map((button, idx) => {
+                if (idx + 1 !== buttons.length) {
+                  botResText += `選項${idx + 1}${button.title},`;
+                } else {
+                  botResText += `選項${idx + 1}${button.title}`;
+                }
+                return button;
+              });
+            }
+
+            axios
+              .post(`http://192.168.10.105:8010/tts/offline`, {
+                text: botResText,
+              })
+              .then((base64) => {
+                setBase64Url(base64.data.result);
+                setAutoPlay(true);
+              })
+              .catch((err) => console.log(err));
           },
         }}
         onWidgetEvent={{
