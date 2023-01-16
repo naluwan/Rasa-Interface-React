@@ -12,4 +12,12 @@
   :global(#voiceBtn.close) {
     background: url('../../images/btnIcon/voiceClose.svg') center/80% no-repeat;
   }
+  :global(#recorderBtn) {
+    background: url('../../images/btnIcon/mic.svg') center/80% no-repeat;
+    border: none;
+    width: 45px;
+    height: 45px;
+    display: inline-block;
+    vertical-align: middle;
+  }
 }

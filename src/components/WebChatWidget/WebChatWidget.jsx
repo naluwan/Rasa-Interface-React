@@ -3,10 +3,18 @@ import Widget from 'rasa-webchat';
 import type { State } from 'components/types';
 import shallow from 'zustand/shallow';
 import axios from 'axios';
+import Recorder from 'js-audio-recorder';
 import style from './WebChatWidget.module.scss';
 import useStoryStore from '../../store/useStoryStore';
 
 const WebChatWidget = () => {
+  const recorder = new Recorder({
+    sampleBits: 16,
+    sampleRate: 16000,
+    numChannels: 1,
+    compiling: true,
+  });
+  const webChatRef = React.useRef(null);
   const [base64Url, setBase64Url] = React.useState('');
   const [voice, setVoice] = React.useState(true);
   const [autoPlay, setAutoPlay] = React.useState(false);
@@ -47,6 +55,46 @@ const WebChatWidget = () => {
     [],
   );
 
+  const atMouseDown = React.useCallback(
+    (e: React.MouseEvent<HTMLButtonElement>, currentRecorder) => {
+      console.log(e.type);
+      if (e.type !== 'touchstart' && e.button === 0) {
+        console.log('點擊錄音');
+        currentRecorder.start();
+      }
+
+      if (e.type === 'touchstart') {
+        e.preventDefault();
+        currentRecorder.start();
+      }
+    },
+    [],
+  );
+
+  const atMouseUp = React.useCallback(
+    (e: React.MouseEvent<HTMLButtonElement>, currentRecorder) => {
+      console.log(e.type);
+      if (e.button === 0 || e.type === 'touchend') {
+        console.log('放開左鍵');
+        currentRecorder.stop();
+        currentRecorder.play();
+        const blob = currentRecorder.getWAVBlob();
+        console.log('blob ==> ', blob.size);
+        const formData = new FormData();
+        formData.append('files', blob);
+        axios
+          .post('http://192.168.10.105:8010/asr/offline', formData)
+          .then((res) => {
+            console.log('asr res ==> ', res);
+            console.log('webChatRef.current ==> ', webChatRef.current);
+            webChatRef.current.sendMessage(res.data.result);
+          })
+          .catch((err) => console.log(err));
+      }
+    },
+    [],
+  );
+
   const title = document.querySelector('title').innerText;
 
   // 重整就消除對話紀錄
@@ -56,6 +104,7 @@ const WebChatWidget = () => {
     // eslint-disable-next-line jsx-a11y/no-static-element-interactions
     <div onKeyDown={handleKeyDown} className={style.root}>
       <Widget
+        ref={webChatRef}
         interval={2000}
         initPayload="/get_started"
         socketUrl="http://192.168.10.105:5005"
@@ -69,7 +118,11 @@ const WebChatWidget = () => {
         showMessageDate
         mainColor="#2d304c"
         onSocketEvent={{
+          user_uttered: (e) => {
+            console.log('user say ==> ', e);
+          },
           bot_uttered: (res) => {
+            console.log('bot res ==> ', res);
             setBase64Url('');
             setAutoPlay(false);
             let botResText = '';
@@ -96,6 +149,7 @@ const WebChatWidget = () => {
             axios
               .post(`http://192.168.10.105:8010/tts/offline`, {
                 text: botResText,
+                spk_id: 174,
               })
               .then((base64) => {
                 setBase64Url(base64.data.result);
@@ -110,12 +164,23 @@ const WebChatWidget = () => {
             voiceBtn.id = 'voiceBtn';
             voiceBtn.setAttribute('class', 'close');
             voiceBtn.onclick = (e) => clickVoiceBtn(e);
+            const recorderBtn = document.createElement('button');
+            recorderBtn.id = 'recorderBtn';
+            recorderBtn.onmousedown = (e) => atMouseDown(e, recorder);
+            recorderBtn.onmouseup = (e) => atMouseUp(e, recorder);
+            recorderBtn.ontouchstart = (e) => atMouseDown(e, recorder);
+            recorderBtn.ontouchend = (e) => atMouseUp(e, recorder);
             setTimeout(() => {
               // 如果聊天室窗打開才執行
               if (document.querySelector('.rw-chat-open')) {
                 document
                   .querySelector('.rw-toggle-fullscreen-button')
                   .insertAdjacentElement('beforebegin', voiceBtn);
+              }
+              if (document.querySelector('.rw-sender')) {
+                document
+                  .querySelector('.rw-send')
+                  .insertAdjacentElement('afterend', recorderBtn);
               }
             }, 0);
           },
