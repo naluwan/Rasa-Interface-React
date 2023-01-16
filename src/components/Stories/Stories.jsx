@@ -1479,10 +1479,10 @@ const Stories = () => {
               </div>
               <div
                 name="stateMentLibrary"
-                className={
-                  (nowMode !== 'statement' ? style.hidden : '',
-                  cx(style.stateMentLibrary))
-                }
+                className={cx(
+                  nowMode !== 'statement' ? style.hidden : '',
+                  style.stateMentLibrary,
+                )}
               >
                 <Slots slots={slots} domain={domain} />
               </div>
