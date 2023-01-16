@@ -22,6 +22,8 @@ import style from './Stories.module.scss';
 import useStoryStore from '../../store/useStoryStore';
 import useCreateStoryStore from '../../store/useCreateStoryStore';
 import Slots from './Slots';
+import NavBar from '../NavBar';
+import { NAVITEMS } from '../config';
 
 const Stories = () => {
   /**
@@ -1139,7 +1141,9 @@ const Stories = () => {
     <>
       <div className={style.searchBar}>
         <div className={cx('d-flex')}>
-          <div className={cx(style.sideBar)} />
+          <div className={cx(style.sideBar)}>
+            <NavBar navItems={NAVITEMS} />
+          </div>
           <div id="senderId" className={style.senderId}>
             <div className={cx('d-flex', style.titleBlock)}>
               <h5

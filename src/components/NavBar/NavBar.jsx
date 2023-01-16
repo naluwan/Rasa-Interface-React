@@ -114,70 +114,52 @@ const NavBar: React.FC<NavBarProps> = () => {
   // );
 
   return (
-    <nav className={cx('navbar navbar-expand-lg navbar-dark', style.navbar)}>
-      <div className="container-fluid">
-        <Link
-          className={cx('navbar-brand', style.logo)}
-          onClick={() => onSetCurrentPage('首頁')}
-          to="/"
-        />
-        <button
-          className="navbar-toggler"
-          type="button"
-          data-bs-toggle="collapse"
-          data-bs-target="#navbarCollapse"
-          aria-controls="navbarCollapse"
-          aria-expanded="false"
-          aria-label="Toggle navigation"
-        >
-          <span className="navbar-toggler-icon" />
-        </button>
-        <div className="collapse navbar-collapse" id="navbarCollapse">
-          <ul className="navbar-nav me-auto mb-2 mb-lg-0">
-            {/* <Authenticate>
-              {navItems.map((navItem) => {
-                return (
-                  <NavItem
-                    key={navItem.id}
-                    id={navItem.id}
-                    name={navItem.name}
-                    link={navItem.link}
-                  />
-                );
-              })}
-            </Authenticate> */}
-          </ul>
-          {user ? (
-            <>
-              {currentPage === '故事流程' &&
-                (rasaTrainState > 0 ? (
-                  <button className="btn btn-outline-info mx-2" disabled>
-                    <CgSpinner className={cx('mx-2', style.loadingIcon)} />
-                    機器人訓練中
-                  </button>
-                ) : (
-                  <button
-                    className="btn btn-outline-info mx-2"
-                    onClick={() => trainRasa(trainData)}
-                  >
-                    執行訓練
-                  </button>
-                ))}
-
-              <button
-                className="btn btn-outline-light mx-1"
-                onClick={() => onLogout()}
-              >
-                登出
+    <nav className={cx(style.navbar)}>
+      <Link
+        className={cx('navbar-brand', style.logo)}
+        onClick={() => onSetCurrentPage('首頁')}
+        to="/"
+      />
+      <button
+        className="navbar-toggler"
+        type="button"
+        data-bs-toggle="collapse"
+        data-bs-target="#navbarCollapse"
+        aria-controls="navbarCollapse"
+        aria-expanded="false"
+        aria-label="Toggle navigation"
+      >
+        <span className="navbar-toggler-icon" />
+      </button>
+      {user ? (
+        <>
+          {currentPage === '故事流程' &&
+            (rasaTrainState > 0 ? (
+              <button className="btn btn-outline-info mx-2" disabled>
+                <CgSpinner className={cx('mx-2', style.loadingIcon)} />
+                機器人訓練中
               </button>
-            </>
-          ) : (
-            <Link className="btn btn-outline-light" to="/login">
-              登入
-            </Link>
-          )}
-        </div>
-      </div>
+            ) : (
+              <button
+                className="btn btn-outline-info mx-2"
+                onClick={() => trainRasa(trainData)}
+              >
+                執行訓練
+              </button>
+            ))}
+
+          <button
+            className="btn btn-outline-light mx-1"
+            onClick={() => onLogout()}
+          >
+            登出
+          </button>
+        </>
+      ) : (
+        <Link className="btn btn-outline-light" to="/login">
+          登入
+        </Link>
+      )}
     </nav>
   );
 };
