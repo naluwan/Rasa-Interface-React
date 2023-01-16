@@ -1,3 +1,4 @@
+/* eslint-disable react/style-prop-object */
 import * as React from 'react';
 import useSWR from 'swr';
 import {
@@ -1117,10 +1118,25 @@ const Stories = () => {
   return (
     <>
       <div className={style.searchBar}>
-        <div>
+        <div className={cx('d-flex')}>
+          <div className={cx(style.sideBar)}>123</div>
           <div id="senderId" className={style.senderId}>
+            <div className={cx('d-flex', style.titleBlock)}>
+              <h5 data-open="open" className={style.searchTitle}>
+                情境劇本
+              </h5>
+              <h5
+                data-open="none"
+                className={style.searchTitle}
+                type="button"
+                data-bs-toggle="offcanvas"
+                data-bs-target="#showSlotsOffcanvas"
+                aria-controls="offcanvasWithBothOptions"
+              >
+                語句庫
+              </h5>
+            </div>
             <div className={cx(style.menuBtnBlock)}>
-              <h4 className={style.searchTitle}>故事流程</h4>
               <div className={cx(style.btn, style.navbar)}>
                 <MyButton
                   variant="third"
@@ -1130,30 +1146,21 @@ const Stories = () => {
                   onClick={() => atClickCreateStoryBtn()}
                   type="button"
                 >
-                  新增故事流程
+                  +創建故事
                 </MyButton>
+                {Object.keys(deletedStory).length > 0 && (
+                  <div className={cx('btn', style.recoverBtn)}>
+                    <MyButton
+                      variant="primary"
+                      onClick={() => atRecoverDeletedStory(deletedStory)}
+                    >
+                      恢復刪除
+                    </MyButton>
+                  </div>
+                )}
               </div>
-              {Object.keys(deletedStory).length > 0 && (
-                <div className={cx('btn', style.recoverBtn)}>
-                  <MyButton
-                    variant="primary"
-                    onClick={() => atRecoverDeletedStory(deletedStory)}
-                  >
-                    恢復刪除
-                  </MyButton>
-                </div>
-              )}
               <div className={cx(style.btn, style.navbar)}>
                 {/* <MyButton variant="secondary">記錄槽</MyButton> */}
-                <button
-                  className={cx('btn btn-secondary', style.recordBtn)}
-                  type="button"
-                  data-bs-toggle="offcanvas"
-                  data-bs-target="#showSlotsOffcanvas"
-                  aria-controls="offcanvasWithBothOptions"
-                >
-                  記錄槽
-                </button>
 
                 {/* offcanvas 左側邊欄 */}
                 <div
@@ -1177,7 +1184,7 @@ const Stories = () => {
                       aria-label="Close"
                     />
                   </div>
-                  <Slots slots={slots} domain={domain} />
+                  {/* <Slots slots={slots} domain={domain} /> */}
                 </div>
               </div>
             </div>
@@ -1227,47 +1234,63 @@ const Stories = () => {
               </div> */}
             </div>
             <div className={cx(style.listBlock)}>
-              {categories &&
-                categories.map((category) => {
-                  return (
-                    <ul
-                      data-open={
-                        selectedCategory === category.name ? 'open' : 'noopen'
-                      }
-                      key={`list-${category.name}`}
-                      className={cx(style.listmenu)}
-                      onClick={() => onSetSelectedCategory(category.name)}
-                    >
-                      {category.name}
-                      <hr />
-                      {storiesOptions &&
-                        storiesOptions.map((item) => {
-                          if (item.metadata.category === category.name) {
-                            return (
-                              <li
-                                key={`list-${item.metadata.category}-${item.story}`}
-                              >
-                                <button
-                                  className={cx(style.listBtn)}
-                                  data-check={
-                                    selectedStory === item.story
-                                      ? 'check'
-                                      : 'none'
-                                  }
-                                  name={item.story}
-                                  value={item.story}
-                                  onClick={(e) => atSelectStory(e.target.value)}
-                                >
-                                  {item.story}
-                                </button>
-                              </li>
-                            );
+              <div
+                name="stories"
+                className={cx(style.hidden, style.storoesBlock)}
+              >
+                <div>
+                  {categories &&
+                    categories.map((category) => {
+                      return (
+                        <ul
+                          data-open={
+                            selectedCategory === category.name
+                              ? 'open'
+                              : 'noopen'
                           }
-                          return null;
-                        })}
-                    </ul>
-                  );
-                })}
+                          key={`list-${category.name}`}
+                          className={cx(style.listmenu)}
+                          onClick={() => onSetSelectedCategory(category.name)}
+                        >
+                          {category.name}
+                          <hr />
+                          {storiesOptions &&
+                            storiesOptions.map((item) => {
+                              if (item.metadata.category === category.name) {
+                                return (
+                                  <li
+                                    key={`list-${item.metadata.category}-${item.story}`}
+                                  >
+                                    <button
+                                      className={cx(style.listBtn)}
+                                      data-check={
+                                        selectedStory === item.story
+                                          ? 'check'
+                                          : 'none'
+                                      }
+                                      name={item.story}
+                                      value={item.story}
+                                      onClick={(e) =>
+                                        atSelectStory(e.target.value)
+                                      }
+                                    >
+                                      {item.story}
+                                    </button>
+                                  </li>
+                                );
+                              }
+                              return null;
+                            })}
+                        </ul>
+                      );
+                    })}
+                </div>
+              </div>
+              <div name="statementLibrary">
+                <div className={cx('offcanvas-body')}>
+                  <Slots slots={slots} domain={domain} />
+                </div>
+              </div>
             </div>
           </div>
         </div>

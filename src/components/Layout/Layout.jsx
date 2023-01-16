@@ -8,15 +8,15 @@ import Stories from 'components/Stories';
 import WebChatWidget from 'components/WebChatWidget';
 import style from './Layout.module.scss';
 import Login from '../Login';
-import NavBar from '../NavBar';
-import { NAVITEMS } from '../config';
+// import NavBar from '../NavBar';
+// import { NAVITEMS } from '../config';
 
 const Layout = () => {
   return (
     <div className={style.layout}>
-      <Authenticate>
+      {/* <Authenticate>
         <NavBar navItems={NAVITEMS} />
-      </Authenticate>
+      </Authenticate> */}
       <Routes>
         <Route
           path="/"

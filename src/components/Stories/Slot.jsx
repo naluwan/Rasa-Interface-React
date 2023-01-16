@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { BiDotsVerticalRounded } from 'react-icons/bi';
+// import { BiDotsVerticalRounded } from 'react-icons/bi';
 import cx from 'classnames';
 import shallow from 'zustand/shallow';
 import style from './Slot.module.scss';
@@ -34,31 +34,34 @@ const Slot: React.FC<SlotPropsType> = (props) => {
   );
 
   return (
-    <div
+    <ul
       key={slot.key}
       className={cx('mb-2 flex-column ', style.slotContainer, style.slot)}
     >
       <div className={style.title}>{slot.key}</div>
-      {slot.slotInfo.type === 'text' ? (
-        <div className={style.type}>類別：文字</div>
-      ) : (
-        <div>
-          <div className={style.type}>類別：儲存槽</div>
-          <div className={cx(style.SlotValueItemBlock)}>
-            {slot.slotInfo.values.map((value) => {
-              return (
-                <SlotValueItem
-                  key={`slotValueItem-${value}`}
-                  slotValue={{ key: slot.key, value }}
-                />
-              );
-            })}
-          </div>
-        </div>
-      )}
+      <hr />
+      <div className={cx(style.SlotValueItemBlock)}>
+        <label htmlFor={slot.key} className={cx(style.labelBlock)}>
+          {slot.slotInfo.values.map((value) => {
+            return (
+              <SlotValueItem
+                key={`slotValueItem-${value}`}
+                slotValue={{ key: slot.key, value }}
+              />
+            );
+          })}
+          <textarea
+            className={cx(style.setTextarea)}
+            id={slot.key}
+            name={slot.key}
+            type="text"
+          />
+        </label>
+      </div>
       <div className={cx('dropdown  mt-3', style.dropdownMenu)}>
         <button className="btn" type="button" data-bs-toggle="dropdown">
-          <BiDotsVerticalRounded />
+          {/* <BiDotsVerticalRounded />
+          123 */}
         </button>
         <ul className="dropdown-menu">
           {slot.slotInfo.type === 'categorical' && (
@@ -83,7 +86,7 @@ const Slot: React.FC<SlotPropsType> = (props) => {
           </li>
         </ul>
       </div>
-    </div>
+    </ul>
   );
 };
 

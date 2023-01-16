@@ -20,13 +20,13 @@ const SlotValueItem: React.FC<SlotValueItemPropsType> = (props) => {
   }, shallow);
 
   return (
-    <span className={cx(' m-2', style.item)}>
+    <div className={cx(' m-2', style.item)}>
       {slotValue.value}
       <RiCloseCircleFill
         className={style.removeSlotValueIcon}
         onClick={() => onRemoveSlotValue(slotValue)}
       />
-    </span>
+    </div>
   );
 };
 
