@@ -45,6 +45,7 @@ const Stories = () => {
    * @type {[{key:string,slotInfo:{type:string,values?:string[]}}[], Function]}
    */
   const [slots, setSlots] = React.useState([]);
+  const [nowMode, setNowMode] = React.useState('scenario');
   const {
     story,
     stories,
@@ -1115,29 +1116,65 @@ const Stories = () => {
     }
   }, [newStory]);
 
+  // 語句庫與情景劇本切換
+  const atChangeMode = React.useCallback(
+    (modeValue) => {
+      setNowMode(modeValue);
+      let other = '';
+      if (modeValue === 'scenario') {
+        other = 'statement';
+      } else {
+        other = 'scenario';
+      }
+      document
+        .querySelector(`#senderId [name=${other}]`)
+        .setAttribute('data-open', 'none');
+      document
+        .querySelector(`#senderId [name=${modeValue}]`)
+        .setAttribute('data-open', 'open');
+    },
+    [nowMode],
+  );
   return (
     <>
       <div className={style.searchBar}>
         <div className={cx('d-flex')}>
-          <div className={cx(style.sideBar)}>123</div>
+          <div className={cx(style.sideBar)} />
           <div id="senderId" className={style.senderId}>
             <div className={cx('d-flex', style.titleBlock)}>
-              <h5 data-open="open" className={style.searchTitle}>
+              <h5
+                name="scenario"
+                data-open="open"
+                className={style.searchTitle}
+                onClick={() => {
+                  atChangeMode('scenario');
+                }}
+              >
                 情境劇本
               </h5>
               <h5
+                name="statement"
                 data-open="none"
+                onClick={() => {
+                  atChangeMode('statement');
+                }}
                 className={style.searchTitle}
                 type="button"
-                data-bs-toggle="offcanvas"
-                data-bs-target="#showSlotsOffcanvas"
-                aria-controls="offcanvasWithBothOptions"
+                // data-bs-toggle="offcanvas"
+                // data-bs-target="#showSlotsOffcanvas"
+                // aria-controls="offcanvasWithBothOptions"
               >
                 語句庫
               </h5>
             </div>
             <div className={cx(style.menuBtnBlock)}>
-              <div className={cx(style.btn, style.navbar)}>
+              <div
+                className={cx(
+                  nowMode !== 'scenario' ? style.hidden : '',
+                  style.btn,
+                  style.navbar,
+                )}
+              >
                 <MyButton
                   variant="third"
                   id="createNewStoryBtn"
@@ -1158,6 +1195,23 @@ const Stories = () => {
                     </MyButton>
                   </div>
                 )}
+              </div>
+              <div
+                className={cx(
+                  nowMode !== 'statement' ? style.hidden : '',
+                  style.btn,
+                  style.navbar,
+                )}
+              >
+                <MyButton
+                  variant="third"
+                  id="createSlot"
+                  type="button"
+                  dataBsToggle="modal"
+                  dataBsTarget="#addSlotModal"
+                >
+                  +創建語句庫
+                </MyButton>
               </div>
               <div className={cx(style.btn, style.navbar)}>
                 {/* <MyButton variant="secondary">記錄槽</MyButton> */}
@@ -1236,9 +1290,12 @@ const Stories = () => {
             <div className={cx(style.listBlock)}>
               <div
                 name="stories"
-                className={cx(style.hidden, style.storoesBlock)}
+                className={cx(
+                  nowMode !== 'scenario' ? style.hidden : '',
+                  style.storoesBlock,
+                )}
               >
-                <div>
+                <div className={cx(style.list)}>
                   {categories &&
                     categories.map((category) => {
                       return (
@@ -1252,7 +1309,7 @@ const Stories = () => {
                           className={cx(style.listmenu)}
                           onClick={() => onSetSelectedCategory(category.name)}
                         >
-                          {category.name}
+                          <div className={cx(style.title)}>{category.name}</div>
                           <hr />
                           {storiesOptions &&
                             storiesOptions.map((item) => {
@@ -1284,12 +1341,150 @@ const Stories = () => {
                         </ul>
                       );
                     })}
+                  {/* create story modal */}
+                  <div
+                    className="modal"
+                    id="createNewStoryModal"
+                    tabIndex="-1"
+                    aria-labelledby="createNewStoryModalLabel"
+                    aria-hidden="true"
+                    data-bs-backdrop="false"
+                  >
+                    <div className="modal-dialog modal-dialog-centered modal-dialog-scrollable ">
+                      <div
+                        className={cx('modal-content swal2-show', style.swtOut)}
+                      >
+                        <div>
+                          <h2
+                            className="swal2-title"
+                            id="createNewStoryModalLabel"
+                          >
+                            建立新故事
+                          </h2>
+                          <button
+                            type="button"
+                            className={cx('swal2-close', style.swetClose)}
+                            data-bs-dismiss="modal"
+                            aria-label="Close"
+                            onClick={() =>
+                              setNewStoryInfo({
+                                story: '',
+                                steps: [],
+                                metadata: { category: '', create: false },
+                              })
+                            }
+                          >
+                            ×
+                          </button>
+                        </div>
+                        <div className="modal-body">
+                          <div className="mb-3">
+                            <label htmlFor="story" className="form-label">
+                              故事名稱
+                            </label>
+                            <input
+                              className="form-control"
+                              id="story"
+                              name="story"
+                              placeholder="請輸入故事名稱"
+                              value={newStoryInfo.story}
+                              onChange={(e) => atChangeNewStoryInfo(e)}
+                            />
+                          </div>
+                          <div className="mb-3">
+                            <label htmlFor="category" className="form-label">
+                              故事類別
+                            </label>
+                            <select
+                              className="form-control"
+                              id="category"
+                              name="category"
+                              value={
+                                newStoryInfo.metadata?.create
+                                  ? 'createNewCategory'
+                                  : newStoryInfo.metadata?.category
+                              }
+                              onChange={(e) => atChangeNewStoryInfo(e)}
+                            >
+                              <option value="" hidden>
+                                請選擇故事類別
+                              </option>
+                              <option value="createNewCategory">
+                                建立新類別
+                              </option>
+                              {categories?.map((category) => {
+                                return (
+                                  <option
+                                    key={`${category.id}-${category.name}`}
+                                    value={category.name}
+                                  >
+                                    {category.name}
+                                  </option>
+                                );
+                              })}
+                            </select>
+                          </div>
+                          {newStoryInfo.metadata?.create && (
+                            <div className="mb-3">
+                              <label
+                                htmlFor="newCategory"
+                                className="form-label"
+                              >
+                                類別名稱
+                              </label>
+                              <input
+                                className="form-control"
+                                id="newCategory"
+                                name="newCategory"
+                                placeholder="請輸入類別名稱"
+                                value={newStoryInfo.metadata?.category}
+                                onChange={(e) => atChangeNewStoryInfo(e)}
+                              />
+                            </div>
+                          )}
+                        </div>
+                        <div className="swal2-actions d-flex">
+                          <button
+                            type="button"
+                            className="swal2-cancel swal2-styled"
+                            id="cancelCreateStoryBtn"
+                            data-bs-dismiss="modal"
+                            onClick={() =>
+                              setNewStoryInfo({
+                                story: '',
+                                steps: [],
+                                metadata: { category: '', create: false },
+                              })
+                            }
+                          >
+                            取消
+                          </button>
+                          <button
+                            className="swal2-confirm swal2-styled"
+                            onClick={() =>
+                              atCreateNewStory(
+                                newStoryInfo,
+                                stories,
+                                categories,
+                              )
+                            }
+                          >
+                            儲存
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </div>
-              <div name="statementLibrary">
-                <div className={cx('offcanvas-body')}>
-                  <Slots slots={slots} domain={domain} />
-                </div>
+              <div
+                name="stateMentLibrary"
+                className={
+                  (nowMode !== 'statement' ? style.hidden : '',
+                  cx(style.stateMentLibrary))
+                }
+              >
+                <Slots slots={slots} domain={domain} />
               </div>
             </div>
           </div>
@@ -1310,127 +1505,6 @@ const Stories = () => {
           onClickSaveBtn={atClickSaveBtn}
         />
       )}
-
-      {/* create story modal */}
-      <div
-        className="modal"
-        id="createNewStoryModal"
-        tabIndex="-1"
-        aria-labelledby="createNewStoryModalLabel"
-        aria-hidden="true"
-        data-bs-backdrop="false"
-      >
-        <div className="modal-dialog  modal-lg modal-dialog-scrollable">
-          <div className={cx('modal-content swal2-show', style.swtOut)}>
-            <div>
-              <h2 className="swal2-title" id="createNewStoryModalLabel">
-                建立新故事
-              </h2>
-              <button
-                type="button"
-                className={cx('swal2-close', style.swetClose)}
-                data-bs-dismiss="modal"
-                aria-label="Close"
-                onClick={() =>
-                  setNewStoryInfo({
-                    story: '',
-                    steps: [],
-                    metadata: { category: '', create: false },
-                  })
-                }
-              >
-                ×
-              </button>
-            </div>
-            <div className="modal-body">
-              <div className="mb-3">
-                <label htmlFor="story" className="form-label">
-                  故事名稱
-                </label>
-                <input
-                  className="form-control"
-                  id="story"
-                  name="story"
-                  placeholder="請輸入故事名稱"
-                  value={newStoryInfo.story}
-                  onChange={(e) => atChangeNewStoryInfo(e)}
-                />
-              </div>
-              <div className="mb-3">
-                <label htmlFor="category" className="form-label">
-                  故事類別
-                </label>
-                <select
-                  className="form-control"
-                  id="category"
-                  name="category"
-                  value={
-                    newStoryInfo.metadata?.create
-                      ? 'createNewCategory'
-                      : newStoryInfo.metadata?.category
-                  }
-                  onChange={(e) => atChangeNewStoryInfo(e)}
-                >
-                  <option value="" hidden>
-                    請選擇故事類別
-                  </option>
-                  <option value="createNewCategory">建立新類別</option>
-                  {categories?.map((category) => {
-                    return (
-                      <option
-                        key={`${category.id}-${category.name}`}
-                        value={category.name}
-                      >
-                        {category.name}
-                      </option>
-                    );
-                  })}
-                </select>
-              </div>
-              {newStoryInfo.metadata?.create && (
-                <div className="mb-3">
-                  <label htmlFor="newCategory" className="form-label">
-                    類別名稱
-                  </label>
-                  <input
-                    className="form-control"
-                    id="newCategory"
-                    name="newCategory"
-                    placeholder="請輸入類別名稱"
-                    value={newStoryInfo.metadata?.category}
-                    onChange={(e) => atChangeNewStoryInfo(e)}
-                  />
-                </div>
-              )}
-            </div>
-            <div className="swal2-actions d-flex">
-              <button
-                type="button"
-                className="swal2-cancel swal2-styled"
-                id="cancelCreateStoryBtn"
-                data-bs-dismiss="modal"
-                onClick={() =>
-                  setNewStoryInfo({
-                    story: '',
-                    steps: [],
-                    metadata: { category: '', create: false },
-                  })
-                }
-              >
-                取消
-              </button>
-              <button
-                className="swal2-confirm swal2-styled"
-                onClick={() =>
-                  atCreateNewStory(newStoryInfo, stories, categories)
-                }
-              >
-                儲存
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
     </>
   );
 };

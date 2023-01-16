@@ -40,7 +40,6 @@ const Slots: React.FC<SlotsPropsType> = (props) => {
       onAddSlotValue: state.onAddSlotValue,
     };
   }, shallow);
-
   // 新增記錄槽輸入框事件，輸入後會將值寫進formValue中
   const atChangeFormValue = React.useCallback(
     (
@@ -518,128 +517,127 @@ const Slots: React.FC<SlotsPropsType> = (props) => {
   );
 
   return (
-    <div className="offcanvas-body">
-      {slots.map((slot) => {
-        const { key, slotInfo } = slot;
-        return (
-          <Slot
-            key={`slot-${key}`}
-            slot={{ key, slotInfo }}
-            onClickAddSlotValuesBtn={atClickAddSlotValuesBtn}
-          />
-        );
-      })}
-      <CgAddR
-        className={cx(style.add)}
-        data-bs-toggle="modal"
-        data-bs-target="#addSlotModal"
-      />
-      {/* 新增記錄槽 modal */}
-      <div
-        className="modal"
-        id="addSlotModal"
-        data-bs-backdrop="false"
-        data-bs-keyboard="false"
-        tabIndex="-1"
-        aria-labelledby="addSlotModalLabel"
-        aria-hidden="true"
-      >
-        <div className="modal-dialog modal-dialog-centered modal-dialog-scrollable ">
-          <div className={cx('modal-content swal2-show', style.swtOut)}>
-            <div>
-              <h2 className="swal2-title" id="addSlotModalLabel">
-                新增記錄槽
-              </h2>
-              <button
-                type="button"
-                className={cx('swal2-close', style.swetClose)}
-                data-bs-dismiss="modal"
-                aria-label="Close"
-                onClick={() => atCancelAddSlot()}
-              >
-                ×
-              </button>
-            </div>
-            <div className="modal-body">
-              <div className="mb-3">
-                <input
-                  type="text"
-                  className="form-control"
-                  id="slotName"
-                  placeholder="請輸入記錄槽名稱"
-                  name="slotName"
-                  value={formValue.slotName}
-                  onChange={(e) => atChangeFormValue(e)}
-                />
-              </div>
-              <div className="mb-3">
-                <select
-                  className="form-control"
-                  id="slotType"
-                  value={formValue.slotType}
-                  name="slotType"
-                  onChange={(e) => atChangeFormValue(e)}
+    <>
+      <div className={cx('offcanvas-body', style.slotsBody)}>
+        {slots.map((slot) => {
+          const { key, slotInfo } = slot;
+          return (
+            <Slot
+              key={`slot-${key}`}
+              slot={{ key, slotInfo }}
+              onClickAddSlotValuesBtn={atClickAddSlotValuesBtn}
+              atChangeNewSlotValues={atChangeNewSlotValues}
+              atSubmitSlotValues={atSubmitSlotValues}
+              domain={domain}
+            />
+          );
+        })}
+        {/* 新增記錄槽 modal */}
+        <div
+          className="modal"
+          id="addSlotModal"
+          data-bs-backdrop="false"
+          data-bs-keyboard="false"
+          tabIndex="-1"
+          aria-labelledby="addSlotModalLabel"
+          aria-hidden="true"
+        >
+          <div className="modal-dialog modal-dialog-centered modal-dialog-scrollable ">
+            <div className={cx('modal-content swal2-show', style.swtOut)}>
+              <div>
+                <h2 className="swal2-title" id="addSlotModalLabel">
+                  新增語句庫
+                </h2>
+                <button
+                  type="button"
+                  className={cx('swal2-close', style.swetClose)}
+                  data-bs-dismiss="modal"
+                  aria-label="Close"
+                  onClick={() => atCancelAddSlot()}
                 >
-                  <option value="" hidden disabled>
-                    請選擇記錄槽種類
-                  </option>
-                  <option value="text">文字</option>
-                  <option value="categorical">儲存槽</option>
-                </select>
+                  ×
+                </button>
               </div>
-              {formValue.slotValues.length > 0 && (
-                <div>
-                  <div className="mb-2">儲存槽值</div>
-                  {formValue.slotValues.map((slotValue) => {
-                    return (
-                      <div
-                        className="mb-3 d-flex align-items-center"
-                        key={slotValue.id}
-                      >
-                        <input
-                          type="text"
-                          className="form-control"
-                          id="slotName"
-                          placeholder="請輸入儲存槽名稱"
-                          name="name"
-                          value={slotValue.name}
-                          onChange={(e) => atChangeFormValue(e, slotValue.id)}
-                        />
-                        <BsTrashFill
-                          className={style.removeSlotInput}
-                          onClick={() => atRemoveSlotInput(slotValue.id)}
-                        />
-                      </div>
-                    );
-                  })}
-                  <CgAddR
-                    className={cx(style.addSlotInput)}
-                    onClick={() => atAddSlotInput()}
+              <div className="modal-body">
+                <div className="mb-3">
+                  <input
+                    type="text"
+                    className="form-control"
+                    id="slotName"
+                    placeholder="請輸入記錄槽名稱"
+                    name="slotName"
+                    value={formValue.slotName}
+                    onChange={(e) => atChangeFormValue(e)}
                   />
                 </div>
-              )}
-            </div>
-            <div className="swal2-actions d-flex">
-              <button
-                type="button"
-                className="swal2-cancel swal2-styled"
-                data-bs-dismiss="modal"
-                onClick={() => atCancelAddSlot()}
-              >
-                取消
-              </button>
-              <button
-                type="button"
-                className="swal2-confirm swal2-styled"
-                onClick={() => atSubmitFormValue(formValue, domain)}
-              >
-                儲存
-              </button>
+                <div className="mb-3">
+                  <select
+                    className="form-control"
+                    id="slotType"
+                    value={formValue.slotType}
+                    name="slotType"
+                    onChange={(e) => atChangeFormValue(e)}
+                  >
+                    <option value="" hidden disabled>
+                      請選擇記錄槽種類
+                    </option>
+                    <option value="text">文字</option>
+                    <option value="categorical">儲存槽</option>
+                  </select>
+                </div>
+                {formValue.slotValues.length > 0 && (
+                  <div>
+                    <div className="mb-2">儲存槽值</div>
+                    {formValue.slotValues.map((slotValue) => {
+                      return (
+                        <div
+                          className="mb-3 d-flex align-items-center"
+                          key={slotValue.id}
+                        >
+                          <input
+                            type="text"
+                            className="form-control"
+                            id="slotName"
+                            placeholder="請輸入儲存槽名稱"
+                            name="name"
+                            value={slotValue.name}
+                            onChange={(e) => atChangeFormValue(e, slotValue.id)}
+                          />
+                          <BsTrashFill
+                            className={style.removeSlotInput}
+                            onClick={() => atRemoveSlotInput(slotValue.id)}
+                          />
+                        </div>
+                      );
+                    })}
+                    <CgAddR
+                      className={cx(style.addSlotInput)}
+                      onClick={() => atAddSlotInput()}
+                    />
+                  </div>
+                )}
+              </div>
+              <div className="swal2-actions d-flex">
+                <button
+                  type="button"
+                  className="swal2-cancel swal2-styled"
+                  data-bs-dismiss="modal"
+                  onClick={() => atCancelAddSlot()}
+                >
+                  取消
+                </button>
+                <button
+                  type="button"
+                  className="swal2-confirm swal2-styled"
+                  onClick={() => atSubmitFormValue(formValue, domain)}
+                >
+                  儲存
+                </button>
+              </div>
             </div>
           </div>
         </div>
       </div>
-
       {/* 新增儲存槽 modal */}
       <div
         className="modal "
@@ -714,7 +712,7 @@ const Slots: React.FC<SlotsPropsType> = (props) => {
           </div>
         </div>
       </div>
-    </div>
+    </>
   );
 };
 

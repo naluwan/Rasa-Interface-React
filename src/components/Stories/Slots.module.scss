@@ -7,6 +7,12 @@
   }
 }
 
+.slotsBody {
+  overflow-y: scroll;
+  height: 100%;
+  width: calc(100% + 18px);
+}
+
 .removeSlotInput {
   font-size: 1.5rem;
   margin-left: 1rem;
