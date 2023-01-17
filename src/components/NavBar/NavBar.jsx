@@ -44,7 +44,7 @@ const NavBar: React.FC<NavBarProps> = () => {
       trainRasa: state.trainRasa,
     };
   }, shallow);
-
+  const [PersonOption, setPersonOption] = React.useState('none');
   const trainData = React.useMemo(() => {
     const today = new Date().toLocaleString('zh-Hant', { hour12: false });
     const date = today.split(' ')[0].replace(/\//g, '');
@@ -131,35 +131,77 @@ const NavBar: React.FC<NavBarProps> = () => {
       >
         <span className="navbar-toggler-icon" />
       </button>
-      {user ? (
-        <>
-          {currentPage === '故事流程' &&
-            (rasaTrainState > 0 ? (
-              <button className="btn btn-outline-info mx-2" disabled>
-                <CgSpinner className={cx('mx-2', style.loadingIcon)} />
-                機器人訓練中
-              </button>
-            ) : (
-              <button
-                className="btn btn-outline-info mx-2"
-                onClick={() => trainRasa(trainData)}
-              >
-                執行訓練
-              </button>
-            ))}
-
+      <div>
+        {user ? (
           <button
-            className="btn btn-outline-light mx-1"
-            onClick={() => onLogout()}
+            className={cx(style.persona)}
+            onClick={() =>
+              PersonOption === 'open'
+                ? setPersonOption('none')
+                : setPersonOption('open')
+            }
           >
-            登出
+            <ul
+              className={cx(
+                PersonOption === 'open' ? '' : style.hidden,
+                style.personaBlock,
+              )}
+            >
+              {currentPage === '故事流程' &&
+                (rasaTrainState > 0 ? (
+                  <li className={cx(style.personaItem)} disabled>
+                    <CgSpinner className={cx('mx-2', style.loadingIcon)} />
+                    機器人訓練中
+                  </li>
+                ) : (
+                  <li
+                    className={cx(style.personaItem)}
+                    onClick={() => trainRasa(trainData)}
+                  >
+                    執行訓練
+                  </li>
+                ))}
+
+              <li className={cx(style.personaItem)} onClick={() => onLogout()}>
+                登出
+              </li>
+            </ul>
           </button>
-        </>
-      ) : (
-        <Link className="btn btn-outline-light" to="/login">
-          登入
-        </Link>
-      )}
+        ) : (
+          <Link className="btn btn-outline-light" to="/login">
+            登入
+          </Link>
+        )}
+      </div>
+      {/* {user ? (
+          <>
+            {currentPage === '故事流程' &&
+              (rasaTrainState > 0 ? (
+                <button className="btn btn-outline-info mx-2" disabled>
+                  <CgSpinner className={cx('mx-2', style.loadingIcon)} />
+                  機器人訓練中
+                </button>
+              ) : (
+                <button
+                  className="btn btn-outline-info mx-2"
+                  onClick={() => trainRasa(trainData)}
+                >
+                  執行訓練
+                </button>
+              ))}
+
+            <button
+              className="btn btn-outline-light mx-1"
+              onClick={() => onLogout()}
+            >
+              登出
+            </button>
+          </>
+        ) : (
+          <Link className="btn btn-outline-light" to="/login">
+            登入
+          </Link>
+        )} */}
     </nav>
   );
 };

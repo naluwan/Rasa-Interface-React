@@ -1,22 +1,71 @@
 .root {
   background: #2d304c;
 }
+
 .logo {
   text-decoration: none;
   font-family: 'Poiret', 'Poiret Ie', 微軟正黑體;
   font-size: 42px;
-  margin: 10px 0;
+  margin: 10px 5px;
   display: inline-block;
-  height: 3.5rem;
-  padding: 3px;
-  border-radius: 99px;
+  height: 5rem;
+  width: 3rem;
+  padding: 0;
   vertical-align: middle;
-  background: #3a4896 url(../../images/logo1.png) no-repeat center ;
+  background: url(../../images/logo1.png) no-repeat center;
+  background-size: contain;
 }
+
+.persona {
+  position: relative;
+  text-decoration: none;
+  font-family: 'Poiret', 'Poiret Ie', 微軟正黑體;
+  margin: 5px;
+  display: inline-block;
+  height: 5rem;
+  width: 3rem;
+  padding: 0;
+  text-align: left;
+  border: none;
+  vertical-align: middle;
+  background: url(../../images/people.png) no-repeat center;
+  background-size: contain;
+}
+
+.personaBlock {
+  margin: 0;
+  bottom: 10px;
+  left: 100%;
+  text-align: left;
+  display: flex;
+    padding: 0;
+  width: max-content;
+  flex-direction: column;
+  background: #fff;
+  border-radius: 5px;
+  border: 1px solid rgb(133, 133, 133);
+  position: absolute;
+  overflow: hidden;
+
+  .personaItem {
+    display: block;
+    background: #fff;
+    padding: 10px;
+    text-align: left;
+
+    &:hover {
+      background: #7d89f7;
+      color: #fff;
+    }
+  }
+}
+
 .navbar {
   display: flex;
   flex-direction: column;
-  
+  justify-content: space-between;
+  height: 100%;
+
 }
 
 .loadingIcon {
@@ -24,10 +73,15 @@
   animation: animate 1s linear infinite;
 }
 
+.hidden {
+  display: none;
+}
+
 @keyframes animate {
   0% {
     transform: rotate(0deg);
   }
+
   100% {
     transform: rotate(720deg);
   }

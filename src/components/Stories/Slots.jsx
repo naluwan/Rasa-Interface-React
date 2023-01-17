@@ -564,7 +564,7 @@ const Slots: React.FC<SlotsPropsType> = (props) => {
                     type="text"
                     className="form-control"
                     id="slotName"
-                    placeholder="請輸入記錄槽名稱"
+                    placeholder="請輸入語句庫名稱"
                     name="slotName"
                     value={formValue.slotName}
                     onChange={(e) => atChangeFormValue(e)}
