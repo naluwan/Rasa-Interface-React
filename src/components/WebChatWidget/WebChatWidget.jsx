@@ -126,11 +126,18 @@ const WebChatWidget = () => {
             setBase64Url('');
             setAutoPlay(false);
             let botResText = '';
-
             // 機器人回覆文字
             if (res.text) {
               const { text } = res;
-              botResText += text;
+
+              // 將要發送到語音伺服器轉化的字句做處理，將換行符、$、,移除
+              const currentText = JSON.parse(
+                JSON.stringify(text)
+                  .replace(/ {2}\\n/g, '')
+                  .replace(/\$/g, '')
+                  .replace(/,/g, ''),
+              );
+              botResText += currentText;
             }
 
             // 機器人回覆按鈕選項，將按鈕選項組進語音字串中
