@@ -1,3 +1,4 @@
+/* eslint-disable jsx-a11y/no-static-element-interactions */
 /* eslint-disable no-use-before-define */
 /* eslint-disable react-hooks/exhaustive-deps */
 import * as React from 'react';
@@ -180,6 +181,12 @@ const UserStep: React.FC<UserStepProps> = (props) => {
    */
   // eslint-disable-next-line no-unused-vars
   const [resSelect, setResSelect] = React.useState('botRes');
+
+  const [contentEntity, setContentEntity] = React.useState({
+    text: '',
+    start: null,
+    end: null,
+  });
 
   const showIntent =
     step.intent === 'get_started' ? '打開聊天室窗' : step.intent;
@@ -1059,6 +1066,48 @@ const UserStep: React.FC<UserStepProps> = (props) => {
     ],
   );
 
+  // 獲取使用者選取文字
+  const getSelectText = React.useCallback(() => {
+    const userSayEle = document.querySelector('#userSay');
+    if (userSayEle) {
+      return {
+        text: userSayEle.value.substring(
+          userSayEle.selectionStart,
+          userSayEle.selectionEnd,
+        ),
+        start: userSayEle.selectionStart,
+        end: userSayEle.selectionEnd,
+      };
+    }
+    return {};
+  }, []);
+
+  // 滑鼠左鍵彈起事件
+  const atMouseSelection = React.useCallback(
+    (e: React.MouseEvent<HTMLInputElement>) => {
+      if (getSelectText().text && e.button === 0) {
+        console.log('user select text ==> ', getSelectText());
+        if (getSelectText().end - getSelectText().start <= 1) {
+          Toast.fire({
+            icon: 'warning',
+            title: '關鍵字至少要有兩個字',
+          });
+          return;
+        }
+        setContentEntity((prev) => {
+          return {
+            ...prev,
+            text: getSelectText().text,
+            start: getSelectText().start,
+            end: getSelectText().end,
+          };
+        });
+        document.querySelector('.entityModalBtn').click();
+      }
+    },
+    [],
+  );
+
   // console.log('entitiesData:', entitiesData);
   // console.log('newBranchStory:', newBranchStory);
   // console.log('resSelect ========================>', resSelect);
@@ -1192,19 +1241,33 @@ const UserStep: React.FC<UserStepProps> = (props) => {
                 刪除
               </button>
             )}
+            <button
+              type="button"
+              className="entityModalBtn"
+              data-bs-toggle="modal"
+              data-bs-target="#entityModal"
+            >
+              按鈕
+            </button>
             <hr />
           </div>
         )}
         <div className="d-flex flex-column">
           <div className="d-flex align-items-center pt-2">
             <div className={style.userTitle}>使用者:</div>
-            <div className={style.userText}>
-              {step.user ? step.user : showIntent}
-            </div>
+            <input
+              className={style.userText}
+              id="userSay"
+              onMouseUp={(e) => atMouseSelection(e)}
+              value={step.user ? step.user : showIntent}
+              readOnly
+            />
           </div>
-          <div className="d-flex align-items-center pt-2">
-            <div className={style.userTitle}>意圖:</div>
-            <div className={style.userText}>{step.intent}</div>
+          <div className="d-flex align-items-center pt-2 intentContainer">
+            <div className={cx('intentContainer', style.userTitle)}>意圖:</div>
+            <div className={cx('intentContainer', style.userText)}>
+              {step.intent}
+            </div>
           </div>
           {entitiesData.length > 0 && (
             <div className={style.entitiesContainer}>
@@ -1316,7 +1379,7 @@ const UserStep: React.FC<UserStepProps> = (props) => {
                       取消
                     </button>
                     <button
-                      className="swal2-cancel swal2-styled"
+                      className="swal2-confirm swal2-styled"
                       data-bs-target={`#add-${step.intent}-example`}
                       data-bs-toggle="modal"
                     >
@@ -1614,6 +1677,78 @@ const UserStep: React.FC<UserStepProps> = (props) => {
                   >
                     儲存
                   </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* entity modal */}
+          <div
+            className="modal fade"
+            id="entityModal"
+            tabIndex="-1"
+            aria-labelledby="entityModalLabel"
+            aria-hidden="true"
+            data-bs-backdrop="false"
+          >
+            <div className="modal-dialog modal-lg modal-dialog-scrollable">
+              <div className={cx('modal-content swal2-show', style.swtOut)}>
+                <div className={style.modalHeader}>
+                  <h1 className="swal2-title" id="entityModalLabel">
+                    關鍵字
+                  </h1>
+                  <button
+                    type="button"
+                    className={cx('swal2-close', style.swetClose)}
+                    data-bs-dismiss="modal"
+                    aria-label="Close"
+                  >
+                    x
+                  </button>
+                </div>
+                <div className="modal-body">
+                  <div className="mb-3">
+                    <label htmlFor="slotName" className="form-label">
+                      標籤類別
+                    </label>
+                    <input
+                      type="text"
+                      className="form-control"
+                      id="slotName"
+                      placeholder="請輸入標籤類別名稱"
+                    />
+                  </div>
+                  <table className="table">
+                    <thead>
+                      <tr>
+                        <th scope="col">標籤</th>
+                        <th scope="col">同義字</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td>{contentEntity.text}</td>
+                        <td />
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+                <div className="swal2-actions d-flex">
+                  <div className="modal-footer">
+                    <button
+                      type="button"
+                      className="swal2-cancel swal2-styled"
+                      data-bs-dismiss="modal"
+                    >
+                      取消
+                    </button>
+                    <button
+                      type="button"
+                      className="swal2-confirm swal2-styled"
+                    >
+                      儲存
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>
