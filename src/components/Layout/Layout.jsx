@@ -33,6 +33,7 @@ const Layout = () => {
           element={
             <ProtectedRoute>
               <div className={style.layoutBlock}>
+                {/* <NavBar /> */}
                 <Stories />
               </div>
             </ProtectedRoute>

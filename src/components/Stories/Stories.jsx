@@ -1,3 +1,4 @@
+/* eslint-disable jsx-a11y/no-static-element-interactions */
 /* eslint-disable react/style-prop-object */
 import * as React from 'react';
 import useSWR from 'swr';
@@ -23,7 +24,7 @@ import useStoryStore from '../../store/useStoryStore';
 import useCreateStoryStore from '../../store/useCreateStoryStore';
 import Slots from './Slots';
 import NavBar from '../NavBar';
-import { NAVITEMS } from '../config';
+// import { NAVITEMS } from '../config';
 
 const Stories = () => {
   /**
@@ -417,10 +418,29 @@ const Stories = () => {
     },
     [onSetAllTrainData, onSetStory, onSetDeleteStory, cloneData, story],
   );
-
+  // 語句庫與情景劇本切換
+  const atChangeMode = React.useCallback((modeValue) => {
+    setNowMode(modeValue);
+    // let other = '';
+    // if (modeValue === 'scenario') {
+    //   other = 'statement';
+    // } else {
+    //   other = 'scenario';
+    // }
+    // if (modeValue === 'storeChid') {
+    //   return;
+    // }
+    // document
+    //   .querySelector(`#senderId [name=${other}]`)
+    //   .setAttribute('data-open', 'none');
+    // document
+    //   .querySelector(`#senderId [name=${modeValue}]`)
+    //   .setAttribute('data-open', 'open');
+  }, []);
   // 選擇故事
   const atSelectStory = React.useCallback(
     (storyName: string) => {
+      atChangeMode('storeChid');
       if (Object.keys(newStory).length !== 0) {
         return confirmWidget(newStory.story, null).then((result) => {
           if (!result.isConfirmed) return;
@@ -1118,180 +1138,27 @@ const Stories = () => {
     }
   }, [newStory]);
 
-  // 語句庫與情景劇本切換
-  const atChangeMode = React.useCallback(
-    (modeValue) => {
-      setNowMode(modeValue);
-      let other = '';
-      if (modeValue === 'scenario') {
-        other = 'statement';
-      } else {
-        other = 'scenario';
-      }
-      document
-        .querySelector(`#senderId [name=${other}]`)
-        .setAttribute('data-open', 'none');
-      document
-        .querySelector(`#senderId [name=${modeValue}]`)
-        .setAttribute('data-open', 'open');
-    },
-    [nowMode],
-  );
   return (
     <>
-      <div className={style.searchBar}>
-        <div className={cx('d-flex')}>
-          <div className={cx(style.sideBar)}>
-            <NavBar navItems={NAVITEMS} />
-          </div>
-          <div id="senderId" className={style.senderId}>
-            <div className={cx('d-flex', style.titleBlock)}>
-              <h5
-                name="scenario"
-                data-open="open"
-                className={style.searchTitle}
-                onClick={() => {
-                  atChangeMode('scenario');
-                }}
-              >
-                情境劇本
-              </h5>
-              <h5
-                name="statement"
-                data-open="none"
-                onClick={() => {
-                  atChangeMode('statement');
-                }}
-                className={style.searchTitle}
-                type="button"
-                // data-bs-toggle="offcanvas"
-                // data-bs-target="#showSlotsOffcanvas"
-                // aria-controls="offcanvasWithBothOptions"
-              >
-                語句庫
-              </h5>
-            </div>
-            <div className={cx(style.menuBtnBlock)}>
-              <div
-                className={cx(
-                  nowMode !== 'scenario' ? style.hidden : '',
-                  style.btn,
-                  style.navbar,
-                )}
-              >
-                <MyButton
-                  variant="third"
-                  id="createNewStoryBtn"
-                  dataBsToggle="modal"
-                  dataBsTarget="#createNewStoryModal"
-                  onClick={() => atClickCreateStoryBtn()}
-                  type="button"
-                >
-                  +創建故事
-                </MyButton>
-                {Object.keys(deletedStory).length > 0 && (
-                  <div className={cx('btn', style.recoverBtn)}>
-                    <MyButton
-                      variant="primary"
-                      onClick={() => atRecoverDeletedStory(deletedStory)}
-                    >
-                      恢復刪除
-                    </MyButton>
-                  </div>
-                )}
+      <NavBar
+        atChangeMode={atChangeMode}
+        atClickCreateStoryBtn={atClickCreateStoryBtn}
+      />
+      <div className={cx(style.storeBlock)}>
+        <div className={cx(style.trainBlock)}>
+          <button>啟動訓練</button>
+        </div>
+        <div
+          className={cx(
+            nowMode !== 'scenario' ? style.hidden : style.storoesBlock,
+            style.searchBar,
+          )}
+        >
+          <div className="container">
+            <div className={cx('row')}>
+              <div className={style.searchBarTitle}>
+                <h5>情境劇本</h5>
               </div>
-              <div
-                className={cx(
-                  nowMode !== 'statement' ? style.hidden : '',
-                  style.btn,
-                  style.navbar,
-                )}
-              >
-                <MyButton
-                  variant="third"
-                  id="createSlot"
-                  type="button"
-                  dataBsToggle="modal"
-                  dataBsTarget="#addSlotModal"
-                >
-                  +創建語句庫
-                </MyButton>
-              </div>
-              <div className={cx(style.btn, style.navbar)}>
-                {/* <MyButton variant="secondary">記錄槽</MyButton> */}
-
-                {/* offcanvas 左側邊欄 */}
-                <div
-                  className={cx('offcanvas offcanvas-start ', style.offcanvas)}
-                  data-bs-scroll="true"
-                  id="showSlotsOffcanvas"
-                  tabIndex="-1"
-                  aria-labelledby="showSlotsOffcanvasLabel"
-                >
-                  <div className="offcanvas-header">
-                    <h5
-                      className={cx('offcanvas-title')}
-                      id="showSlotsOffcanvasLabel"
-                    >
-                      記錄槽
-                    </h5>
-                    <button
-                      type="button"
-                      className="btn-close"
-                      data-bs-dismiss="offcanvas"
-                      aria-label="Close"
-                    />
-                  </div>
-                  {/* <Slots slots={slots} domain={domain} /> */}
-                </div>
-              </div>
-            </div>
-            <div className={cx(style.menuInputBlock)}>
-              <select
-                id="stories"
-                className={cx('form-control', style.storiesSelector)}
-                onChange={(e) => atSelectStory(e.target.value)}
-                value={defaultValue}
-              >
-                <option value="" disabled hidden>
-                  請選擇
-                </option>
-                {categories &&
-                  categories.map((category) => (
-                    <React.Fragment
-                      key={`${category.createdAt}-${category.id}-${category.name}`}
-                    >
-                      <option
-                        className={cx(style.categoryDisabled)}
-                        disabled
-                        key={`${category.name}-${category.id}`}
-                      >
-                        {category.name}
-                      </option>
-                      {storiesOptions &&
-                        storiesOptions.map(
-                          (item) =>
-                            item.metadata.category === category.name && (
-                              <option
-                                key={`${item.metadata.category}-${item.story}`}
-                                value={item.story}
-                              >
-                                &nbsp;&nbsp;&nbsp;&nbsp;{item.story}
-                              </option>
-                            ),
-                        )}
-                    </React.Fragment>
-                  ))}
-              </select>
-              {/* <div>
-                <input
-                  type="text"
-                  className="form-control"
-                  placeholder="搜尋故事流程"
-                />
-              </div> */}
-            </div>
-            <div className={cx(style.listBlock)}>
               <div
                 name="stories"
                 className={cx(
@@ -1299,28 +1166,40 @@ const Stories = () => {
                   style.storoesBlock,
                 )}
               >
+                <div className={cx(style.listTitle)}>
+                  {categories &&
+                    categories.map((category) => {
+                      return (
+                        <div
+                          key={`list-${category.name}-`}
+                          onClick={() => onSetSelectedCategory(category.name)}
+                          className={cx(style.title)}
+                        >
+                          {category.name}
+                        </div>
+                      );
+                    })}
+                </div>
                 <div className={cx(style.list)}>
                   {categories &&
                     categories.map((category) => {
                       return (
-                        <ul
+                        <div
                           data-open={
                             selectedCategory === category.name
                               ? 'open'
                               : 'noopen'
                           }
                           key={`list-${category.name}`}
-                          className={cx(style.listmenu)}
-                          onClick={() => onSetSelectedCategory(category.name)}
+                          className={cx('row', cx(style.listmenu))}
                         >
-                          <div className={cx(style.title)}>{category.name}</div>
-                          <hr />
                           {storiesOptions &&
                             storiesOptions.map((item) => {
                               if (item.metadata.category === category.name) {
                                 return (
-                                  <li
+                                  <div
                                     key={`list-${item.metadata.category}-${item.story}`}
+                                    className="col-lg-3 col-md-4 col-sm-6 "
                                   >
                                     <button
                                       className={cx(style.listBtn)}
@@ -1337,12 +1216,12 @@ const Stories = () => {
                                     >
                                       {item.story}
                                     </button>
-                                  </li>
+                                  </div>
                                 );
                               }
                               return null;
                             })}
-                        </ul>
+                        </div>
                       );
                     })}
                   {/* create story modal */}
@@ -1492,23 +1371,147 @@ const Stories = () => {
               </div>
             </div>
           </div>
+          <div className={cx('d-flex')}>
+            <div id="senderId" className={style.senderId}>
+              <div className={cx(style.menuBtnBlock)}>
+                <div
+                  className={cx(
+                    nowMode !== 'scenario' ? style.hidden : '',
+                    style.btn,
+                    style.navbar,
+                  )}
+                >
+                  {Object.keys(deletedStory).length > 0 && (
+                    <div className={cx('btn', style.recoverBtn)}>
+                      <MyButton
+                        variant="primary"
+                        onClick={() => atRecoverDeletedStory(deletedStory)}
+                      >
+                        恢復刪除
+                      </MyButton>
+                    </div>
+                  )}
+                </div>
+                <div
+                  className={cx(
+                    nowMode !== 'statement' ? style.hidden : '',
+                    style.btn,
+                    style.navbar,
+                  )}
+                >
+                  <MyButton
+                    variant="third"
+                    id="createSlot"
+                    type="button"
+                    dataBsToggle="modal"
+                    dataBsTarget="#addSlotModal"
+                  >
+                    +創建語句庫
+                  </MyButton>
+                </div>
+                <div className={cx(style.btn, style.navbar)}>
+                  {/* <MyButton variant="secondary">記錄槽</MyButton> */}
+
+                  {/* offcanvas 左側邊欄 */}
+                  <div
+                    className={cx(
+                      'offcanvas offcanvas-start ',
+                      style.offcanvas,
+                    )}
+                    data-bs-scroll="true"
+                    id="showSlotsOffcanvas"
+                    tabIndex="-1"
+                    aria-labelledby="showSlotsOffcanvasLabel"
+                  >
+                    <div className="offcanvas-header">
+                      <h5
+                        className={cx('offcanvas-title')}
+                        id="showSlotsOffcanvasLabel"
+                      >
+                        記錄槽
+                      </h5>
+                      <button
+                        type="button"
+                        className="btn-close"
+                        data-bs-dismiss="offcanvas"
+                        aria-label="Close"
+                      />
+                    </div>
+                    {/* <Slots slots={slots} domain={domain} /> */}
+                  </div>
+                </div>
+              </div>
+              <div className={cx(style.menuInputBlock)}>
+                <select
+                  id="stories"
+                  className={cx('form-control', style.storiesSelector)}
+                  onChange={(e) => atSelectStory(e.target.value)}
+                  value={defaultValue}
+                >
+                  <option value="" disabled hidden>
+                    請選擇
+                  </option>
+                  {categories &&
+                    categories.map((category) => (
+                      <React.Fragment
+                        key={`${category.createdAt}-${category.id}-${category.name}`}
+                      >
+                        <option
+                          className={cx(style.categoryDisabled)}
+                          disabled
+                          key={`${category.name}-${category.id}`}
+                        >
+                          {category.name}
+                        </option>
+                        {storiesOptions &&
+                          storiesOptions.map(
+                            (item) =>
+                              item.metadata.category === category.name && (
+                                <option
+                                  key={`${item.metadata.category}-${item.story}`}
+                                  value={item.story}
+                                >
+                                  &nbsp;&nbsp;&nbsp;&nbsp;{item.story}
+                                </option>
+                              ),
+                          )}
+                      </React.Fragment>
+                    ))}
+                </select>
+                {/* <div>
+                  <input
+                    type="text"
+                    className="form-control"
+                    placeholder="搜尋故事流程"
+                  />
+                </div> */}
+              </div>
+            </div>
+          </div>
         </div>
+        <div
+          className={cx(
+            nowMode !== 'storeChid' ? style.hidden : style.storoesBlock,
+            style.searchBar,
+          )}
+        >
+          {Object.keys(story).length > 0 && (
+            <ShowStory
+              isCreate={create}
+              story={story}
+              onDeleteStory={atDeleteStory}
+            />
+          )}
+        </div>
+        {create && (
+          <CreateStory
+            isCreate={create}
+            nlu={nlu.rasa_nlu_data.common_examples}
+            actions={actions}
+            onClickSaveBtn={atClickSaveBtn}
+          />
+        )}
       </div>
-      {Object.keys(story).length > 0 && (
-        <ShowStory
-          isCreate={create}
-          story={story}
-          onDeleteStory={atDeleteStory}
-        />
-      )}
-      {create && (
-        <CreateStory
-          isCreate={create}
-          nlu={nlu.rasa_nlu_data.common_examples}
-          actions={actions}
-          onClickSaveBtn={atClickSaveBtn}
-        />
-      )}
     </>
   );
 };

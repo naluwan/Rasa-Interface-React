@@ -2,80 +2,219 @@
   background: #2d304c;
 }
 
-.logo {
-  text-decoration: none;
-  font-family: 'Poiret', 'Poiret Ie', 微軟正黑體;
-  font-size: 42px;
-  margin: 10px 5px;
-  display: inline-block;
-  height: 5rem;
-  width: 3rem;
-  padding: 0;
-  vertical-align: middle;
-  background: url(../../images/logo1.png) no-repeat center;
-  background-size: contain;
-}
-
-.persona {
-  position: relative;
-  text-decoration: none;
-  font-family: 'Poiret', 'Poiret Ie', 微軟正黑體;
-  margin: 5px;
-  display: inline-block;
-  height: 5rem;
-  width: 3rem;
-  padding: 0;
-  text-align: left;
-  border: none;
-  vertical-align: middle;
-  background: url(../../images/people.png) no-repeat center;
-  background-size: contain;
-}
-
-.personaBlock {
-  margin: 0;
-  bottom: 10px;
-  left: 100%;
-  text-align: left;
-  display: flex;
-    padding: 0;
-  width: max-content;
-  flex-direction: column;
-  background: #fff;
-  border-radius: 5px;
-  border: 1px solid rgb(133, 133, 133);
-  position: absolute;
-  overflow: hidden;
-
-  .personaItem {
-    display: block;
-    background: #fff;
-    padding: 10px;
-    text-align: left;
-
-    &:hover {
-      background: #7d89f7;
-      color: #fff;
-    }
-  }
-}
-
 .navbar {
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
   height: 100%;
+  border-right: 1px solid #cacaca;
+  background: #fff;
+  justify-content: space-between;
 
+  h5 {
+     opacity: 0;
+     width: 0;
+     transition: opacity 0s;
+  }
+
+
+
+
+  .logo {
+    display: flex;
+    flex-direction: row;
+    height: 3rem;
+    align-items: center;
+    margin: 1rem 1.5rem;
+    cursor: pointer;
+    background: #ffffff;
+    border-radius: .5rem;
+
+    .logoIcon {
+      text-decoration: none;
+      font-family: 'Poiret', 'Poiret Ie', 微軟正黑體;
+      margin: 1rem .5rem;
+      display: inline-block;
+      height: 3rem;
+      width: 3rem;
+      padding: 0;
+      vertical-align: middle;
+      background: url(../../images/navbar/logo1.png) no-repeat center;
+      background-size: contain;
+    }
+  }
+
+  .list {
+    .btn {
+      display: flex;
+      flex-direction: row;
+      height: 3rem;
+      align-items: center;
+      margin: 1rem 1.5rem;
+      cursor: pointer;
+      background: #ffffff;
+      border-radius: .5rem;
+      user-select: none;
+      -webkit-user-select: none;
+      -moz-user-select: none;
+
+      h5 {
+        margin: 0;
+      }
+
+      .icon {
+        margin: 0.1rem 0;
+        width: 3rem;
+        height: 3rem;
+        padding: .6rem;
+        border-radius: .5rem;
+        stroke: #272848;
+        fill: #272848;
+        pointer-events: none;
+
+        svg {
+          display: block;
+        }
+
+      }
+
+      &.create {
+        text-align: center;
+        justify-content: center;
+        border: 1px solid #D4D4DA;
+      }
+
+      &:hover {
+        background: #F4F4F6;
+        color: #272848;
+
+        .icon {
+          fill: #272848;
+
+        }
+
+        svg {
+          stroke: #272848;
+        }
+      }
+
+      &:active {
+        background: #6D71F9;
+        color: #fff;
+
+        .icon {
+          fill: #fff;
+
+        }
+
+        svg {
+          stroke: #fff;
+        }
+      }
+
+
+    }
+  }
+
+  .customer {
+    width: 100%;
+
+    .btn {
+      position: relative;
+      width: calc(100% - 3rem);
+      display: flex;
+      flex-direction: row;
+      height: 3rem;
+      align-items: center;
+      margin: 1rem 1.5rem;
+      cursor: pointer;
+      border: none;
+      background: #ffffff;
+      border-radius: .5rem;
+
+      h5 {
+        margin: 0;
+      }
+
+      .persona {
+
+        text-decoration: none;
+        font-family: 'Poiret', 'Poiret Ie', 微軟正黑體;
+        margin: 0;
+        display: inline-block;
+        height: 5rem;
+        width: 3rem;
+        padding: 0;
+        text-align: left;
+        border: none;
+        vertical-align: middle;
+        background: url(../../images/navbar/people.png) no-repeat center;
+        background-size: contain;
+
+
+        .personaBlock {
+          margin: 0;
+          bottom: 10px;
+          left: 100%;
+          text-align: left;
+          display: flex;
+          padding: 0;
+          width: max-content;
+          flex-direction: column;
+          background: #fff;
+          border-radius: 5px;
+          border: 1px solid rgb(133, 133, 133);
+          position: absolute;
+          overflow: hidden;
+
+          .personaItem {
+            display: block;
+            background: #fff;
+            padding: 10px;
+            text-align: left;
+
+            .loadingIcon {
+              font-size: 2rem;
+              animation: animate 1s linear infinite;
+            }
+
+            &:hover {
+              background: #F4F4F6;
+              color: #fff;
+            }
+          }
+        }
+
+        .hidden {
+          display: none;
+        }
+      }
+    }
+
+
+  }
+     width: 6rem;
+transition: all 1s;
+  &:hover {
+    width: 18.5rem;
+    transition: all .5s;
+    h5 {
+        opacity: 1;
+        width: auto;
+        transition: opacity 2s;
+      }
+  }
 }
 
-.loadingIcon {
-  font-size: 2rem;
-  animation: animate 1s linear infinite;
-}
 
-.hidden {
-  display: none;
-}
+
+
+
+
+
+
+
+
+
 
 @keyframes animate {
   0% {
@@ -87,12 +226,12 @@
   }
 }
 
-@media screen and (max-width:768px){
+@media screen and (max-width:768px) {
   .navbar {
-      display: flex;
-      flex-direction: row;
-      justify-content: space-between;
-      height: 100%;
-  
-    }
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    height: 100%;
+
+  }
 }
