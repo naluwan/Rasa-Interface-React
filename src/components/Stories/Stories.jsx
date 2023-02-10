@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable jsx-a11y/no-static-element-interactions */
 /* eslint-disable react/style-prop-object */
 import * as React from 'react';
@@ -24,6 +25,7 @@ import useStoryStore from '../../store/useStoryStore';
 import useCreateStoryStore from '../../store/useCreateStoryStore';
 import Slots from './Slots';
 import NavBar from '../NavBar';
+import CreateNewStory from '../CreateNewStory';
 // import { NAVITEMS } from '../config';
 
 const Stories = () => {
@@ -421,21 +423,6 @@ const Stories = () => {
   // 語句庫與情景劇本切換
   const atChangeMode = React.useCallback((modeValue) => {
     setNowMode(modeValue);
-    // let other = '';
-    // if (modeValue === 'scenario') {
-    //   other = 'statement';
-    // } else {
-    //   other = 'scenario';
-    // }
-    // if (modeValue === 'storeChid') {
-    //   return;
-    // }
-    // document
-    //   .querySelector(`#senderId [name=${other}]`)
-    //   .setAttribute('data-open', 'none');
-    // document
-    //   .querySelector(`#senderId [name=${modeValue}]`)
-    //   .setAttribute('data-open', 'open');
   }, []);
   // 選擇故事
   const atSelectStory = React.useCallback(
@@ -1499,9 +1486,61 @@ const Stories = () => {
             <ShowStory
               isCreate={create}
               story={story}
+              atChangeMode={atChangeMode}
               onDeleteStory={atDeleteStory}
             />
           )}
+        </div>
+        <div
+          className={cx(
+            nowMode !== 'createStories' ? style.hidden : style.storoesBlock,
+            style.searchBar,
+          )}
+        >
+          <button
+            data-bs-toggle="modal"
+            data-bs-target="#createNewStoryModal"
+            onClick={() => atClickCreateStoryBtn()}
+          >
+            123
+          </button>
+          <div className={cx(style.createStoriesBlock)}>
+            <div className={cx(style.createStoriesCard)}>
+              <div>
+                <img
+                  src={require('../../images/creactStory/A.png')}
+                  alt="basic"
+                />
+                <div />
+                <div>
+                  <h3>基礎</h3>
+                  <h3>(一問一答)</h3>
+                </div>
+              </div>
+            </div>
+            <div className={cx(style.createStoriesCard)}>
+              <div>
+                <img
+                  src={require('../../images/creactStory/B.png')}
+                  alt="basic"
+                />
+                <div />
+                <div>
+                  <h3>進階</h3>
+                  <h3>(智慧型機器人)</h3>
+                </div>
+              </div>
+            </div>
+          </div>
+          {/* creactStory */}
+          <CreateNewStory
+            atChangeNewStoryInfo={atChangeNewStoryInfo}
+            atCreateNewStory={atCreateNewStory}
+            categories={categories}
+            stories={stories}
+            newStoryInfo={newStoryInfo}
+            setNewStoryInfo={setNewStoryInfo}
+          />
         </div>
         {create && (
           <CreateStory

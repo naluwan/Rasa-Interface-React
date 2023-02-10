@@ -1,0 +1,132 @@
+.creactStoryBlock {
+    border: 1px solid #000;
+    border-radius: 5px;
+    flex-direction: column;
+    margin: 0 auto;
+    display: flex;
+    width: 40rem;
+    justify-content: center;
+    background-color: #fff;
+    position: relative;
+
+    .creactStoryCloseBtn {
+        padding: 10px;
+        position: absolute;
+        top: 0;
+        right: 0;
+        color: #fff;
+    }
+
+    .creactStoryStep {
+        padding: 10px;
+        display: flex;
+        flex-direction: row;
+        background: #52536D;
+        color: #fff;
+
+        .item {
+            margin-left: 1rem;
+            cursor: pointer;
+            display: flex;
+            flex-direction: row;
+            justify-content: center;
+            align-items: center;
+
+            h6 {
+                padding: 0;
+                margin: 0;
+            }
+
+            .itemIcon {
+                width: 3.3rem;
+                height: 10px;
+                display: inline-flex;
+                position: relative;
+
+                &:after {
+                    position: absolute;
+                    content: "";
+                    left: 50%;
+                    width: 1.3rem;
+                    top: 50%;
+                    transform: translate(-50%, -50%);
+                    height: 1.3rem;
+                    display: block;
+                    border: 2px solid #ffffff;
+                    border-radius: 99px;
+                }
+
+                &:before {
+                    position: absolute;
+                    content: "";
+                    width: .8rem;
+                    height: .8rem;
+                    display: block;
+                    left: 50%;
+                    transform: translate(-50%, -50%);
+                    top: 50%;
+                    background: #ffffff;
+                    border: 1px solid #ffffff;
+                    border-radius: 99px;
+
+                }
+
+            }
+
+            &.active {
+                h6 {
+                    padding: 0;
+                    margin: 0;
+                    color: #54C1FB;
+                }
+
+                .itemIcon {
+                    &:after {
+                        position: absolute;
+                        content: "";
+                        left: 50%;
+                        width: 1.3rem;
+                        top: 50%;
+                        transform: translate(-50%, -50%);
+                        height: 1.3rem;
+                        display: block;
+                        border: 2px solid #54C1FB;
+                        border-radius: 99px;
+                    }
+
+
+                    &:before {
+                        position: absolute;
+                        content: "";
+                        width: .8rem;
+                        height: .8rem;
+                        display: block;
+                        left: 50%;
+                        transform: translate(-50%, -50%);
+                        top: 50%;
+                        background: #54C1FB;
+                        border: 1px solid #54C1FB;
+                        border-radius: 99px;
+
+                    }
+                }
+            }
+        }
+    }
+
+    .creactStoryTitle {
+        padding: 10px;
+        color: #697ef1;
+    }
+
+    .creactStoryFunction {
+        padding: 10px;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .creactStoryFunctionBtn {
+        padding: 10px;
+        text-align: right;
+    }
+}

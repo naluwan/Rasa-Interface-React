@@ -15,11 +15,10 @@ import type { State } from '../types';
 type NavBarProps = {
   navItems: NavItemType[],
   atChangeMode: (e: String) => void,
-  atClickCreateStoryBtn: () => void,
 };
 
 const NavBar: React.FC<NavBarProps> = (props) => {
-  const { atChangeMode, atClickCreateStoryBtn } = props;
+  const { atChangeMode } = props;
   const {
     user,
     rasaTrainState,
@@ -236,13 +235,7 @@ const NavBar: React.FC<NavBarProps> = (props) => {
               </svg>
             </div>
             <div>
-              <h5
-                data-bs-toggle="modal"
-                data-bs-target="#createNewStoryModal"
-                onClick={() => atClickCreateStoryBtn()}
-              >
-                創建劇本
-              </h5>
+              <h5 onClick={() => atChangeMode('createStories')}>創建劇本</h5>
             </div>
           </div>
         </div>

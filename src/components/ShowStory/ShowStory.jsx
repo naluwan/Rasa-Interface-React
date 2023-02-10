@@ -13,11 +13,12 @@ import CheckPoint from '../CheckPoint';
 type ShowStoryProps = {
   story: StoryType,
   isCreate: boolean,
+  atChangeMode: (e: string) => void,
   onDeleteStory: (storyName: string) => void,
 };
 
 const ShowStory: React.FC<ShowStoryProps> = (props) => {
-  const { story, isCreate, onDeleteStory } = props;
+  const { story, isCreate, onDeleteStory, atChangeMode } = props;
 
   /**
    * @type {[{ori:{story:string,category:string},new:{story:string,category:string,create?:boolean}}, Function]}
@@ -226,6 +227,24 @@ const ShowStory: React.FC<ShowStoryProps> = (props) => {
 
   return (
     <div data-showstory className={style.root}>
+      <nav aria-label="breadcrumb">
+        <ol className="breadcrumb">
+          <li className="breadcrumb-item">
+            <button
+              className={cx(style.showBreadcrumbBtn)}
+              onClick={() => atChangeMode('scenario')}
+            >
+              情境劇本
+            </button>
+          </li>
+          <li className="breadcrumb-item">
+            <span>{story.metadata.category}</span>
+          </li>
+          <li className="breadcrumb-item active" aria-current="page">
+            {story.story}
+          </li>
+        </ol>
+      </nav>
       <div className={cx('d-flex align-items-center', style.tilteBlock)}>
         <div className={style.title}>{story.story}</div>
         {story.story !== '問候語' && (
