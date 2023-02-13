@@ -77,7 +77,7 @@ const WebChatWidget = () => {
       if (e.button === 0 || e.type === 'touchend') {
         console.log('放開左鍵');
         currentRecorder.stop();
-        currentRecorder.play();
+        // currentRecorder.play();
         const blob = currentRecorder.getWAVBlob();
         console.log('blob ==> ', blob.size);
         const formData = new FormData();
@@ -134,8 +134,9 @@ const WebChatWidget = () => {
               const currentText = JSON.parse(
                 JSON.stringify(text)
                   .replace(/ {2}\\n/g, '')
-                  .replace(/\$/g, '')
-                  .replace(/,/g, ''),
+                  .replace(/\$/g, ''),
+                // .replace(/,/g, '')
+                // .replace(/\(comma\)/g, ','),
               );
               botResText += currentText;
             }
