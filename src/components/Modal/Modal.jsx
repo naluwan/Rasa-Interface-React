@@ -1,0 +1,132 @@
+import * as React from 'react';
+import cx from 'classnames';
+import ReactDOM from 'react-dom';
+import { AiOutlineClose } from 'react-icons/ai';
+import style from './Modal.module.scss';
+
+type ModalProps = {
+  title: string,
+  inputPlaceholder: string,
+  textAreaPlaceholder: string,
+  isVisible: boolean,
+  maxWidth: string,
+  modalTextarea: string,
+  onClose: () => void,
+  onAddResButtons: (
+    modalData: {
+      modalInput: string,
+      modalTextarea: string,
+    },
+    hasInput: boolean,
+  ) => void,
+};
+
+const Modal: React.FC<ModalProps> = (props) => {
+  const {
+    title,
+    inputPlaceholder,
+    textAreaPlaceholder,
+    isVisible,
+    maxWidth,
+    modalTextarea,
+    onClose,
+    onAddResButtons,
+  } = props;
+
+  const [modalData, setModalData] = React.useState({
+    modalInput: '',
+    modalTextarea: '',
+  });
+
+  React.useEffect(() => {
+    setModalData((prev) => {
+      return {
+        ...prev,
+        modalTextarea,
+      };
+    });
+  }, [modalTextarea]);
+
+  // 更新modal input, textarea的值
+  const atChange = React.useCallback(
+    (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+      const { name, value } = e.target;
+      setModalData((prev) => {
+        return {
+          ...prev,
+          [name]: value,
+        };
+      });
+    },
+    [],
+  );
+
+  const atCloseModal = React.useCallback(() => {
+    onClose();
+    setModalData({ modalInput: '', modalTextarea: '' });
+  }, [onClose, setModalData]);
+
+  return isVisible
+    ? ReactDOM.createPortal(
+        <div className={style.backdrop}>
+          <div
+            className={cx(style.modal, 'swal2-show')}
+            style={
+              maxWidth ? { maxWidth: `${maxWidth}%` } : { maxWidth: `${60}%` }
+            }
+          >
+            <div className={cx(style.modalHeader)}>
+              <h2 className={cx(style.modalTitle)}>{title}</h2>
+              <AiOutlineClose
+                className={cx(style.closeBtn)}
+                onClick={() => atCloseModal()}
+              />
+            </div>
+            <div className={cx(style.modalContent)}>
+              {inputPlaceholder ? (
+                <div className={cx('mb-3 mt-1')}>
+                  <input
+                    type="text"
+                    className="form-control"
+                    name="modalInput"
+                    id="modalInput"
+                    value={modalData.modalInput}
+                    placeholder={inputPlaceholder}
+                    onChange={(e) => atChange(e)}
+                  />
+                </div>
+              ) : null}
+              <div className={cx('mb-3 mt-1')}>
+                <textarea
+                  className="form-control"
+                  name="modalTextarea"
+                  id="modalTextarea"
+                  rows="5"
+                  placeholder={textAreaPlaceholder}
+                  value={modalData.modalTextarea}
+                  onChange={(e) => atChange(e)}
+                />
+              </div>
+            </div>
+            <div className={cx(style.modalFooter)}>
+              <button
+                className="btn btn-danger modalBtn"
+                onClick={() => atCloseModal()}
+              >
+                取消
+              </button>
+              <button
+                className="btn btn-primary modalBtn"
+                onClick={() => onAddResButtons(modalData, !!inputPlaceholder)}
+              >
+                儲存
+              </button>
+            </div>
+          </div>
+        </div>,
+        document.body,
+      )
+    : null;
+};
+
+export default React.memo(Modal);
