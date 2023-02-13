@@ -870,6 +870,17 @@ const reducer = (state: State, action: Action): State => {
         });
       }
 
+      const isRepeat = domain.responses[actionName][0].buttons.some(
+        (button) => button.title === title,
+      );
+
+      if (isRepeat) {
+        return Toast.fire({
+          icon: 'warning',
+          title: '按鈕重複',
+        });
+      }
+
       const intentStory = [];
       stories.map((item) => {
         return item.steps.map((step) =>

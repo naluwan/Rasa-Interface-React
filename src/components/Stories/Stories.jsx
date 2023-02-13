@@ -629,6 +629,12 @@ const Stories = () => {
         return step;
       });
 
+      const allStoryIntents = cloneData.stories.map(
+        (item) => item.steps.map((step) => step.intent)[0],
+      );
+
+      console.log('allStoryIntents ==> ', allStoryIntents);
+
       // 支線故事和支線故事內的串接故事處理
       if (branchStories.length) {
         // 支線故事
@@ -646,6 +652,21 @@ const Stories = () => {
                       payload:
                         isPayload > -1 ? button.payload : `/${button.payload}`,
                       reply: button.reply,
+                    });
+                  }
+
+                  // 驗證新增的按鈕是否是要串接別的故事
+                  const isIntentStory = allStoryIntents.indexOf(
+                    button.payload.slice(1, button.payload.length),
+                  );
+
+                  if (isIntentStory > -1) {
+                    return buttons.push({
+                      title: button.title,
+                      payload:
+                        isPayload > -1
+                          ? `/${button.payload.slice(1, button.payload.length)}`
+                          : `/${button.payload}`,
                     });
                   }
                   return buttons.push({
@@ -688,6 +709,24 @@ const Stories = () => {
                                 ? button.payload
                                 : `/${button.payload}`,
                             reply: button.reply,
+                          });
+                        }
+
+                        // 驗證新增的按鈕是否是要串接別的故事
+                        const isIntentStory = allStoryIntents.indexOf(
+                          button.payload.slice(1, button.payload.length),
+                        );
+
+                        if (isIntentStory > -1) {
+                          return buttons.push({
+                            title: button.title,
+                            payload:
+                              isPayload > -1
+                                ? `/${button.payload.slice(
+                                    1,
+                                    button.payload.length,
+                                  )}`
+                                : `/${button.payload}`,
                           });
                         }
                         return buttons.push({
@@ -799,6 +838,20 @@ const Stories = () => {
                   reply: button.reply,
                 });
               }
+              // 驗證新增的按鈕是否是要串接別的故事
+              const isIntentStory = allStoryIntents.indexOf(
+                button.payload.slice(1, button.payload.length),
+              );
+
+              if (isIntentStory > -1) {
+                return buttons.push({
+                  title: button.title,
+                  payload:
+                    isPayload > -1
+                      ? `/${button.payload.slice(1, button.payload.length)}`
+                      : `/${button.payload}`,
+                });
+              }
               return buttons.push({
                 title: button.title,
                 payload:
@@ -850,7 +903,7 @@ const Stories = () => {
         if (actionItem.buttons?.length) {
           actionItem.buttons.map((button) => {
             const intent = button.payload.replace(/\//g, '');
-
+            console.log('button intent ===> ', intent);
             // 按鈕只需要新增沒有相同意圖的就好，因為同意圖，代表是要回答現有的故事流程回答
             if (
               newNlu.rasa_nlu_data.common_examples.every(
