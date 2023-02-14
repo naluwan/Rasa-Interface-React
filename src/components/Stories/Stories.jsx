@@ -979,6 +979,7 @@ const Stories = () => {
   // 更新新故事資訊
   const atChangeNewStoryInfo = React.useCallback(
     (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+      console.log('change e target =>', e.target);
       // 獲取使用者輸入的資訊
       const { name, value } = e.target;
 
@@ -1538,6 +1539,7 @@ const Stories = () => {
             atCreateNewStory={atCreateNewStory}
             categories={categories}
             stories={stories}
+            newStory={newStory}
             newStoryInfo={newStoryInfo}
             setNewStoryInfo={setNewStoryInfo}
           />

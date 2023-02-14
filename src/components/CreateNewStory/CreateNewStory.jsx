@@ -1,10 +1,16 @@
 /* eslint-disable react-hooks/exhaustive-deps */
+/* eslint-disable array-callback-return */
+/* eslint-disable no-return-assign */
 import * as React from 'react';
 import cx from 'classnames';
 import type { State } from 'components/types';
+import uuid from 'react-uuid';
 import style from './CreateNewStory.module.scss';
+import type { StoryType } from '../types';
+import { Toast } from '../../utils/swalInput';
 
 type CreateNewStoryProps = {
+  newStory: StoryType,
   newStoryInfo: Object,
   categories: State,
   stories: State,
@@ -22,6 +28,7 @@ const CreateNewStory: React.FC<CreateNewStoryProps> = (props) => {
   const {
     atCreateNewStory,
     categories,
+    newStory,
     setNewStoryInfo,
     atChangeNewStoryInfo,
     newStoryInfo,
@@ -29,13 +36,14 @@ const CreateNewStory: React.FC<CreateNewStoryProps> = (props) => {
   } = props;
   const [creactStoryStep, setcreactStoryStep] = React.useState('creactName');
   const [title, settitle] = React.useState('為你的劇本取名吧!');
+
   // next step
   const ChangeStep = React.useCallback(
     (stepName: string) => {
       if (stepName === 'creactName') {
+        atCreateNewStory(newStoryInfo, stories, categories);
         setcreactStoryStep('creactQuestion');
         settitle('用戶問句');
-        atCreateNewStory(newStoryInfo, stories, categories);
       }
       if (stepName === 'creactQuestion') {
         setcreactStoryStep('creactBot');
@@ -50,40 +58,103 @@ const CreateNewStory: React.FC<CreateNewStoryProps> = (props) => {
         setcreactStoryStep('creactName');
       }
     },
-    [creactStoryStep, title],
+    [
+      creactStoryStep,
+      title,
+      atCreateNewStory,
+      newStoryInfo,
+      newStory,
+      stories,
+      categories,
+    ],
   );
-  const [QuestionValue, setQuestionValue] = React.useState([1, 2]);
+  const [QuestionValue, setQuestionValue] = React.useState([
+    { id: uuid(), question: '', error: '' },
+    { id: uuid(), question: '', error: '' },
+  ]);
   // deleteInput
   const deleteQuestion = React.useCallback(
-    (number: number) => {
-      const arr = QuestionValue.filter(function (item) {
-        return item !== number;
-      });
-      console.log(arr);
-      setQuestionValue([arr]);
+    (id: string) => {
+      setQuestionValue((prev) => prev.filter((item) => item.id !== id));
     },
     [QuestionValue],
   );
 
-  const listItems = QuestionValue.map((number, index) => (
-    <div>
-      <label htmlFor={`"Question${index + 1}"`}>*問句{index + 1}</label>
-      <input
-        id={`"Question${index + 1}"`}
-        type="text"
-        placeholder={
-          index === 0 ? '請輸入問句內容' : '請輸入與『 問句1 』相似意圖的句子'
+  // writeStore
+  const changeQuestion = React.useCallback(
+    (id: string, question: string) => {
+      let error = '';
+      if (question === '') {
+        error = '所有欄位都是必填的';
+      } else {
+        QuestionValue.map((item) => {
+          return item.question === question
+            ? (error = `代表值『${question}』的關鍵字重疊，請重新輸入`)
+            : '';
+        });
+      }
+
+      const updatedQuestionValue = QuestionValue.map((item) => {
+        if (item.id === id) {
+          return { ...item, question, error };
         }
-      />
-      {index > 1 && (
-        <button onClick={() => deleteQuestion(index + 1)}>刪除</button>
-      )}
+        return item;
+      });
+      setQuestionValue(updatedQuestionValue);
+    },
+    [setQuestionValue, QuestionValue],
+  );
+  const listItems = QuestionValue.map((item, index) => (
+    <div key={item.id}>
+      <label htmlFor={`"Question${index + 1}"`}>問句{index + 1}</label>
+      <div className={cx('d-flex flex-row')}>
+        <input
+          id={`"Question${index + 1}"`}
+          className="form-control"
+          type="text"
+          onChange={(e) => changeQuestion(item.id, e.target.value)}
+          placeholder={
+            index === 0 ? '請輸入問句內容' : '請輸入與『 問句1 』相似意圖的句子'
+          }
+        />
+
+        {QuestionValue.length > 2 && (
+          <button onClick={() => deleteQuestion(item.id)}>
+            <img src={require('../../images/creactStory/Vector.png')} alt="" />
+          </button>
+        )}
+      </div>
+      {item.error.length > 0 && <div>{item.error}</div>}
     </div>
   ));
   const CreactNewQuestion = React.useCallback(() => {
-    const newQuestionDom = QuestionValue.length + 1;
-    setQuestionValue([...QuestionValue, newQuestionDom]);
-  }, [QuestionValue]);
+    let error = false;
+    let errorName = '';
+    QuestionValue.map((item) => {
+      if (item.error.length > 0) {
+        errorName = `欄位有誤檢查完再新增`;
+        error = true;
+      }
+      console.log(item.question.length);
+      if (item.question.length === 0) {
+        errorName = `所有欄位都是必填的`;
+        error = true;
+      }
+    });
+    if (error === true) {
+      Toast.fire({
+        icon: 'warning',
+        title: errorName,
+        position: 'top-center',
+      });
+      return;
+    }
+    setQuestionValue((prev) => {
+      const newList = prev.concat([{ id: uuid(), question: '', error: '' }]);
+      return newList;
+    });
+  }, [setQuestionValue, QuestionValue]);
+
   return (
     <div>
       <div className={cx(style.creactStoryBlock)}>
