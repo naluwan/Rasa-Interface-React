@@ -121,7 +121,7 @@ const reducer = (state: State, action: Action): State => {
         if (step.action) {
           step.response = JSON.parse(
             JSON.stringify(domain.responses[step.action][0].text).replace(
-              / \\n/g,
+              / {2}\\n/g,
               '\\r',
             ),
           );
@@ -504,10 +504,11 @@ const reducer = (state: State, action: Action): State => {
       const { oriWord, newWord, actionName, storyName } = action.payload;
       const { onSetStory, onSetAllTrainData } = state;
       const { domain } = cloneDeep(state.cloneData);
+
       if (
         state.cloneData.domain.responses[actionName] &&
         state.cloneData.domain.responses[actionName][0].text ===
-          JSON.parse(JSON.stringify(oriWord).replace(/ \\n/g, '  \\n'))
+          JSON.parse(JSON.stringify(oriWord).replace(/\\r/g, '  \\n'))
       ) {
         domain.responses[actionName][0].text = JSON.parse(
           JSON.stringify(newWord).replace(/\\n/g, '  \\n'),
