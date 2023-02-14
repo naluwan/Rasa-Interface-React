@@ -1,12 +1,14 @@
 import * as React from 'react';
 import cx from 'classnames';
 import shallow from 'zustand/shallow';
+import Modal from 'components/Modal';
 import style from './BotStep.module.scss';
 import type { StepsType, StoryType, State } from '../types';
 import {
-  swalInput,
+  // swalInput,
   swalMultipleInput,
   confirmWidget,
+  Toast,
 } from '../../utils/swalInput';
 import ButtonItems from './ButtonItems';
 import useStoryStore from '../../store/useStoryStore';
@@ -67,6 +69,17 @@ const BotStep: React.FC<BotStepProps> = (props) => {
     };
   }, shallow);
 
+  const [isBotButtonVisible, setIsBotButtonVisible] = React.useState(false);
+  const [isBotResponseVisible, setIsBotResponseVisible] = React.useState(false);
+
+  const atToggleBotButtonVisible = React.useCallback(() => {
+    setIsBotButtonVisible((prev) => !prev);
+  }, [setIsBotButtonVisible]);
+
+  const atToggleBotResponseVisible = React.useCallback(() => {
+    setIsBotResponseVisible((prev) => !prev);
+  }, [setIsBotResponseVisible]);
+
   // textarea 自適應高度
   const textAreaRef = React.useRef();
   React.useEffect(() => {
@@ -78,59 +91,109 @@ const BotStep: React.FC<BotStepProps> = (props) => {
   // 編輯機器人回覆
   const atEditBotResponse = React.useCallback(
     (
-      response: string,
-      action: string,
-      currentStoryName: string,
-      currentCheckPointName: string,
-      currentConnectBranchStoryName: string,
+      modalData: { modalInput?: string, modalTextarea: string },
+      hasInput: boolean,
     ) => {
-      return swalInput(
-        '編輯機器人回覆',
-        'textarea',
-        '請輸入機器人回覆',
-        response,
-        true,
-      ).then((data) => {
-        if (!data || !data.new || response === data.new) return;
-        onEditBotRes(
-          data.ori,
-          data.new,
-          action,
-          currentStoryName,
-          currentCheckPointName,
-          currentConnectBranchStoryName,
-        );
-      });
+      // return swalInput(
+      //   '編輯機器人回覆',
+      //   'textarea',
+      //   '請輸入機器人回覆',
+      //   response,
+      //   true,
+      // ).then((data) => {
+      //   if (!data || !data.new || response === data.new) return;
+      //   onEditBotRes(
+      //     data.ori,
+      //     data.new,
+      //     action,
+      //     currentStoryName,
+      //     currentCheckPointName,
+      //     currentConnectBranchStoryName,
+      //   );
+      // });
+      if (!hasInput && modalData.modalTextarea === '') {
+        Toast.fire({
+          icon: 'warning',
+          title: '請輸入機器人回覆',
+        });
+        return;
+      }
+
+      if (!hasInput && modalData.modalTextarea === step.response) {
+        setIsBotResponseVisible((prev) => !prev);
+        return;
+      }
+      onEditBotRes(
+        step.response,
+        modalData.modalTextarea,
+        step.action,
+        storyName,
+        checkPointName,
+        connectBranchStoryName,
+      );
+      setIsBotResponseVisible((prev) => !prev);
     },
-    [onEditBotRes],
+    [
+      onEditBotRes,
+      checkPointName,
+      connectBranchStoryName,
+      step.response,
+      step.action,
+      storyName,
+    ],
   );
 
   // 增加機器人回覆按鈕選項
   const atAddResButtons = React.useCallback(
     (
-      action: string,
-      currentStoryName: string,
-      currentCheckPointName: string,
-      currentConnectStoryName: string,
+      modalData: { modalInput?: string, modalTextarea: string },
+      hasInput: boolean,
     ) => {
-      return swalMultipleInput('新增機器人回覆選項', '', '', true).then(
-        (data) => {
-          if (!data || !data.title) return;
-          const payload = `/${data.title}`;
-          onAddResButtons(
-            action,
-            data.title,
-            payload,
-            data.reply,
-            currentStoryName,
-            stories,
-            currentCheckPointName,
-            currentConnectStoryName,
-          );
-        },
+      //   return swalMultipleInput('新增機器人回覆選項', '', '', true).then(
+      //     (data) => {
+      //       if (!data || !data.title) return;
+      //       const payload = `/${data.title}`;
+      //       onAddResButtons(
+      //         action,
+      //         data.title,
+      //         payload,
+      //         data.reply,
+      //         currentStoryName,
+      //         stories,
+      //         currentCheckPointName,
+      //         currentConnectStoryName,
+      //       );
+      //     },
+      //   );
+      if (hasInput && modalData.modalInput === '') {
+        Toast.fire({
+          icon: 'warning',
+          title: '請輸入按鈕名稱',
+        });
+        return;
+      }
+      const payload = `/${modalData.modalInput}`;
+      onAddResButtons(
+        step.action,
+        modalData.modalInput,
+        payload,
+        modalData.modalTextarea,
+        storyName,
+        stories,
+        checkPointName,
+        connectBranchStoryName,
       );
+      setIsBotButtonVisible((prev) => !prev);
     },
-    [onAddResButtons, stories],
+    [
+      onAddResButtons,
+      stories,
+      step.action,
+      storyName,
+      checkPointName,
+      connectBranchStoryName,
+      setIsBotButtonVisible,
+    ],
   );
 
   // 編輯機器人選項
@@ -205,15 +268,7 @@ const BotStep: React.FC<BotStepProps> = (props) => {
             <button
               type="button"
               className={cx('btn mx-2', style.editBtn)}
-              onClick={() =>
-                atEditBotResponse(
-                  step.response,
-                  step.action,
-                  storyName,
-                  checkPointName,
-                  connectBranchStoryName,
-                )
-              }
+              onClick={() => atToggleBotResponseVisible()}
             >
               <svg
                 width="24"
@@ -232,14 +287,7 @@ const BotStep: React.FC<BotStepProps> = (props) => {
             <button
               type="button"
               className={cx('btn mx-2', style.addBtn)}
-              onClick={() =>
-                atAddResButtons(
-                  step.action,
-                  storyName,
-                  checkPointName,
-                  connectBranchStoryName,
-                )
-              }
+              onClick={() => atToggleBotButtonVisible()}
             >
               <svg
                 width="24"
@@ -294,6 +342,24 @@ const BotStep: React.FC<BotStepProps> = (props) => {
             })}
         </div>
       </div>
+      <Modal
+        title="增加選項"
+        isVisible={isBotButtonVisible}
+        inputPlaceholder="請輸入選項名稱"
+        textAreaPlaceholder="請輸入選項內容"
+        maxWidth="55"
+        onClose={atToggleBotButtonVisible}
+        onSubmit={atAddResButtons}
+      />
+      <Modal
+        title="編輯機器人回覆"
+        isVisible={isBotResponseVisible}
+        textAreaPlaceholder="請輸入機器人回覆"
+        maxWidth="55"
+        onClose={atToggleBotResponseVisible}
+        onSubmit={atEditBotResponse}
+        modalTextarea={step.response}
+      />
     </div>
   );
 };

@@ -1,3 +1,4 @@
+/* eslint-disable jsx-a11y/no-static-element-interactions */
 import * as React from 'react';
 import cx from 'classnames';
 import ReactDOM from 'react-dom';
@@ -12,13 +13,7 @@ type ModalProps = {
   maxWidth: string,
   modalTextarea: string,
   onClose: () => void,
-  onAddResButtons: (
-    modalData: {
-      modalInput: string,
-      modalTextarea: string,
-    },
-    hasInput: boolean,
-  ) => void,
+  onSubmit: () => void,
 };
 
 const Modal: React.FC<ModalProps> = (props) => {
@@ -30,7 +25,7 @@ const Modal: React.FC<ModalProps> = (props) => {
     maxWidth,
     modalTextarea,
     onClose,
-    onAddResButtons,
+    onSubmit,
   } = props;
 
   const [modalData, setModalData] = React.useState({
@@ -38,6 +33,15 @@ const Modal: React.FC<ModalProps> = (props) => {
     modalTextarea: '',
   });
 
+  // 點選back drop可以關閉視窗
+  const modalRef = React.useRef(null);
+  const atBackdropClick = (e) => {
+    if (!modalRef.current.contains(e.target)) {
+      onClose();
+    }
+  };
+
+  // 當父層有傳textarea值進來時要將值設為textarea的預設值
   React.useEffect(() => {
     setModalData((prev) => {
       return {
@@ -61,15 +65,19 @@ const Modal: React.FC<ModalProps> = (props) => {
     [],
   );
 
+  // 關閉視窗時會重置新增按鈕的modal data
   const atCloseModal = React.useCallback(() => {
     onClose();
-    setModalData({ modalInput: '', modalTextarea: '' });
-  }, [onClose, setModalData]);
+    if (inputPlaceholder) {
+      setModalData({ modalInput: '', modalTextarea: '' });
+    }
+  }, [onClose, setModalData, inputPlaceholder]);
 
   return isVisible
     ? ReactDOM.createPortal(
-        <div className={style.backdrop}>
+        <div className={style.backdrop} onClick={atBackdropClick}>
           <div
+            ref={modalRef}
             className={cx(style.modal, 'swal2-show')}
             style={
               maxWidth ? { maxWidth: `${maxWidth}%` } : { maxWidth: `${60}%` }
@@ -117,7 +125,7 @@ const Modal: React.FC<ModalProps> = (props) => {
               </button>
               <button
                 className="btn btn-primary modalBtn"
-                onClick={() => onAddResButtons(modalData, !!inputPlaceholder)}
+                onClick={() => onSubmit(modalData, !!inputPlaceholder)}
               >
                 儲存
               </button>
