@@ -90,6 +90,7 @@ const Modal: React.FC<ModalProps> = (props) => {
                 onClick={() => atCloseModal()}
               />
             </div>
+            <div className={cx(style.hr)} />
             <div className={cx(style.modalContent)}>
               {inputPlaceholder ? (
                 <div className={cx('mb-3 mt-1')}>
