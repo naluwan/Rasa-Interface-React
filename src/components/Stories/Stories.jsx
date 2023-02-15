@@ -1540,8 +1540,10 @@ const Stories = () => {
             categories={categories}
             stories={stories}
             newStory={newStory}
+            actions={actions}
             newStoryInfo={newStoryInfo}
             setNewStoryInfo={setNewStoryInfo}
+            nlu={nlu}
           />
         </div>
         {create && (

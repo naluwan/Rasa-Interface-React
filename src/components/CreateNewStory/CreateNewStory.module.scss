@@ -1,6 +1,7 @@
 .creactStoryBlock {
-    border: 1px solid #000;
-    border-radius: 5px;
+    // border: 1px solid #000;
+    overflow: hidden;
+    border-radius: 10px;
     flex-direction: column;
     margin: 0 auto;
     display: flex;
@@ -10,15 +11,24 @@
     position: relative;
 
     .creactStoryCloseBtn {
-        padding: 10px;
+        padding: 0 1rem;
         position: absolute;
         top: 0;
         right: 0;
         color: #fff;
+        border: none;
+
+        button {
+            border: none;
+            color: #fff;
+            font-size: 1.5rem;
+            padding: 0;
+            background: rgba(0, 0, 0, 0);
+        }
     }
 
     .creactStoryStep {
-        padding: 10px;
+        padding: 2rem 1rem;
         display: flex;
         flex-direction: row;
         background: #52536D;
@@ -115,18 +125,81 @@
     }
 
     .creactStoryTitle {
-        padding: 10px;
+
+        padding: 1rem 2.5rem;
         color: #697ef1;
+
+        h3 {
+            margin: 0;
+            padding: 0;
+            font-weight: 900;
+        }
     }
 
     .creactStoryFunction {
-        padding: 10px;
+        padding: 1rem 2.5rem;
         display: flex;
         flex-direction: column;
     }
 
     .creactStoryFunctionBtn {
-        padding: 10px;
+        padding: 1rem 2.5rem;
         text-align: right;
+        display: flex;
+        justify-content:space-between
+    }
+
+    .stepBtn {
+        border: 1px solid #6D71F9;
+        color: #6D71F9;
+        padding: 5px 10px;
+        border-radius: 5px;
+        background: #fff;
+
+        &:hover {
+            color: #fff;
+            background: #6D71F9;
+        }
+    }
+
+    .storyInputBlock {
+        padding-bottom: 1rem;
+        label{
+            margin-bottom: .5rem;
+        }
+    }
+
+    .moreBtn {
+        width: 100%;
+        text-align: center;
+        color: #54C1FB;
+        border: none;
+        background: #fff;
+
+    }
+
+    .error {
+        input {
+            border: 1px solid #EE6634;
+        }
+
+        .errorMsg {
+            color: #EE6634;
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+
+            &::before {
+                content: '';
+                background: url(../../images/creactStory/bi_exclamation-circle-fill.png) no-repeat;
+                display: inline-flex;
+                width: 1.5rem;
+                height: 1.5rem;
+
+            }
+        }
+    }
+    .textarea{
+        resize: none;
     }
 }

@@ -65,7 +65,9 @@ const reducer = (state: CreateStoryState, action: Action): State => {
     }
     case 'CREATE_STORY_CREATE_USER_STEP': {
       const userSay = action.payload;
-      const intent = userSay.replace(/\?|!|？|！/g, '');
+      const { newStory } = state;
+      // const intent = userSay.replace(/\?|!|？|！/g, '');
+      const intent = newStory.story;
       return {
         ...state,
         newStory: {

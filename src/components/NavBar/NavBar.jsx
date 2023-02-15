@@ -1,3 +1,4 @@
+/* eslint-disable jsx-a11y/no-static-element-interactions */
 /* eslint-disable no-unused-expressions */
 import * as React from 'react';
 import { NavItemType } from 'components/types';
@@ -129,7 +130,10 @@ const NavBar: React.FC<NavBarProps> = (props) => {
           </div>
         </div>
         <div className={cx(style.list)}>
-          <div className={cx(style.btn)}>
+          <div
+            className={cx(style.btn)}
+            onClick={() => atChangeMode('scenario')}
+          >
             <div className={cx(style.icon)}>
               <svg
                 width="100%"
@@ -152,7 +156,7 @@ const NavBar: React.FC<NavBarProps> = (props) => {
               </svg>
             </div>
             <div>
-              <h5 onClick={() => atChangeMode('scenario')}>情境劇本</h5>
+              <h5>情境劇本</h5>
             </div>
           </div>
           <div className={cx(style.btn)}>
@@ -209,7 +213,10 @@ const NavBar: React.FC<NavBarProps> = (props) => {
               <h5>表單設計</h5>
             </div>
           </div>
-          <div className={cx(style.btn, style.create)}>
+          <div
+            className={cx(style.btn, style.create)}
+            onClick={() => atChangeMode('createStories')}
+          >
             <div className={cx(style.icon)}>
               <svg
                 width="100%"
@@ -235,7 +242,7 @@ const NavBar: React.FC<NavBarProps> = (props) => {
               </svg>
             </div>
             <div>
-              <h5 onClick={() => atChangeMode('createStories')}>創建劇本</h5>
+              <h5>創建劇本</h5>
             </div>
           </div>
         </div>
