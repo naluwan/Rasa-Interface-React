@@ -72,10 +72,12 @@ const BotStep: React.FC<BotStepProps> = (props) => {
   const [isBotButtonVisible, setIsBotButtonVisible] = React.useState(false);
   const [isBotResponseVisible, setIsBotResponseVisible] = React.useState(false);
 
+  // 控制是否顯示新增機器人回覆按鈕modal
   const atToggleBotButtonVisible = React.useCallback(() => {
     setIsBotButtonVisible((prev) => !prev);
   }, [setIsBotButtonVisible]);
 
+  // 控制是否顯示編輯機器人回覆modal
   const atToggleBotResponseVisible = React.useCallback(() => {
     setIsBotResponseVisible((prev) => !prev);
   }, [setIsBotResponseVisible]);
