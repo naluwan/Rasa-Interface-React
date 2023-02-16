@@ -1089,7 +1089,12 @@ const Stories = () => {
         return;
       }
 
-      if (newStoryData.story.indexOf('_') > -1) {
+      const regex = /\\|\/|\(|\)|\{|\}/g;
+
+      if (
+        newStoryData.story.indexOf('_') > -1 ||
+        regex.test(newStoryData.story)
+      ) {
         setNewStoryInfo((prev) => {
           return {
             ...prev,
@@ -1098,7 +1103,7 @@ const Stories = () => {
         });
         Toast.fire({
           icon: 'warning',
-          title: '故事名稱不能含有底線',
+          title: '故事名稱不能含有底線、括號等特殊符號',
         });
         document.querySelector('.form-control#story').focus();
         return;
