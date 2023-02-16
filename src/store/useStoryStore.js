@@ -122,7 +122,7 @@ const reducer = (state: State, action: Action): State => {
           step.response = JSON.parse(
             JSON.stringify(domain.responses[step.action][0].text).replace(
               / {2}\\n/g,
-              '\\r',
+              '\\n',
             ),
           );
 
@@ -640,7 +640,7 @@ const reducer = (state: State, action: Action): State => {
       });
 
       const currentReply = JSON.parse(
-        JSON.stringify(reply).replace(/\\r\\n/g, '  \\n'),
+        JSON.stringify(reply).replace(/\\n/g, '  \\n'),
       );
 
       // 如果按鈕標題有更改
@@ -871,7 +871,7 @@ const reducer = (state: State, action: Action): State => {
         });
       }
 
-      const isRepeat = domain.responses[actionName][0].buttons.some(
+      const isRepeat = domain.responses[actionName][0]?.buttons?.some(
         (button) => button.title === title,
       );
 
@@ -942,7 +942,11 @@ const reducer = (state: State, action: Action): State => {
           }
 
           domain.actions.push(buttonActionName);
-          domain.responses[buttonActionName] = [{ text: reply }];
+          domain.responses[buttonActionName] = [
+            {
+              text: JSON.parse(JSON.stringify(reply).replace(/\\n/g, '  \\n')),
+            },
+          ];
           domain.intents.push(`${storyName}_${title}`);
         }
         cloneData.stories = stories;
