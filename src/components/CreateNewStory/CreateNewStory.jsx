@@ -46,12 +46,16 @@ const CreateNewStory: React.FC<CreateNewStoryProps> = (props) => {
     onCreateExample,
     onCreateUserStep,
     onCreateBotStep,
+    onRemoveBotStep,
+    // onInitialNewStory,
     onRemoveUserStep,
   } = useCreateStoryStore((state: CreateStoryState) => {
     return {
       onCreateExample: state.onCreateExample,
+      // onInitialNewStory: state.onInitialNewStory,
       onDeleteExample: state.onDeleteExample,
       onRemoveUserStep: state.onRemoveUserStep,
+      onRemoveBotStep: state.onRemoveBotStep,
       onCreateBotStep: state.onCreateBotStep,
       onCreateUserStep: state.onCreateUserStep,
     };
@@ -60,15 +64,29 @@ const CreateNewStory: React.FC<CreateNewStoryProps> = (props) => {
   const [creactStoryStep, setcreactStoryStep] = React.useState('creactName');
 
   const [title, settitle] = React.useState('為你的劇本取名吧!');
+  const [storeName, setstoreName] = React.useState('');
   // 問句
   const [questionValue, setQuestionValue] = React.useState([
     { id: uuid(), question: '', error: '' },
     { id: uuid(), question: '', error: '' },
   ]);
+
   // 機器人回應
   const [botValue, setbotValue] = React.useState([
     { id: uuid(), reply: '', error: '' },
   ]);
+  // textarea 自適應高度
+  const textAreaRef = React.useRef();
+  React.useEffect(() => {
+    if (textAreaRef.current) {
+      textAreaRef.current.style = 'height:0px';
+      const a = textAreaRef.current.value;
+      textAreaRef.current.value = a;
+      textAreaRef.current.style = `height: ${
+        textAreaRef.current.scrollHeight + 9
+      }px`;
+    }
+  }, [textAreaRef.current?.value]);
   // next step
   const nextStep = React.useCallback(
     (stepName: string) => {
@@ -103,7 +121,7 @@ const CreateNewStory: React.FC<CreateNewStoryProps> = (props) => {
           onCreateBotStep(actionName, item.reply);
         });
         setcreactStoryStep('creactTrain');
-        settitle('啟動訓練');
+        settitle('');
       }
       if (stepName === 'creactTrain') {
         settitle('劇本名稱');
@@ -128,20 +146,47 @@ const CreateNewStory: React.FC<CreateNewStoryProps> = (props) => {
   // 上一步
   const previousStep = React.useCallback(
     (stepName: string) => {
+      if (stepName === 'creactTrain') {
+        newStory.steps.map((step) => {
+          const { action } = step;
+          if (action) {
+            onRemoveBotStep(action);
+          }
+        });
+        // setbotValue([{ id: uuid(), reply: '', error: '' }]);
+        settitle('機器人回應');
+        setcreactStoryStep('creactBot');
+      }
       if (stepName === 'creactBot') {
         newStory.steps.map((step) => {
           const { intent, user } = step;
           onRemoveUserStep(intent, user);
         });
+        // setQuestionValue([
+        //   { id: uuid(), question: '', error: '' },
+        //   { id: uuid(), question: '', error: '' },
+        // ]);
         settitle('用戶問句');
         setcreactStoryStep('creactQuestion');
       }
       if (stepName === 'creactQuestion') {
+        // onInitialNewStory();
+        // setNewStoryInfo({
+        //   story: '',
+        //   steps: [],
+        //   metadata: { category: '', create: false },
+        // });
         settitle('劇本名稱');
         setcreactStoryStep('creactName');
       }
     },
     [
+      setbotValue,
+      setbotValue,
+      setQuestionValue,
+      setNewStoryInfo,
+      onRemoveUserStep,
+      onRemoveBotStep,
       newStory,
       creactStoryStep,
       title,
@@ -156,6 +201,7 @@ const CreateNewStory: React.FC<CreateNewStoryProps> = (props) => {
       botValue,
     ],
   );
+
   // 刪除用戶問句
   const deleteQuestion = React.useCallback(
     (id: string) => {
@@ -238,6 +284,7 @@ const CreateNewStory: React.FC<CreateNewStoryProps> = (props) => {
           className="form-control"
           type="text"
           onChange={(e) => changeQuestion(item.id, e.target.value)}
+          value={item.question}
           placeholder={
             index === 0 ? '請輸入問句內容' : '請輸入與『 問句1 』相似意圖的句子'
           }
@@ -321,9 +368,11 @@ const CreateNewStory: React.FC<CreateNewStoryProps> = (props) => {
         <textarea
           id={`"botReply${index + 1}"`}
           className={cx('form-control', style.textarea)}
+          ref={textAreaRef}
           type="text"
           onChange={(e) => changeBotReply(item.id, e.target.value)}
           placeholder="請輸入機器人回應"
+          value={item.reply}
         />
 
         {botValue.length > 1 && (
@@ -413,8 +462,11 @@ const CreateNewStory: React.FC<CreateNewStoryProps> = (props) => {
                     id="storyName"
                     name="story"
                     placeholder="請輸入劇本名稱"
-                    value={newStoryInfo.story}
-                    onChange={(e) => atChangeNewStoryInfo(e)}
+                    value={storeName}
+                    onChange={(e) => {
+                      atChangeNewStoryInfo(e);
+                      setstoreName(e.target.value);
+                    }}
                   />
                 </div>
               </div>
@@ -493,6 +545,25 @@ const CreateNewStory: React.FC<CreateNewStoryProps> = (props) => {
                 >
                   +新增機器人回應
                 </button>
+              </div>
+            </>
+          )}
+          {creactStoryStep === 'creactTrain' && (
+            <>
+              <div>
+                <img
+                  src={require('../../images/creactStory/success.png')}
+                  alt=""
+                />
+              </div>
+              <div>
+                <h2>恭喜!</h2>
+              </div>
+              <div>
+                <h5>
+                  劇本創建完成後可點擊 『 啟動訓練 』<br />
+                  開始訓練您的專屬機器人吧！
+                </h5>
               </div>
             </>
           )}
