@@ -25,6 +25,7 @@ import Examples from './Examples';
 import useStoryStore from '../../store/useStoryStore';
 import { randomBotResAction } from '../../utils/randomBotResAction';
 import useCreateStoryStore from '../../store/useCreateStoryStore';
+import EntitiesModal from './EntitiesModal';
 
 type UserStepProps = {
   isCreate: boolean,
@@ -183,20 +184,65 @@ const UserStep: React.FC<UserStepProps> = (props) => {
   const [resSelect, setResSelect] = React.useState('botRes');
 
   const [contentEntity, setContentEntity] = React.useState({
-    text: '',
+    id: uuid(),
+    entity: '',
+    value: '',
     start: null,
     end: null,
   });
+
+  const [entitiesArr, setEntitiesArr] = React.useState([]);
+
+  /**
+   * @type {[{key:string,slotInfo:{type:string,values?:string[]}}[], Function]}
+   */
+  const [slots, setSlots] = React.useState([]);
+
+  /**
+   * @type {[boolean, Function]}
+   */
+  const [isEntitiesModalVisible, setIsEntitiesModalVisible] =
+    React.useState(false);
+
+  const atToggleEntitiesModal = React.useCallback(() => {
+    setIsEntitiesModalVisible((prev) => !prev);
+    setContentEntity({
+      entity: '',
+      value: '',
+      start: null,
+      end: null,
+    });
+  }, [setIsEntitiesModalVisible, setContentEntity]);
 
   const showIntent =
     step.intent === 'get_started' ? '打開聊天室窗' : step.intent;
 
   const isGetStarted = step.intent === 'get_started';
 
+  // textarea 自適應高度
+  const textAreaRef = React.useRef();
+  React.useEffect(() => {
+    textAreaRef.current.style = 'height:0px';
+    textAreaRef.current.value = step.user;
+    textAreaRef.current.style = `height: ${textAreaRef.current.scrollHeight}px`;
+  }, [step.user]);
+
   // 重組entities資料
   const entitiesData = React.useMemo(() => {
     return filteredEntities(step.entities, step.user, step.intent, nlu);
   }, [step.entities, step.user, step.intent, nlu]);
+
+  // 待domain資料設定完成後，設定slots值
+  React.useEffect(() => {
+    if (Object.keys(domain).length && Object.keys(domain.slots).length) {
+      const allSlots = Object.entries(domain.slots);
+      const filteredSlots = allSlots.map((slot) => ({
+        key: slot[0],
+        slotInfo: slot[1],
+      }));
+      setSlots(filteredSlots);
+    }
+  }, [domain]);
 
   // 編輯使用者對話
   const atEditUserSay = React.useCallback(
@@ -597,7 +643,7 @@ const UserStep: React.FC<UserStepProps> = (props) => {
             const start = userSay.indexOf(showValue);
             const end = userSay.indexOf(showValue) + showValue.length;
             // 驗證關鍵字代表值是否有數字
-            const regex = /^[0-9]*$/g;
+            const regex = /^[0-9]*$/;
 
             // 都沒值
             if (showValue === '' && entity === '' && currentValue === '') {
@@ -1070,6 +1116,21 @@ const UserStep: React.FC<UserStepProps> = (props) => {
   const getSelectText = React.useCallback(() => {
     const userSayEle = document.querySelector('#userSay');
     if (userSayEle) {
+      // 檢查選取的文字是否重疊
+      const isRepeat = entitiesData.some(
+        (entitiesItem) =>
+          (entitiesItem.start <= userSayEle.selectionStart &&
+            userSayEle.selectionStart <= entitiesItem.end - 1) ||
+          (entitiesItem.start <= userSayEle.selectionEnd - 1 &&
+            userSayEle.selectionEnd - 1 <= entitiesItem.end),
+      );
+      if (isRepeat) {
+        return Toast.fire({
+          icon: 'warning',
+          title: '關鍵字不可重疊',
+        });
+      }
+
       return {
         text: userSayEle.value.substring(
           userSayEle.selectionStart,
@@ -1086,7 +1147,6 @@ const UserStep: React.FC<UserStepProps> = (props) => {
   const atMouseSelection = React.useCallback(
     (e: React.MouseEvent<HTMLInputElement>) => {
       if (getSelectText().text && e.button === 0) {
-        console.log('user select text ==> ', getSelectText());
         if (getSelectText().end - getSelectText().start <= 1) {
           Toast.fire({
             icon: 'warning',
@@ -1094,19 +1154,31 @@ const UserStep: React.FC<UserStepProps> = (props) => {
           });
           return;
         }
-        setContentEntity((prev) => {
-          return {
-            ...prev,
-            text: getSelectText().text,
-            start: getSelectText().start,
-            end: getSelectText().end,
-          };
-        });
-        document.querySelector('.entityModalBtn').click();
+        // setContentEntity((prev) => {
+        //   return {
+        //     ...prev,
+        //     start: getSelectText().start,
+        //     end: getSelectText().end,
+        //   };
+        // });
+        const entityData = {
+          id: uuid(),
+          entity: '',
+          value: '',
+          start: getSelectText().start,
+          end: getSelectText().end,
+          synonyms: [],
+        };
+        setEntitiesArr((prev) => prev.concat([entityData]));
+        setIsEntitiesModalVisible((prev) => !prev);
       }
     },
-    [],
+    [setIsEntitiesModalVisible, setEntitiesArr],
   );
+
+  // const atSubmitEntities = React.useCallback(() => {
+  //   contentEntity.map;
+  // });
 
   // console.log('entitiesData:', entitiesData);
   // console.log('newBranchStory:', newBranchStory);
@@ -1255,11 +1327,13 @@ const UserStep: React.FC<UserStepProps> = (props) => {
         <div className="d-flex flex-column">
           <div className="d-flex align-items-center pt-2">
             <div className={style.userTitle}>使用者:</div>
-            <input
+            <textarea
               className={style.userText}
               id="userSay"
+              ref={textAreaRef}
               onMouseUp={(e) => atMouseSelection(e)}
               value={step.user ? step.user : showIntent}
+              rows={1}
               readOnly
             />
           </div>
@@ -1683,7 +1757,7 @@ const UserStep: React.FC<UserStepProps> = (props) => {
           </div>
 
           {/* entity modal */}
-          <div
+          {/* <div
             className="modal fade"
             id="entityModal"
             tabIndex="-1"
@@ -1717,6 +1791,18 @@ const UserStep: React.FC<UserStepProps> = (props) => {
                       id="slotName"
                       placeholder="請輸入標籤類別名稱"
                     />
+                    <select
+                      className="form-control"
+                      name="slotCategory"
+                      id="slotCategory"
+                    >
+                      <option value="">建立標籤類別</option>
+                      {slots.map((slot) => (
+                        <option key={slot.key} value={slot.key}>
+                          {slot.key}
+                        </option>
+                      ))}
+                    </select>
                   </div>
                   <table className="table">
                     <thead>
@@ -1752,9 +1838,20 @@ const UserStep: React.FC<UserStepProps> = (props) => {
                 </div>
               </div>
             </div>
-          </div>
+          </div> */}
         </div>
       </div>
+      <EntitiesModal
+        title="關鍵字"
+        isVisible={isEntitiesModalVisible}
+        onClose={atToggleEntitiesModal}
+        slots={slots}
+        contentEntity={contentEntity}
+        onSetContentEntity={setContentEntity}
+        entitiesData={entitiesData}
+        entitiesArr={entitiesArr}
+        onSetEntitiesArr={setEntitiesArr}
+      />
     </div>
   );
 };
