@@ -51,6 +51,7 @@ const Stories = () => {
    */
   const [slots, setSlots] = React.useState([]);
   const [nowMode, setNowMode] = React.useState('scenario');
+  const [nowcreactStory, setnowcreactStory] = React.useState('');
   const {
     story,
     stories,
@@ -1129,6 +1130,7 @@ const Stories = () => {
   return (
     <>
       <NavBar
+        nowMode={nowMode}
         atChangeMode={atChangeMode}
         atClickCreateStoryBtn={atClickCreateStoryBtn}
       />
@@ -1496,23 +1498,30 @@ const Stories = () => {
           className={cx(
             nowMode !== 'createStories' ? style.hidden : style.storoesBlock,
             style.searchBar,
+            style.storeChid,
           )}
         >
-          <button
+          {/* <button
             data-bs-toggle="modal"
             data-bs-target="#createNewStoryModal"
             onClick={() => atClickCreateStoryBtn()}
           >
             123
-          </button>
+          </button> */}
           <div className={cx(style.createStoriesBlock)}>
-            <div className={cx(style.createStoriesCard)}>
+            <div
+              onClick={() => {
+                setnowcreactStory('Base');
+              }}
+              className={cx(style.createStoriesCard)}
+            >
               <div>
-                <img
-                  src={require('../../images/creactStory/A.png')}
-                  alt="basic"
-                />
-                <div />
+                <div className={style.card}>
+                  <img
+                    src={require('../../images/creactStory/A.png')}
+                    alt="basic"
+                  />
+                </div>
                 <div>
                   <h3>基礎</h3>
                   <h3>(一問一答)</h3>
@@ -1521,11 +1530,12 @@ const Stories = () => {
             </div>
             <div className={cx(style.createStoriesCard)}>
               <div>
-                <img
-                  src={require('../../images/creactStory/B.png')}
-                  alt="basic"
-                />
-                <div />
+                <div className={style.card}>
+                  <img
+                    src={require('../../images/creactStory/B.png')}
+                    alt="basic"
+                  />
+                </div>
                 <div>
                   <h3>進階</h3>
                   <h3>(智慧型機器人)</h3>
@@ -1534,19 +1544,25 @@ const Stories = () => {
             </div>
           </div>
           {/* creactStory */}
-          <CreateNewStory
-            atChangeNewStoryInfo={atChangeNewStoryInfo}
-            atCreateNewStory={atCreateNewStory}
-            categories={categories}
-            stories={stories}
-            newStory={newStory}
-            actions={actions}
-            newStoryInfo={newStoryInfo}
-            setNewStoryInfo={setNewStoryInfo}
-            nlu={nlu}
-          />
+          {nowcreactStory === 'Base' && (
+            <CreateNewStory
+              setnowcreactStory={setnowcreactStory}
+              atChangeNewStoryInfo={atChangeNewStoryInfo}
+              atCreateNewStory={atCreateNewStory}
+              categories={categories}
+              stories={stories}
+              newStory={newStory}
+              actions={actions}
+              newStoryInfo={newStoryInfo}
+              setNewStoryInfo={setNewStoryInfo}
+              nlu={nlu}
+              onClickSaveBtn={atClickSaveBtn}
+              atSelectStory={atSelectStory}
+              setNowMode={setNowMode}
+            />
+          )}
         </div>
-        {create && (
+        {create && document.querySelector('body').innerHTML === null && (
           <CreateStory
             isCreate={create}
             nlu={nlu.rasa_nlu_data.common_examples}

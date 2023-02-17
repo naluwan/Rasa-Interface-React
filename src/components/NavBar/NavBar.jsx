@@ -15,11 +15,12 @@ import type { State } from '../types';
 
 type NavBarProps = {
   navItems: NavItemType[],
+  nowMode: State,
   atChangeMode: (e: String) => void,
 };
 
 const NavBar: React.FC<NavBarProps> = (props) => {
-  const { atChangeMode } = props;
+  const { atChangeMode, nowMode } = props;
   const {
     user,
     rasaTrainState,
@@ -126,12 +127,16 @@ const NavBar: React.FC<NavBarProps> = (props) => {
             to="/"
           />
           <div>
-            <h5> chat Bot</h5>
+            <h6> chat Bot</h6>
           </div>
         </div>
         <div className={cx(style.list)}>
           <div
-            className={cx(style.btn)}
+            className={
+              nowMode === ('scenario' || 'storeChid')
+                ? cx(style.btn, style.btnCheck)
+                : cx(style.btn)
+            }
             onClick={() => atChangeMode('scenario')}
           >
             <div className={cx(style.icon)}>
@@ -156,10 +161,17 @@ const NavBar: React.FC<NavBarProps> = (props) => {
               </svg>
             </div>
             <div>
-              <h5>情境劇本</h5>
+              <h6>情境劇本</h6>
             </div>
           </div>
-          <div className={cx(style.btn)}>
+          <div
+            className={
+              nowMode === 'statement'
+                ? cx(style.btn, style.btnCheck)
+                : cx(style.btn)
+            }
+            onClick={() => atChangeMode('statement')}
+          >
             <div className={cx(style.icon)}>
               <svg
                 width="100%"
@@ -189,10 +201,14 @@ const NavBar: React.FC<NavBarProps> = (props) => {
               </svg>
             </div>
             <div>
-              <h5 onClick={() => atChangeMode('statement')}>語句庫</h5>
+              <h6>語句庫</h6>
             </div>
           </div>
-          <div className={cx(style.btn)}>
+          <div
+            className={
+              nowMode === '123' ? cx(style.btn, style.btnCheck) : cx(style.btn)
+            }
+          >
             <div className={cx(style.icon)}>
               <svg
                 width="100%"
@@ -210,11 +226,15 @@ const NavBar: React.FC<NavBarProps> = (props) => {
               </svg>
             </div>
             <div>
-              <h5>表單設計</h5>
+              <h6>表單設計</h6>
             </div>
           </div>
           <div
-            className={cx(style.btn, style.create)}
+            className={
+              nowMode === 'createStories'
+                ? cx(style.btn, style.create, style.btnCheck)
+                : cx(style.create, style.btn)
+            }
             onClick={() => atChangeMode('createStories')}
           >
             <div className={cx(style.icon)}>
@@ -242,7 +262,7 @@ const NavBar: React.FC<NavBarProps> = (props) => {
               </svg>
             </div>
             <div>
-              <h5>創建劇本</h5>
+              <h6>創建劇本</h6>
             </div>
           </div>
         </div>
@@ -288,7 +308,7 @@ const NavBar: React.FC<NavBarProps> = (props) => {
               </ul>
             </div>
             <div>
-              <h5> userName</h5>
+              <h6> userName</h6>
             </div>
           </button>
         ) : (

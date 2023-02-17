@@ -10,10 +10,10 @@
   background: #fff;
   justify-content: space-between;
 
-  h5 {
-     opacity: 0;
-     width: 0;
-     transition: opacity 0s;
+  h6 {
+    opacity: 0;
+    width: 0;
+    transition: opacity 0s;
   }
 
 
@@ -35,7 +35,7 @@
       margin: 1rem .5rem;
       display: inline-block;
       height: 3rem;
-      width: 3rem;
+      width: 2rem;
       padding: 0;
       vertical-align: middle;
       background: url(../../images/navbar/logo1.png) no-repeat center;
@@ -57,7 +57,7 @@
       -webkit-user-select: none;
       -moz-user-select: none;
 
-      h5 {
+      h6 {
         margin: 0;
       }
 
@@ -114,6 +114,37 @@
 
 
     }
+
+    .btnCheck {
+      background: #6D71F9 !important;
+
+      h6 {
+        color: #fff;
+      }
+
+      svg {
+        fill: #fff;
+
+      }
+
+      &.create {
+        color: #fff !important;
+
+        svg {
+          fill: #6D71F9;
+          stroke: #fff;
+        }
+
+        :hover {
+          svg {
+            fill: #6D71F9;
+            stroke: #fff !important;
+            color: #fff !important;
+          }
+        }
+      }
+
+    }
   }
 
   .customer {
@@ -132,7 +163,7 @@
       background: #ffffff;
       border-radius: .5rem;
 
-      h5 {
+      h6 {
         margin: 0;
       }
 
@@ -193,20 +224,21 @@
 
 
   }
-     width: 6rem;
-transition: all 1s;
+
+  width: 6rem;
+  transition: all 1s;
+
   &:hover {
-    width: 18.5rem;
+    width: 17.5rem;
     transition: all .5s;
-    h5 {
-        opacity: 1;
-        width: auto;
-        transition: opacity 2s;
-      }
+
+    h6 {
+      opacity: 1;
+      width: auto;
+      transition: opacity 2s;
+    }
   }
 }
-
-
 
 
 

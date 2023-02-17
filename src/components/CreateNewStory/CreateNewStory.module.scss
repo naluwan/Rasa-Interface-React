@@ -1,14 +1,23 @@
+.root {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+
+}
+
 .creactStoryBlock {
-    // border: 1px solid #000;
+    max-height: 37rem;
     overflow: hidden;
+    transition: all .3s;
     border-radius: 10px;
     flex-direction: column;
     margin: 0 auto;
     display: flex;
-    width: 40rem;
+    min-width: 35rem;
     justify-content: center;
-    background-color: #fff;
     position: relative;
+    background: #FAFAFC;
 
     .creactStoryCloseBtn {
         padding: 0 1rem;
@@ -33,6 +42,7 @@
         flex-direction: row;
         background: #52536D;
         color: #fff;
+        min-width: 45rem;
 
         .item {
             margin-left: 1rem;
@@ -69,14 +79,14 @@
                 &:before {
                     position: absolute;
                     content: "";
-                    width: .8rem;
-                    height: .8rem;
+                    width: 0.8rem;
+                    height: 0.8rem;
                     display: block;
                     left: 50%;
                     transform: translate(-50%, -50%);
                     top: 50%;
-                    background: #ffffff;
-                    border: 1px solid #ffffff;
+                    /* background: #ffffff; */
+                    border: 2px solid #ffffff;
                     border-radius: 99px;
 
                 }
@@ -140,13 +150,49 @@
         padding: 1rem 2.5rem;
         display: flex;
         flex-direction: column;
+        overflow-y: auto;
+
+        &::-webkit-scrollbar-track {
+            // -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
+            background-color: #dfdfdf;
+            border-radius: 10px;
+        }
+
+        &::-webkit-scrollbar {
+            width: 10px;
+            background-color: #F5F5F5;
+        }
+
+        &::-webkit-scrollbar-thumb {
+            background-color: #acacac;
+            border-radius: 10px;
+
+        }
     }
 
     .creactStoryFunctionBtn {
         padding: 1rem 2.5rem;
         text-align: right;
         display: flex;
-        justify-content:space-between
+        justify-content: space-between;
+        position: relative;
+
+        .creactStoryFunctionBtnFinish {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+    }
+
+    .prevstepBtn {
+        border: none;
+        background: #fff;
+        color: #acacac;
+
+        &:hover {
+            color: #6D71F9;
+        }
     }
 
     .stepBtn {
@@ -164,7 +210,8 @@
 
     .storyInputBlock {
         padding-bottom: 1rem;
-        label{
+
+        label {
             margin-bottom: .5rem;
         }
     }
@@ -199,7 +246,21 @@
             }
         }
     }
-    .textarea{
+
+    .textarea {
         resize: none;
+    }
+}
+
+.formStyle {
+    width: 100%;
+    border-radius: 0.3rem;
+    padding: 0.4rem 0.4rem;
+    border: 1px solid #d1d1d1;
+    cursor: pointer;
+
+    &:focus {
+        border: 1px solid #d1d1d1;
+        outline: none;
     }
 }

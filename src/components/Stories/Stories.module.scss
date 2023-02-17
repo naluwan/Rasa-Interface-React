@@ -137,7 +137,7 @@
 .searchBar {
   justify-content: center;
   align-items: center;
-  background: #f5f5f5;
+  background: #ffffff;
   display: block;
 
   .searchBarTitle {
@@ -243,8 +243,6 @@
   }
 }
 
-
-
 .menuInputBlock {
   display: block;
   width: 100%;
@@ -290,69 +288,6 @@
   margin: 0 auto;
 }
 
-
-
-
-
-@media (max-width: 960px) {
-  .searchBar {
-    width: 100%;
-
-    // padding: 10px 0;
-    div {
-      flex-direction: column;
-
-      .sideBar {
-        background: #697ef1;
-        color: #fff;
-        width: 100%;
-      }
-
-      .titleBlock {
-        flex-direction: row;
-      }
-    }
-  }
-
-  .senderId {
-    flex-direction: column;
-    word-break: keep-all;
-
-    .btn {
-      margin: 0;
-      width: auto;
-    }
-
-    button {
-      display: inline;
-      width: auto;
-      margin: 0 5px 0 5px;
-    }
-  }
-
-  .menuInputBlock {
-    display: inline-flex;
-    margin: 10px;
-    align-items: self-end;
-
-    select {
-      display: block;
-      margin: 0 10px 0 0;
-    }
-  }
-
-  .menuBtnBlock {
-    display: flex;
-    margin: 0 auto;
-    justify-content: space-between;
-    flex-wrap: wrap;
-  }
-
-  .listBlock {
-    display: none;
-  }
-}
-
 .swtOut {
   position: relative;
   box-sizing: border-box;
@@ -382,16 +317,33 @@
 .createStoriesBlock {
   justify-content: center;
   display: flex;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
 
   .createStoriesCard {
-    border: 1px solid #000;
-    border-radius: 5px;
+    border-radius: 0.5rem;
     cursor: pointer;
     display: inline-flex;
     background: #ffffff;
     text-align: center;
     margin: 0 10px;
+    justify-content: center;
 
+    .card {
+      width: 17rem;
+      padding: 1rem;
+      margin: 1rem;
+      background: #D9D9D9;
+    }
+
+    h3 {
+      font-weight: 900;
+      color: #272848;
+    }
   }
 }
-
+.storeChid{
+  background: #d3d3d3!important;
+}

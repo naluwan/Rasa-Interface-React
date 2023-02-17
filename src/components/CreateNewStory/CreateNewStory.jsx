@@ -16,10 +16,14 @@ type CreateNewStoryProps = {
   newStory: StoryType,
   newStoryInfo: Object,
   categories: State,
+  setnowcreactStory: State,
   stories: State,
   nlu: NluType,
   actions: string[],
+  onClickSaveBtn: (story: StoryType) => void,
+  atSelectStory: (storyName: string) => void,
   setNewStoryInfo: (setStory: Object) => void,
+  setNowMode: (setStory: string) => void,
   atChangeNewStoryInfo: (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
   ) => void,
@@ -31,12 +35,16 @@ type CreateNewStoryProps = {
 };
 const CreateNewStory: React.FC<CreateNewStoryProps> = (props) => {
   const {
+    setnowcreactStory,
     actions,
+    atSelectStory,
+    setNowMode,
     atCreateNewStory,
     categories,
     newStory,
     setNewStoryInfo,
     atChangeNewStoryInfo,
+    onClickSaveBtn,
     newStoryInfo,
     stories,
     nlu,
@@ -47,12 +55,12 @@ const CreateNewStory: React.FC<CreateNewStoryProps> = (props) => {
     onCreateUserStep,
     onCreateBotStep,
     onRemoveBotStep,
-    // onInitialNewStory,
+    onInitialNewStory,
     onRemoveUserStep,
   } = useCreateStoryStore((state: CreateStoryState) => {
     return {
       onCreateExample: state.onCreateExample,
-      // onInitialNewStory: state.onInitialNewStory,
+      onInitialNewStory: state.onInitialNewStory,
       onDeleteExample: state.onDeleteExample,
       onRemoveUserStep: state.onRemoveUserStep,
       onRemoveBotStep: state.onRemoveBotStep,
@@ -60,11 +68,59 @@ const CreateNewStory: React.FC<CreateNewStoryProps> = (props) => {
       onCreateUserStep: state.onCreateUserStep,
     };
   }, shallow);
+
   // 步驟
   const [creactStoryStep, setcreactStoryStep] = React.useState('creactName');
 
   const [title, settitle] = React.useState('為你的劇本取名吧!');
-  const [storeName, setstoreName] = React.useState('');
+  const [storeName, setstoreName] = React.useState({
+    id: uuid(),
+    name: '',
+    error: '',
+  });
+  const [TypeStoreName, setTypeStoreName] = React.useState({
+    id: uuid(),
+    TypeStoreName: '',
+    error: '',
+  });
+  // 劇本名稱更新
+  const changeStoreName = React.useCallback(
+    (Name: string) => {
+      let error = '';
+      if (Name === '' || Name === undefined) {
+        error = '所有欄位都是必填的';
+      } else {
+        stories.map((item) => {
+          return item.story === Name
+            ? (error = `故事『${Name}』重複，請重新輸入`)
+            : '';
+        });
+      }
+      const { id } = storeName;
+      const updateStoreNameValue = { id, Name, error };
+      setstoreName(updateStoreNameValue);
+    },
+    [stories, storeName, setstoreName],
+  );
+  // 類別名稱更新
+  const changeTypeStoreName = React.useCallback(
+    (Name: string) => {
+      let error = '';
+      if (Name === '' || Name === undefined) {
+        error = '所有欄位都是必填的';
+      } else {
+        categories.map((item) => {
+          return item.name === Name
+            ? (error = `故事『${Name}』重複，請重新輸入`)
+            : '';
+        });
+      }
+      const { id } = TypeStoreName;
+      const updateTypeNameValue = { id, Name, error };
+      setTypeStoreName(updateTypeNameValue);
+    },
+    [categories, TypeStoreName, setTypeStoreName],
+  );
   // 問句
   const [questionValue, setQuestionValue] = React.useState([
     { id: uuid(), question: '', error: '' },
@@ -87,120 +143,6 @@ const CreateNewStory: React.FC<CreateNewStoryProps> = (props) => {
       }px`;
     }
   }, [textAreaRef.current?.value]);
-  // next step
-  const nextStep = React.useCallback(
-    (stepName: string) => {
-      if (stepName === 'creactName') {
-        atCreateNewStory(newStoryInfo, stories, categories);
-        setcreactStoryStep('creactQuestion');
-        settitle('用戶問句');
-      }
-      if (stepName === 'creactQuestion') {
-        questionValue.map((item, idx) => {
-          console.log('questionValue item ===> ', item);
-          if (idx === 0) {
-            onCreateUserStep(item.question);
-          } else {
-            onCreateExample(
-              newStory.story,
-              item.question,
-              [],
-              newStory.story,
-              nlu,
-            );
-          }
-        });
-        setcreactStoryStep('creactBot');
-        settitle('機器人回應');
-      }
-      if (stepName === 'creactBot') {
-        botValue.map((item) => {
-          console.log('botValue item ===> ', item);
-          const actionName = randomBotResAction(actions);
-          console.log('actionName ===> ', actionName);
-          onCreateBotStep(actionName, item.reply);
-        });
-        setcreactStoryStep('creactTrain');
-        settitle('');
-      }
-      if (stepName === 'creactTrain') {
-        settitle('劇本名稱');
-        setcreactStoryStep('creactName');
-      }
-    },
-    [
-      creactStoryStep,
-      title,
-      atCreateNewStory,
-      newStoryInfo,
-      newStory,
-      stories,
-      categories,
-      nlu,
-      questionValue,
-      onCreateBotStep,
-      actions,
-      botValue,
-    ],
-  );
-  // 上一步
-  const previousStep = React.useCallback(
-    (stepName: string) => {
-      if (stepName === 'creactTrain') {
-        newStory.steps.map((step) => {
-          const { action } = step;
-          if (action) {
-            onRemoveBotStep(action);
-          }
-        });
-        // setbotValue([{ id: uuid(), reply: '', error: '' }]);
-        settitle('機器人回應');
-        setcreactStoryStep('creactBot');
-      }
-      if (stepName === 'creactBot') {
-        newStory.steps.map((step) => {
-          const { intent, user } = step;
-          onRemoveUserStep(intent, user);
-        });
-        // setQuestionValue([
-        //   { id: uuid(), question: '', error: '' },
-        //   { id: uuid(), question: '', error: '' },
-        // ]);
-        settitle('用戶問句');
-        setcreactStoryStep('creactQuestion');
-      }
-      if (stepName === 'creactQuestion') {
-        // onInitialNewStory();
-        // setNewStoryInfo({
-        //   story: '',
-        //   steps: [],
-        //   metadata: { category: '', create: false },
-        // });
-        settitle('劇本名稱');
-        setcreactStoryStep('creactName');
-      }
-    },
-    [
-      setbotValue,
-      setbotValue,
-      setQuestionValue,
-      setNewStoryInfo,
-      onRemoveUserStep,
-      onRemoveBotStep,
-      newStory,
-      creactStoryStep,
-      title,
-      atCreateNewStory,
-      newStoryInfo,
-      stories,
-      categories,
-      nlu,
-      questionValue,
-      onCreateBotStep,
-      actions,
-      botValue,
-    ],
-  );
 
   // 刪除用戶問句
   const deleteQuestion = React.useCallback(
@@ -214,11 +156,13 @@ const CreateNewStory: React.FC<CreateNewStoryProps> = (props) => {
   const changeQuestion = React.useCallback(
     (id: string, question: string) => {
       let error = '';
+      console.log(id);
+      console.log(question);
       if (question === '') {
         error = '所有欄位都是必填的';
       } else {
         questionValue.map((item) => {
-          return item.question === question
+          return item.question === question && item.id !== id
             ? (error = `例句『${question}』重複，請重新輸入`)
             : '';
         });
@@ -228,13 +172,15 @@ const CreateNewStory: React.FC<CreateNewStoryProps> = (props) => {
             : '';
         });
       }
-
+      console.log(questionValue);
       const updatedQuestionValue = questionValue.map((item) => {
         if (item.id === id) {
           return { ...item, question, error };
         }
         return item;
       });
+
+      console.log(updatedQuestionValue);
       setQuestionValue(updatedQuestionValue);
     },
     [setQuestionValue, questionValue, nlu],
@@ -281,7 +227,7 @@ const CreateNewStory: React.FC<CreateNewStoryProps> = (props) => {
       <div className={cx('d-flex flex-row')}>
         <input
           id={`"Question${index + 1}"`}
-          className="form-control"
+          className={cx(style.formStyle)}
           type="text"
           onChange={(e) => changeQuestion(item.id, e.target.value)}
           value={item.question}
@@ -367,7 +313,8 @@ const CreateNewStory: React.FC<CreateNewStoryProps> = (props) => {
       <div className={cx('d-flex flex-row')}>
         <textarea
           id={`"botReply${index + 1}"`}
-          className={cx('form-control', style.textarea)}
+          className={cx(style.formStyle, style.textarea)}
+          rows="1"
           ref={textAreaRef}
           type="text"
           onChange={(e) => changeBotReply(item.id, e.target.value)}
@@ -386,89 +333,247 @@ const CreateNewStory: React.FC<CreateNewStoryProps> = (props) => {
       )}
     </div>
   ));
-
+  // next step
+  const nextStep = React.useCallback(
+    (stepName: string) => {
+      let stepError = '';
+      if (stepName === 'creactName') {
+        changeStoreName(storeName.Name);
+        if (
+          storeName.error.length > 0 ||
+          storeName.Name.length === undefined ||
+          storeName.Name.length === 0 ||
+          TypeStoreName.error.length > 0 ||
+          TypeStoreName.Name.length === undefined
+        ) {
+          stepError = 'error';
+        }
+        if (stepError !== 'error') {
+          atCreateNewStory(newStoryInfo, stories, categories);
+          setcreactStoryStep('creactQuestion');
+          settitle('用戶問句');
+        }
+      }
+      if (stepName === 'creactQuestion') {
+        CreactNewQuestion();
+        questionValue.map((item, idx) => {
+          if (
+            item.error.length > 0 ||
+            item.question === undefined ||
+            item.question.length === 0
+          ) {
+            stepError = 'error';
+          } else if (idx === 0) {
+            onCreateUserStep(item.question);
+          } else {
+            onCreateExample(
+              newStory.story,
+              item.question,
+              [],
+              newStory.story,
+              nlu,
+            );
+          }
+        });
+        if (stepError !== 'error') {
+          setcreactStoryStep('creactBot');
+          settitle('機器人回應');
+        }
+      }
+      if (stepName === 'creactBot') {
+        botValue.map((item) => {
+          console.log('botValue item ===> ', item);
+          const actionName = randomBotResAction(actions);
+          console.log('actionName ===> ', actionName);
+          onCreateBotStep(actionName, item.reply);
+        });
+        if (stepError !== 'error') {
+          setcreactStoryStep('creactTrain');
+          settitle('');
+        }
+      }
+      if (stepName === 'creactTrain') {
+        settitle('劇本名稱');
+        setcreactStoryStep('creactName');
+      }
+    },
+    [
+      creactStoryStep,
+      title,
+      CreactNewQuestion,
+      setQuestionValue,
+      changeStoreName,
+      atCreateNewStory,
+      newStoryInfo,
+      newStory,
+      stories,
+      categories,
+      nlu,
+      questionValue,
+      onCreateBotStep,
+      actions,
+      botValue,
+    ],
+  );
+  // 上一步
+  const previousStep = React.useCallback(
+    (stepName: string) => {
+      if (stepName === 'creactTrain') {
+        newStory.steps.map((step) => {
+          const { action } = step;
+          if (action) {
+            onRemoveBotStep(action);
+          }
+        });
+        // setbotValue([{ id: uuid(), reply: '', error: '' }]);
+        settitle('機器人回應');
+        setcreactStoryStep('creactBot');
+      }
+      if (stepName === 'creactBot') {
+        newStory.steps.map((step) => {
+          const { intent, user } = step;
+          onRemoveUserStep(intent, user);
+        });
+        // setQuestionValue([
+        //   { id: uuid(), question: '', error: '' },
+        //   { id: uuid(), question: '', error: '' },
+        // ]);
+        settitle('用戶問句');
+        setcreactStoryStep('creactQuestion');
+      }
+      if (stepName === 'creactQuestion') {
+        // onInitialNewStory();
+        // setNewStoryInfo({
+        //   story: '',
+        //   steps: [],
+        //   metadata: { category: '', create: false },
+        // });
+        settitle('劇本名稱');
+        setcreactStoryStep('creactName');
+      }
+    },
+    [
+      setbotValue,
+      setbotValue,
+      setQuestionValue,
+      setNewStoryInfo,
+      onRemoveUserStep,
+      onRemoveBotStep,
+      newStory,
+      creactStoryStep,
+      title,
+      atCreateNewStory,
+      newStoryInfo,
+      stories,
+      categories,
+      nlu,
+      questionValue,
+      onCreateBotStep,
+      actions,
+      botValue,
+    ],
+  );
   return (
-    <div>
+    <div className={cx(style.root)}>
       <div className={cx(style.creactStoryBlock)}>
-        <div className={cx(style.creactStoryCloseBtn)}>
-          <button
-            type="button"
-            onClick={() =>
-              setNewStoryInfo({
-                story: '',
-                steps: [],
-                metadata: { category: '', create: false },
-              })
-            }
-          >
-            ×
-          </button>
-        </div>
-        <div className={cx(style.creactStoryStep)}>
-          <span
-            className={cx(
-              creactStoryStep === 'creactName'
-                ? [style.active, style.item]
-                : style.item,
-            )}
-          >
-            <span className={cx(style.itemIcon)} />
-            <h6>劇本名稱</h6>
-          </span>
-          <span
-            className={cx(
-              creactStoryStep === 'creactQuestion'
-                ? [style.active, style.item]
-                : style.item,
-            )}
-          >
-            <span className={cx(style.itemIcon)} />
-            <h6>用戶問句</h6>
-          </span>
-          <span
-            className={cx(
-              creactStoryStep === 'creactBot'
-                ? [style.active, style.item]
-                : style.item,
-            )}
-          >
-            <span className={cx(style.itemIcon)} />
-            <h6>機器人回應</h6>
-          </span>
-          <span
-            className={cx(
-              creactStoryStep === 'creactTrain'
-                ? [style.active, style.item]
-                : style.item,
-            )}
-          >
-            <span className={cx(style.itemIcon)} />
-            <h6>啟動訓練</h6>
-          </span>
-        </div>
-        <div className={cx(style.creactStoryTitle)}>
-          <h3>{title}</h3>
-        </div>
+        {creactStoryStep !== 'creactTrain' && (
+          <>
+            <div className={cx(style.creactStoryCloseBtn)}>
+              <button
+                type="button"
+                onClick={() => {
+                  setNewStoryInfo({
+                    story: '',
+                    steps: [],
+                    metadata: { category: '', create: false },
+                  });
+                  setnowcreactStory('');
+                }}
+              >
+                ×
+              </button>
+            </div>
+            <div className={cx(style.creactStoryStep)}>
+              <span
+                className={cx(
+                  creactStoryStep === 'creactName'
+                    ? [style.active, style.item]
+                    : style.item,
+                )}
+              >
+                <span className={cx(style.itemIcon)} />
+                <h6>劇本名稱</h6>
+              </span>
+              <span
+                className={cx(
+                  creactStoryStep === 'creactQuestion'
+                    ? [style.active, style.item]
+                    : style.item,
+                )}
+              >
+                <span className={cx(style.itemIcon)} />
+                <h6>用戶問句</h6>
+              </span>
+              <span
+                className={cx(
+                  creactStoryStep === 'creactBot'
+                    ? [style.active, style.item]
+                    : style.item,
+                )}
+              >
+                <span className={cx(style.itemIcon)} />
+                <h6>機器人回應</h6>
+              </span>
+              <span
+                className={cx(
+                  creactStoryStep === 'creactTrain'
+                    ? [style.active, style.item]
+                    : style.item,
+                )}
+              >
+                <span className={cx(style.itemIcon)} />
+                <h6>啟動訓練</h6>
+              </span>
+            </div>
+            <div className={cx(style.creactStoryTitle)}>
+              <h3>{title}</h3>
+            </div>
+          </>
+        )}
+        {creactStoryStep === 'creactTrain' && (
+          <div>
+            <img src={require('../../images/creactStory/success.png')} alt="" />
+          </div>
+        )}
         <div className={cx(style.creactStoryFunction)}>
           {creactStoryStep === 'creactName' && (
             <>
-              <div className={style.storyInputBlock}>
+              <div
+                className={
+                  storeName.error.length > 0
+                    ? (style.storyInputBlock, style.error)
+                    : style.storyInputBlock
+                }
+              >
                 <div>
                   <label htmlFor="storyName">名稱</label>
                 </div>
                 <div>
                   <input
-                    className="form-control"
+                    className={cx(style.formStyle)}
                     id="storyName"
                     name="story"
                     placeholder="請輸入劇本名稱"
-                    value={storeName}
+                    value={storeName.name}
                     onChange={(e) => {
                       atChangeNewStoryInfo(e);
-                      setstoreName(e.target.value);
+                      changeStoreName(e.target.value);
                     }}
                   />
                 </div>
+                {storeName.error.length > 0 && (
+                  <div className={style.errorMsg}>{storeName.error}</div>
+                )}
               </div>
               <div className={style.storyInputBlock}>
                 <div>
@@ -476,7 +581,7 @@ const CreateNewStory: React.FC<CreateNewStoryProps> = (props) => {
                 </div>
                 <div>
                   <select
-                    className="form-control"
+                    className={cx(style.formStyle)}
                     id="category"
                     name="category"
                     value={
@@ -503,21 +608,37 @@ const CreateNewStory: React.FC<CreateNewStoryProps> = (props) => {
                   </select>
                 </div>
               </div>
-              <div className={style.storyInputBlock}>
+              <div
+                className={
+                  TypeStoreName.error.length > 0
+                    ? (style.storyInputBlock, style.error)
+                    : style.storyInputBlock
+                }
+              >
                 {newStoryInfo.metadata?.create && (
-                  <div className="mb-3">
-                    <label htmlFor="newCategory" className="form-label">
-                      類別名稱
-                    </label>
-                    <input
-                      className="form-control"
-                      id="newCategory"
-                      name="newCategory"
-                      placeholder="請輸入類別名稱"
-                      value={newStoryInfo.metadata?.category}
-                      onChange={(e) => atChangeNewStoryInfo(e)}
-                    />
-                  </div>
+                  <>
+                    <div className="mb-3">
+                      <label htmlFor="newCategory" className="form-label">
+                        類別名稱
+                      </label>
+                      <input
+                        className={cx(style.formStyle)}
+                        id="newCategory"
+                        name="newCategory"
+                        placeholder="請輸入類別名稱"
+                        value={newStoryInfo.metadata?.category}
+                        onChange={(e) => {
+                          atChangeNewStoryInfo(e);
+                          changeTypeStoreName(e.target.value);
+                        }}
+                      />
+                    </div>
+                    {TypeStoreName.error.length > 0 && (
+                      <div className={style.errorMsg}>
+                        {TypeStoreName.error}
+                      </div>
+                    )}
+                  </>
                 )}
               </div>
             </>
@@ -549,13 +670,7 @@ const CreateNewStory: React.FC<CreateNewStoryProps> = (props) => {
             </>
           )}
           {creactStoryStep === 'creactTrain' && (
-            <>
-              <div>
-                <img
-                  src={require('../../images/creactStory/success.png')}
-                  alt=""
-                />
-              </div>
+            <div>
               <div>
                 <h2>恭喜!</h2>
               </div>
@@ -565,26 +680,57 @@ const CreateNewStory: React.FC<CreateNewStoryProps> = (props) => {
                   開始訓練您的專屬機器人吧！
                 </h5>
               </div>
-            </>
+            </div>
           )}
         </div>
         <div className={cx(style.creactStoryFunctionBtn)}>
           {creactStoryStep !== 'creactName' ? (
-            <button onClick={() => previousStep(creactStoryStep)}>
-              上一頁
+            <button
+              className={cx(style.prevstepBtn)}
+              onClick={() => previousStep(creactStoryStep)}
+            >
+              上一步
             </button>
           ) : (
             <div />
           )}
+          {creactStoryStep !== 'creactTrain' && (
+            <button
+              className={cx(style.stepBtn)}
+              onClick={() => {
+                nextStep(creactStoryStep);
+              }}
+            >
+              下一步
+            </button>
+          )}
 
-          <button
-            className={cx(style.stepBtn)}
-            onClick={() => {
-              nextStep(creactStoryStep);
-            }}
-          >
-            下一步
-          </button>
+          {creactStoryStep === 'creactTrain' && (
+            <button
+              onClick={() => {
+                onClickSaveBtn(newStory);
+                setNowMode('storeChid');
+                atSelectStory('storeName');
+                setbotValue([{ id: uuid(), reply: '', error: '' }]);
+                setQuestionValue([
+                  { id: uuid(), question: '', error: '' },
+                  { id: uuid(), question: '', error: '' },
+                ]);
+                onInitialNewStory();
+                setNewStoryInfo({
+                  story: '',
+                  steps: [],
+                  metadata: { category: '', create: false },
+                });
+                settitle('劇本名稱');
+                setcreactStoryStep('creactName');
+                setnowcreactStory('');
+              }}
+              className={cx(style.creactStoryFunctionBtnFinish, style.stepBtn)}
+            >
+              劇本創建完成
+            </button>
+          )}
         </div>
       </div>
     </div>
