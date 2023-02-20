@@ -508,7 +508,7 @@ const reducer = (state: State, action: Action): State => {
       if (
         state.cloneData.domain.responses[actionName] &&
         state.cloneData.domain.responses[actionName][0].text ===
-          JSON.parse(JSON.stringify(oriWord).replace(/\\r/g, '  \\n'))
+          JSON.parse(JSON.stringify(oriWord).replace(/\\n/g, '  \\n'))
       ) {
         domain.responses[actionName][0].text = JSON.parse(
           JSON.stringify(newWord).replace(/\\n/g, '  \\n'),

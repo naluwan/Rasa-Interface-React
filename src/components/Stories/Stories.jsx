@@ -1,12 +1,13 @@
 import * as React from 'react';
-import useSWR from 'swr';
+// import useSWR from 'swr';
 import {
-  fetchAllData,
+  // fetchAllData,
   postAllTrainData,
   fetchAllAction,
-  fetchAllCategories,
+  // fetchAllCategories,
   postCategory,
   deleteCategory,
+  fetchTrainAndCategoriesData,
 } from 'services/api';
 import shallow from 'zustand/shallow';
 import type { State, StoryType, CreateStoryState } from 'components/types';
@@ -17,6 +18,7 @@ import MyButton from 'components/MyButton';
 import CreateStory from 'components/CreateStory';
 import { cloneDeep } from 'lodash-es';
 import { randomBotResAction } from 'utils/randomBotResAction';
+import { useQuery } from 'react-query';
 import style from './Stories.module.scss';
 import useStoryStore from '../../store/useStoryStore';
 import useCreateStoryStore from '../../store/useCreateStoryStore';
@@ -104,19 +106,42 @@ const Stories = () => {
     };
   }, shallow);
 
-  // 進入頁面打API要所有訓練資料
-  const { data } = useSWR('/api/getAllTrainData', fetchAllData);
-  const allCategories = useSWR('/api/getAllCategories', fetchAllCategories);
+  const fetchData = useQuery(
+    'fetchTrainAndCategoriesData',
+    fetchTrainAndCategoriesData,
+  );
 
-  // 進入頁面獲取設定資料
   React.useEffect(() => {
-    onSetAllTrainData(data);
-  }, [data, onSetAllTrainData]);
+    if (fetchData.isSuccess && !fetchData.isError && !fetchData.isLoading) {
+      const [allTrainData, allCategories] = fetchData.data;
 
-  // 進入頁面設定故事類別
-  React.useEffect(() => {
-    onSetAllCategories(allCategories.data);
-  }, [allCategories.data, onSetAllCategories]);
+      onSetAllCategories(allCategories);
+      onSetAllTrainData(allTrainData);
+    }
+  }, [
+    fetchData.data,
+    fetchData.isError,
+    fetchData.isSuccess,
+    fetchData.isLoading,
+    onSetAllCategories,
+    onSetAllTrainData,
+  ]);
+
+  // // 進入頁面打API要所有訓練資料
+  // const { data } = useSWR('/api/getAllTrainData', fetchAllData);
+  // const allCategories = useSWR('/api/getAllCategories', fetchAllCategories);
+
+  // // 進入頁面獲取設定資料
+  // React.useEffect(() => {
+  //   console.log('all data ==> ', data);
+  //   onSetAllTrainData(data);
+  // }, [data, onSetAllTrainData]);
+
+  // // 進入頁面設定故事類別
+  // React.useEffect(() => {
+  //   console.log('all categories ==> ', allCategories.data);
+  //   onSetAllCategories(allCategories.data);
+  // }, [allCategories.data, onSetAllCategories]);
 
   // 故事類別或stories更新時，判斷類別下是否有故事
   React.useEffect(() => {

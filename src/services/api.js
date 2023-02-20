@@ -142,6 +142,18 @@ export const fetchAllData = (): Promise<TrainDataType> => {
     });
 };
 
+// 獲取所有訓練檔和故事類別
+export const fetchTrainAndCategoriesData = async (): Promise<TrainDataType> => {
+  return Promise.all([
+    axiosInstance
+      .get(`${API_URL}/train/allTrainData`)
+      .then(({ data: { data } }) => data),
+    axiosInstance
+      .get(`${API_URL}/train/categories`)
+      .then((categories) => categories.data.data),
+  ]);
+};
+
 // 抓取全部action
 export const fetchAllAction = (): Promise<string[]> => {
   return axiosInstance
