@@ -33,14 +33,6 @@ const Modal: React.FC<ModalProps> = (props) => {
     modalTextarea: '',
   });
 
-  // 點選back drop可以關閉視窗
-  const modalRef = React.useRef(null);
-  const atBackdropClick = (e) => {
-    if (!modalRef.current.contains(e.target)) {
-      onClose();
-    }
-  };
-
   // 當父層有傳textarea值進來時要將值設為textarea的預設值
   React.useEffect(() => {
     setModalData((prev) => {
@@ -73,9 +65,17 @@ const Modal: React.FC<ModalProps> = (props) => {
     }
   }, [onClose, setModalData, inputPlaceholder]);
 
+  // 點選back drop可以關閉視窗
+  const modalRef = React.useRef(null);
+  const atBackdropClick = (e) => {
+    if (!modalRef.current.contains(e.target)) {
+      atCloseModal();
+    }
+  };
+
   return isVisible
     ? ReactDOM.createPortal(
-        <div className={style.backdrop} onClick={atBackdropClick}>
+        <div className={style.backdrop} onMouseDown={atBackdropClick}>
           <div
             ref={modalRef}
             className={cx(style.modal, 'swal2-show')}
