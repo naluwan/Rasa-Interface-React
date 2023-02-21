@@ -133,7 +133,6 @@ const BotStep: React.FC<BotStepProps> = (props) => {
         checkPointName,
         connectBranchStoryName,
       );
-      setIsBotResponseVisible((prev) => !prev);
     },
     [
       onEditBotRes,
@@ -185,7 +184,6 @@ const BotStep: React.FC<BotStepProps> = (props) => {
         checkPointName,
         connectBranchStoryName,
       );
-      setIsBotButtonVisible((prev) => !prev);
     },
     [
       onAddResButtons,
@@ -194,7 +192,6 @@ const BotStep: React.FC<BotStepProps> = (props) => {
       storyName,
       checkPointName,
       connectBranchStoryName,
-      setIsBotButtonVisible,
     ],
   );
 

@@ -73,6 +73,29 @@ const Modal: React.FC<ModalProps> = (props) => {
     }
   };
 
+  // 送出填入的資料，送出後關閉彈跳窗
+  const atSubmit = React.useCallback(
+    (
+      currentData: {
+        modalInput: string,
+        modalTextarea: string,
+      },
+      hasInput: boolean,
+    ) => {
+      if (!hasInput && !currentData.modalTextarea) {
+        setModalData((prev) => {
+          return {
+            ...prev,
+            modalTextarea,
+          };
+        });
+      }
+      onSubmit(currentData, hasInput);
+      atCloseModal();
+    },
+    [onSubmit, atCloseModal, modalTextarea],
+  );
+
   return isVisible
     ? ReactDOM.createPortal(
         <div className={style.backdrop} onMouseDown={atBackdropClick}>
@@ -126,7 +149,7 @@ const Modal: React.FC<ModalProps> = (props) => {
               </button>
               <button
                 className="btn btn-primary modalBtn"
-                onClick={() => onSubmit(modalData, !!inputPlaceholder)}
+                onClick={() => atSubmit(modalData, !!inputPlaceholder)}
               >
                 儲存
               </button>
