@@ -13,6 +13,7 @@ import { randomBotResAction } from '../../utils/randomBotResAction';
 import useCreateStoryStore from '../../store/useCreateStoryStore';
 
 type CreateNewStoryProps = {
+  mode: string,
   newStory: StoryType,
   newStoryInfo: Object,
   categories: State,
@@ -35,6 +36,7 @@ type CreateNewStoryProps = {
 };
 const CreateNewStory: React.FC<CreateNewStoryProps> = (props) => {
   const {
+    mode,
     setnowcreactStory,
     actions,
     atSelectStory,
@@ -473,6 +475,7 @@ const CreateNewStory: React.FC<CreateNewStoryProps> = (props) => {
       botValue,
     ],
   );
+
   return (
     <div className={cx(style.root)}>
       <div className={cx(style.creactStoryBlock)}>
@@ -494,46 +497,105 @@ const CreateNewStory: React.FC<CreateNewStoryProps> = (props) => {
               </button>
             </div>
             <div className={cx(style.creactStoryStep)}>
-              <span
-                className={cx(
-                  creactStoryStep === 'creactName'
-                    ? [style.active, style.item]
-                    : style.item,
-                )}
-              >
-                <span className={cx(style.itemIcon)} />
-                <h6>劇本名稱</h6>
-              </span>
-              <span
-                className={cx(
-                  creactStoryStep === 'creactQuestion'
-                    ? [style.active, style.item]
-                    : style.item,
-                )}
-              >
-                <span className={cx(style.itemIcon)} />
-                <h6>用戶問句</h6>
-              </span>
-              <span
-                className={cx(
-                  creactStoryStep === 'creactBot'
-                    ? [style.active, style.item]
-                    : style.item,
-                )}
-              >
-                <span className={cx(style.itemIcon)} />
-                <h6>機器人回應</h6>
-              </span>
-              <span
-                className={cx(
-                  creactStoryStep === 'creactTrain'
-                    ? [style.active, style.item]
-                    : style.item,
-                )}
-              >
-                <span className={cx(style.itemIcon)} />
-                <h6>啟動訓練</h6>
-              </span>
+              {mode === 'Base' && (
+                <>
+                  <span
+                    className={cx(
+                      creactStoryStep === 'creactName'
+                        ? [style.active, style.item]
+                        : style.item,
+                    )}
+                  >
+                    <span className={cx(style.itemIcon)} />
+                    <h6>劇本名稱</h6>
+                  </span>
+                  <span
+                    className={cx(
+                      creactStoryStep === 'creactQuestion'
+                        ? [style.active, style.item]
+                        : style.item,
+                    )}
+                  >
+                    <span className={cx(style.itemIcon)} />
+                    <h6>用戶問句</h6>
+                  </span>
+                  <span
+                    className={cx(
+                      creactStoryStep === 'creactBot'
+                        ? [style.active, style.item]
+                        : style.item,
+                    )}
+                  >
+                    <span className={cx(style.itemIcon)} />
+                    <h6>機器人回應</h6>
+                  </span>
+                  <span
+                    className={cx(
+                      creactStoryStep === 'creactTrain'
+                        ? [style.active, style.item]
+                        : style.item,
+                    )}
+                  >
+                    <span className={cx(style.itemIcon)} />
+                    <h6>啟動訓練</h6>
+                  </span>
+                </>
+              )}
+
+              {mode === 'Advanced' && (
+                <>
+                  <span
+                    className={cx(
+                      creactStoryStep === 'creactName'
+                        ? [style.active, style.item]
+                        : style.item,
+                    )}
+                  >
+                    <span className={cx(style.itemIcon)} />
+                    <h6>劇本名稱</h6>
+                  </span>
+                  <span
+                    className={cx(
+                      creactStoryStep === 'creactQuestion'
+                        ? [style.active, style.item]
+                        : style.item,
+                    )}
+                  >
+                    <span className={cx(style.itemIcon)} />
+                    <h6>用戶問句</h6>
+                  </span>
+                  <span
+                    className={cx(
+                      creactStoryStep === 'creactQuestion'
+                        ? [style.active, style.item]
+                        : style.item,
+                    )}
+                  >
+                    <span className={cx(style.itemIcon)} />
+                    <h6>關鍵字設定</h6>
+                  </span>
+                  <span
+                    className={cx(
+                      creactStoryStep === 'creactBot'
+                        ? [style.active, style.item]
+                        : style.item,
+                    )}
+                  >
+                    <span className={cx(style.itemIcon)} />
+                    <h6>機器人回應</h6>
+                  </span>
+                  <span
+                    className={cx(
+                      creactStoryStep === 'creactTrain'
+                        ? [style.active, style.item]
+                        : style.item,
+                    )}
+                  >
+                    <span className={cx(style.itemIcon)} />
+                    <h6>啟動訓練</h6>
+                  </span>
+                </>
+              )}
             </div>
             <div className={cx(style.creactStoryTitle)}>
               <h3>{title}</h3>

@@ -69,7 +69,7 @@ const Stories = () => {
     onSetAllCategories,
     categories,
     onSetSelectedCategory,
-    selectedCategory,
+    // selectedCategory,
     onSetSelectedStory,
     selectedStory,
   } = useStoryStore((state: State) => {
@@ -474,7 +474,16 @@ const Stories = () => {
       onSetSelectedStory,
     ],
   );
-
+  // 故事類別名稱
+  const [categoriesName, setcategoriesName] = React.useState('預設故事');
+  // 選擇故事類別
+  const chooseCategories = React.useCallback(
+    (categoryName: String) => {
+      onSetSelectedCategory(categoryName);
+      setcategoriesName(categoryName);
+    },
+    [onSetSelectedCategory, setcategoriesName, categoriesName],
+  );
   // 新增故事
   /* const atClickCreateStoryBtn = React.useCallback(() => {
   if (Object.keys(newStory).length !== 0) {
@@ -1127,6 +1136,15 @@ const Stories = () => {
     }
   }, [newStory]);
 
+  const chooseListType = React.useCallback((direction) => {
+    const listTitle = document.querySelector('#listTitle');
+    const width = document.querySelector('#listTitle [data-item]').offsetWidth;
+    if (direction === 'right') {
+      listTitle.scrollLeft += width;
+    } else {
+      listTitle.scrollLeft -= width;
+    }
+  }, []);
   return (
     <>
       <NavBar
@@ -1156,19 +1174,40 @@ const Stories = () => {
                   style.storoesBlock,
                 )}
               >
-                <div className={cx(style.listTitle)}>
-                  {categories &&
-                    categories.map((category) => {
-                      return (
-                        <div
-                          key={`list-${category.name}-`}
-                          onClick={() => onSetSelectedCategory(category.name)}
-                          className={cx(style.title)}
-                        >
-                          {category.name}
-                        </div>
-                      );
-                    })}
+                <div className={cx(style.storesBar)}>
+                  <div
+                    className={cx(style.ctrolBar)}
+                    onClick={() => {
+                      chooseListType('left');
+                    }}
+                  >
+                    <img src={require('../../images/icon_left.png')} alt="" />
+                  </div>
+                  <div id="listTitle" className={cx(style.listTitle)}>
+                    {categories &&
+                      categories.map((category) => {
+                        return (
+                          <div
+                            data-item
+                            key={`list-${category.name}-`}
+                            onClick={() => {
+                              chooseCategories(category.name);
+                            }}
+                            className={cx(style.title)}
+                          >
+                            {category.name}
+                          </div>
+                        );
+                      })}
+                  </div>
+                  <div
+                    className={cx(style.ctrolBar)}
+                    onClick={() => {
+                      chooseListType('right');
+                    }}
+                  >
+                    <img src={require('../../images/icon_right.png')} alt="" />
+                  </div>
                 </div>
                 <div className={cx(style.list)}>
                   {categories &&
@@ -1176,9 +1215,7 @@ const Stories = () => {
                       return (
                         <div
                           data-open={
-                            selectedCategory === category.name
-                              ? 'open'
-                              : 'noopen'
+                            categoriesName === category.name ? 'open' : 'noopen'
                           }
                           key={`list-${category.name}`}
                           className={cx('row', cx(style.listmenu))}
@@ -1528,7 +1565,12 @@ const Stories = () => {
                 </div>
               </div>
             </div>
-            <div className={cx(style.createStoriesCard)}>
+            <div
+              onClick={() => {
+                setnowcreactStory('Advanced');
+              }}
+              className={cx(style.createStoriesCard)}
+            >
               <div>
                 <div className={style.card}>
                   <img
@@ -1544,8 +1586,9 @@ const Stories = () => {
             </div>
           </div>
           {/* creactStory */}
-          {nowcreactStory === 'Base' && (
+          {(nowcreactStory === 'Base' || nowcreactStory === 'Advanced') && (
             <CreateNewStory
+              mode={nowcreactStory}
               setnowcreactStory={setnowcreactStory}
               atChangeNewStoryInfo={atChangeNewStoryInfo}
               atCreateNewStory={atCreateNewStory}
