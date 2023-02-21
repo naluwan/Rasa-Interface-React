@@ -1,9 +1,17 @@
+/* eslint-disable camelcase */
 /* eslint-disable jsx-a11y/no-static-element-interactions */
 import * as React from 'react';
 import cx from 'classnames';
 import ReactDOM from 'react-dom';
 import { AiOutlineClose } from 'react-icons/ai';
+import uuid from 'react-uuid';
+import { CgAddR } from 'react-icons/cg';
+import { BsTrashFill } from 'react-icons/bs';
+import shallow from 'zustand/shallow';
+import type { State } from 'components/types';
+import { Toast } from 'utils/swalInput';
 import style from './CreateFromModal.module.scss';
+import useStoryStore from '../../store/useStoryStore';
 
 type CreateFromModalProps = {
   title: string,
@@ -17,19 +25,37 @@ type CreateFromModalProps = {
 };
 
 const CreateFromModal: React.FC<CreateFromModalProps> = (props) => {
-  const { title, isVisible, maxWidth, modalTextarea, onClose, onSubmit } =
-    props;
+  const { title, isVisible, maxWidth, allForms, onClose } = props;
 
   const [modalData, setModalData] = React.useState({
     name: '',
-    request_slot: {},
+    request_slot: [{ id: uuid(), question: '' }],
   });
+
+  const { onCreateForm } = useStoryStore((state: State) => {
+    return {
+      onCreateForm: state.onCreateForm,
+    };
+  }, shallow);
 
   // 更新modal input, textarea的值
   const atChange = React.useCallback(
-    (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    (e: React.ChangeEvent<HTMLInputElement>, id?: string) => {
       const { name, value } = e.target;
-      setModalData((prev) => {
+      if (name === 'request_slot') {
+        return setModalData((prev) => {
+          return {
+            ...prev,
+            request_slot: prev.request_slot.map((slot) => {
+              if (slot.id === id) {
+                slot.question = value;
+              }
+              return slot;
+            }),
+          };
+        });
+      }
+      return setModalData((prev) => {
         return {
           ...prev,
           [name]: value,
@@ -42,7 +68,10 @@ const CreateFromModal: React.FC<CreateFromModalProps> = (props) => {
   // 關閉視窗時會重置新增按鈕的modal data
   const atCloseModal = React.useCallback(() => {
     onClose();
-    setModalData({ name: '', request_slot: {} });
+    setModalData({
+      name: '',
+      request_slot: [{ id: uuid(), question: '' }],
+    });
   }, [onClose, setModalData]);
 
   // 點選back drop可以關閉視窗
@@ -55,26 +84,60 @@ const CreateFromModal: React.FC<CreateFromModalProps> = (props) => {
 
   // 送出填入的資料，送出後關閉彈跳窗
   const atSubmit = React.useCallback(
-    (
-      currentData: {
-        modalInput: string,
-        modalTextarea: string,
-      },
-      hasInput: boolean,
-    ) => {
-      if (!hasInput && !currentData.modalTextarea) {
-        setModalData((prev) => {
-          return {
-            ...prev,
-            modalTextarea,
-          };
+    (currentData) => {
+      const { name, request_slot } = currentData;
+
+      const isRepeat = allForms.some((form) => form[0] === name);
+
+      if (isRepeat) {
+        Toast.fire({
+          icon: 'warning',
+          title: '表單名稱重複',
         });
+        return;
       }
-      onSubmit(currentData, hasInput);
+
+      const isNull = request_slot.some((slot) => slot.question === '');
+
+      if (isNull) {
+        Toast.fire({
+          icon: 'warning',
+          title: '表單問題是必填的',
+        });
+        return;
+      }
+
+      onCreateForm(name, request_slot);
       atCloseModal();
     },
-    [onSubmit, atCloseModal, modalTextarea],
+    [atCloseModal, onCreateForm, allForms],
   );
+
+  // 新增表單問答輸入框
+  const addSlot = React.useCallback(() => {
+    setModalData((prev) => {
+      const newRequestSlot = prev.request_slot.concat([
+        { id: uuid(), question: '' },
+      ]);
+      return {
+        ...prev,
+        request_slot: newRequestSlot,
+      };
+    });
+  }, []);
+
+  // 移除表單問答輸入框
+  const removeSlot = React.useCallback((id: string) => {
+    setModalData((prev) => {
+      return {
+        ...prev,
+        request_slot:
+          prev.request_slot.length === 1
+            ? prev.request_slot
+            : prev.request_slot.filter((slot) => slot.id !== id),
+      };
+    });
+  }, []);
 
   return isVisible
     ? ReactDOM.createPortal(
@@ -107,16 +170,34 @@ const CreateFromModal: React.FC<CreateFromModalProps> = (props) => {
                 />
               </div>
 
-              <div className={cx('mb-3 mt-1')}>
-                <input
-                  type="text"
-                  className="form-control"
-                  name="request_slot"
-                  id="request_slot"
-                  value={modalData.modalInput}
-                  placeholder="請輸入要收集的表單問題"
-                  onChange={(e) => atChange(e)}
-                />
+              {modalData.request_slot.length > 0 &&
+                modalData.request_slot.map((slot, idx) => {
+                  return (
+                    <div key={slot.id} className={cx(style.inputContainer)}>
+                      <div className={cx('mb-3 mt-1 col-11')}>
+                        <input
+                          type="text"
+                          className="form-control"
+                          name="request_slot"
+                          id="request_slot"
+                          value={slot.question}
+                          placeholder={`請輸入第${idx + 1}個的表單問題`}
+                          onChange={(e) => atChange(e, slot.id)}
+                        />
+                      </div>
+                      <div
+                        className={cx(
+                          'mb-3 mt-1 col-1',
+                          style.trashIconContainer,
+                        )}
+                      >
+                        <BsTrashFill onClick={() => removeSlot(slot.id)} />
+                      </div>
+                    </div>
+                  );
+                })}
+              <div className={cx('mb-3 mt-1 d-flex justify-content-center')}>
+                <CgAddR className={cx(style.add)} onClick={() => addSlot()} />
               </div>
             </div>
             <div className={cx(style.modalFooter)}>

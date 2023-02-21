@@ -70,3 +70,30 @@
 :global(.modalBtn) {
   margin-left: 1rem;
 }
+
+.add {
+  transform: scale(1.5, 1.5);
+  transition: all 0.1s ease-out;
+  cursor: pointer;
+  &:hover {
+    transform: scale(1.8, 1.8);
+  }
+}
+
+.inputContainer {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  .trashIconContainer {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transform: scale(1, 1);
+    transition: all 0.1s ease-out;
+    cursor: pointer;
+    &:hover {
+      color: red;
+      transform: scale(1.5, 1.5);
+    }
+  }
+}

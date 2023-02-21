@@ -64,7 +64,6 @@ const Forms: React.FC<FormsProps> = (props) => {
             <div>
               {Object.keys(selectForm.required_slots).length > 0 &&
                 Object.entries(selectForm.required_slots).map((slot) => {
-                  console.log('slot => ', slot);
                   return (
                     <div
                       className="card mt-2 d-flex "
@@ -87,6 +86,7 @@ const Forms: React.FC<FormsProps> = (props) => {
         title="建立表單"
         isVisible={isCreateForm}
         onClose={() => setIsCreateForm((prev) => !prev)}
+        allForms={allForms}
       />
     </div>
   );
