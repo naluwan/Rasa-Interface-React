@@ -61,6 +61,7 @@ import {
   actionSelectedCategory,
   actionSelectedStory,
   actionEditStoryInfo,
+  actionCreateFrom,
 } from 'actions';
 // import { computed } from 'zustand-middleware-computed-state';
 import { Toast } from 'utils/swalInput';
@@ -3135,6 +3136,15 @@ const reducer = (state: State, action: Action): State => {
         })
         .then(() => document.querySelector('#cancelEditStoryBtn').click());
     }
+    case 'CREATE_FORM': {
+      // eslint-disable-next-line camelcase
+      const { name, require_slot } = action.payload;
+      console.log(name);
+      console.log(require_slot);
+      return {
+        ...state,
+      };
+    }
     default:
       return state;
   }
@@ -3682,6 +3692,14 @@ const useStoryStore = create((set) => {
       new: { story: string, category: string, create?: boolean },
     }) {
       dispatch(actionEditStoryInfo(storyInfo));
+    },
+    // 建立表單
+    onCreateForm(
+      name: string,
+      // eslint-disable-next-line camelcase
+      require_slot: { id: string, question: string }[],
+    ) {
+      dispatch(actionCreateFrom(name, require_slot));
     },
   };
 });
