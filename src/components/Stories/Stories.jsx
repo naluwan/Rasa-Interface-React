@@ -1193,7 +1193,11 @@ const Stories = () => {
                             onClick={() => {
                               chooseCategories(category.name);
                             }}
-                            className={cx(style.title)}
+                            className={cx(
+                              categoriesName === category.name
+                                ? style.active
+                                : style.title,
+                            )}
                           >
                             {category.name}
                           </div>

@@ -32,9 +32,10 @@
     position: relative;
     display: flex;
     align-items: center;
-    .ctrolBar{
+
+    .ctrolBar {
       cursor: pointer;
-      margin:0 2rem;
+      margin: 0 2rem;
     }
   }
 
@@ -63,12 +64,25 @@
     }
 
     .title {
-      padding: 1rem;
+      margin: 1rem;
       cursor: pointer;
       text-align: left;
       font-size: 20px;
       font-weight: 900;
       word-break: keep-all;
+
+
+    }
+
+    .active {
+      margin: 1rem;
+      cursor: pointer;
+      text-align: left;
+      font-size: 20px;
+      font-weight: 900;
+      word-break: keep-all;
+      color: #7377FA;
+      border-bottom: 1px solid #7377FA;
     }
   }
 
@@ -92,10 +106,11 @@
         width: 100%;
         text-align: center;
         background: #fff;
+        overflow: hidden;
         border: 1px solid rgb(182, 182, 182);
+        text-overflow: ellipsis;
         border-radius: 5px;
         padding: 10px;
-        pointer-events: none;
 
 
         &[data-check="check"] {
