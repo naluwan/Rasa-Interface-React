@@ -19,6 +19,7 @@ import CreateStory from 'components/CreateStory';
 import { cloneDeep } from 'lodash-es';
 import { randomBotResAction } from 'utils/randomBotResAction';
 import { useQuery } from 'react-query';
+import Forms from 'components/Forms';
 import style from './Stories.module.scss';
 import useStoryStore from '../../store/useStoryStore';
 import useCreateStoryStore from '../../store/useCreateStoryStore';
@@ -30,9 +31,12 @@ const Stories = () => {
    */
   const [create, setCreate] = React.useState(false);
   /**
+   * @type {[boolean, Function]}
+   */
+  const [forms, setForms] = React.useState(false);
+  /**
    * @type {[string, Function]}
    */
-
   const [defaultValue, setDefaultValue] = React.useState('');
   /**
    * @type {[StoryType, Function]}
@@ -458,6 +462,7 @@ const Stories = () => {
           onSetSelectedCategory(story.metadata?.category);
           onSetSelectedStory(storyName);
           onSetStory(storyName);
+          setForms(false);
           onInitialNewStory();
         });
       }
@@ -474,6 +479,7 @@ const Stories = () => {
       onSetSelectedCategory(story.metadata?.category);
       onSetSelectedStory(storyName);
       onSetStory(storyName);
+      setForms(false);
       return onInitialNewStory();
     },
     [
@@ -485,6 +491,7 @@ const Stories = () => {
       onSetSelectedCategory,
       story.metadata?.category,
       onSetSelectedStory,
+      setForms,
     ],
   );
 
@@ -1197,6 +1204,13 @@ const Stories = () => {
     }
   }, [newStory]);
 
+  // 點擊表單設計按鈕事件
+  const atClickCreateFormBtn = React.useCallback(() => {
+    onSetStory('');
+    setCreate(false);
+    setForms(true);
+  }, [onSetStory, setCreate, setForms]);
+
   return (
     <>
       <div className={style.searchBar}>
@@ -1262,6 +1276,16 @@ const Stories = () => {
                   </div>
                   <Slots slots={slots} domain={domain} />
                 </div>
+              </div>
+              <div className={cx(style.btn, style.navbar)}>
+                <MyButton
+                  variant="primary"
+                  id="createNewForm"
+                  onClick={() => atClickCreateFormBtn()}
+                  type="button"
+                >
+                  表單設計
+                </MyButton>
               </div>
             </div>
             <div className={cx(style.menuInputBlock)}>
@@ -1370,6 +1394,7 @@ const Stories = () => {
           onClickSaveBtn={atClickSaveBtn}
         />
       )}
+      {forms && <Forms domain={domain} />}
 
       {/* create story modal */}
       <div
