@@ -1186,11 +1186,12 @@ const Stories = () => {
 
       delete newStoryData.metadata.create;
       onCreateNewStory(newStoryData);
+      setForms(false);
       setCreate(true);
       onSetStory('');
       document.querySelector('#cancelCreateStoryBtn').click();
     },
-    [setNewStoryInfo, onCreateNewStory, onSetStory],
+    [setNewStoryInfo, onCreateNewStory, onSetStory, setForms],
   );
 
   // 提示使用者新增的故事尚未儲存
