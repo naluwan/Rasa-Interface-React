@@ -80,7 +80,7 @@ const CreateNewStory: React.FC<CreateNewStoryProps> = (props) => {
   });
   const [TypeStoreName, setTypeStoreName] = React.useState({
     id: uuid(),
-    TypeStoreName: '',
+    name: '',
     error: '',
   });
   // 劇本名稱更新
@@ -97,7 +97,7 @@ const CreateNewStory: React.FC<CreateNewStoryProps> = (props) => {
         });
       }
       const { id } = storeName;
-      const updateStoreNameValue = { id, Name, error };
+      const updateStoreNameValue = { id, name: Name, error };
       setstoreName(updateStoreNameValue);
     },
     [stories, storeName, setstoreName],
@@ -116,7 +116,7 @@ const CreateNewStory: React.FC<CreateNewStoryProps> = (props) => {
         });
       }
       const { id } = TypeStoreName;
-      const updateTypeNameValue = { id, Name, error };
+      const updateTypeNameValue = { id, name: Name, error };
       setTypeStoreName(updateTypeNameValue);
     },
     [categories, TypeStoreName, setTypeStoreName],
@@ -341,10 +341,10 @@ const CreateNewStory: React.FC<CreateNewStoryProps> = (props) => {
         changeStoreName(storeName.Name);
         if (
           storeName.error.length > 0 ||
-          storeName.Name.length === undefined ||
-          storeName.Name.length === 0 ||
+          storeName.name.length === undefined ||
+          storeName.name.length === 0 ||
           TypeStoreName.error.length > 0 ||
-          TypeStoreName.Name.length === undefined
+          TypeStoreName.name.length === undefined
         ) {
           stepError = 'error';
         }
