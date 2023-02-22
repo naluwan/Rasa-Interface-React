@@ -172,6 +172,7 @@ h3 {
     align-items: center;
     color: white;
     display: flex;
+    min-width: 100%;
     flex: 1;
     flex-direction: column;
     height: var(--slide-size);
@@ -329,6 +330,7 @@ h3 {
     font-size: 8vmin;
     font-weight: 600;
     position: relative;
+    word-break: keep-all;
 }
 
 .slide__content {

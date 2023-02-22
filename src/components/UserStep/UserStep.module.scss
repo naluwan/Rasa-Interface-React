@@ -15,10 +15,9 @@
   .userText {
     border-radius: 10px;
     padding: 10px;
-    max-width: 50%;
-    width: fit-content;
-    background-color: rgb(95, 121, 160);
-    color: #fff;
+    width: 100%;
+    border: 1px solid #D4D4DA;
+    color: #272848;
   }
 
   .entitiesContainer {
@@ -193,9 +192,11 @@
 .mt2 {
   margin-top: 0.5rem;
 }
+
 .keyWordBtnMr {
   margin-right: 62px;
 }
+
 [data-showstory] .keyWordBtnMr {
   margin-right: 0;
 }
@@ -213,6 +214,7 @@ table {
   text-align: center;
   font-size: 15px;
 }
+
 .swtOut {
   position: relative;
   box-sizing: border-box;

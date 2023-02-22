@@ -194,9 +194,7 @@ const Slider: React.FC<SliderProps> = (props) => {
       .querySelector('#wrapperTransform')
       .setAttribute(
         'style',
-        `transform:translateX(-${
-          lastpoint * (100 / slides.length)
-        }%);transition: all .3s;`,
+        `transform:translateX(-${lastpoint * 110}%);transition: all .3s;`,
       );
     document
       .querySelector(`#wrapperTransform [data-number="${Number(lastpoint)}"]`)
@@ -233,14 +231,12 @@ const Slider: React.FC<SliderProps> = (props) => {
     } else {
       Nextpoint = next;
     }
-
+    console.log(slides.length);
     document
       .querySelector('#wrapperTransform')
       .setAttribute(
         'style',
-        `transform:translateX(-${
-          Nextpoint * (100 / slides.length)
-        }%);transition: all .3s;`,
+        `transform:translateX(-${Nextpoint * 110}%);transition: all .3s;`,
       );
     document
       .querySelector(`#wrapperTransform [data-number="${Number(Nextpoint)}"]`)
@@ -284,9 +280,7 @@ const Slider: React.FC<SliderProps> = (props) => {
       .querySelector('#wrapperTransform')
       .setAttribute(
         'style',
-        `transform:translateX(-${
-          type * (100 / slides.length)
-        }%);transition: all .3s;`,
+        `transform:translateX(-${type * 110}%);transition: all .3s;`,
       );
     document
       .querySelector(`#wrapperTransform [data-number="${Number(type)}"]`)
@@ -307,7 +301,7 @@ const Slider: React.FC<SliderProps> = (props) => {
       .setAttribute('data-choose', 'next');
   };
   const wrapperTransform = {
-    transform: `translateX(-${0 * (100 / slides.length)}%) transition: all .3s`,
+    transform: `translateX(-${0 * 110}%) transition: all .3s`,
   };
   const headingId = `slider-heading__${heading}`;
 

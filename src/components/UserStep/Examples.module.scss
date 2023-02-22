@@ -1,13 +1,17 @@
 .root {
+  width: 100%;
+  display: flex;
+  place-content: space-between;
 
-    &:nth-child(even) {
-      background: #e8ebff;
-      text-align: center;
-    }
-     &:nth-child(odd) {
-       background: #fff;
-       text-align: center;
-     }
+  &:nth-child(even) {
+    background: #e8ebff;
+    text-align: center;
+  }
+
+  &:nth-child(odd) {
+    background: #fff;
+    text-align: center;
+  }
 
   .tbltd {
     padding: 10px;

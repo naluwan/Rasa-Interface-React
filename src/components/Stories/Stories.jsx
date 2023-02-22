@@ -1528,6 +1528,8 @@ const Stories = () => {
         >
           {Object.keys(story).length > 0 && (
             <ShowStory
+              setcategoriesName={setcategoriesName}
+              setNowMode={setNowMode}
               isCreate={create}
               story={story}
               atChangeMode={atChangeMode}

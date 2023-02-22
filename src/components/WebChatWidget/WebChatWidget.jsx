@@ -59,6 +59,7 @@ const WebChatWidget = () => {
         interval={2000}
         initPayload="/get_started"
         socketUrl="http://192.168.10.105:5005"
+        // socketUrl="https://1eb3-114-32-167-155.jp.ngrok.io/"
         socketPath="/socket.io/"
         customData={{ language: 'zh', userId: user.cpnyId }}
         profileAvatar={user.image}

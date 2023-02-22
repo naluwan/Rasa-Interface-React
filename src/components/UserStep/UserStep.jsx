@@ -901,8 +901,16 @@ const UserStep: React.FC<UserStepProps> = (props) => {
 
   return (
     <div className="row pt-2" id="userStep">
+      <div className={cx('col-sm-1 col-md-1 col-lg-1')}>
+        <img
+          className="w-100"
+          src={require('../../images/navbar/people.png')}
+          alt=""
+        />
+        <div className="text-center">用戶問句</div>
+      </div>
       <div
-        className={cx('col-sm-12 col-md-12 col-lg-6', style.userStepContainer)}
+        className={cx('col-sm-10 col-md-10 col-lg-10', style.userStepContainer)}
       >
         {!isGetStarted && (
           <div className={cx('py-2')}>
@@ -1032,14 +1040,43 @@ const UserStep: React.FC<UserStepProps> = (props) => {
         )}
         <div className="d-flex flex-column">
           <div className="d-flex align-items-center pt-2">
-            <div className={style.userTitle}>使用者:</div>
+            {/* <div className={style.userTitle}>使用者:</div> */}
             <div className={style.userText}>
               {step.user ? step.user : showIntent}
             </div>
           </div>
-          <div className="d-flex align-items-center pt-2">
-            <div className={style.userTitle}>意圖:</div>
-            <div className={style.userText}>{step.intent}</div>
+          <div className="d-flex flex-column align-items-center pt-2">
+            {/* <div className={style.userTitle}>意圖:</div> */}
+            {step.examples.length > 0 ? (
+              step.examples.map((example) => {
+                const { text, intent, entities } = example;
+                return (
+                  <Examples
+                    key={text + intent}
+                    text={text}
+                    intent={intent}
+                    entities={entities}
+                    onDeleteExample={atDeleteExample}
+                    entitiesData={entitiesData}
+                  />
+                );
+              })
+            ) : (
+              <tr>
+                <td className="alert alert-warning" role="alert">
+                  沒有例句資料，請先添加例句
+                </td>
+              </tr>
+            )}
+          </div>
+          <div>
+            <button
+              className="swal2-cancel swal2-styled"
+              data-bs-target={`#add-${step.intent}-example`}
+              data-bs-toggle="modal"
+            >
+              新增例句
+            </button>
           </div>
           {entitiesData.length > 0 && (
             <div className={style.entitiesContainer}>
@@ -1455,6 +1492,7 @@ const UserStep: React.FC<UserStepProps> = (props) => {
           </div>
         </div>
       </div>
+      <div className={cx('col-sm-1 col-md-1 col-lg-1')} />
     </div>
   );
 };

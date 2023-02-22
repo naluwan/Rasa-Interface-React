@@ -1,3 +1,4 @@
+/* eslint-disable react/style-prop-object */
 import * as React from 'react';
 import shallow from 'zustand/shallow';
 import UserStep from 'components/UserStep';
@@ -11,14 +12,23 @@ import useStoryStore from '../../store/useStoryStore';
 import CheckPoint from '../CheckPoint';
 
 type ShowStoryProps = {
+  setcategoriesName: State,
   story: StoryType,
   isCreate: boolean,
+  setNowMode: State,
   atChangeMode: (e: string) => void,
   onDeleteStory: (storyName: string) => void,
 };
 
 const ShowStory: React.FC<ShowStoryProps> = (props) => {
-  const { story, isCreate, onDeleteStory, atChangeMode } = props;
+  const {
+    story,
+    isCreate,
+    onDeleteStory,
+    atChangeMode,
+    setNowMode,
+    setcategoriesName,
+  } = props;
 
   /**
    * @type {[{ori:{story:string,category:string},new:{story:string,category:string,create?:boolean}}, Function]}
@@ -227,239 +237,257 @@ const ShowStory: React.FC<ShowStoryProps> = (props) => {
 
   return (
     <div data-showstory className={style.root}>
-      <nav aria-label="breadcrumb">
-        <ol className="breadcrumb">
-          <li className="breadcrumb-item">
-            <button
-              className={cx(style.showBreadcrumbBtn)}
-              onClick={() => atChangeMode('scenario')}
-            >
-              情境劇本
-            </button>
-          </li>
-          <li className="breadcrumb-item">
-            <span>{story.metadata.category}</span>
-          </li>
-          <li className="breadcrumb-item active" aria-current="page">
-            {story.story}
-          </li>
-        </ol>
-      </nav>
-      <div className={cx('d-flex align-items-center', style.tilteBlock)}>
-        <div className={style.title}>{story.story}</div>
-        {story.story !== '問候語' && (
-          <div
-            className={cx(' d-flex justify-content-between', style.editBlock)}
-          >
-            <button
-              type="button"
-              className={cx('btn btn-primary mx-4', style.deletStory)}
-              data-bs-toggle="modal"
-              data-bs-target={`#edit${story.story}StoryModal`}
-            >
-              編輯
-            </button>
-            <button
-              type="button"
-              className={cx('btn btn-danger mx-4', style.deletStory)}
-              onClick={() => onDeleteStory(story.story)}
-            >
-              刪除故事
-            </button>
-          </div>
-        )}
-      </div>
-      <div className={style.stepsPanel}>
-        {story.steps.map((step) => {
-          const {
-            intent,
-            user,
-            entities,
-            examples,
-            action,
-            response,
-            buttons,
-            checkpoint,
-            branchStories,
-          } = step;
-          if (step.intent) {
-            return (
-              <UserStep
-                key={step.intent}
-                step={{ intent, user, entities, examples }}
-                storyName={story.story}
-                onCreateExample={onCreateExample}
-                onEditUserSay={onEditUserSay}
-                onEditIntent={onEditIntent}
-                onCreateEntities={onCreateEntities}
-                onDeleteEntities={onDeleteEntities}
-                onEditEntityShowValue={onEditEntityShowValue}
-                onEditEntity={onEditEntity}
-                onEditEntityValue={onEditEntityValue}
-                onDeleteExample={onDeleteExample}
-              />
-            );
-          }
-
-          if (step.action) {
-            return (
-              <BotStep
-                key={step.action}
-                step={{ action, response, buttons }}
-                storyName={story.story}
-                onEditBotRes={onEditBotRes}
-                onEditResButtons={onEditResButtons}
-                onRemoveResButton={onRemoveResButton}
-                onAddResButtons={onAddResButtons}
-              />
-            );
-          }
-
-          return (
-            <CheckPoint
-              isCreate={isCreate}
-              key={checkpoint}
-              branch={branchStories}
-              onEditBranchStoryBotRes={onEditBranchStoryBotRes}
-              onEditConnectStoryBotRes={onEditConnectStoryBotRes}
-              onAddBranchStoryResButtons={onAddBranchStoryResButtons}
-              onRemoveBranchStoryResButton={onRemoveBranchStoryResButton}
-              onEditBranchStoryResButtons={onEditBranchStoryResButtons}
-              onAddConnectStoryResButtons={onAddConnectStoryResButtons}
-              onRemoveConnectStoryResButton={onRemoveConnectStoryResButton}
-              onEditConnectStoryResButtons={onEditConnectStoryResButtons}
-            />
-          );
-        })}
-        {/* <StepControl /> */}
-      </div>
-      {/* edit story modal */}
-      <div
-        className="modal"
-        id={`edit${story.story}StoryModal`}
-        tabIndex="-1"
-        aria-labelledby={`edit${story.story}StoryModalLabel`}
-        aria-hidden="true"
-        data-bs-backdrop="false"
-      >
-        <div className="modal-dialog  modal-lg modal-dialog-scrollable">
-          <div className={cx('modal-content swal2-show', style.swtOut)}>
-            <div>
-              <h2
-                className="swal2-title"
-                id={`edit${story.story}StoryModalLabel`}
+      <div className={cx('container', style.h_1)}>
+        <nav aria-label="breadcrumb">
+          <ol className="breadcrumb">
+            <li className="breadcrumb-item">
+              <button
+                className={cx(style.showBreadcrumbBtn)}
+                onClick={() => atChangeMode('scenario')}
               >
-                編輯故事資訊
-              </h2>
+                情境劇本
+              </button>
+            </li>
+            <li
+              className="breadcrumb-item"
+              onClick={() => {
+                setNowMode('scenario');
+                setcategoriesName(`${story.metadata.category}`);
+              }}
+            >
+              <span className={cx(style.showBreadcrumbBtn)}>
+                {story.metadata.category}
+              </span>
+            </li>
+            <li className="breadcrumb-item active" aria-current="page">
+              <span className={cx(style.showBreadcrumbBtn, style.active)}>
+                {story.story}
+              </span>
+            </li>
+          </ol>
+        </nav>
+        <div className={cx('d-flex align-items-center', style.tilteBlock)}>
+          <div className={style.title}>{story.story}</div>
+          {story.story !== '問候語' && (
+            <div
+              className={cx(' d-flex justify-content-between', style.editBlock)}
+            >
               <button
                 type="button"
-                className={cx('swal2-close', style.swetClose)}
-                data-bs-dismiss="modal"
-                aria-label="Close"
-                onClick={() =>
-                  setStoryInfo({
-                    ori: {
-                      story: story.story,
-                      category: story.metadata.category,
-                    },
-                    new: {
-                      story: story.story,
-                      category: story.metadata.category,
-                    },
-                  })
-                }
+                className={cx('btn btn-primary mx-4', style.deletStory)}
+                data-bs-toggle="modal"
+                data-bs-target={`#edit${story.story}StoryModal`}
               >
-                ×
+                編輯
+              </button>
+              <button
+                type="button"
+                className={cx('btn btn-danger mx-4', style.deletStory)}
+                onClick={() => onDeleteStory(story.story)}
+              >
+                刪除故事
               </button>
             </div>
-            <div className="modal-body">
-              <div className="mb-3">
-                <label htmlFor="story" className="form-label">
-                  故事名稱
-                </label>
-                <input
-                  className="form-control"
-                  id="story"
-                  name="story"
-                  placeholder="請輸入故事名稱"
-                  value={storyInfo.new.story}
-                  onChange={(e) => atChangeStoryInfo(e)}
+          )}
+        </div>
+      </div>
+      <div className={cx('container', style.h_9)}>
+        <div className=" h-100">
+          <div className={style.stepsPanel}>
+            {story.steps.map((step) => {
+              const {
+                intent,
+                user,
+                entities,
+                examples,
+                action,
+                response,
+                buttons,
+                checkpoint,
+                branchStories,
+              } = step;
+              if (step.intent) {
+                return (
+                  <UserStep
+                    key={step.intent}
+                    step={{ intent, user, entities, examples }}
+                    storyName={story.story}
+                    onCreateExample={onCreateExample}
+                    onEditUserSay={onEditUserSay}
+                    onEditIntent={onEditIntent}
+                    onCreateEntities={onCreateEntities}
+                    onDeleteEntities={onDeleteEntities}
+                    onEditEntityShowValue={onEditEntityShowValue}
+                    onEditEntity={onEditEntity}
+                    onEditEntityValue={onEditEntityValue}
+                    onDeleteExample={onDeleteExample}
+                  />
+                );
+              }
+
+              if (step.action) {
+                return (
+                  <BotStep
+                    key={step.action}
+                    step={{ action, response, buttons }}
+                    storyName={story.story}
+                    onEditBotRes={onEditBotRes}
+                    onEditResButtons={onEditResButtons}
+                    onRemoveResButton={onRemoveResButton}
+                    onAddResButtons={onAddResButtons}
+                  />
+                );
+              }
+
+              return (
+                <CheckPoint
+                  isCreate={isCreate}
+                  key={checkpoint}
+                  branch={branchStories}
+                  onEditBranchStoryBotRes={onEditBranchStoryBotRes}
+                  onEditConnectStoryBotRes={onEditConnectStoryBotRes}
+                  onAddBranchStoryResButtons={onAddBranchStoryResButtons}
+                  onRemoveBranchStoryResButton={onRemoveBranchStoryResButton}
+                  onEditBranchStoryResButtons={onEditBranchStoryResButtons}
+                  onAddConnectStoryResButtons={onAddConnectStoryResButtons}
+                  onRemoveConnectStoryResButton={onRemoveConnectStoryResButton}
+                  onEditConnectStoryResButtons={onEditConnectStoryResButtons}
                 />
-              </div>
-              <div className="mb-3">
-                <label htmlFor="category" className="form-label">
-                  故事類別
-                </label>
-                <select
-                  className="form-control"
-                  id="category"
-                  name="category"
-                  value={
-                    storyInfo.new.create
-                      ? 'createNewCategory'
-                      : storyInfo.new.category
-                  }
-                  onChange={(e) => atChangeStoryInfo(e)}
+              );
+            })}
+            {/* <StepControl /> */}
+          </div>
+        </div>
+        {/* edit story modal */}
+        <div
+          className="modal"
+          id={`edit${story.story}StoryModal`}
+          tabIndex="-1"
+          aria-labelledby={`edit${story.story}StoryModalLabel`}
+          aria-hidden="true"
+          data-bs-backdrop="false"
+        >
+          <div className="modal-dialog  modal-lg modal-dialog-scrollable">
+            <div className={cx('modal-content swal2-show', style.swtOut)}>
+              <div>
+                <h2
+                  className="swal2-title"
+                  id={`edit${story.story}StoryModalLabel`}
                 >
-                  <option value="" hidden>
-                    請選擇故事類別
-                  </option>
-                  <option value="createNewCategory">建立新類別</option>
-                  {categories?.map((category) => {
-                    return (
-                      <option
-                        key={`${category.id}-${category.name}`}
-                        value={category.name}
-                      >
-                        {category.name}
-                      </option>
-                    );
-                  })}
-                </select>
+                  編輯故事資訊
+                </h2>
+                <button
+                  type="button"
+                  className={cx('swal2-close', style.swetClose)}
+                  data-bs-dismiss="modal"
+                  aria-label="Close"
+                  onClick={() =>
+                    setStoryInfo({
+                      ori: {
+                        story: story.story,
+                        category: story.metadata.category,
+                      },
+                      new: {
+                        story: story.story,
+                        category: story.metadata.category,
+                      },
+                    })
+                  }
+                >
+                  ×
+                </button>
               </div>
-              {storyInfo.new?.create && (
+              <div className="modal-body">
                 <div className="mb-3">
-                  <label htmlFor="newCategory" className="form-label">
-                    類別名稱
+                  <label htmlFor="story" className="form-label">
+                    故事名稱
                   </label>
                   <input
                     className="form-control"
-                    id="newCategory"
-                    name="newCategory"
-                    placeholder="請輸入類別名稱"
-                    value={storyInfo.new.category}
+                    id="story"
+                    name="story"
+                    placeholder="請輸入故事名稱"
+                    value={storyInfo.new.story}
                     onChange={(e) => atChangeStoryInfo(e)}
                   />
                 </div>
-              )}
-            </div>
-            <div className="swal2-actions d-flex">
-              <button
-                type="button"
-                className="swal2-cancel swal2-styled"
-                id="cancelEditStoryBtn"
-                data-bs-dismiss="modal"
-                onClick={() =>
-                  setStoryInfo({
-                    ori: {
-                      story: story.story,
-                      category: story.metadata.category,
-                    },
-                    new: {
-                      story: story.story,
-                      category: story.metadata.category,
-                    },
-                  })
-                }
-              >
-                取消
-              </button>
-              <button
-                className="swal2-confirm swal2-styled"
-                onClick={() => atEditStoryInfo(storyInfo, stories, categories)}
-              >
-                儲存
-              </button>
+                <div className="mb-3">
+                  <label htmlFor="category" className="form-label">
+                    故事類別
+                  </label>
+                  <select
+                    className="form-control"
+                    id="category"
+                    name="category"
+                    value={
+                      storyInfo.new.create
+                        ? 'createNewCategory'
+                        : storyInfo.new.category
+                    }
+                    onChange={(e) => atChangeStoryInfo(e)}
+                  >
+                    <option value="" hidden>
+                      請選擇故事類別
+                    </option>
+                    <option value="createNewCategory">建立新類別</option>
+                    {categories?.map((category) => {
+                      return (
+                        <option
+                          key={`${category.id}-${category.name}`}
+                          value={category.name}
+                        >
+                          {category.name}
+                        </option>
+                      );
+                    })}
+                  </select>
+                </div>
+                {storyInfo.new?.create && (
+                  <div className="mb-3">
+                    <label htmlFor="newCategory" className="form-label">
+                      類別名稱
+                    </label>
+                    <input
+                      className="form-control"
+                      id="newCategory"
+                      name="newCategory"
+                      placeholder="請輸入類別名稱"
+                      value={storyInfo.new.category}
+                      onChange={(e) => atChangeStoryInfo(e)}
+                    />
+                  </div>
+                )}
+              </div>
+              <div className="swal2-actions d-flex">
+                <button
+                  type="button"
+                  className="swal2-cancel swal2-styled"
+                  id="cancelEditStoryBtn"
+                  data-bs-dismiss="modal"
+                  onClick={() =>
+                    setStoryInfo({
+                      ori: {
+                        story: story.story,
+                        category: story.metadata.category,
+                      },
+                      new: {
+                        story: story.story,
+                        category: story.metadata.category,
+                      },
+                    })
+                  }
+                >
+                  取消
+                </button>
+                <button
+                  className="swal2-confirm swal2-styled"
+                  onClick={() =>
+                    atEditStoryInfo(storyInfo, stories, categories)
+                  }
+                >
+                  儲存
+                </button>
+              </div>
             </div>
           </div>
         </div>
