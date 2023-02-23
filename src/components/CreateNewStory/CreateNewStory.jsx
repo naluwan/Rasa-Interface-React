@@ -337,7 +337,8 @@ const CreateNewStory: React.FC<CreateNewStoryProps> = (props) => {
   ));
   // next step
   const nextStep = React.useCallback(
-    (stepName: string) => {
+    (stepName: string, modename: string) => {
+      console.log(modename);
       let stepError = '';
       if (stepName === 'creactName') {
         changeStoreName(storeName.Name);
@@ -479,320 +480,328 @@ const CreateNewStory: React.FC<CreateNewStoryProps> = (props) => {
   return (
     <div className={cx(style.root)}>
       <div className={cx(style.creactStoryBlock)}>
-        {creactStoryStep !== 'creactTrain' && (
-          <>
-            <div className={cx(style.creactStoryCloseBtn)}>
-              <button
-                type="button"
-                onClick={() => {
-                  setNewStoryInfo({
-                    story: '',
-                    steps: [],
-                    metadata: { category: '', create: false },
-                  });
-                  setnowcreactStory('');
-                }}
-              >
-                ×
-              </button>
-            </div>
-            <div className={cx(style.creactStoryStep)}>
-              {mode === 'Base' && (
-                <>
-                  <span
-                    className={cx(
-                      creactStoryStep === 'creactName'
-                        ? [style.active, style.item]
-                        : style.item,
-                    )}
-                  >
-                    <span className={cx(style.itemIcon)} />
-                    <h6>劇本名稱</h6>
-                  </span>
-                  <span
-                    className={cx(
-                      creactStoryStep === 'creactQuestion'
-                        ? [style.active, style.item]
-                        : style.item,
-                    )}
-                  >
-                    <span className={cx(style.itemIcon)} />
-                    <h6>用戶問句</h6>
-                  </span>
-                  <span
-                    className={cx(
-                      creactStoryStep === 'creactBot'
-                        ? [style.active, style.item]
-                        : style.item,
-                    )}
-                  >
-                    <span className={cx(style.itemIcon)} />
-                    <h6>機器人回應</h6>
-                  </span>
-                  <span
-                    className={cx(
-                      creactStoryStep === 'creactTrain'
-                        ? [style.active, style.item]
-                        : style.item,
-                    )}
-                  >
-                    <span className={cx(style.itemIcon)} />
-                    <h6>啟動訓練</h6>
-                  </span>
-                </>
-              )}
-
-              {mode === 'Advanced' && (
-                <>
-                  <span
-                    className={cx(
-                      creactStoryStep === 'creactName'
-                        ? [style.active, style.item]
-                        : style.item,
-                    )}
-                  >
-                    <span className={cx(style.itemIcon)} />
-                    <h6>劇本名稱</h6>
-                  </span>
-                  <span
-                    className={cx(
-                      creactStoryStep === 'creactQuestion'
-                        ? [style.active, style.item]
-                        : style.item,
-                    )}
-                  >
-                    <span className={cx(style.itemIcon)} />
-                    <h6>用戶問句</h6>
-                  </span>
-                  <span
-                    className={cx(
-                      creactStoryStep === 'creactQuestion'
-                        ? [style.active, style.item]
-                        : style.item,
-                    )}
-                  >
-                    <span className={cx(style.itemIcon)} />
-                    <h6>關鍵字設定</h6>
-                  </span>
-                  <span
-                    className={cx(
-                      creactStoryStep === 'creactBot'
-                        ? [style.active, style.item]
-                        : style.item,
-                    )}
-                  >
-                    <span className={cx(style.itemIcon)} />
-                    <h6>機器人回應</h6>
-                  </span>
-                  <span
-                    className={cx(
-                      creactStoryStep === 'creactTrain'
-                        ? [style.active, style.item]
-                        : style.item,
-                    )}
-                  >
-                    <span className={cx(style.itemIcon)} />
-                    <h6>啟動訓練</h6>
-                  </span>
-                </>
-              )}
-            </div>
-            <div className={cx(style.creactStoryTitle)}>
-              <h3>{title}</h3>
-            </div>
-          </>
-        )}
-        {creactStoryStep === 'creactTrain' && (
-          <div>
-            <img src={require('../../images/creactStory/success.png')} alt="" />
-          </div>
-        )}
-        <div className={cx(style.creactStoryFunction)}>
-          {creactStoryStep === 'creactName' && (
+        <div className={cx('swal2-show', style.creactStoryBorder)}>
+          {creactStoryStep !== 'creactTrain' && (
             <>
-              <div
-                className={
-                  storeName.error.length > 0
-                    ? (style.storyInputBlock, style.error)
-                    : style.storyInputBlock
-                }
-              >
-                <div>
-                  <label htmlFor="storyName">名稱</label>
-                </div>
-                <div>
-                  <input
-                    className={cx(style.formStyle)}
-                    id="storyName"
-                    name="story"
-                    placeholder="請輸入劇本名稱"
-                    value={storeName.name}
-                    onChange={(e) => {
-                      atChangeNewStoryInfo(e);
-                      changeStoreName(e.target.value);
-                    }}
-                  />
-                </div>
-                {storeName.error.length > 0 && (
-                  <div className={style.errorMsg}>{storeName.error}</div>
-                )}
+              <div className={cx(style.creactStoryCloseBtn)}>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setNewStoryInfo({
+                      story: '',
+                      steps: [],
+                      metadata: { category: '', create: false },
+                    });
+                    setnowcreactStory('');
+                  }}
+                >
+                  ×
+                </button>
               </div>
-              <div className={style.storyInputBlock}>
-                <div>
-                  <label htmlFor="category">劇本分類</label>
-                </div>
-                <div>
-                  <select
-                    className={cx(style.formStyle)}
-                    id="category"
-                    name="category"
-                    value={
-                      newStoryInfo.metadata?.create
-                        ? 'createNewCategory'
-                        : newStoryInfo.metadata?.category
-                    }
-                    onChange={(e) => atChangeNewStoryInfo(e)}
-                  >
-                    <option value="" hidden>
-                      請選擇故事類別
-                    </option>
-                    <option value="createNewCategory">建立新類別</option>
-                    {categories?.map((category) => {
-                      return (
-                        <option
-                          key={`${category.id}-${category.name}`}
-                          value={category.name}
-                        >
-                          {category.name}
-                        </option>
-                      );
-                    })}
-                  </select>
-                </div>
-              </div>
-              <div
-                className={
-                  TypeStoreName.error.length > 0
-                    ? (style.storyInputBlock, style.error)
-                    : style.storyInputBlock
-                }
-              >
-                {newStoryInfo.metadata?.create && (
+              <div className={cx(style.creactStoryStep)}>
+                {mode === 'Base' && (
                   <>
-                    <div className="mb-3">
-                      <label htmlFor="newCategory" className="form-label">
-                        類別名稱
-                      </label>
-                      <input
-                        className={cx(style.formStyle)}
-                        id="newCategory"
-                        name="newCategory"
-                        placeholder="請輸入類別名稱"
-                        value={newStoryInfo.metadata?.category}
-                        onChange={(e) => {
-                          atChangeNewStoryInfo(e);
-                          changeTypeStoreName(e.target.value);
-                        }}
-                      />
-                    </div>
-                    {TypeStoreName.error.length > 0 && (
-                      <div className={style.errorMsg}>
-                        {TypeStoreName.error}
-                      </div>
-                    )}
+                    <span
+                      className={cx(
+                        creactStoryStep === 'creactName'
+                          ? [style.active, style.item]
+                          : style.item,
+                      )}
+                    >
+                      <span className={cx(style.itemIcon)} />
+                      <h6>劇本名稱</h6>
+                    </span>
+                    <span
+                      className={cx(
+                        creactStoryStep === 'creactQuestion'
+                          ? [style.active, style.item]
+                          : style.item,
+                      )}
+                    >
+                      <span className={cx(style.itemIcon)} />
+                      <h6>用戶問句</h6>
+                    </span>
+                    <span
+                      className={cx(
+                        creactStoryStep === 'creactBot'
+                          ? [style.active, style.item]
+                          : style.item,
+                      )}
+                    >
+                      <span className={cx(style.itemIcon)} />
+                      <h6>機器人回應</h6>
+                    </span>
+                    <span
+                      className={cx(
+                        creactStoryStep === 'creactTrain'
+                          ? [style.active, style.item]
+                          : style.item,
+                      )}
+                    >
+                      <span className={cx(style.itemIcon)} />
+                      <h6>啟動訓練</h6>
+                    </span>
+                  </>
+                )}
+
+                {mode === 'Advanced' && (
+                  <>
+                    <span
+                      className={cx(
+                        creactStoryStep === 'creactName'
+                          ? [style.active, style.item]
+                          : style.item,
+                      )}
+                    >
+                      <span className={cx(style.itemIcon)} />
+                      <h6>劇本名稱</h6>
+                    </span>
+                    <span
+                      className={cx(
+                        creactStoryStep === 'creactQuestion'
+                          ? [style.active, style.item]
+                          : style.item,
+                      )}
+                    >
+                      <span className={cx(style.itemIcon)} />
+                      <h6>用戶問句</h6>
+                    </span>
+                    <span
+                      className={cx(
+                        creactStoryStep === 'creactQuestion'
+                          ? [style.active, style.item]
+                          : style.item,
+                      )}
+                    >
+                      <span className={cx(style.itemIcon)} />
+                      <h6>關鍵字設定</h6>
+                    </span>
+                    <span
+                      className={cx(
+                        creactStoryStep === 'creactBot'
+                          ? [style.active, style.item]
+                          : style.item,
+                      )}
+                    >
+                      <span className={cx(style.itemIcon)} />
+                      <h6>機器人回應</h6>
+                    </span>
+                    <span
+                      className={cx(
+                        creactStoryStep === 'creactTrain'
+                          ? [style.active, style.item]
+                          : style.item,
+                      )}
+                    >
+                      <span className={cx(style.itemIcon)} />
+                      <h6>啟動訓練</h6>
+                    </span>
                   </>
                 )}
               </div>
-            </>
-          )}
-          {creactStoryStep === 'creactQuestion' && (
-            <>
-              {QuestionItems}
-              <div>
-                <button
-                  className={cx(style.moreBtn)}
-                  onClick={() => CreactNewQuestion()}
-                >
-                  +新增更多問句
-                </button>
-              </div>
-            </>
-          )}
-          {creactStoryStep === 'creactBot' && (
-            <>
-              {BotReply}
-              <div>
-                <button
-                  className={cx(style.moreBtn)}
-                  onClick={() => CreactNewBotReply()}
-                >
-                  +新增機器人回應
-                </button>
+              <div className={cx(style.creactStoryTitle)}>
+                <h3>{title}</h3>
               </div>
             </>
           )}
           {creactStoryStep === 'creactTrain' && (
             <div>
-              <div>
-                <h2>恭喜!</h2>
-              </div>
-              <div>
-                <h5>
-                  劇本創建完成後可點擊 『 啟動訓練 』<br />
-                  開始訓練您的專屬機器人吧！
-                </h5>
-              </div>
+              <img
+                src={require('../../images/creactStory/success.png')}
+                alt=""
+              />
             </div>
           )}
-        </div>
-        <div className={cx(style.creactStoryFunctionBtn)}>
-          {creactStoryStep !== 'creactName' ? (
-            <button
-              className={cx(style.prevstepBtn)}
-              onClick={() => previousStep(creactStoryStep)}
-            >
-              上一步
-            </button>
-          ) : (
-            <div />
-          )}
-          {creactStoryStep !== 'creactTrain' && (
-            <button
-              className={cx(style.stepBtn)}
-              onClick={() => {
-                nextStep(creactStoryStep);
-              }}
-            >
-              下一步
-            </button>
-          )}
+          <div className={cx(style.creactStoryFunction)}>
+            {creactStoryStep === 'creactName' && (
+              <>
+                <div
+                  className={
+                    storeName.error.length > 0
+                      ? (style.storyInputBlock, style.error)
+                      : style.storyInputBlock
+                  }
+                >
+                  <div>
+                    <label htmlFor="storyName">名稱</label>
+                  </div>
+                  <div>
+                    <input
+                      className={cx(style.formStyle)}
+                      id="storyName"
+                      name="story"
+                      placeholder="請輸入劇本名稱"
+                      value={storeName.name}
+                      onChange={(e) => {
+                        atChangeNewStoryInfo(e);
+                        changeStoreName(e.target.value);
+                      }}
+                    />
+                  </div>
+                  {storeName.error.length > 0 && (
+                    <div className={style.errorMsg}>{storeName.error}</div>
+                  )}
+                </div>
+                <div className={style.storyInputBlock}>
+                  <div>
+                    <label htmlFor="category">劇本分類</label>
+                  </div>
+                  <div>
+                    <select
+                      className={cx(style.formStyle)}
+                      id="category"
+                      name="category"
+                      value={
+                        newStoryInfo.metadata?.create
+                          ? 'createNewCategory'
+                          : newStoryInfo.metadata?.category
+                      }
+                      onChange={(e) => atChangeNewStoryInfo(e)}
+                    >
+                      <option value="" hidden>
+                        請選擇故事類別
+                      </option>
+                      <option value="createNewCategory">建立新類別</option>
+                      {categories?.map((category) => {
+                        return (
+                          <option
+                            key={`${category.id}-${category.name}`}
+                            value={category.name}
+                          >
+                            {category.name}
+                          </option>
+                        );
+                      })}
+                    </select>
+                  </div>
+                </div>
+                <div
+                  className={
+                    TypeStoreName.error.length > 0
+                      ? (style.storyInputBlock, style.error)
+                      : style.storyInputBlock
+                  }
+                >
+                  {newStoryInfo.metadata?.create && (
+                    <>
+                      <div className="mb-3">
+                        <label htmlFor="newCategory" className="form-label">
+                          類別名稱
+                        </label>
+                        <input
+                          className={cx(style.formStyle)}
+                          id="newCategory"
+                          name="newCategory"
+                          placeholder="請輸入類別名稱"
+                          value={newStoryInfo.metadata?.category}
+                          onChange={(e) => {
+                            atChangeNewStoryInfo(e);
+                            changeTypeStoreName(e.target.value);
+                          }}
+                        />
+                      </div>
+                      {TypeStoreName.error.length > 0 && (
+                        <div className={style.errorMsg}>
+                          {TypeStoreName.error}
+                        </div>
+                      )}
+                    </>
+                  )}
+                </div>
+              </>
+            )}
+            {creactStoryStep === 'creactQuestion' && (
+              <>
+                {QuestionItems}
+                <div>
+                  <button
+                    className={cx(style.moreBtn)}
+                    onClick={() => CreactNewQuestion()}
+                  >
+                    +新增更多問句
+                  </button>
+                </div>
+              </>
+            )}
+            {creactStoryStep === 'creactBot' && (
+              <>
+                {BotReply}
+                <div>
+                  <button
+                    className={cx(style.moreBtn)}
+                    onClick={() => CreactNewBotReply()}
+                  >
+                    +新增機器人回應
+                  </button>
+                </div>
+              </>
+            )}
+            {creactStoryStep === 'creactTrain' && (
+              <div>
+                <div>
+                  <h2>恭喜!</h2>
+                </div>
+                <div>
+                  <h5>
+                    劇本創建完成後可點擊 『 啟動訓練 』<br />
+                    開始訓練您的專屬機器人吧！
+                  </h5>
+                </div>
+              </div>
+            )}
+          </div>
+          <div className={cx(style.creactStoryFunctionBtn)}>
+            {creactStoryStep !== 'creactName' ? (
+              <button
+                className={cx(style.prevstepBtn)}
+                onClick={() => previousStep(creactStoryStep)}
+              >
+                上一步
+              </button>
+            ) : (
+              <div />
+            )}
+            {creactStoryStep !== 'creactTrain' && (
+              <button
+                className={cx(style.stepBtn)}
+                onClick={() => {
+                  nextStep(creactStoryStep, mode);
+                }}
+              >
+                下一步
+              </button>
+            )}
 
-          {creactStoryStep === 'creactTrain' && (
-            <button
-              onClick={() => {
-                onClickSaveBtn(newStory);
-                setNowMode('storeChid');
-                atSelectStory('storeName');
-                setbotValue([{ id: uuid(), reply: '', error: '' }]);
-                setQuestionValue([
-                  { id: uuid(), question: '', error: '' },
-                  { id: uuid(), question: '', error: '' },
-                ]);
-                onInitialNewStory();
-                setNewStoryInfo({
-                  story: '',
-                  steps: [],
-                  metadata: { category: '', create: false },
-                });
-                settitle('劇本名稱');
-                setcreactStoryStep('creactName');
-                setnowcreactStory('');
-              }}
-              className={cx(style.creactStoryFunctionBtnFinish, style.stepBtn)}
-            >
-              劇本創建完成
-            </button>
-          )}
+            {creactStoryStep === 'creactTrain' && (
+              <button
+                onClick={() => {
+                  onClickSaveBtn(newStory);
+                  setNowMode('storeChid');
+                  atSelectStory('storeName');
+                  setbotValue([{ id: uuid(), reply: '', error: '' }]);
+                  setQuestionValue([
+                    { id: uuid(), question: '', error: '' },
+                    { id: uuid(), question: '', error: '' },
+                  ]);
+                  onInitialNewStory();
+                  setNewStoryInfo({
+                    story: '',
+                    steps: [],
+                    metadata: { category: '', create: false },
+                  });
+                  settitle('劇本名稱');
+                  setcreactStoryStep('creactName');
+                  setnowcreactStory('');
+                }}
+                className={cx(
+                  style.creactStoryFunctionBtnFinish,
+                  style.stepBtn,
+                )}
+              >
+                劇本創建完成
+              </button>
+            )}
+          </div>
         </div>
       </div>
     </div>

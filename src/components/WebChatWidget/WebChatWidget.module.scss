@@ -1,4 +1,47 @@
 .root {
+  :global(.rw-launcher.rw-hide-sm) {
+    background: #fff !important;
+    position: relative;
+
+    &::after {
+      content: '';
+      background: #fff url('../../images/chatdel.png') no-repeat !important;
+      background-size: cover;
+      display: block;
+      background-size: cover !important;
+      width: 2rem;
+      height: 2rem;
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      transition: all .3s ;
+
+    }
+  }
+
+  :global(.rw-launcher) {
+    background: #fff !important;
+  }
+
+  :global(.rw-open-launcher__container) {
+    background: #fff !important;
+    position: relative;
+
+    &::after {
+      content: '';
+      background: #fff url('../../images/chat.png');
+      display: block;
+      width: 2rem;
+      height: 2rem;
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+
+    }
+  }
+
   :global(#voiceBtn) {
     background: url('../../images/btnIcon/voiceOpen.svg') center/80% no-repeat;
     border: none;
@@ -6,9 +49,11 @@
     display: inline-block;
     vertical-align: middle;
   }
+
   :global(#voiceBtn:hover) {
     background: url('../../images/btnIcon/voiceOpen.svg') center/90% no-repeat;
   }
+
   :global(#voiceBtn.close) {
     background: url('../../images/btnIcon/voiceClose.svg') center/80% no-repeat;
   }

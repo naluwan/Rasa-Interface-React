@@ -9,17 +9,24 @@
   display: block;
   // width: 100%;
   position: absolute;
-  top: 0;
-  right: 0;
+  top: 1.5rem;
+  right: 2rem;
   z-index: 99;
 
   button {
 
     padding: 5px 10px;
     float: right;
-    border: 1px solid #6171F9;
+    border: 1px solid #BFBFC4;
     border-radius: 5px;
-    color: #6171F9;
+    background: #BFBFC4;
+    color: #fff;
+
+    &:hover {
+      border: 1px solid #D4D4DA;
+      background: #6171F9;
+      color: #fff;
+    }
   }
 }
 
@@ -186,6 +193,7 @@
   display: block;
 
   .searchBarTitle {
+    padding-top: 4rem;
     margin: 10px;
 
     h5 {
@@ -391,5 +399,6 @@
 }
 
 .storeChid {
-  background: #d3d3d3 !important;
+  background: #ececec !important;
+  position: relative;
 }
