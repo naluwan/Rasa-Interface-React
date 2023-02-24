@@ -220,12 +220,12 @@ const UserStep: React.FC<UserStepProps> = (props) => {
   const isGetStarted = step.intent === 'get_started';
 
   // textarea 自適應高度
-  const textAreaRef = React.useRef();
-  React.useEffect(() => {
-    textAreaRef.current.style = 'height:0px';
-    textAreaRef.current.value = step.user;
-    textAreaRef.current.style = `height: ${textAreaRef.current.scrollHeight}px`;
-  }, [step.user]);
+  // const textAreaRef = React.useRef();
+  // React.useEffect(() => {
+  //   textAreaRef.current.style = 'height:0px';
+  //   textAreaRef.current.value = step.user;
+  //   textAreaRef.current.style = `height: ${textAreaRef.current.scrollHeight}px`;
+  // }, [step.user]);
 
   // 重組entities資料
   const entitiesData = React.useMemo(() => {
