@@ -2,14 +2,15 @@
 /* eslint-disable jsx-a11y/no-static-element-interactions */
 /* eslint-disable react/style-prop-object */
 import * as React from 'react';
-import useSWR from 'swr';
+// import useSWR from 'swr';
 import {
-  fetchAllData,
+  // fetchAllData,
   postAllTrainData,
   fetchAllAction,
-  fetchAllCategories,
+  // fetchAllCategories,
   postCategory,
   deleteCategory,
+  fetchTrainAndCategoriesData,
 } from 'services/api';
 import shallow from 'zustand/shallow';
 import type { State, StoryType, CreateStoryState } from 'components/types';
@@ -20,6 +21,8 @@ import MyButton from 'components/MyButton';
 import CreateStory from 'components/CreateStory';
 import { cloneDeep } from 'lodash-es';
 import { randomBotResAction } from 'utils/randomBotResAction';
+import { useQuery } from 'react-query';
+// import Forms from 'components/Forms';
 import style from './Stories.module.scss';
 import useStoryStore from '../../store/useStoryStore';
 import useCreateStoryStore from '../../store/useCreateStoryStore';
@@ -33,10 +36,13 @@ const Stories = () => {
    * @type {[boolean, Function]}
    */
   const [create, setCreate] = React.useState(false);
+  // /**
+  //  * @type {[boolean, Function]}
+  //  */
+  // const [forms, setForms] = React.useState(false);
   /**
    * @type {[string, Function]}
    */
-
   const [defaultValue, setDefaultValue] = React.useState('');
   /**
    * @type {[StoryType, Function]}
@@ -112,19 +118,42 @@ const Stories = () => {
     };
   }, shallow);
 
-  // 進入頁面打API要所有訓練資料
-  const { data } = useSWR('/api/getAllTrainData', fetchAllData);
-  const allCategories = useSWR('/api/getAllCategories', fetchAllCategories);
+  const fetchData = useQuery(
+    'fetchTrainAndCategoriesData',
+    fetchTrainAndCategoriesData,
+  );
 
-  // 進入頁面獲取設定資料
   React.useEffect(() => {
-    onSetAllTrainData(data);
-  }, [data, onSetAllTrainData]);
+    if (fetchData.isSuccess && !fetchData.isError && !fetchData.isLoading) {
+      const [allTrainData, allCategories] = fetchData.data;
 
-  // 進入頁面設定故事類別
-  React.useEffect(() => {
-    onSetAllCategories(allCategories.data);
-  }, [allCategories.data, onSetAllCategories]);
+      onSetAllCategories(allCategories);
+      onSetAllTrainData(allTrainData);
+    }
+  }, [
+    fetchData.data,
+    fetchData.isError,
+    fetchData.isSuccess,
+    fetchData.isLoading,
+    onSetAllCategories,
+    onSetAllTrainData,
+  ]);
+
+  // // 進入頁面打API要所有訓練資料
+  // const { data } = useSWR('/api/getAllTrainData', fetchAllData);
+  // const allCategories = useSWR('/api/getAllCategories', fetchAllCategories);
+
+  // // 進入頁面獲取設定資料
+  // React.useEffect(() => {
+  //   console.log('all data ==> ', data);
+  //   onSetAllTrainData(data);
+  // }, [data, onSetAllTrainData]);
+
+  // // 進入頁面設定故事類別
+  // React.useEffect(() => {
+  //   console.log('all categories ==> ', allCategories.data);
+  //   onSetAllCategories(allCategories.data);
+  // }, [allCategories.data, onSetAllCategories]);
 
   // 故事類別或stories更新時，判斷類別下是否有故事
   React.useEffect(() => {
@@ -445,6 +474,7 @@ const Stories = () => {
           onSetSelectedCategory(story.metadata?.category);
           onSetSelectedStory(storyName);
           onSetStory(storyName);
+          // setForms(false);
           onInitialNewStory();
         });
       }
@@ -461,6 +491,7 @@ const Stories = () => {
       onSetSelectedCategory(story.metadata?.category);
       onSetSelectedStory(storyName);
       onSetStory(storyName);
+      // setForms(false);
       return onInitialNewStory();
     },
     [
@@ -472,6 +503,7 @@ const Stories = () => {
       onSetSelectedCategory,
       story.metadata?.category,
       onSetSelectedStory,
+      // setForms,
     ],
   );
   // 故事類別名稱
@@ -650,6 +682,12 @@ const Stories = () => {
         return step;
       });
 
+      const allStoryIntents = cloneData.stories.map(
+        (item) => item.steps.map((step) => step.intent)[0],
+      );
+
+      console.log('allStoryIntents ==> ', allStoryIntents);
+
       // 支線故事和支線故事內的串接故事處理
       if (branchStories.length) {
         // 支線故事
@@ -667,6 +705,21 @@ const Stories = () => {
                       payload:
                         isPayload > -1 ? button.payload : `/${button.payload}`,
                       reply: button.reply,
+                    });
+                  }
+
+                  // 驗證新增的按鈕是否是要串接別的故事
+                  const isIntentStory = allStoryIntents.indexOf(
+                    button.payload.slice(1, button.payload.length),
+                  );
+
+                  if (isIntentStory > -1) {
+                    return buttons.push({
+                      title: button.title,
+                      payload:
+                        isPayload > -1
+                          ? `/${button.payload.slice(1, button.payload.length)}`
+                          : `/${button.payload}`,
                     });
                   }
                   return buttons.push({
@@ -709,6 +762,24 @@ const Stories = () => {
                                 ? button.payload
                                 : `/${button.payload}`,
                             reply: button.reply,
+                          });
+                        }
+
+                        // 驗證新增的按鈕是否是要串接別的故事
+                        const isIntentStory = allStoryIntents.indexOf(
+                          button.payload.slice(1, button.payload.length),
+                        );
+
+                        if (isIntentStory > -1) {
+                          return buttons.push({
+                            title: button.title,
+                            payload:
+                              isPayload > -1
+                                ? `/${button.payload.slice(
+                                    1,
+                                    button.payload.length,
+                                  )}`
+                                : `/${button.payload}`,
                           });
                         }
                         return buttons.push({
@@ -820,6 +891,20 @@ const Stories = () => {
                   reply: button.reply,
                 });
               }
+              // 驗證新增的按鈕是否是要串接別的故事
+              const isIntentStory = allStoryIntents.indexOf(
+                button.payload.slice(1, button.payload.length),
+              );
+
+              if (isIntentStory > -1) {
+                return buttons.push({
+                  title: button.title,
+                  payload:
+                    isPayload > -1
+                      ? `/${button.payload.slice(1, button.payload.length)}`
+                      : `/${button.payload}`,
+                });
+              }
               return buttons.push({
                 title: button.title,
                 payload:
@@ -871,7 +956,7 @@ const Stories = () => {
         if (actionItem.buttons?.length) {
           actionItem.buttons.map((button) => {
             const intent = button.payload.replace(/\//g, '');
-
+            console.log('button intent ===> ', intent);
             // 按鈕只需要新增沒有相同意圖的就好，因為同意圖，代表是要回答現有的故事流程回答
             if (
               newNlu.rasa_nlu_data.common_examples.every(
@@ -1058,7 +1143,12 @@ const Stories = () => {
         return;
       }
 
-      if (newStoryData.story.indexOf('_') > -1) {
+      const regex = /\\|\/|\(|\)|\{|\}/g;
+
+      if (
+        newStoryData.story.indexOf('_') > -1 ||
+        regex.test(newStoryData.story)
+      ) {
         setNewStoryInfo((prev) => {
           return {
             ...prev,
@@ -1067,7 +1157,7 @@ const Stories = () => {
         });
         Toast.fire({
           icon: 'warning',
-          title: '故事名稱不能含有底線',
+          title: '故事名稱不能含有底線、括號等特殊符號',
         });
         document.querySelector('.form-control#story').focus();
         return;
@@ -1118,6 +1208,7 @@ const Stories = () => {
 
       delete newStoryData.metadata.create;
       onCreateNewStory(newStoryData);
+      // setForms(false);
       setCreate(true);
       onSetStory('');
       document.querySelector('#cancelCreateStoryBtn').click();
@@ -1145,6 +1236,14 @@ const Stories = () => {
       listTitle.scrollLeft -= width;
     }
   }, []);
+
+  // 點擊表單設計按鈕事件
+  // const atClickCreateFormBtn = React.useCallback(() => {
+  //   onSetStory('');
+  //   setCreate(false);
+  //   setForms(true);
+  // }, [onSetStory, setCreate, setForms]);
+
   return (
     <>
       <NavBar

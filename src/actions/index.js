@@ -542,6 +542,14 @@ export type Action =
         ori: { story: string, category: string },
         new: { story: string, category: string, create?: boolean },
       },
+    }
+  | {
+      type: 'CREATE_FORM',
+      // eslint-disable-next-line camelcase
+      payload: {
+        name: string,
+        require_slot: { id: string, question: string }[],
+      },
     };
 
 // ====================== query story ======================
@@ -1357,4 +1365,16 @@ export const actionCreateStoryConnectStoryEditResButtons = (
     checkPointName,
     connectStoryName,
   },
+});
+
+// ====================== forms ======================
+
+export const actionCreateFrom = (
+  name: string,
+  // eslint-disable-next-line camelcase
+  require_slot: { id: string, question: string }[],
+): Action => ({
+  type: 'CREATE_FORM',
+  // eslint-disable-next-line camelcase
+  payload: { name, require_slot },
 });

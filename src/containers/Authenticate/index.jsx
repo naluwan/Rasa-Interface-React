@@ -1,5 +1,3 @@
-import { memo } from 'react';
-
 import type { State } from 'components/types';
 import useStoryStore from '../../store/useStoryStore';
 
@@ -18,4 +16,4 @@ const Authenticate = (props) => {
   return child;
 };
 
-export default memo(Authenticate);
+export default Authenticate;

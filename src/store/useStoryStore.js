@@ -61,6 +61,7 @@ import {
   actionSelectedCategory,
   actionSelectedStory,
   actionEditStoryInfo,
+  actionCreateFrom,
 } from 'actions';
 // import { computed } from 'zustand-middleware-computed-state';
 import { Toast } from 'utils/swalInput';
@@ -121,8 +122,8 @@ const reducer = (state: State, action: Action): State => {
         if (step.action) {
           step.response = JSON.parse(
             JSON.stringify(domain.responses[step.action][0].text).replace(
-              / \\n/g,
-              '\\r',
+              / {2}\\n/g,
+              '\\n',
             ),
           );
 
@@ -504,10 +505,11 @@ const reducer = (state: State, action: Action): State => {
       const { oriWord, newWord, actionName, storyName } = action.payload;
       const { onSetStory, onSetAllTrainData } = state;
       const { domain } = cloneDeep(state.cloneData);
+
       if (
         state.cloneData.domain.responses[actionName] &&
         state.cloneData.domain.responses[actionName][0].text ===
-          JSON.parse(JSON.stringify(oriWord).replace(/ \\n/g, '  \\n'))
+          JSON.parse(JSON.stringify(oriWord).replace(/\\n/g, '  \\n'))
       ) {
         domain.responses[actionName][0].text = JSON.parse(
           JSON.stringify(newWord).replace(/\\n/g, '  \\n'),
@@ -639,7 +641,7 @@ const reducer = (state: State, action: Action): State => {
       });
 
       const currentReply = JSON.parse(
-        JSON.stringify(reply).replace(/\\r\\n/g, '  \\n'),
+        JSON.stringify(reply).replace(/\\n/g, '  \\n'),
       );
 
       // 如果按鈕標題有更改
@@ -870,6 +872,17 @@ const reducer = (state: State, action: Action): State => {
         });
       }
 
+      const isRepeat = domain.responses[actionName][0]?.buttons?.some(
+        (button) => button.title === title,
+      );
+
+      if (isRepeat) {
+        return Toast.fire({
+          icon: 'warning',
+          title: '按鈕重複',
+        });
+      }
+
       const intentStory = [];
       stories.map((item) => {
         return item.steps.map((step) =>
@@ -930,7 +943,11 @@ const reducer = (state: State, action: Action): State => {
           }
 
           domain.actions.push(buttonActionName);
-          domain.responses[buttonActionName] = [{ text: reply }];
+          domain.responses[buttonActionName] = [
+            {
+              text: JSON.parse(JSON.stringify(reply).replace(/\\n/g, '  \\n')),
+            },
+          ];
           domain.intents.push(`${storyName}_${title}`);
         }
         cloneData.stories = stories;
@@ -3119,6 +3136,15 @@ const reducer = (state: State, action: Action): State => {
         })
         .then(() => document.querySelector('#cancelEditStoryBtn').click());
     }
+    case 'CREATE_FORM': {
+      // eslint-disable-next-line camelcase
+      const { name, require_slot } = action.payload;
+      console.log(name);
+      console.log(require_slot);
+      return {
+        ...state,
+      };
+    }
     default:
       return state;
   }
@@ -3666,6 +3692,14 @@ const useStoryStore = create((set) => {
       new: { story: string, category: string, create?: boolean },
     }) {
       dispatch(actionEditStoryInfo(storyInfo));
+    },
+    // 建立表單
+    onCreateForm(
+      name: string,
+      // eslint-disable-next-line camelcase
+      require_slot: { id: string, question: string }[],
+    ) {
+      dispatch(actionCreateFrom(name, require_slot));
     },
   };
 });

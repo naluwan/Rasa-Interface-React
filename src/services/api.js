@@ -143,6 +143,18 @@ export const fetchAllData = (): Promise<TrainDataType> => {
     });
 };
 
+// 獲取所有訓練檔和故事類別
+export const fetchTrainAndCategoriesData = async (): Promise<TrainDataType> => {
+  return Promise.all([
+    axiosInstance
+      .get(`${API_URL}/train/allTrainData`)
+      .then(({ data: { data } }) => data),
+    axiosInstance
+      .get(`${API_URL}/train/categories`)
+      .then((categories) => categories.data.data),
+  ]);
+};
+
 // 抓取全部action
 export const fetchAllAction = (): Promise<string[]> => {
   return axiosInstance
@@ -193,8 +205,9 @@ export const fetchRasaTrainState = () => {
 
 // 發送訓練檔至rasa訓練
 export const postTrainDataToRasa = (currentData: ApiTrainDataType) => {
+  // 強制訓練API => http://192.168.10.105:5005/model/train?save_to_default_model_directory=true&force_training=true
   return axios(
-    'http://192.168.10.105:5005/model/train?save_to_default_model_directory=true&force_training=true',
+    'http://192.168.10.105:5005/model/train?save_to_default_model_directory=true',
     {
       method: 'POST',
       data: JSON.stringify(currentData),
