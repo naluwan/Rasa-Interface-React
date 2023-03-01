@@ -65,7 +65,7 @@ const Stories = () => {
     nlu,
     domain,
     cloneData,
-    deletedStory,
+    // deletedStory,
     actions,
     storiesOptions,
     onSetStory,
@@ -1076,21 +1076,21 @@ const Stories = () => {
   );
 
   // 恢復刪除故事(只能恢復最後一筆資料)
-  const atRecoverDeletedStory = React.useCallback(
-    (deleteStory: StoryType) => {
-      const isExist = stories.some((item) => item.story === deleteStory.story);
-      if (isExist) {
-        Toast.fire({
-          icon: 'warning',
-          title: '故事名稱重複',
-        });
-        return;
-      }
-      atClickSaveBtn(deleteStory, true);
-      onSetDeleteStory({});
-    },
-    [onSetDeleteStory, atClickSaveBtn, stories],
-  );
+  // const atRecoverDeletedStory = React.useCallback(
+  //   (deleteStory: StoryType) => {
+  //     const isExist = stories.some((item) => item.story === deleteStory.story);
+  //     if (isExist) {
+  //       Toast.fire({
+  //         icon: 'warning',
+  //         title: '故事名稱重複',
+  //       });
+  //       return;
+  //     }
+  //     atClickSaveBtn(deleteStory, true);
+  //     onSetDeleteStory({});
+  //   },
+  //   [onSetDeleteStory, atClickSaveBtn, stories],
+  // );
 
   // 更新新故事資訊
   const atChangeNewStoryInfo = React.useCallback(
@@ -1539,7 +1539,7 @@ const Stories = () => {
                     style.navbar,
                   )}
                 >
-                  {Object.keys(deletedStory).length > 0 && (
+                  {/* {Object.keys(deletedStory).length > 0 && (
                     <div className={cx('btn', style.recoverBtn)}>
                       <MyButton
                         variant="primary"
@@ -1548,7 +1548,7 @@ const Stories = () => {
                         恢復刪除
                       </MyButton>
                     </div>
-                  )}
+                  )} */}
                 </div>
                 <div
                   className={cx(
@@ -1664,6 +1664,17 @@ const Stories = () => {
             />
           )}
         </div>
+        {nowMode === 'statement' && (
+          <div
+            className={cx(
+              nowMode !== 'statement' ? style.hidden : style.storoesBlock,
+              style.searchBar,
+              style.storeChid,
+            )}
+          >
+            語句庫
+          </div>
+        )}
         {nowMode === 'formsDesigan' && (
           <div
             className={cx(
