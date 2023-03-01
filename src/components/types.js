@@ -343,6 +343,12 @@ export type State = {
   }) => void,
   // 設定所有故事類別
   onSetAllCategories: (categories: Categories[]) => void,
+  // 建立表單
+  onCreateForm: (
+    name: string,
+    // eslint-disable-next-line camelcase
+    require_slot: { id: string, question: string }[],
+  ) => void,
 };
 
 export type CreateStoryState = {

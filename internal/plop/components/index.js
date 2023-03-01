@@ -6,7 +6,7 @@ module.exports = {
     {
       type: 'input',
       name: 'name',
-      message: 'What should it be called?',
+      message: '要創建的component名稱是?',
       default: 'MyCustomComponent',
       validate: (value) => {
         if (/.+/.test(value)) {

@@ -1,3 +1,4 @@
+/* eslint-disable jsx-a11y/no-static-element-interactions */
 /* eslint-disable no-use-before-define */
 /* eslint-disable react-hooks/exhaustive-deps */
 import * as React from 'react';
@@ -24,6 +25,7 @@ import Examples from './Examples';
 import useStoryStore from '../../store/useStoryStore';
 import { randomBotResAction } from '../../utils/randomBotResAction';
 import useCreateStoryStore from '../../store/useCreateStoryStore';
+import EntitiesModal from './EntitiesModal';
 
 type UserStepProps = {
   isCreate: boolean,
@@ -73,7 +75,7 @@ type UserStepProps = {
   ) => void,
   onDeleteExample: (
     userSay: string,
-    intent: String,
+    intent: string,
     storyName?: string,
   ) => void,
   onCreateBranchStory: (newBranchStory: {
@@ -181,15 +183,66 @@ const UserStep: React.FC<UserStepProps> = (props) => {
   // eslint-disable-next-line no-unused-vars
   const [resSelect, setResSelect] = React.useState('botRes');
 
+  const [contentEntity, setContentEntity] = React.useState({
+    id: uuid(),
+    entity: '',
+    value: '',
+    start: null,
+    end: null,
+  });
+
+  const [entitiesArr, setEntitiesArr] = React.useState([]);
+
+  /**
+   * @type {[{key:string,slotInfo:{type:string,values?:string[]}}[], Function]}
+   */
+  const [slots, setSlots] = React.useState([]);
+
+  /**
+   * @type {[boolean, Function]}
+   */
+  const [isEntitiesModalVisible, setIsEntitiesModalVisible] =
+    React.useState(false);
+
+  const atToggleEntitiesModal = React.useCallback(() => {
+    setIsEntitiesModalVisible((prev) => !prev);
+    setContentEntity({
+      entity: '',
+      value: '',
+      start: null,
+      end: null,
+    });
+  }, [setIsEntitiesModalVisible, setContentEntity]);
+
   const showIntent =
     step.intent === 'get_started' ? '打開聊天室窗' : step.intent;
 
   const isGetStarted = step.intent === 'get_started';
 
+  // textarea 自適應高度
+  // const textAreaRef = React.useRef();
+  // React.useEffect(() => {
+  //   textAreaRef.current.style = 'height:0px';
+  //   textAreaRef.current.value = step.user;
+  //   textAreaRef.current.style = `height: ${textAreaRef.current.scrollHeight}px`;
+  // }, [step.user]);
+
   // 重組entities資料
   const entitiesData = React.useMemo(() => {
     return filteredEntities(step.entities, step.user, step.intent, nlu);
   }, [step.entities, step.user, step.intent, nlu]);
+
+  // 待domain資料設定完成後，設定slots值
+  React.useEffect(() => {
+    if (Object.keys(domain).length && Object.keys(domain.slots).length) {
+      const allSlots = Object.entries(domain.slots);
+      const filteredSlots = allSlots.map((slot) => ({
+        key: slot[0],
+        slotInfo: slot[1],
+      }));
+      setSlots(filteredSlots);
+    }
+  }, [domain]);
 
   // 編輯使用者對話
   const atEditUserSay = React.useCallback(
@@ -425,7 +478,7 @@ const UserStep: React.FC<UserStepProps> = (props) => {
             const start = userSay.indexOf(showValue);
             const end = userSay.indexOf(showValue) + showValue.length;
             // 驗證關鍵字代表值是否有數字
-            const regex = /^[0-9]*$/g;
+            const regex = /^[0-9]*$/;
 
             // 都沒值
             if (showValue === '' && entity === '' && currentValue === '') {
@@ -894,6 +947,67 @@ const UserStep: React.FC<UserStepProps> = (props) => {
     ],
   );
 
+  // 獲取使用者選取文字
+  // const getSelectText = React.useCallback(() => {
+  //   const userSayEle = document.querySelector('#userSay');
+  //   if (userSayEle) {
+  //     // 檢查選取的文字是否重疊
+  //     const isRepeat = entitiesData.some(
+  //       (entitiesItem) =>
+  //         (entitiesItem.start <= userSayEle.selectionStart &&
+  //           userSayEle.selectionStart <= entitiesItem.end - 1) ||
+  //         (entitiesItem.start <= userSayEle.selectionEnd - 1 &&
+  //           userSayEle.selectionEnd - 1 <= entitiesItem.end),
+  //     );
+  //     if (isRepeat) {
+  //       return Toast.fire({
+  //         icon: 'warning',
+  //         title: '關鍵字不可重疊',
+  //       });
+  //     }
+
+  //     return {
+  //       text: userSayEle.value.substring(
+  //         userSayEle.selectionStart,
+  //         userSayEle.selectionEnd,
+  //       ),
+  //       start: userSayEle.selectionStart,
+  //       end: userSayEle.selectionEnd,
+  //     };
+  //   }
+  //   return {};
+  // }, []);
+
+  // 滑鼠左鍵彈起事件
+  // const atMouseSelection = React.useCallback(
+  //   (e: React.MouseEvent<HTMLInputElement>) => {
+  //     if (getSelectText().text && e.button === 0) {
+  //       if (getSelectText().end - getSelectText().start <= 1) {
+  //         Toast.fire({
+  //           icon: 'warning',
+  //           title: '關鍵字至少要有兩個字',
+  //         });
+  //         return;
+  //       }
+  //       const entityData = {
+  //         id: uuid(),
+  //         entity: '',
+  //         value: '',
+  //         start: getSelectText().start,
+  //         end: getSelectText().end,
+  //         synonyms: [],
+  //       };
+  //       setEntitiesArr((prev) => prev.concat([entityData]));
+  //       setIsEntitiesModalVisible((prev) => !prev);
+  //     }
+  //   },
+  //   [setIsEntitiesModalVisible, setEntitiesArr],
+  // );
+
+  // const atSubmitEntities = React.useCallback(() => {
+  //   contentEntity.map;
+  // });
+
   // console.log('entitiesData:', entitiesData);
   // console.log('newBranchStory:', newBranchStory);
   // console.log('resSelect ========================>', resSelect);
@@ -1035,6 +1149,14 @@ const UserStep: React.FC<UserStepProps> = (props) => {
                 刪除
               </button>
             )}
+            <button
+              type="button"
+              className="entityModalBtn"
+              data-bs-toggle="modal"
+              data-bs-target="#entityModal"
+            >
+              按鈕
+            </button>
             <hr />
           </div>
         )}
@@ -1188,7 +1310,7 @@ const UserStep: React.FC<UserStepProps> = (props) => {
                       取消
                     </button>
                     <button
-                      className="swal2-cancel swal2-styled"
+                      className="swal2-confirm swal2-styled"
                       data-bs-target={`#add-${step.intent}-example`}
                       data-bs-toggle="modal"
                     >
@@ -1490,9 +1612,103 @@ const UserStep: React.FC<UserStepProps> = (props) => {
               </div>
             </div>
           </div>
+
+          {/* entity modal */}
+          {/* <div
+            className="modal fade"
+            id="entityModal"
+            tabIndex="-1"
+            aria-labelledby="entityModalLabel"
+            aria-hidden="true"
+            data-bs-backdrop="false"
+          >
+            <div className="modal-dialog modal-lg modal-dialog-scrollable">
+              <div className={cx('modal-content swal2-show', style.swtOut)}>
+                <div className={style.modalHeader}>
+                  <h1 className="swal2-title" id="entityModalLabel">
+                    關鍵字
+                  </h1>
+                  <button
+                    type="button"
+                    className={cx('swal2-close', style.swetClose)}
+                    data-bs-dismiss="modal"
+                    aria-label="Close"
+                  >
+                    x
+                  </button>
+                </div>
+                <div className="modal-body">
+                  <div className="mb-3">
+                    <label htmlFor="slotName" className="form-label">
+                      標籤類別
+                    </label>
+                    <input
+                      type="text"
+                      className="form-control"
+                      id="slotName"
+                      placeholder="請輸入標籤類別名稱"
+                    />
+                    <select
+                      className="form-control"
+                      name="slotCategory"
+                      id="slotCategory"
+                    >
+                      <option value="">建立標籤類別</option>
+                      {slots.map((slot) => (
+                        <option key={slot.key} value={slot.key}>
+                          {slot.key}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  <table className="table">
+                    <thead>
+                      <tr>
+                        <th scope="col">標籤</th>
+                        <th scope="col">同義字</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td>{contentEntity.text}</td>
+                        <td />
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+                <div className="swal2-actions d-flex">
+                  <div className="modal-footer">
+                    <button
+                      type="button"
+                      className="swal2-cancel swal2-styled"
+                      data-bs-dismiss="modal"
+                    >
+                      取消
+                    </button>
+                    <button
+                      type="button"
+                      className="swal2-confirm swal2-styled"
+                    >
+                      儲存
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div> */}
         </div>
       </div>
-      <div className={cx('col-sm-1 col-md-1 col-lg-1')} />
+      <EntitiesModal
+        title="關鍵字"
+        isVisible={isEntitiesModalVisible}
+        onClose={atToggleEntitiesModal}
+        slots={slots}
+        contentEntity={contentEntity}
+        onSetContentEntity={setContentEntity}
+        entitiesData={entitiesData}
+        entitiesArr={entitiesArr}
+        onSetEntitiesArr={setEntitiesArr}
+      />
     </div>
   );
 };

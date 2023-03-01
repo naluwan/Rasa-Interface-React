@@ -1,6 +1,6 @@
 .userStepContainer {
   position: relative;
-  border: 1px solid #B7B7B7;
+  border: 1px solid #b7b7b7;
   border-radius: 10px;
   padding: 1rem;
   background: #fff;
@@ -10,13 +10,14 @@
     font-size: 20px;
     font-weight: 500;
     color: #000000;
+    word-break: keep-all;
   }
 
   .userText {
     border-radius: 10px;
     padding: 10px;
     width: 100%;
-    border: 1px solid #D4D4DA;
+    border: 1px solid #d4d4da;
     color: #272848;
   }
 
@@ -25,7 +26,7 @@
     flex-direction: column;
     padding-top: 2px;
 
-    &>div:not(:nth-of-type(1))+div:not(:nth-of-type(2)) {
+    & > div:not(:nth-of-type(1)) + div:not(:nth-of-type(2)) {
       margin-top: 1rem;
     }
   }
@@ -52,9 +53,7 @@
   &:hover {
     color: red;
   }
-
 }
-
 
 .deleteBtn {
   position: absolute;
@@ -67,24 +66,22 @@
 .editBtn {
   background: #fff !important;
   color: #000 !important;
-  border: 1px solid #B7B7B7 !important;
+  border: 1px solid #b7b7b7 !important;
   display: inline-flex !important;
   flex-direction: row;
   align-items: center;
 
   &:hover {
-    background: #E14D2A !important;
+    background: #e14d2a !important;
     color: #fff !important;
     fill: #fff !important;
-    border: 1px solid #E14D2A !important;
+    border: 1px solid #e14d2a !important;
 
     svg {
       path {
         fill: #fff;
       }
     }
-
-
   }
 
   svg {
@@ -95,21 +92,19 @@
   }
 }
 
-
-
 //intentionBtn
 .intentionBtn {
   background-color: #fff !important;
   color: #000 !important;
-  border: 1px solid #B7B7B7 !important;
+  border: 1px solid #b7b7b7 !important;
   display: inline-flex !important;
   flex-direction: row;
   align-items: center;
 
   &:hover {
-    background: #FD841F !important;
+    background: #fd841f !important;
     color: #fff !important;
-    border: 1px solid #FD841F !important;
+    border: 1px solid #fd841f !important;
 
     svg {
       path {
@@ -130,15 +125,15 @@
 .exampleBtn {
   background-color: #fff !important;
   color: #000 !important;
-  border: 1px solid #B7B7B7 !important;
+  border: 1px solid #b7b7b7 !important;
   display: inline-flex !important;
   flex-direction: row;
   align-items: center;
 
   &:hover {
-    background: #3E6D9C !important;
+    background: #3e6d9c !important;
     color: #fff !important;
-    border: 1px solid #3E6D9C !important;
+    border: 1px solid #3e6d9c !important;
 
     svg {
       path {
@@ -159,11 +154,10 @@
 .keyWordBtn {
   background-color: #fff !important;
   color: #000 !important;
-  border: 1px solid #B7B7B7 !important;
+  border: 1px solid #b7b7b7 !important;
   display: inline-flex !important;
   flex-direction: row;
   align-items: center;
-
 
   &:hover {
     background: #001253 !important;
@@ -234,4 +228,25 @@ table {
   position: absolute;
   top: 0;
   right: 0;
+}
+
+:global(.intentContainer) {
+  display: none !important;
+}
+
+:global(.entityModalBtn) {
+  display: none;
+}
+
+:global(.swal2-actions) {
+  width: 100%;
+}
+
+:global(.swal2-title) {
+  padding: 0.8em 1em 0.8em;
+}
+
+.modalHeader {
+  width: 100%;
+  border-bottom: 1px solid #dee2e6;
 }

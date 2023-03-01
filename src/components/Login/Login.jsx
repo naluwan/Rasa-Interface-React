@@ -140,7 +140,7 @@ const Login = () => {
             data-testid="registerBtn"
             to="/register"
             variant="nostyle"
-            className={cx('btn', style.accountBtn)}
+            className={cx(style.accountBtn)}
           >
             註冊
           </NavLink>

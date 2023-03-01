@@ -15,8 +15,7 @@
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%);
-      transition: all .3s ;
-
+      transition: all 0.3s;
     }
   }
 
@@ -38,7 +37,6 @@
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%);
-
     }
   }
 
@@ -56,5 +54,13 @@
 
   :global(#voiceBtn.close) {
     background: url('../../images/btnIcon/voiceClose.svg') center/80% no-repeat;
+  }
+  :global(#recorderBtn) {
+    background: url('../../images/btnIcon/mic.svg') center/80% no-repeat;
+    border: none;
+    width: 45px;
+    height: 45px;
+    display: inline-block;
+    vertical-align: middle;
   }
 }
