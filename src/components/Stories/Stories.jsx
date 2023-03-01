@@ -128,22 +128,7 @@ const Stories = () => {
     'fetchTrainAndCategoriesData',
     fetchTrainAndCategoriesData,
   );
-  const trainData = React.useMemo(() => {
-    const today = new Date().toLocaleString('zh-Hant', { hour12: false });
-    const date = today.split(' ')[0].replace(/\//g, '');
-    const time = today.split(' ')[1].replace(/:/g, '');
-    const data = {
-      stories: yaml.dump({ stories }),
-      domain: yaml.dump(domain),
-      config: yaml.dump(config),
-      nlu: { nlu },
-      fixed_model_name: `model-${date}T${time}`,
-    };
 
-    return data;
-
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [stories, nlu, domain, config, cloneData]);
   React.useEffect(() => {
     if (fetchData.isSuccess && !fetchData.isError && !fetchData.isLoading) {
       const [allTrainData, allCategories] = fetchData.data;
@@ -221,6 +206,23 @@ const Stories = () => {
       setSlots(filteredSlots);
     }
   }, [domain]);
+
+  const trainData = React.useMemo(() => {
+    const today = new Date().toLocaleString('zh-Hant', { hour12: false });
+    const date = today.split(' ')[0].replace(/\//g, '');
+    const time = today.split(' ')[1].replace(/:/g, '');
+    const data = {
+      stories: yaml.dump({ stories }),
+      domain: yaml.dump(domain),
+      config: yaml.dump(config),
+      nlu: { nlu },
+      fixed_model_name: `model-${date}T${time}`,
+    };
+
+    return data;
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [stories, nlu, domain, config, cloneData]);
 
   // 刪除故事
   const atDeleteStory = React.useCallback(
