@@ -19,10 +19,12 @@ import cx from 'classnames';
 import { Toast, confirmWidget } from 'utils/swalInput';
 import MyButton from 'components/MyButton';
 import CreateStory from 'components/CreateStory';
+import Forms from 'components/Forms';
+import { CgSpinner } from 'react-icons/cg';
 import { cloneDeep } from 'lodash-es';
 import { randomBotResAction } from 'utils/randomBotResAction';
 import { useQuery } from 'react-query';
-// import Forms from 'components/Forms';
+import yaml from 'js-yaml';
 import style from './Stories.module.scss';
 import useStoryStore from '../../store/useStoryStore';
 import useCreateStoryStore from '../../store/useCreateStoryStore';
@@ -30,7 +32,6 @@ import Slots from './Slots';
 import NavBar from '../NavBar';
 import CreateNewStory from '../CreateNewStory';
 // import { NAVITEMS } from '../config';
-
 const Stories = () => {
   /**
    * @type {[boolean, Function]}
@@ -74,9 +75,11 @@ const Stories = () => {
     onSetRasaTrainState,
     onSetAllCategories,
     categories,
+    config,
     onSetSelectedCategory,
-    // selectedCategory,
+    trainRasa,
     onSetSelectedStory,
+    rasaTrainState,
     selectedStory,
   } = useStoryStore((state: State) => {
     return {
@@ -84,7 +87,9 @@ const Stories = () => {
       stories: state.stories,
       nlu: state.nlu,
       domain: state.domain,
+      rasaTrainState: state.rasaTrainState,
       cloneData: state.cloneData,
+      config: state.config,
       deletedStory: state.deletedStory,
       actions: state.actions,
       storiesOptions: state.storiesOptions,
@@ -99,6 +104,7 @@ const Stories = () => {
       selectedCategory: state.selectedCategory,
       onSetSelectedStory: state.onSetSelectedStory,
       selectedStory: state.selectedStory,
+      trainRasa: state.trainRasa,
     };
   }, shallow);
 
@@ -122,7 +128,22 @@ const Stories = () => {
     'fetchTrainAndCategoriesData',
     fetchTrainAndCategoriesData,
   );
+  const trainData = React.useMemo(() => {
+    const today = new Date().toLocaleString('zh-Hant', { hour12: false });
+    const date = today.split(' ')[0].replace(/\//g, '');
+    const time = today.split(' ')[1].replace(/:/g, '');
+    const data = {
+      stories: yaml.dump({ stories }),
+      domain: yaml.dump(domain),
+      config: yaml.dump(config),
+      nlu: { nlu },
+      fixed_model_name: `model-${date}T${time}`,
+    };
 
+    return data;
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [stories, nlu, domain, config, cloneData]);
   React.useEffect(() => {
     if (fetchData.isSuccess && !fetchData.isError && !fetchData.isLoading) {
       const [allTrainData, allCategories] = fetchData.data;
@@ -1253,7 +1274,14 @@ const Stories = () => {
       />
       <div className={cx(style.storeBlock)}>
         <div className={cx(style.trainBlock)}>
-          <button>啟動訓練</button>
+          {rasaTrainState > 0 ? (
+            <li className={cx(style.personaItem)} disabled>
+              <CgSpinner className={cx('mx-2', style.loadingIcon)} />
+              機器人訓練中
+            </li>
+          ) : (
+            <button onClick={() => trainRasa(trainData)}>啟動訓練</button>
+          )}
         </div>
         <div
           className={cx(
@@ -1636,6 +1664,18 @@ const Stories = () => {
             />
           )}
         </div>
+        {nowMode === 'formsDesigan' && (
+          <div
+            className={cx(
+              nowMode !== 'formsDesigan' ? style.hidden : style.storoesBlock,
+              style.searchBar,
+              style.storeChid,
+            )}
+          >
+            <Forms domain={domain} />
+          </div>
+        )}
+
         <div
           className={cx(
             nowMode !== 'createStories' ? style.hidden : style.storoesBlock,

@@ -28,6 +28,25 @@
       color: #fff;
     }
   }
+
+  .personaItem {
+    display: block;
+    background: #6171F9;
+    padding: 5px 10px;
+    border-radius: 5px;
+    color: #fff;
+    text-align: left;
+    cursor: pointer;
+    .loadingIcon {
+      font-size: 1rem;
+      animation: animate 1s linear infinite;
+    }
+
+    &:hover {
+      background: #4b4bbb;
+      color: #fff;
+    }
+  }
 }
 
 // 清單區塊
@@ -401,4 +420,14 @@
 .storeChid {
   background: #ececec !important;
   position: relative;
+}
+
+@keyframes animate {
+  0% {
+    transform: rotate(0deg);
+  }
+
+  100% {
+    transform: rotate(720deg);
+  }
 }

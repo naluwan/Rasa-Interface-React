@@ -206,8 +206,11 @@ const NavBar: React.FC<NavBarProps> = (props) => {
           </div>
           <div
             className={
-              nowMode === '123' ? cx(style.btn, style.btnCheck) : cx(style.btn)
+              nowMode === 'formsDesigan'
+                ? cx(style.btn, style.btnCheck)
+                : cx(style.btn)
             }
+            onClick={() => atChangeMode('formsDesigan')}
           >
             <div className={cx(style.icon)}>
               <svg

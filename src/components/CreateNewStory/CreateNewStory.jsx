@@ -340,64 +340,153 @@ const CreateNewStory: React.FC<CreateNewStoryProps> = (props) => {
     (stepName: string, modename: string) => {
       console.log(modename);
       let stepError = '';
-      if (stepName === 'creactName') {
-        changeStoreName(storeName.Name);
-        if (
-          storeName.error.length > 0 ||
-          storeName.name.length === undefined ||
-          storeName.name.length === 0 ||
-          TypeStoreName.error.length > 0 ||
-          TypeStoreName.name.length === undefined
-        ) {
-          stepError = 'error';
-        }
-        if (stepError !== 'error') {
-          atCreateNewStory(newStoryInfo, stories, categories);
-          setcreactStoryStep('creactQuestion');
-          settitle('用戶問句');
-        }
-      }
-      if (stepName === 'creactQuestion') {
-        CreactNewQuestion();
-        questionValue.map((item, idx) => {
+      if (modename === 'Base') {
+        if (stepName === 'creactName') {
+          changeStoreName(storeName.Name);
           if (
-            item.error.length > 0 ||
-            item.question === undefined ||
-            item.question.length === 0
+            storeName.error.length > 0 ||
+            storeName.name.length === undefined ||
+            storeName.name.length === 0 ||
+            TypeStoreName.error.length > 0 ||
+            TypeStoreName.name.length === undefined
           ) {
             stepError = 'error';
-          } else if (idx === 0) {
-            onCreateUserStep(item.question);
-          } else {
-            onCreateExample(
-              newStory.story,
-              item.question,
-              [],
-              newStory.story,
-              nlu,
-            );
           }
-        });
-        if (stepError !== 'error') {
-          setcreactStoryStep('creactBot');
-          settitle('機器人回應');
+          if (stepError !== 'error') {
+            atCreateNewStory(newStoryInfo, stories, categories);
+            setcreactStoryStep('creactQuestion');
+            settitle('用戶問句');
+          }
+        }
+        if (stepName === 'creactQuestion') {
+          CreactNewQuestion();
+          questionValue.map((item, idx) => {
+            if (
+              item.error.length > 0 ||
+              item.question === undefined ||
+              item.question.length === 0
+            ) {
+              stepError = 'error';
+            } else if (idx === 0) {
+              onCreateUserStep(item.question);
+            } else {
+              onCreateExample(
+                newStory.story,
+                item.question,
+                [],
+                newStory.story,
+                nlu,
+              );
+            }
+          });
+          if (stepError !== 'error') {
+            setcreactStoryStep('creactBot');
+            settitle('機器人回應');
+          }
+        }
+        if (stepName === 'creactBot') {
+          botValue.map((item) => {
+            console.log('botValue item ===> ', item);
+            const actionName = randomBotResAction(actions);
+            console.log('actionName ===> ', actionName);
+            onCreateBotStep(actionName, item.reply);
+          });
+          if (stepError !== 'error') {
+            setcreactStoryStep('creactTrain');
+            settitle('');
+          }
+        }
+        if (stepName === 'creactTrain') {
+          settitle('劇本名稱');
+          setcreactStoryStep('creactName');
         }
       }
-      if (stepName === 'creactBot') {
-        botValue.map((item) => {
-          console.log('botValue item ===> ', item);
-          const actionName = randomBotResAction(actions);
-          console.log('actionName ===> ', actionName);
-          onCreateBotStep(actionName, item.reply);
-        });
-        if (stepError !== 'error') {
-          setcreactStoryStep('creactTrain');
-          settitle('');
+      if (modename === 'Advanced') {
+        if (stepName === 'creactName') {
+          changeStoreName(storeName.Name);
+          if (
+            storeName.error.length > 0 ||
+            storeName.name.length === undefined ||
+            storeName.name.length === 0 ||
+            TypeStoreName.error.length > 0 ||
+            TypeStoreName.name.length === undefined
+          ) {
+            stepError = 'error';
+          }
+          if (stepError !== 'error') {
+            atCreateNewStory(newStoryInfo, stories, categories);
+            setcreactStoryStep('creactQuestion');
+            settitle('用戶問句');
+          }
         }
-      }
-      if (stepName === 'creactTrain') {
-        settitle('劇本名稱');
-        setcreactStoryStep('creactName');
+        if (stepName === 'creactQuestion') {
+          CreactNewQuestion();
+          questionValue.map((item, idx) => {
+            if (
+              item.error.length > 0 ||
+              item.question === undefined ||
+              item.question.length === 0
+            ) {
+              stepError = 'error';
+            } else if (idx === 0) {
+              onCreateUserStep(item.question);
+            } else {
+              onCreateExample(
+                newStory.story,
+                item.question,
+                [],
+                newStory.story,
+                nlu,
+              );
+            }
+          });
+          if (stepError !== 'error') {
+            setcreactStoryStep('creactBot');
+            settitle('機器人回應');
+          }
+        }
+        if (stepName === 'creactkeywords') {
+          CreactNewQuestion();
+          questionValue.map((item, idx) => {
+            if (
+              item.error.length > 0 ||
+              item.question === undefined ||
+              item.question.length === 0
+            ) {
+              stepError = 'error';
+            } else if (idx === 0) {
+              onCreateUserStep(item.question);
+            } else {
+              onCreateExample(
+                newStory.story,
+                item.question,
+                [],
+                newStory.story,
+                nlu,
+              );
+            }
+          });
+          if (stepError !== 'error') {
+            setcreactStoryStep('creactBot');
+            settitle('機器人回應');
+          }
+        }
+        if (stepName === 'creactBot') {
+          botValue.map((item) => {
+            console.log('botValue item ===> ', item);
+            const actionName = randomBotResAction(actions);
+            console.log('actionName ===> ', actionName);
+            onCreateBotStep(actionName, item.reply);
+          });
+          if (stepError !== 'error') {
+            setcreactStoryStep('creactTrain');
+            settitle('');
+          }
+        }
+        if (stepName === 'creactTrain') {
+          settitle('劇本名稱');
+          setcreactStoryStep('creactName');
+        }
       }
     },
     [
