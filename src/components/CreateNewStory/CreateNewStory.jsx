@@ -657,7 +657,7 @@ const CreateNewStory: React.FC<CreateNewStoryProps> = (props) => {
                     </span>
                     <span
                       className={cx(
-                        creactStoryStep === 'creactQuestion'
+                        creactStoryStep === 'creactkeywords'
                           ? [style.active, style.item]
                           : style.item,
                       )}
