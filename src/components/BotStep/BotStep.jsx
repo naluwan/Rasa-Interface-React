@@ -275,15 +275,7 @@ const BotStep: React.FC<BotStepProps> = (props) => {
               <button
                 type="button"
                 className={cx('btn mx-2', style.editBtn)}
-                onClick={() =>
-                  atEditBotResponse(
-                    step.response,
-                    step.action,
-                    storyName,
-                    checkPointName,
-                    connectBranchStoryName,
-                  )
-                }
+                onClick={() => atToggleBotResponseVisible()}
               >
                 <svg
                   width="24"
