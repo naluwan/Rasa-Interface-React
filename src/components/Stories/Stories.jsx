@@ -44,7 +44,7 @@ const Stories = () => {
   /**
    * @type {[string, Function]}
    */
-  const [defaultValue, setDefaultValue] = React.useState('');
+  // const [defaultValue, setDefaultValue] = React.useState('');
   /**
    * @type {[StoryType, Function]}
    */
@@ -465,7 +465,7 @@ const Stories = () => {
             title: '刪除故事流程成功',
           });
           onSetAllTrainData(res.data);
-          setDefaultValue('');
+          // setDefaultValue('');
           onSetDeleteStory(story);
           return onSetStory('');
         });
@@ -474,9 +474,12 @@ const Stories = () => {
     [onSetAllTrainData, onSetStory, onSetDeleteStory, cloneData, story],
   );
   // 語句庫與情景劇本切換
-  const atChangeMode = React.useCallback((modeValue) => {
-    setNowMode(modeValue);
-  }, []);
+  const atChangeMode = React.useCallback(
+    (modeValue) => {
+      setNowMode(modeValue);
+    },
+    [setNowMode, nowMode],
+  );
   // 選擇故事
   const atSelectStory = React.useCallback(
     (storyName: string) => {
@@ -493,7 +496,7 @@ const Stories = () => {
             steps: [],
           });
           setCreate(false);
-          setDefaultValue(storyName);
+          // setDefaultValue(storyName);
           onSetSelectedCategory(story.metadata?.category);
           onSetSelectedStory(storyName);
           onSetStory(storyName);
@@ -510,7 +513,7 @@ const Stories = () => {
         steps: [],
       });
       setCreate(false);
-      setDefaultValue(storyName);
+      // setDefaultValue(storyName);
       onSetSelectedCategory(story.metadata?.category);
       onSetSelectedStory(storyName);
       onSetStory(storyName);
@@ -1096,11 +1099,9 @@ const Stories = () => {
 
   // 更新新故事資訊
   const atChangeNewStoryInfo = React.useCallback(
-    (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-      console.log('change e target =>', e.target);
-      // 獲取使用者輸入的資訊
-      const { name, value } = e.target;
-
+    (value: String, name: String) => {
+      console.log('change e name =>', name);
+      console.log('change e value =>', value);
       // 更新故事名稱
       if (name === 'story') {
         setNewStoryInfo((prev) => {
@@ -1234,7 +1235,7 @@ const Stories = () => {
       // setForms(false);
       setCreate(true);
       onSetStory('');
-      document.querySelector('#cancelCreateStoryBtn').click();
+      // document.querySelector('#cancelCreateStoryBtn').click();
     },
     [setNewStoryInfo, onCreateNewStory, onSetStory],
   );
@@ -1296,239 +1297,263 @@ const Stories = () => {
               <div className={style.searchBarTitle}>
                 <h5>情境劇本</h5>
               </div>
-              <div
-                name="stories"
-                className={cx(
-                  nowMode !== 'scenario' ? style.hidden : '',
-                  style.storoesBlock,
-                )}
-              >
-                <div className={cx(style.storesBar)}>
-                  <div
-                    className={cx(style.ctrolBar)}
-                    onClick={() => {
-                      chooseListType('left');
-                    }}
-                  >
-                    <img src={require('../../images/icon_left.png')} alt="" />
+              {nowMode === 'scenario' && (
+                <div
+                  name="stories"
+                  className={cx(
+                    nowMode !== 'scenario' ? style.hidden : '',
+                    style.storoesBlock,
+                  )}
+                >
+                  <div className={cx(style.storesBar)}>
+                    <div
+                      className={cx(style.ctrolBar)}
+                      onClick={() => {
+                        chooseListType('left');
+                      }}
+                    >
+                      <img src={require('../../images/icon_left.png')} alt="" />
+                    </div>
+                    <div id="listTitle" className={cx(style.listTitle)}>
+                      {categories &&
+                        categories.map((category) => {
+                          return (
+                            <div
+                              data-item
+                              key={`list-${category.name}-`}
+                              onClick={() => {
+                                chooseCategories(category.name);
+                              }}
+                              className={cx(
+                                categoriesName === category.name
+                                  ? style.active
+                                  : style.title,
+                              )}
+                            >
+                              {category.name}
+                            </div>
+                          );
+                        })}
+                    </div>
+                    <div
+                      className={cx(style.ctrolBar)}
+                      onClick={() => {
+                        chooseListType('right');
+                      }}
+                    >
+                      <img
+                        src={require('../../images/icon_right.png')}
+                        alt=""
+                      />
+                    </div>
                   </div>
-                  <div id="listTitle" className={cx(style.listTitle)}>
+                  <div className={cx(style.list)}>
                     {categories &&
                       categories.map((category) => {
                         return (
                           <div
-                            data-item
-                            key={`list-${category.name}-`}
-                            onClick={() => {
-                              chooseCategories(category.name);
-                            }}
-                            className={cx(
+                            data-open={
                               categoriesName === category.name
-                                ? style.active
-                                : style.title,
-                            )}
+                                ? 'open'
+                                : 'noopen'
+                            }
+                            key={`list-${category.name}`}
+                            className={cx('row', cx(style.listmenu))}
                           >
-                            {category.name}
+                            {storiesOptions &&
+                              storiesOptions.map((item) => {
+                                if (item.metadata.category === category.name) {
+                                  return (
+                                    <div
+                                      key={`list-${item.metadata.category}-${item.story}`}
+                                      className="col-lg-3 col-md-4 col-sm-6 "
+                                    >
+                                      <button
+                                        className={cx(style.listBtn)}
+                                        data-check={
+                                          selectedStory === item.story
+                                            ? 'check'
+                                            : 'none'
+                                        }
+                                        name={item.story}
+                                        value={item.story}
+                                        onClick={(e) =>
+                                          atSelectStory(e.target.value)
+                                        }
+                                      >
+                                        {item.story}
+                                      </button>
+                                    </div>
+                                  );
+                                }
+                                return null;
+                              })}
                           </div>
                         );
                       })}
-                  </div>
-                  <div
-                    className={cx(style.ctrolBar)}
-                    onClick={() => {
-                      chooseListType('right');
-                    }}
-                  >
-                    <img src={require('../../images/icon_right.png')} alt="" />
-                  </div>
-                </div>
-                <div className={cx(style.list)}>
-                  {categories &&
-                    categories.map((category) => {
-                      return (
+                    {/* create story modal */}
+                    <div
+                      className="modal"
+                      id="createNewStoryModal"
+                      tabIndex="-1"
+                      aria-labelledby="createNewStoryModalLabel"
+                      aria-hidden="true"
+                      data-bs-backdrop="false"
+                    >
+                      <div className="modal-dialog modal-dialog-centered modal-dialog-scrollable ">
                         <div
-                          data-open={
-                            categoriesName === category.name ? 'open' : 'noopen'
-                          }
-                          key={`list-${category.name}`}
-                          className={cx('row', cx(style.listmenu))}
+                          className={cx(
+                            'modal-content swal2-show',
+                            style.swtOut,
+                          )}
                         >
-                          {storiesOptions &&
-                            storiesOptions.map((item) => {
-                              if (item.metadata.category === category.name) {
-                                return (
-                                  <div
-                                    key={`list-${item.metadata.category}-${item.story}`}
-                                    className="col-lg-3 col-md-4 col-sm-6 "
-                                  >
-                                    <button
-                                      className={cx(style.listBtn)}
-                                      data-check={
-                                        selectedStory === item.story
-                                          ? 'check'
-                                          : 'none'
-                                      }
-                                      name={item.story}
-                                      value={item.story}
-                                      onClick={(e) =>
-                                        atSelectStory(e.target.value)
-                                      }
-                                    >
-                                      {item.story}
-                                    </button>
-                                  </div>
-                                );
-                              }
-                              return null;
-                            })}
-                        </div>
-                      );
-                    })}
-                  {/* create story modal */}
-                  <div
-                    className="modal"
-                    id="createNewStoryModal"
-                    tabIndex="-1"
-                    aria-labelledby="createNewStoryModalLabel"
-                    aria-hidden="true"
-                    data-bs-backdrop="false"
-                  >
-                    <div className="modal-dialog modal-dialog-centered modal-dialog-scrollable ">
-                      <div
-                        className={cx('modal-content swal2-show', style.swtOut)}
-                      >
-                        <div>
-                          <h2
-                            className="swal2-title"
-                            id="createNewStoryModalLabel"
-                          >
-                            建立新故事
-                          </h2>
-                          <button
-                            type="button"
-                            className={cx('swal2-close', style.swetClose)}
-                            data-bs-dismiss="modal"
-                            aria-label="Close"
-                            onClick={() =>
-                              setNewStoryInfo({
-                                story: '',
-                                steps: [],
-                                metadata: { category: '', create: false },
-                              })
-                            }
-                          >
-                            ×
-                          </button>
-                        </div>
-                        <div className="modal-body">
-                          <div className="mb-3">
-                            <label htmlFor="story" className="form-label">
-                              故事名稱
-                            </label>
-                            <input
-                              className="form-control"
-                              id="story"
-                              name="story"
-                              placeholder="請輸入故事名稱"
-                              value={newStoryInfo.story}
-                              onChange={(e) => atChangeNewStoryInfo(e)}
-                            />
-                          </div>
-                          <div className="mb-3">
-                            <label htmlFor="category" className="form-label">
-                              故事類別
-                            </label>
-                            <select
-                              className="form-control"
-                              id="category"
-                              name="category"
-                              value={
-                                newStoryInfo.metadata?.create
-                                  ? 'createNewCategory'
-                                  : newStoryInfo.metadata?.category
-                              }
-                              onChange={(e) => atChangeNewStoryInfo(e)}
+                          <div>
+                            <h2
+                              className="swal2-title"
+                              id="createNewStoryModalLabel"
                             >
-                              <option value="" hidden>
-                                請選擇故事類別
-                              </option>
-                              <option value="createNewCategory">
-                                建立新類別
-                              </option>
-                              {categories?.map((category) => {
-                                return (
-                                  <option
-                                    key={`${category.id}-${category.name}`}
-                                    value={category.name}
-                                  >
-                                    {category.name}
-                                  </option>
-                                );
-                              })}
-                            </select>
+                              建立新故事
+                            </h2>
+                            <button
+                              type="button"
+                              className={cx('swal2-close', style.swetClose)}
+                              data-bs-dismiss="modal"
+                              aria-label="Close"
+                              onClick={() =>
+                                setNewStoryInfo({
+                                  story: '',
+                                  steps: [],
+                                  metadata: { category: '', create: false },
+                                })
+                              }
+                            >
+                              ×
+                            </button>
                           </div>
-                          {newStoryInfo.metadata?.create && (
+                          <div className="modal-body">
                             <div className="mb-3">
-                              <label
-                                htmlFor="newCategory"
-                                className="form-label"
-                              >
-                                類別名稱
+                              <label htmlFor="story" className="form-label">
+                                故事名稱
                               </label>
                               <input
                                 className="form-control"
-                                id="newCategory"
-                                name="newCategory"
-                                placeholder="請輸入類別名稱"
-                                value={newStoryInfo.metadata?.category}
-                                onChange={(e) => atChangeNewStoryInfo(e)}
+                                id="story"
+                                name="story"
+                                placeholder="請輸入故事名稱"
+                                value={newStoryInfo.story}
+                                onChange={(e) =>
+                                  atChangeNewStoryInfo(e.target.value, 'story')
+                                }
                               />
                             </div>
-                          )}
-                        </div>
-                        <div className="swal2-actions d-flex">
-                          <button
-                            type="button"
-                            className="swal2-cancel swal2-styled"
-                            id="cancelCreateStoryBtn"
-                            data-bs-dismiss="modal"
-                            onClick={() =>
-                              setNewStoryInfo({
-                                story: '',
-                                steps: [],
-                                metadata: { category: '', create: false },
-                              })
-                            }
-                          >
-                            取消
-                          </button>
-                          <button
-                            className="swal2-confirm swal2-styled"
-                            onClick={() =>
-                              atCreateNewStory(
-                                newStoryInfo,
-                                stories,
-                                categories,
-                              )
-                            }
-                          >
-                            儲存
-                          </button>
+                            <div className="mb-3">
+                              <label htmlFor="category" className="form-label">
+                                故事類別
+                              </label>
+                              <select
+                                className="form-control"
+                                id="category"
+                                name="category"
+                                value={
+                                  newStoryInfo.metadata?.create
+                                    ? 'createNewCategory'
+                                    : newStoryInfo.metadata?.category
+                                }
+                                onChange={(e) =>
+                                  atChangeNewStoryInfo(
+                                    e.target.value,
+                                    'category',
+                                  )
+                                }
+                              >
+                                <option value="" hidden>
+                                  請選擇故事類別
+                                </option>
+                                <option value="createNewCategory">
+                                  建立新類別
+                                </option>
+                                {categories?.map((category) => {
+                                  return (
+                                    <option
+                                      key={`${category.id}-${category.name}`}
+                                      value={category.name}
+                                    >
+                                      {category.name}
+                                    </option>
+                                  );
+                                })}
+                              </select>
+                            </div>
+                            {newStoryInfo.metadata?.create && (
+                              <div className="mb-3">
+                                <label
+                                  htmlFor="newCategory"
+                                  className="form-label"
+                                >
+                                  類別名稱
+                                </label>
+                                <input
+                                  className="form-control"
+                                  id="newCategory"
+                                  name="newCategory"
+                                  placeholder="請輸入類別名稱"
+                                  value={newStoryInfo.metadata?.category}
+                                  onChange={(e) =>
+                                    atChangeNewStoryInfo(
+                                      e.target.value,
+                                      'newCategory',
+                                    )
+                                  }
+                                />
+                              </div>
+                            )}
+                          </div>
+                          <div className="swal2-actions d-flex">
+                            <button
+                              type="button"
+                              className="swal2-cancel swal2-styled"
+                              id="cancelCreateStoryBtn"
+                              data-bs-dismiss="modal"
+                              onClick={() =>
+                                setNewStoryInfo({
+                                  story: '',
+                                  steps: [],
+                                  metadata: { category: '', create: false },
+                                })
+                              }
+                            >
+                              取消
+                            </button>
+                            <button
+                              className="swal2-confirm swal2-styled"
+                              onClick={() =>
+                                atCreateNewStory(
+                                  newStoryInfo,
+                                  stories,
+                                  categories,
+                                )
+                              }
+                            >
+                              儲存
+                            </button>
+                          </div>
                         </div>
                       </div>
                     </div>
                   </div>
                 </div>
-              </div>
-              <div
-                name="stateMentLibrary"
-                className={cx(
-                  nowMode !== 'statement' ? style.hidden : '',
-                  style.stateMentLibrary,
-                )}
-              >
-                <Slots slots={slots} domain={domain} />
-              </div>
+              )}
+              {nowMode === 'statement' && (
+                <div
+                  name="stateMentLibrary"
+                  className={cx(
+                    nowMode !== 'statement' ? style.hidden : '',
+                    style.stateMentLibrary,
+                  )}
+                >
+                  <Slots slots={slots} domain={domain} />
+                </div>
+              )}
             </div>
           </div>
           <div className={cx('d-flex')}>
@@ -1601,7 +1626,7 @@ const Stories = () => {
                   </div>
                 </div>
               </div>
-              <div className={cx(style.menuInputBlock)}>
+              {/* <div className={cx(style.menuInputBlock)}>
                 <select
                   id="stories"
                   className={cx('form-control', style.storiesSelector)}
@@ -1644,8 +1669,8 @@ const Stories = () => {
                     className="form-control"
                     placeholder="搜尋故事流程"
                   />
-                </div> */}
-              </div>
+                </div> 
+              </div> */}
             </div>
           </div>
         </div>
@@ -1688,81 +1713,82 @@ const Stories = () => {
             <Forms domain={domain} />
           </div>
         )}
-
-        <div
-          className={cx(
-            nowMode !== 'createStories' ? style.hidden : style.storoesBlock,
-            style.searchBar,
-            style.storeChid,
-          )}
-        >
-          {/* <button
+        {nowMode === 'createStories' && (
+          <div
+            className={cx(
+              nowMode !== 'createStories' ? style.hidden : style.storoesBlock,
+              style.searchBar,
+              style.storeChid,
+            )}
+          >
+            {/* <button
             data-bs-toggle="modal"
             data-bs-target="#createNewStoryModal"
             onClick={() => atClickCreateStoryBtn()}
           >
             123
           </button> */}
-          <div className={cx(style.createStoriesBlock)}>
-            <div
-              onClick={() => {
-                setnowcreactStory('Base');
-              }}
-              className={cx(style.createStoriesCard)}
-            >
-              <div>
-                <div className={style.card}>
-                  <img
-                    src={require('../../images/creactStory/A.png')}
-                    alt="basic"
-                  />
-                </div>
+            <div className={cx(style.createStoriesBlock)}>
+              <div
+                onClick={() => {
+                  setnowcreactStory('Base');
+                }}
+                className={cx(style.createStoriesCard)}
+              >
                 <div>
-                  <h3>基礎</h3>
-                  <h3>(一問一答)</h3>
+                  <div className={style.card}>
+                    <img
+                      src={require('../../images/creactStory/A.png')}
+                      alt="basic"
+                    />
+                  </div>
+                  <div>
+                    <h3>基礎</h3>
+                    <h3>(一問一答)</h3>
+                  </div>
+                </div>
+              </div>
+              <div
+                onClick={() => {
+                  setnowcreactStory('Advanced');
+                }}
+                className={cx(style.createStoriesCard)}
+              >
+                <div>
+                  <div className={style.card}>
+                    <img
+                      src={require('../../images/creactStory/B.png')}
+                      alt="basic"
+                    />
+                  </div>
+                  <div>
+                    <h3>進階</h3>
+                    <h3>(智慧型機器人)</h3>
+                  </div>
                 </div>
               </div>
             </div>
-            <div
-              onClick={() => {
-                setnowcreactStory('Advanced');
-              }}
-              className={cx(style.createStoriesCard)}
-            >
-              <div>
-                <div className={style.card}>
-                  <img
-                    src={require('../../images/creactStory/B.png')}
-                    alt="basic"
-                  />
-                </div>
-                <div>
-                  <h3>進階</h3>
-                  <h3>(智慧型機器人)</h3>
-                </div>
-              </div>
-            </div>
+            {/* creactStory */}
+            {(nowcreactStory === 'Base' || nowcreactStory === 'Advanced') && (
+              <CreateNewStory
+                mode={nowcreactStory}
+                setnowcreactStory={setnowcreactStory}
+                atChangeNewStoryInfo={atChangeNewStoryInfo}
+                atCreateNewStory={atCreateNewStory}
+                categories={categories}
+                stories={stories}
+                newStory={newStory}
+                actions={actions}
+                newStoryInfo={newStoryInfo}
+                setNewStoryInfo={setNewStoryInfo}
+                nlu={nlu}
+                onClickSaveBtn={atClickSaveBtn}
+                atSelectStory={atSelectStory}
+                setNowMode={setNowMode}
+              />
+            )}
           </div>
-          {/* creactStory */}
-          {(nowcreactStory === 'Base' || nowcreactStory === 'Advanced') && (
-            <CreateNewStory
-              mode={nowcreactStory}
-              setnowcreactStory={setnowcreactStory}
-              atChangeNewStoryInfo={atChangeNewStoryInfo}
-              atCreateNewStory={atCreateNewStory}
-              categories={categories}
-              stories={stories}
-              newStory={newStory}
-              actions={actions}
-              newStoryInfo={newStoryInfo}
-              setNewStoryInfo={setNewStoryInfo}
-              nlu={nlu}
-              onClickSaveBtn={atClickSaveBtn}
-              atSelectStory={atSelectStory}
-              setNowMode={setNowMode}
-            />
-          )}
-        </div>
+        )}
         {create && document.querySelector('body').innerHTML === null && (
           <CreateStory
             isCreate={create}

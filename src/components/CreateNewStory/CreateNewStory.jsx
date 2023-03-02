@@ -1,3 +1,4 @@
+/* eslint-disable prefer-spread */
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable array-callback-return */
 /* eslint-disable no-return-assign */
@@ -6,6 +7,7 @@ import cx from 'classnames';
 import type { State } from 'components/types';
 import uuid from 'react-uuid';
 import shallow from 'zustand/shallow';
+import Select from 'react-select';
 import style from './CreateNewStory.module.scss';
 import type { StoryType, CreateStoryState, NluType } from '../types';
 import { Toast } from '../../utils/swalInput';
@@ -25,15 +27,14 @@ type CreateNewStoryProps = {
   atSelectStory: (storyName: string) => void,
   setNewStoryInfo: (setStory: Object) => void,
   setNowMode: (setStory: string) => void,
-  atChangeNewStoryInfo: (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
-  ) => void,
+  atChangeNewStoryInfo: (value: String, name: String) => void,
   atCreateNewStory: (
     newStoryData: State,
     storiesData: State,
     categoriesData: State,
   ) => void,
 };
+
 const CreateNewStory: React.FC<CreateNewStoryProps> = (props) => {
   const {
     mode,
@@ -85,9 +86,27 @@ const CreateNewStory: React.FC<CreateNewStoryProps> = (props) => {
     name: '',
     error: '',
   });
+
+  const categoriesOption = [].concat.apply(
+    [],
+    categories?.map((category, index) => {
+      if (index === 0) {
+        const a = [
+          { value: 'createNewCategory', label: '建立新類別' },
+          { value: category.name, label: category.name },
+        ];
+        const [b, c] = a;
+        return [b, c];
+      }
+
+      return { value: category.name, label: category.name };
+    }),
+  );
+  console.log(categoriesOption);
   // 劇本名稱更新
   const changeStoreName = React.useCallback(
     (Name: string) => {
+      console.log(Name);
       let error = '';
       if (Name === '' || Name === undefined) {
         error = '所有欄位都是必填的';
@@ -338,10 +357,11 @@ const CreateNewStory: React.FC<CreateNewStoryProps> = (props) => {
   // next step
   const nextStep = React.useCallback(
     (stepName: string, modename: string) => {
-      console.log(modename);
+      console.log(storeName.Name);
       let stepError = '';
       if (modename === 'Base') {
         if (stepName === 'creactName') {
+          // console.log(storeName.Name);
           changeStoreName(storeName.Name);
           if (
             storeName.error.length > 0 ||
@@ -496,6 +516,7 @@ const CreateNewStory: React.FC<CreateNewStoryProps> = (props) => {
       setQuestionValue,
       changeStoreName,
       atCreateNewStory,
+      storeName,
       newStoryInfo,
       newStory,
       stories,
@@ -722,8 +743,9 @@ const CreateNewStory: React.FC<CreateNewStoryProps> = (props) => {
                       placeholder="請輸入劇本名稱"
                       value={storeName.name}
                       onChange={(e) => {
-                        atChangeNewStoryInfo(e);
+                        console.log(e);
                         changeStoreName(e.target.value);
+                        atChangeNewStoryInfo(e.target.value, 'story');
                       }}
                     />
                   </div>
@@ -736,32 +758,19 @@ const CreateNewStory: React.FC<CreateNewStoryProps> = (props) => {
                     <label htmlFor="category">劇本分類</label>
                   </div>
                   <div>
-                    <select
-                      className={cx(style.formStyle)}
+                    <Select
                       id="category"
                       name="category"
-                      value={
-                        newStoryInfo.metadata?.create
-                          ? 'createNewCategory'
-                          : newStoryInfo.metadata?.category
+                      onChange={(e) =>
+                        atChangeNewStoryInfo(e.value, 'category')
                       }
-                      onChange={(e) => atChangeNewStoryInfo(e)}
-                    >
-                      <option value="" hidden>
-                        請選擇故事類別
-                      </option>
-                      <option value="createNewCategory">建立新類別</option>
-                      {categories?.map((category) => {
-                        return (
-                          <option
-                            key={`${category.id}-${category.name}`}
-                            value={category.name}
-                          >
-                            {category.name}
-                          </option>
-                        );
-                      })}
-                    </select>
+                      options={categoriesOption}
+                      menuPlacement="bottom"
+                      styles={{
+                        menuPortal: (base) => ({ ...base, zIndex: 9999 }),
+                      }}
+                      menuPortalTarget={document.querySelector('body')}
+                    />
                   </div>
                 </div>
                 <div
@@ -784,7 +793,7 @@ const CreateNewStory: React.FC<CreateNewStoryProps> = (props) => {
                           placeholder="請輸入類別名稱"
                           value={newStoryInfo.metadata?.category}
                           onChange={(e) => {
-                            atChangeNewStoryInfo(e);
+                            atChangeNewStoryInfo(e.target.value, 'newCategory');
                             changeTypeStoreName(e.target.value);
                           }}
                         />
