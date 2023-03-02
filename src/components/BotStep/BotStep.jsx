@@ -11,7 +11,7 @@ import {
   Toast,
 } from '../../utils/swalInput';
 import ButtonItems from './ButtonItems';
-import useStoryStore from '../../store/useStryStore';
+import useStoryStore from '../../store/useStoryStore';
 
 type BotStepProps = {
   step: StepsType,
