@@ -1169,37 +1169,41 @@ const UserStep: React.FC<UserStepProps> = (props) => {
           </div>
           <div className="d-flex flex-column align-items-center pt-2">
             {/* <div className={style.userTitle}>意圖:</div> */}
-            {step.examples.length > 0 ? (
-              step.examples.map((example) => {
-                const { text, intent, entities } = example;
-                return (
-                  <Examples
-                    key={text + intent}
-                    text={text}
-                    intent={intent}
-                    entities={entities}
-                    onDeleteExample={atDeleteExample}
-                    entitiesData={entitiesData}
-                  />
-                );
-              })
-            ) : (
-              <tr>
-                <td className="alert alert-warning" role="alert">
-                  沒有例句資料，請先添加例句
-                </td>
-              </tr>
-            )}
+            {console.log('storyName ==> ', storyName)}
+            {step.examples.length > 0
+              ? step.examples.map((example) => {
+                  const { text, intent, entities } = example;
+                  return (
+                    <Examples
+                      key={text + intent}
+                      text={text}
+                      intent={intent}
+                      entities={entities}
+                      onDeleteExample={atDeleteExample}
+                      entitiesData={entitiesData}
+                    />
+                  );
+                })
+              : storyName !== '問候語' && (
+                  <tr>
+                    <td className="alert alert-warning" role="alert">
+                      沒有例句資料，請先添加例句
+                    </td>
+                  </tr>
+                )}
           </div>
-          <div>
-            <button
-              className="swal2-cancel swal2-styled"
-              data-bs-target={`#add-${step.intent}-example`}
-              data-bs-toggle="modal"
-            >
-              新增例句
-            </button>
-          </div>
+          {storyName !== '問候語' && (
+            <div>
+              <button
+                className="swal2-cancel swal2-styled"
+                data-bs-target={`#add-${step.intent}-example`}
+                data-bs-toggle="modal"
+              >
+                新增例句
+              </button>
+            </div>
+          )}
+
           {entitiesData.length > 0 && (
             <div className={style.entitiesContainer}>
               <div className={style.userTitle}>關鍵字資訊:</div>
@@ -1276,27 +1280,27 @@ const UserStep: React.FC<UserStepProps> = (props) => {
                       </thead>
                     )}
                     <tbody>
-                      {step.examples.length > 0 ? (
-                        step.examples.map((example) => {
-                          const { text, intent, entities } = example;
-                          return (
-                            <Examples
-                              key={text + intent}
-                              text={text}
-                              intent={intent}
-                              entities={entities}
-                              onDeleteExample={atDeleteExample}
-                              entitiesData={entitiesData}
-                            />
-                          );
-                        })
-                      ) : (
-                        <tr>
-                          <td className="alert alert-warning" role="alert">
-                            沒有例句資料，請先添加例句
-                          </td>
-                        </tr>
-                      )}
+                      {step.examples.length > 0
+                        ? step.examples.map((example) => {
+                            const { text, intent, entities } = example;
+                            return (
+                              <Examples
+                                key={text + intent}
+                                text={text}
+                                intent={intent}
+                                entities={entities}
+                                onDeleteExample={atDeleteExample}
+                                entitiesData={entitiesData}
+                              />
+                            );
+                          })
+                        : storyName !== '問候語' && (
+                            <tr>
+                              <td className="alert alert-warning" role="alert">
+                                沒有例句資料，請先添加例句
+                              </td>
+                            </tr>
+                          )}
                     </tbody>
                   </table>
                 </div>
