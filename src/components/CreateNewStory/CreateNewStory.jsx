@@ -40,7 +40,6 @@ const CreateNewStory: React.FC<CreateNewStoryProps> = (props) => {
     mode,
     setnowcreactStory,
     actions,
-    atSelectStory,
     setNowMode,
     atCreateNewStory,
     categories,
@@ -58,12 +57,10 @@ const CreateNewStory: React.FC<CreateNewStoryProps> = (props) => {
     onCreateUserStep,
     onCreateBotStep,
     onRemoveBotStep,
-    onInitialNewStory,
     onRemoveUserStep,
   } = useCreateStoryStore((state: CreateStoryState) => {
     return {
       onCreateExample: state.onCreateExample,
-      onInitialNewStory: state.onInitialNewStory,
       onDeleteExample: state.onDeleteExample,
       onRemoveUserStep: state.onRemoveUserStep,
       onRemoveBotStep: state.onRemoveBotStep,
@@ -875,13 +872,11 @@ const CreateNewStory: React.FC<CreateNewStoryProps> = (props) => {
                 onClick={() => {
                   onClickSaveBtn(newStory);
                   setNowMode('storeChid');
-                  atSelectStory('storeName');
                   setbotValue([{ id: uuid(), reply: '', error: '' }]);
                   setQuestionValue([
                     { id: uuid(), question: '', error: '' },
                     { id: uuid(), question: '', error: '' },
                   ]);
-                  onInitialNewStory();
                   setNewStoryInfo({
                     story: '',
                     steps: [],
