@@ -214,10 +214,17 @@ const UserStep: React.FC<UserStepProps> = (props) => {
     });
   }, [setIsEntitiesModalVisible, setContentEntity]);
 
-  const showIntent =
-    step.intent === 'get_started' ? '打開聊天室窗' : step.intent;
+  let showIntent = '';
+  if (step.intent === 'get_started') {
+    showIntent = '打開聊天室';
+  } else if (step.intent === 'nlu_fallback') {
+    showIntent = '查無答案時';
+  } else {
+    showIntent = step.intent;
+  }
 
-  const isGetStarted = step.intent === 'get_started';
+  const isGetStarted =
+    step.intent === 'get_started' || step.intent === 'nlu_fallback';
 
   // textarea 自適應高度
   // const textAreaRef = React.useRef();
@@ -1184,7 +1191,8 @@ const UserStep: React.FC<UserStepProps> = (props) => {
                     />
                   );
                 })
-              : storyName !== '問候語' && (
+              : storyName !== '問候語' &&
+                storyName !== '預設回覆' && (
                   <tr>
                     <td className="alert alert-warning" role="alert">
                       沒有例句資料，請先添加例句
@@ -1192,7 +1200,7 @@ const UserStep: React.FC<UserStepProps> = (props) => {
                   </tr>
                 )}
           </div>
-          {storyName !== '問候語' && (
+          {storyName !== '問候語' && storyName !== '預設回覆' && (
             <div>
               <button
                 className="swal2-cancel swal2-styled"
