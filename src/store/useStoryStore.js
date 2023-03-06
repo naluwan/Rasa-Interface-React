@@ -119,7 +119,7 @@ const reducer = (state: State, action: Action): State => {
       const { domain, nlu, stories } = cloneDeep(state.cloneData);
       const story = stories.filter((item) => item.story === storyName)[0];
       story.steps.map((step) => {
-        if (step.action) {
+        if (step.action && domain.responses[step.action]) {
           step.response = JSON.parse(
             JSON.stringify(domain.responses[step.action][0].text).replace(
               / {2}\\n/g,
@@ -192,6 +192,9 @@ const reducer = (state: State, action: Action): State => {
 
             step.buttons = buttons;
           }
+        }
+        if (step.action && !domain.responses[step.action]) {
+          step.response = `${step.action}`;
         }
         if (step.intent) {
           const examples = nlu.rasa_nlu_data.common_examples.filter(
