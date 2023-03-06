@@ -68,7 +68,7 @@
 //addBtn
 .addBtn {
   background-color: #fff !important;
-  color: #54C1FB!important;
+  color: #54C1FB !important;
   border: none;
   display: inline-flex !important;
   text-align: center;
@@ -92,9 +92,11 @@
   svg {
     width: 20px;
     height: 20px;
-      path {
-          fill: #54C1FB;
-        }
+
+    path {
+      fill: #54C1FB;
+    }
+
     display: inherit;
     margin: 0 10px 0 0;
   }
@@ -114,4 +116,8 @@
   padding: 10px;
   font-size: 17px;
   max-width: calc(100% - 129px);
+}
+
+.keepAll {
+  word-break: keep-all;
 }
