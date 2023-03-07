@@ -107,7 +107,6 @@ const Stories = () => {
       trainRasa: state.trainRasa,
     };
   }, shallow);
-
   const {
     newStory,
     onSetSelectedBranchStory,
@@ -1771,6 +1770,7 @@ const Stories = () => {
             {/* creactStory */}
             {(nowcreactStory === 'Base' || nowcreactStory === 'Advanced') && (
               <CreateNewStory
+                slots={slots}
                 mode={nowcreactStory}
                 setnowcreactStory={setnowcreactStory}
                 atChangeNewStoryInfo={atChangeNewStoryInfo}

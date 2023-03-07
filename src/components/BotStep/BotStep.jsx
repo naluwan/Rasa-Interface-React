@@ -319,7 +319,7 @@ const BotStep: React.FC<BotStepProps> = (props) => {
                 />
               );
             })}
-          <button
+          {/* <button
             type="button"
             className={cx('btn mx-2', style.addBtn)}
             onClick={() =>
@@ -344,7 +344,7 @@ const BotStep: React.FC<BotStepProps> = (props) => {
               />
             </svg>
             新增機器人回應
-          </button>
+          </button> */}
         </div>
         <div className={cx('col-sm-1 col-md-1 col-lg-1')}>
           <img
@@ -352,7 +352,7 @@ const BotStep: React.FC<BotStepProps> = (props) => {
             src={require('../../images/navbar/bot.png')}
             alt=""
           />
-          <div className="text-center">機器人回復</div>
+          <div className={cx('text-center', style.keepAll)}>機器人回覆</div>
         </div>
       </div>
       <Modal

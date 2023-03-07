@@ -7,6 +7,7 @@
     height: 100%;
     width: 100%;
     transition: all .3s;
+
     &::before {
         content: "";
         position: absolute;
@@ -17,7 +18,8 @@
         width: 100%;
         background: #00000029;
     }
-    .creactStoryBlock{
+
+    .creactStoryBlock {
         display: flex;
         align-items: center;
         height: 100%;
@@ -287,4 +289,90 @@
         border: 1px solid #d1d1d1;
         outline: none;
     }
+}
+
+.customCheckbox {
+    position: relative;
+    cursor: pointer;
+    display: block;
+
+    &:hover {
+        background: #F4F4F6;
+    }
+
+    span[name='checkIcon'] {
+        position: relative;
+        display: inline-block;
+        border: 1px solid #9393A3;
+        width: 16px;
+        height: 16px;
+        margin: 10px;
+        border-radius: 15px;
+
+        &::before {
+            content: attr(data-foo) " ";
+            margin-left: 2rem;
+            top: 45%;
+            word-break: keep-all;
+            position: absolute;
+            width: 100%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+    }
+
+    span[name='checkItem'] {
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        right: 1rem;
+
+        img {
+            height: 1rem;
+            width: 1rem;
+        }
+    }
+
+    input[type="radio"] {
+        position: absolute;
+        opacity: 0;
+        cursor: pointer;
+        height: 0;
+        width: 0;
+
+        &:checked+span[name='checkIcon'] {
+            border: 1px solid #7377FA;
+
+            &:after {
+                content: "";
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                width: 10px;
+                height: 10px;
+                border-radius: 15px;
+                background-color: #7377FA;
+            }
+        }
+
+        &:checked+span[name='checkItem'] {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            right: 0;
+        }
+    }
+
+
+}
+
+
+.keywordBtn {
+    background: #52536D;
+    border: 1px solid #52536D;
+    border-radius: 25px;
+    color: #fff;
+    padding: 5px 20px;
+    display: inline-block;
 }

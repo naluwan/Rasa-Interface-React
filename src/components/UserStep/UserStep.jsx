@@ -1028,7 +1028,7 @@ const UserStep: React.FC<UserStepProps> = (props) => {
           src={require('../../images/navbar/people.png')}
           alt=""
         />
-        <div className="text-center">用戶問句</div>
+        <div className={cx('text-center', style.keepAll)}>用戶問句</div>
       </div>
       <div
         className={cx('col-sm-10 col-md-10 col-lg-10', style.userStepContainer)}
