@@ -6,12 +6,25 @@ import Register from 'components/Register';
 import Authenticate from 'containers/Authenticate';
 import Stories from 'components/Stories';
 import WebChatWidget from 'components/WebChatWidget';
+import shallow from 'zustand/shallow';
+import type { State } from 'components/types';
 import style from './Layout.module.scss';
 import Login from '../Login';
+import useStoryStore from '../../store/useStoryStore';
 // import NavBar from '../NavBar';
 // import { NAVITEMS } from '../config';
 
 const Layout = () => {
+  const { init } = useStoryStore((state: State) => {
+    return {
+      init: state.init,
+    };
+  }, shallow);
+
+  React.useEffect(() => {
+    init();
+  });
+
   return (
     <div className={style.layout}>
       {/* <Authenticate>
