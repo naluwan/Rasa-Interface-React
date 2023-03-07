@@ -103,7 +103,7 @@ const Conversation: React.FC<ConversationProps> = () => {
                       className={cx('col-6', style.botLog)}
                       key={item.timestamp}
                     >
-                      機器人回覆：{item.text}
+                      機器人回覆：{`\n${item.text}`}
                     </div>
                   );
                 }
