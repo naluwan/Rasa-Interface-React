@@ -9,7 +9,6 @@ import uuid from 'react-uuid';
 import shallow from 'zustand/shallow';
 import Select from 'react-select';
 import CreatableSelect from 'react-select/creatable';
-// import Slots from 'components/Stories/Slots';
 import style from './CreateNewStory.module.scss';
 import type { StoryType, CreateStoryState, NluType } from '../types';
 import { Toast } from '../../utils/swalInput';
@@ -149,18 +148,37 @@ const CreateNewStory: React.FC<CreateNewStoryProps> = (props) => {
   ]);
   // 關鍵字資料(用戶問句)
   const [keywordOption, setkeywordOption] = React.useState([]);
+
   // 關鍵字類別
   const [keywordType] = React.useState([{ value: '123' }, { value: '456' }]);
 
   // 當前關鍵字
   const [nowkeyword, setnowkeyword] = React.useState([]);
-  // 新增關鍵字類別
-  const addkeyWord = React.useCallback(
+  // 檢查關鍵字是否包含當前問句
+  const checkKeyword = React.useCallback(
     (e) => {
-      setnowkeyword(e);
-      // setkeywordType([...keywordType, { value: e }]);
+      // 取得當前問句
+      const nowquestion = keywordOption.map((item) => {
+        return item.check === 'true' && item.name;
+      });
+      console.log(nowquestion);
+
+      const matched = nowquestion.some((word) => {
+        if (typeof word !== 'string') {
+          return false;
+        }
+        return word.includes(e);
+      });
+      if (matched) {
+        // console.log(`"${e}" 符合`);
+        setnowkeyword(e);
+      } else {
+        setnowkeyword('');
+        // console.log(`"${e}" 不符合`);
+      }
+      return matched;
     },
-    [setnowkeyword, keywordType],
+    [keywordOption],
   );
 
   // 載入關鍵字資料
@@ -310,6 +328,11 @@ const CreateNewStory: React.FC<CreateNewStoryProps> = (props) => {
   // 語句庫子選項
   const [slotChild, setslotChild] = React.useState();
 
+  // 語句庫子選項已選項目
+  const [nowSlotChild, setnowSlotChild] = React.useState([]);
+  // 語句庫父選項已選項目
+  const [nowSentenceTypeOption, setSentenceTypeOption] = React.useState([]);
+  console.log(nowSentenceTypeOption);
   // 語句庫父選項
   const SentenceTypeOption = slots
     .map((item) => {
@@ -319,15 +342,16 @@ const CreateNewStory: React.FC<CreateNewStoryProps> = (props) => {
       return null;
     })
     .filter((item) => item !== null);
+
   // 語句庫父選項選擇
   console.log(slots);
   const changeSentenceTypeOption = React.useCallback(
     (obj: string) => {
+      setSentenceTypeOption([obj]);
       const slotsChild = slots
         .map(({ key, slotInfo }) =>
           key === obj
             ? slotInfo.values?.map((values) => ({
-                id: uuid(),
                 value: values,
                 label: values,
               }))
@@ -338,7 +362,7 @@ const CreateNewStory: React.FC<CreateNewStoryProps> = (props) => {
     },
     [slotChild, setslotChild, slots],
   );
-  console.log(SentenceTypeOption);
+  console.log(slotChild);
   // 刪除機器人回應
   const deleteBotReply = React.useCallback(
     (id: string) => {
@@ -511,7 +535,7 @@ const CreateNewStory: React.FC<CreateNewStoryProps> = (props) => {
           }
         }
         if (stepName === 'creactQuestion') {
-          CreactNewQuestion();
+          // CreactNewQuestion();
           questionValue.map((item, idx) => {
             if (
               item.error.length > 0 ||
@@ -893,108 +917,113 @@ const CreateNewStory: React.FC<CreateNewStoryProps> = (props) => {
               </>
             )}
             {creactStoryStep === 'creactkeywords' && (
-              <>
-                <div className="container">
-                  <div className="row">
-                    <div className="col-6">
-                      <div>選擇問句</div>
-                      {questionValue.map((item) => {
-                        return (
-                          <div key={`${item.id}`}>
-                            <label
-                              data-check=""
-                              onClick={() => loadkeywordOption(item.question)}
-                              className={cx(style.customCheckbox)}
-                              htmlFor={item.id}
-                            >
-                              <input
-                                id={item.id}
-                                name="creactkeywords"
-                                type="radio"
+              <div className="container">
+                <div className="row">
+                  <div className="col-6">
+                    <div>選擇問句</div>
+                    {questionValue.map((item) => {
+                      return (
+                        <div key={`${item.id}`}>
+                          <label
+                            data-check=""
+                            onClick={() => loadkeywordOption(item.question)}
+                            className={cx(style.customCheckbox)}
+                            htmlFor={item.id}
+                          >
+                            <input
+                              id={item.id}
+                              name="creactkeywords"
+                              type="radio"
+                            />
+                            <span name="checkIcon" data-foo={item.question} />
+                            <span name="checkItem">
+                              <img
+                                src={require('../../images/creactStory/avatar.png')}
+                                alt=""
                               />
-                              <span name="checkIcon" data-foo={item.question} />
-                              <span name="checkItem">
-                                <img
-                                  src={require('../../images/creactStory/avatar.png')}
-                                  alt=""
-                                />
-                              </span>
-                            </label>
-                          </div>
-                        );
-                      })}
-                    </div>
-                    <div className="col-6">
-                      {keywordOption && (
+                            </span>
+                          </label>
+                        </div>
+                      );
+                    })}
+                  </div>
+                  <div className="col-6">
+                    {keywordOption && (
+                      <div>
+                        <div>關鍵字設定</div>
                         <div>
-                          <div>關鍵字設定</div>
-                          <div>
-                            {keywordOption.map((item) => {
-                              return (
-                                item.check === 'true' && (
-                                  <>
-                                    <div key={`${item.id}`}>
-                                      『{item.name}』
+                          {keywordOption.map((item) => {
+                            return (
+                              item.check === 'true' && (
+                                <>
+                                  <div key={`${item.id}`}>『{item.name}』</div>
+                                  <div>
+                                    <div className={style.keywordBtn}>
+                                      {nowkeyword}
                                     </div>
-                                    <div>
-                                      <div className={style.keywordBtn}>
-                                        {nowkeyword}
-                                      </div>
-                                      {keywordType.map((itm) => {
-                                        return (
-                                          <div className={style.keywordBtn}>
-                                            {itm.value}
-                                          </div>
-                                        );
-                                      })}
-                                    </div>
-                                    <div>
-                                      <label htmlFor={`keyword${item.id}`}>
-                                        關鍵字{item.slotType}
-                                      </label>
-                                      <input
-                                        className={cx(style.formStyle)}
-                                        id={`keyword${item.id}`}
-                                        placeholder={`請輸入『${item.name}』關鍵字`}
-                                        onChange={(e) => {
-                                          addkeyWord(e.target.value);
-                                        }}
-                                        type="text"
-                                      />
-                                    </div>
-                                    <div>
-                                      <label htmlFor="SentenceType">
-                                        語句庫分類
-                                      </label>
+                                    {keywordType.map((itm) => {
+                                      return (
+                                        <div className={style.keywordBtn}>
+                                          {itm.value}
+                                        </div>
+                                      );
+                                    })}
+                                  </div>
+                                  <div>
+                                    <label htmlFor={`keyword${item.id}`}>
+                                      關鍵字{item.slotType}
+                                    </label>
+                                    <input
+                                      className={cx(style.formStyle)}
+                                      id={`keyword${item.id}`}
+                                      placeholder={`請輸入『${item.name}』關鍵字`}
+                                      onChange={(e) => {
+                                        checkKeyword(e.target.value);
+                                      }}
+                                      type="text"
+                                    />
+                                  </div>
+                                  <div>
+                                    <label htmlFor="SentenceType">
+                                      語句庫分類
+                                    </label>
+                                    <CreatableSelect
+                                      isClearable
+                                      id="SentenceType"
+                                      name="SentenceType"
+                                      onChange={(e) =>
+                                        changeSentenceTypeOption(e.value)
+                                      }
+                                      options={SentenceTypeOption}
+                                      menuPlacement="bottom"
+                                      styles={{
+                                        menuPortal: (base) => ({
+                                          ...base,
+                                          zIndex: 9999,
+                                        }),
+                                      }}
+                                      menuPortalTarget={document.querySelector(
+                                        'body',
+                                      )}
+                                    />
+                                  </div>
+                                  <div>
+                                    <label htmlFor="Selectlabel">
+                                      標籤（輸入即可新增）
+                                    </label>
+                                    {slotChild && slotChild[0] && (
                                       <CreatableSelect
-                                        isClearable
-                                        id="SentenceType"
-                                        name="SentenceType"
-                                        onChange={(e) =>
-                                          changeSentenceTypeOption(e.value)
-                                        }
-                                        options={SentenceTypeOption}
-                                        menuPlacement="bottom"
-                                        styles={{
-                                          menuPortal: (base) => ({
-                                            ...base,
-                                            zIndex: 9999,
-                                          }),
-                                        }}
-                                        menuPortalTarget={document.querySelector(
-                                          'body',
-                                        )}
-                                      />
-                                    </div>
-                                    <div>
-                                      <label htmlFor="Selectlabel">
-                                        標籤（輸入即可新增）
-                                      </label>
-                                      <CreatableSelect
+                                        key={`select${nowSentenceTypeOption}`}
                                         isMulti
                                         id="Selectlabel"
                                         name="Selectlabel"
-                                        options={slotChild}
+                                        options={slotChild[0]}
+                                        onChange={(e) => {
+                                          setnowSlotChild({
+                                            ...nowSlotChild,
+                                            e,
+                                          });
+                                        }}
                                         menuPlacement="bottom"
                                         styles={{
                                           menuPortal: (base) => ({
@@ -1006,27 +1035,49 @@ const CreateNewStory: React.FC<CreateNewStoryProps> = (props) => {
                                           'body',
                                         )}
                                       />
-                                    </div>
-                                  </>
-                                )
-                              );
-                            })}
-                          </div>
+                                    )}
+                                  </div>
+                                  <div>同義詞設定</div>
+
+                                  {nowSlotChild?.e?.map((resemblance) => {
+                                    console.log(resemblance);
+
+                                    return (
+                                      <div className="row">
+                                        <div className="col-5">
+                                          <div>
+                                            <label htmlFor="">標籤</label>
+                                          </div>
+                                          <div className={cx(style.formStyle)}>
+                                            {resemblance.value}
+                                          </div>
+                                        </div>
+                                        <div className="col-7">
+                                          <div>
+                                            <label htmlFor="">
+                                              同義詞 (可用逗點隔開)
+                                            </label>
+                                          </div>
+                                          <div>
+                                            <input
+                                              type="text"
+                                              className={cx(style.formStyle)}
+                                            />
+                                          </div>
+                                        </div>
+                                      </div>
+                                    );
+                                  })}
+                                </>
+                              )
+                            );
+                          })}
                         </div>
-                      )}
-                    </div>
+                      </div>
+                    )}
                   </div>
                 </div>
-                {QuestionItems}
-                <div>
-                  <button
-                    className={cx(style.moreBtn)}
-                    onClick={() => CreactNewQuestion()}
-                  >
-                    +新增更多問句
-                  </button>
-                </div>
-              </>
+              </div>
             )}
             {creactStoryStep === 'creactBot' && (
               <>
