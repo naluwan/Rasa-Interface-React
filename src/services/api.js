@@ -273,6 +273,7 @@ export const deleteCategory = (category: string): Promise<Categories[]> => {
     .catch((err) => console.log(err));
 };
 
+// 文字轉語音
 export const fetchTextToVoice = (text: string) => {
   console.log('fetch text ===> ', text);
   axios
@@ -281,12 +282,32 @@ export const fetchTextToVoice = (text: string) => {
     .catch((err) => console.log(err));
 };
 
+// 文字轉語音
 export const paddleSpeech = (text: string) => {
   axios
     .post(`http://192.168.10.105:8010/tts/offline`, { text })
     .then((res) => {
       console.log('get text2voice base64 ==> ', res.data.result);
       return res.data.result;
+    })
+    .catch((err) => console.log(err));
+};
+
+// 獲取對話紀錄ID
+export const fetchAllSenderIds = () => {
+  return axiosInstance
+    .get(`${API_URL}/train/senderIds`)
+    .then((res) => res.data.data)
+    .catch((err) => console.log(err));
+};
+
+// 獲取對話紀錄
+export const fetchConversationLog = (id: string) => {
+  return axios
+    .get(`http://192.168.10.105:5005/conversations/${id}/tracker`)
+    .then((res) => {
+      console.log('res data ==> ', res.data);
+      return res.data;
     })
     .catch((err) => console.log(err));
 };

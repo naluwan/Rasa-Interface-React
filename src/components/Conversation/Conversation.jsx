@@ -5,10 +5,7 @@ import Select from 'react-select';
 import { useQuery } from 'react-query';
 import cx from 'classnames';
 import style from './Conversation.module.scss';
-import {
-  fetchGetAllSenderIds,
-  fetchGetConversationLog,
-} from '../../services/api';
+import { fetchAllSenderIds, fetchConversationLog } from '../../services/api';
 
 type ConversationProps = {};
 
@@ -18,9 +15,9 @@ const Conversation: React.FC<ConversationProps> = () => {
   // eslint-disable-next-line no-unused-vars
   const [conversation, setConversation] = React.useState({});
 
-  const senderIds = useQuery('fetchGetAllSenderIds', fetchGetAllSenderIds);
+  const senderIds = useQuery('fetchGetAllSenderIds', fetchAllSenderIds);
   const conversationLog = useQuery(['conversationLog', selectedId], () =>
-    fetchGetConversationLog(selectedId),
+    fetchConversationLog(selectedId),
   );
 
   // 獲取全部senderId後，將senderId全部資料重組成options
