@@ -25,6 +25,7 @@ import { cloneDeep } from 'lodash-es';
 import { randomBotResAction } from 'utils/randomBotResAction';
 import { useQuery } from 'react-query';
 import yaml from 'js-yaml';
+import Conversation from 'components/Conversation';
 import style from './Stories.module.scss';
 import useStoryStore from '../../store/useStoryStore';
 import useCreateStoryStore from '../../store/useCreateStoryStore';
@@ -1710,6 +1711,17 @@ const Stories = () => {
             )}
           >
             <Forms domain={domain} />
+          </div>
+        )}
+        {nowMode === 'conversation' && (
+          <div
+            className={cx(
+              nowMode !== 'conversation' ? style.hidden : style.storoesBlock,
+              style.searchBar,
+              style.storeChid,
+            )}
+          >
+            <Conversation />
           </div>
         )}
         {nowMode === 'createStories' && (
