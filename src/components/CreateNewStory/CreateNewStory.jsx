@@ -87,21 +87,35 @@ const CreateNewStory: React.FC<CreateNewStoryProps> = (props) => {
     name: '',
     error: '',
   });
-  const categoriesOption = [].concat.apply(
-    [],
-    categories?.map((category, index) => {
-      if (index === 0) {
-        const a = [
-          { value: 'createNewCategory', label: '建立新類別' },
-          { value: category.name, label: category.name },
-        ];
-        const [b, c] = a;
-        return [b, c];
-      }
 
-      return { value: category.name, label: category.name };
-    }),
-  );
+  const [options, setOptions] = React.useState([
+    { value: 'createNewCategory', label: '建立新類別' },
+  ]);
+  // const categoriesOption = [].concat.apply(
+  //   [],
+  //   categories?.map((category, index) => {
+  //     if (index === 0) {
+  //       const a = [
+  //         { value: 'createNewCategory', label: '建立新類別' },
+  //         { value: category.name, label: category.name },
+  //       ];
+  //       const [b, c] = a;
+  //       return [b, c];
+  //     }
+
+  //     return { value: category.name, label: category.name };
+  //   }),
+  // );
+  React.useEffect(() => {
+    categories?.map((category) => {
+      setOptions((prev) => {
+        const newOptions = prev.concat([
+          { value: category.name, label: category.name },
+        ]);
+        return newOptions;
+      });
+    });
+  }, [categories]);
 
   // 劇本名稱更新
   const changeStoreName = React.useCallback(
@@ -950,7 +964,7 @@ const CreateNewStory: React.FC<CreateNewStoryProps> = (props) => {
                       onChange={(e) =>
                         atChangeNewStoryInfo(e.value, 'category')
                       }
-                      options={categoriesOption}
+                      options={options}
                       menuPlacement="bottom"
                       styles={{
                         menuPortal: (base) => ({ ...base, zIndex: 9999 }),
