@@ -293,21 +293,18 @@ export const paddleSpeech = (text: string) => {
     .catch((err) => console.log(err));
 };
 
-// 獲取對話紀錄ID
-export const fetchAllSenderIds = () => {
-  return axiosInstance
-    .get(`${API_URL}/train/senderIds`)
-    .then((res) => res.data.data)
-    .catch((err) => console.log(err));
-};
-
 // 獲取對話紀錄
-export const fetchConversationLog = (id: string) => {
-  return axios
-    .get(`http://192.168.10.105:5005/conversations/${id}/tracker`)
-    .then((res) => {
-      console.log('res data ==> ', res.data);
-      return res.data;
-    })
-    .catch((err) => console.log(err));
+export const fetchConversationLogs = () => {
+  return axiosInstance
+    .get(`${API_URL}/train/conversations`)
+    .then((res) => res.data.data)
+    .catch(({ response: { data } }) => {
+      Toast.fire({
+        icon: 'error',
+        title: data.message,
+      }).then(() => {
+        cleanToken();
+        window.location.reload();
+      });
+    });
 };
