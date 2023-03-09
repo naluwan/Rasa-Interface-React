@@ -3,6 +3,7 @@
 /* eslint-disable array-callback-return */
 /* eslint-disable no-return-assign */
 import * as React from 'react';
+import { KeyboardEventHandler } from 'react';
 import cx from 'classnames';
 import type { State } from 'components/types';
 import uuid from 'react-uuid';
@@ -105,7 +106,7 @@ const CreateNewStory: React.FC<CreateNewStoryProps> = (props) => {
   // 劇本名稱更新
   const changeStoreName = React.useCallback(
     (Name: string) => {
-      console.log(Name);
+      // console.log(Name);
       let error = '';
       if (Name === '' || Name === undefined) {
         error = '所有欄位都是必填的';
@@ -234,8 +235,8 @@ const CreateNewStory: React.FC<CreateNewStoryProps> = (props) => {
   const changeQuestion = React.useCallback(
     (id: string, question: string) => {
       let error = '';
-      console.log(id);
-      console.log(question);
+      // console.log(id);
+      // console.log(question);
       if (question === '') {
         error = '所有欄位都是必填的';
       } else {
@@ -250,7 +251,7 @@ const CreateNewStory: React.FC<CreateNewStoryProps> = (props) => {
             : '';
         });
       }
-      console.log(questionValue);
+      // console.log(questionValue);
       const updatedQuestionValue = questionValue.map((item) => {
         if (item.id === id) {
           return { ...item, question, error };
@@ -258,7 +259,7 @@ const CreateNewStory: React.FC<CreateNewStoryProps> = (props) => {
         return item;
       });
 
-      console.log(updatedQuestionValue);
+      // console.log(updatedQuestionValue);
       setQuestionValue(updatedQuestionValue);
     },
     [setQuestionValue, questionValue, nlu],
@@ -272,7 +273,7 @@ const CreateNewStory: React.FC<CreateNewStoryProps> = (props) => {
         errorName = `欄位有誤檢查完再新增`;
         error = true;
       }
-      console.log(item.question.length);
+      // console.log(item.question.length);
       if (item.question.length === 0) {
         errorName = `所有欄位都是必填的`;
         error = true;
@@ -327,12 +328,23 @@ const CreateNewStory: React.FC<CreateNewStoryProps> = (props) => {
   ));
   // 語句庫子選項
   const [slotChild, setslotChild] = React.useState();
-
+  // 同義詞分類
+  const [Identifier, setIdentifier] = React.useState([]);
   // 語句庫子選項已選項目
   const [nowSlotChild, setnowSlotChild] = React.useState([]);
+  React.useEffect(() => {
+    const a = nowSlotChild.e;
+    const b = a?.map((item) => {
+      const updatedA = { ...item, data: [] };
+      return updatedA;
+    });
+    setIdentifier(b);
+  }, [nowSlotChild]);
+
   // 語句庫父選項已選項目
   const [nowSentenceTypeOption, setSentenceTypeOption] = React.useState([]);
-  console.log(nowSentenceTypeOption);
+  // console.log(nowSentenceTypeOption);
+
   // 語句庫父選項
   const SentenceTypeOption = slots
     .map((item) => {
@@ -344,7 +356,7 @@ const CreateNewStory: React.FC<CreateNewStoryProps> = (props) => {
     .filter((item) => item !== null);
 
   // 語句庫父選項選擇
-  console.log(slots);
+  // console.log(slots);
   const changeSentenceTypeOption = React.useCallback(
     (obj: string) => {
       setSentenceTypeOption([obj]);
@@ -362,7 +374,86 @@ const CreateNewStory: React.FC<CreateNewStoryProps> = (props) => {
     },
     [slotChild, setslotChild, slots],
   );
-  console.log(slotChild);
+  const [value, setValue] = React.useState([]);
+  // 同義詞處理
+  const changeIdentifier = React.useCallback(
+    (e: any, Identifiers: string) => {
+      console.log(e);
+      console.dir(e);
+      console.log(`Identifiers=${Identifiers}`);
+      // let evalue = e;
+      // if (e === []) {
+      //   evalue = null;
+      // }
+      const newIdentifier = Identifier.map((item) => {
+        if (item.label === Identifiers) {
+          return { ...item, data: e };
+        }
+        return item;
+      });
+      console.log(newIdentifier);
+      setIdentifier(newIdentifier);
+      console.log(value);
+      const a = Identifier?.filter((obj) => obj.label === Identifiers).map(
+        (obj) => obj.data,
+      )[0];
+      console.log(a);
+    },
+    [setIdentifier, Identifier],
+  );
+  // Multi-select text input
+  const components = {
+    DropdownIndicator: null,
+  };
+
+  const createOption = (label: string) => ({
+    label,
+    value: label,
+  });
+
+  const [inputValue, setInputValue] = React.useState('');
+
+  const handleKeyDown: KeyboardEventHandler = React.useCallback(
+    (event, Identifiers) => {
+      const newIdentifier = Identifier.map((item) => {
+        if (item.label === Identifiers) {
+          console.log(createOption(inputValue));
+          return { ...item, data: [...item.data, createOption(inputValue)] };
+        }
+        return item;
+      });
+      if (!inputValue) return;
+      switch (event.key) {
+        case 'Enter':
+        case 'Tab':
+          setIdentifier(newIdentifier);
+          setValue((prev) => [...prev, createOption(inputValue)]);
+          setInputValue('');
+          event.preventDefault();
+          break;
+        default:
+          break;
+      }
+    },
+    [setIdentifier, setValue, inputValue],
+  );
+
+  // 確認多選同義字按鈕
+  // const checkIdentifier = React.useCallback(
+  //   (resemblance) => {
+  //     const visIdentifier = Identifier?.map((obj) => {
+  //       if (obj.label === resemblance) {
+  //         return obj.data;
+  //       }
+  //       return null;
+  //     });
+  //     console.log(visIdentifier);
+  //     return visIdentifier;
+  //   },
+  //   [Identifier],
+  // );
+
+  // console.log(slotChild);
   // 刪除機器人回應
   const deleteBotReply = React.useCallback(
     (id: string) => {
@@ -1040,7 +1131,7 @@ const CreateNewStory: React.FC<CreateNewStoryProps> = (props) => {
                                   <div>同義詞設定</div>
 
                                   {nowSlotChild?.e?.map((resemblance) => {
-                                    console.log(resemblance);
+                                    // console.log(resemblance);
 
                                     return (
                                       <div className="row">
@@ -1059,9 +1150,58 @@ const CreateNewStory: React.FC<CreateNewStoryProps> = (props) => {
                                             </label>
                                           </div>
                                           <div>
-                                            <input
-                                              type="text"
-                                              className={cx(style.formStyle)}
+                                            <CreatableSelect
+                                              components={components}
+                                              inputValue={inputValue}
+                                              isClearable
+                                              isMulti
+                                              menuIsOpen={false}
+                                              onChange={(newValue) => {
+                                                console.log(newValue);
+                                                let a = '';
+                                                a = newValue.filter(
+                                                  (nv) => nv.length !== 0,
+                                                );
+                                                console.log(a);
+                                                changeIdentifier(
+                                                  a,
+                                                  resemblance.value,
+                                                );
+                                                setValue(newValue);
+                                              }}
+                                              onInputChange={(newValue) =>
+                                                setInputValue(newValue)
+                                              }
+                                              onKeyDown={(e) => {
+                                                handleKeyDown(
+                                                  e,
+                                                  resemblance.value,
+                                                );
+                                              }}
+                                              value={
+                                                Identifier?.find(
+                                                  (obj) =>
+                                                    obj.label ===
+                                                    resemblance.value,
+                                                )?.data ?? ''
+                                              }
+                                              // value={Identifier?.map((obj) => {
+                                              //   console.log(value);
+                                              //   if (
+                                              //     obj.label ===
+                                              //     resemblance.value
+                                              //   ) {
+                                              //     return obj.data;
+                                              //   }
+                                              //   return null;
+                                              // })}
+                                              // onChange={(newValue) => {
+                                              //   changeIdentifier(
+                                              //     newValue.value,
+                                              //     resemblance.value,
+                                              //   );
+                                              // }}
+                                              placeholder="請輸入同義詞"
                                             />
                                           </div>
                                         </div>
