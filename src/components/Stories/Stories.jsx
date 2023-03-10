@@ -1292,7 +1292,7 @@ const Stories = () => {
             style.searchBar,
           )}
         >
-          <div className="container">
+          <div name="scenarioBlock" className="container">
             <div className={cx('row')}>
               <div className={style.searchBarTitle}>
                 <h5>情境劇本</h5>

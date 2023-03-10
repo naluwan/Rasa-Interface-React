@@ -37,6 +37,7 @@
     color: #fff;
     text-align: left;
     cursor: pointer;
+
     .loadingIcon {
       font-size: 1rem;
       animation: animate 1s linear infinite;
@@ -58,10 +59,23 @@
     position: relative;
     display: flex;
     align-items: center;
+    height: 63px;
 
     .ctrolBar {
       cursor: pointer;
       margin: 0 2rem;
+    }
+  }
+
+  &[name='stories'] {
+    height: calc(100% - 116px);
+  }
+
+  [name='scenarioBlock'] {
+    height: 100%;
+
+    >div {
+      height: 100%;
     }
   }
 
@@ -113,10 +127,29 @@
   }
 
   .list {
-    display: flex;
-    flex-direction: row;
+    display: block;
     text-align: left;
     width: 100%;
+    overflow-y: auto;
+    overflow-x: hidden;
+    height: calc(100% - 66px);
+
+    &::-webkit-scrollbar-track {
+      // -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
+      background-color: #dfdfdf;
+      border-radius: 10px;
+    }
+
+    &::-webkit-scrollbar {
+      width: 10px;
+      background-color: #F5F5F5;
+    }
+
+    &::-webkit-scrollbar-thumb {
+      background-color: #acacac;
+      border-radius: 10px;
+
+    }
 
     .listmenu {
       padding-bottom: 0;
@@ -214,6 +247,7 @@
   .searchBarTitle {
     padding-top: 4rem;
     margin: 10px;
+    height: 116px;
 
     h5 {
       font-style: normal;
