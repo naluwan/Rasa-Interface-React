@@ -61,6 +61,9 @@ const Conversation: React.FC<ConversationProps> = () => {
           new Date(log.timestamp * 1000).toLocaleDateString() === filtered,
       ),
     );
+    if (currentLogs.every((item) => item.length === 0)) {
+      return [];
+    }
     return currentLogs;
   }, [conversations, filtered]);
 
@@ -94,7 +97,7 @@ const Conversation: React.FC<ConversationProps> = () => {
               />
             </div>
           </div>
-          {filteredLog.length > 0 && (
+          {filteredLog.length > 0 ? (
             <div className={cx('table-responsive', style.logContainer)}>
               <table className={cx('table table-bordered border-dark')}>
                 <thead className={cx(style.tableHeader)}>
@@ -141,6 +144,11 @@ const Conversation: React.FC<ConversationProps> = () => {
                   })}
                 </tbody>
               </table>
+            </div>
+          ) : (
+            <div className="alert alert-warning" role="alert">
+              <h4 className="alert-heading">查無資料</h4>
+              <p>{showDate}此日期無資料，請選擇其他日期</p>
             </div>
           )}
         </div>
