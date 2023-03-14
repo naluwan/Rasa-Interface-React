@@ -1,0 +1,23 @@
+.root {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 999;
+  position: absolute;
+  background-color: #fff;
+  left: 0.8rem;
+  box-shadow: 0px 2px 4px #d4d4da;
+  border-radius: 8px;
+  button {
+    border: none;
+    background-color: #fff;
+  }
+  .editIcon {
+    border-bottom-left-radius: 10px;
+    border-top-left-radius: 10px;
+  }
+  .deleteIcon {
+    border-bottom-right-radius: 10px;
+    border-top-right-radius: 10px;
+  }
+}

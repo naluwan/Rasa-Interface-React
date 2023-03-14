@@ -1031,11 +1031,58 @@ const UserStep: React.FC<UserStepProps> = (props) => {
         />
         <div className={cx('text-center', style.keepAll)}>用戶問句</div>
       </div> */}
+      <div className="d-flex justify-content-center">
+        <div className="col-10">
+          <div className={cx(style.stepContainer)}>
+            <div className={cx('d-flex align-items-center py-2')}>
+              <div
+                className={cx(
+                  'col-sm-1 col-md-1 col-lg-1 d-flex justify-content-center',
+                )}
+              >
+                <img
+                  className="w-50"
+                  src={require('../../images/navbar/people.png')}
+                  alt=""
+                />
+              </div>
+
+              <div>{step.user ? step.user : showIntent}</div>
+            </div>
+            {step.examples.length > 0 &&
+              step.examples.map((example, idx) => {
+                const { text, intent, entities } = example;
+                return (
+                  <div
+                    className={cx(
+                      `d-flex align-items-center py-2`,
+                      (idx + 1) % 2 === 0
+                        ? style.exampleEven
+                        : style.exampleOdd,
+                      idx + 1 === step.examples.length && style.lastExample,
+                    )}
+                    key={`${intent}-${text}`}
+                  >
+                    <div
+                      className={cx(
+                        'col-sm-1 col-md-1 col-lg-1 d-flex justify-content-center',
+                      )}
+                    >
+                      <img
+                        className="w-50"
+                        src={require('../../images/navbar/people.png')}
+                        alt=""
+                      />
+                    </div>
+                    <div>{text}</div>
+                  </div>
+                );
+              })}
+          </div>
+        </div>
+      </div>
       <div
-        className={cx(
-          'col-sm-10 col-md-10 col-lg-10 row',
-          style.userStepContainer,
-        )}
+        className={cx('col-sm-10 col-md-10 col-lg-10', style.userStepContainer)}
       >
         {/* {!isGetStarted && (
           <div className={cx('py-2')}>
@@ -1151,7 +1198,6 @@ const UserStep: React.FC<UserStepProps> = (props) => {
         )} */}
         <div className="d-flex flex-column">
           <div className="d-flex align-items-center py-2">
-            {/* <div className={style.userTitle}>使用者:</div> */}
             <div
               className={cx(
                 'col-sm-1 col-md-1 col-lg-1 d-flex justify-content-center',
@@ -1169,8 +1215,6 @@ const UserStep: React.FC<UserStepProps> = (props) => {
             </div>
           </div>
           <div className="d-flex flex-column align-items-center">
-            {/* <div className={style.userTitle}>意圖:</div> */}
-            {console.log('storyName ==> ', storyName)}
             {step.examples.length > 0
               ? step.examples.map((example) => {
                   const { text, intent, entities } = example;

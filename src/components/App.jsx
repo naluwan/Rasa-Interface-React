@@ -4,6 +4,7 @@ import { Toast } from 'utils/swalInput';
 import useStoryStore from '../store/useStoryStore';
 import Layout from './Layout';
 import type { State } from './types';
+import './App.scss';
 
 const App = () => {
   // eslint-disable-next-line no-unused-vars
