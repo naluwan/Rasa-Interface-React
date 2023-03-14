@@ -173,6 +173,7 @@
         display: flex;
         flex-direction: column;
         overflow-y: auto;
+        position: relative;
 
         &::-webkit-scrollbar-track {
             // -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
@@ -299,6 +300,10 @@
     cursor: pointer;
     display: block;
 
+    &[data-check="true"] {
+        background: #F4F4F6;
+    }
+
     &:hover {
         background: #F4F4F6;
     }
@@ -370,12 +375,49 @@
 
 }
 
+.choiceQuestionSentence {
+    position: relative;
+}
 
 .keywordBtn {
+    margin-right: 0.5rem;
     background: #52536D;
     border: 1px solid #52536D;
     border-radius: 25px;
     color: #fff;
     padding: 5px 20px;
     display: inline-block;
+}
+
+.setKeyWordBlock {
+    height: 23rem;
+
+    >div {
+        padding: 0 1rem;
+        height: 100%;
+        overflow-Y: auto;
+        overflow-x: hidden;
+
+        &::-webkit-scrollbar-track {
+            background-color: #dfdfdf;
+            border-radius: 10px;
+        }
+
+        &::-webkit-scrollbar {
+            width: 10px;
+            background-color: #F5F5F5;
+        }
+
+        &::-webkit-scrollbar-thumb {
+            background-color: #acacac;
+            border-radius: 10px;
+
+        }
+    }
+}
+
+.creactkeywordsStep {
+    position: absolute !important;
+    bottom: 0;
+    width: 100%;
 }
