@@ -1,3 +1,4 @@
+/* eslint-disable jsx-a11y/no-static-element-interactions */
 /* eslint-disable react/style-prop-object */
 import * as React from 'react';
 import shallow from 'zustand/shallow';
@@ -5,11 +6,13 @@ import UserStep from 'components/UserStep';
 import BotStep from 'components/BotStep';
 import cx from 'classnames';
 import { Toast } from 'utils/swalInput';
+import MoreAction from 'components/MoreAction';
 import style from './ShowStory.module.scss';
 import type { StoryType, State } from '../types';
 import useStoryStore from '../../store/useStoryStore';
 // import StepControl from '../CreateStory/StepControl';
 import CheckPoint from '../CheckPoint';
+import moreIcon from '../../images/more_icon.png';
 
 type ShowStoryProps = {
   setcategoriesName: State,
@@ -40,6 +43,8 @@ const ShowStory: React.FC<ShowStoryProps> = (props) => {
       category: story.metadata.category,
     },
   });
+
+  const [showMoreAction, setShowMoreAction] = React.useState(false);
 
   React.useEffect(() => {
     setStoryInfo({
@@ -235,8 +240,20 @@ const ShowStory: React.FC<ShowStoryProps> = (props) => {
     [onEditStoryInfo],
   );
 
+  const moreActionRef = React.useRef(null);
+  const atBackdropClick = (e) => {
+    if (!moreActionRef.current.contains(e.target)) {
+      console.log('moreActionRef.current ==> ', moreActionRef.current);
+      setShowMoreAction(false);
+    }
+  };
+
   return (
-    <div data-showstory className={style.root}>
+    <div
+      data-showstory
+      className={style.root}
+      onMouseDown={(e) => atBackdropClick(e)}
+    >
       <div className={cx('container', style.h_1)}>
         <nav aria-label="breadcrumb">
           <ol className="breadcrumb">
@@ -266,29 +283,51 @@ const ShowStory: React.FC<ShowStoryProps> = (props) => {
             </li>
           </ol>
         </nav>
-        <div className={cx('d-flex align-items-center', style.tilteBlock)}>
-          <div className={style.title}>{story.story}</div>
-          {story.story !== '問候語' && (
-            <div
-              className={cx(' d-flex justify-content-between', style.editBlock)}
-            >
-              <button
-                type="button"
-                className={cx('btn btn-primary mx-4', style.deletStory)}
-                data-bs-toggle="modal"
-                data-bs-target={`#edit${story.story}StoryModal`}
+        <div className="d-flex justify-content-center">
+          <div
+            className={cx('d-flex col-10 align-items-center', style.tilteBlock)}
+          >
+            <div className={style.title}>{story.story}</div>
+            {story.story !== '問候語' && (
+              <div
+                className={cx(
+                  ' d-flex justify-content-between',
+                  style.editBlock,
+                )}
               >
-                編輯
-              </button>
-              <button
-                type="button"
-                className={cx('btn btn-danger mx-4', style.deletStory)}
-                onClick={() => onDeleteStory(story.story)}
-              >
-                刪除故事
-              </button>
-            </div>
-          )}
+                <div className={cx(style.moreActionContainer)}>
+                  <button
+                    className={cx(style.moreAction)}
+                    onClick={() => setShowMoreAction(true)}
+                  >
+                    <img src={moreIcon} alt="more_icon" />
+                  </button>
+                  {showMoreAction && (
+                    <MoreAction
+                      ref={moreActionRef}
+                      onSetShowMoreAction={setShowMoreAction}
+                      onDeleteStory={() => onDeleteStory(story.story)}
+                    />
+                  )}
+                </div>
+                <button
+                  type="button"
+                  className={cx('btn btn-primary mx-4', style.deletStory)}
+                  data-bs-toggle="modal"
+                  data-bs-target={`#edit${story.story}StoryModal`}
+                >
+                  編輯
+                </button>
+                <button
+                  type="button"
+                  className={cx('btn btn-danger mx-4', style.deletStory)}
+                  onClick={() => onDeleteStory(story.story)}
+                >
+                  刪除故事
+                </button>
+              </div>
+            )}
+          </div>
         </div>
       </div>
       <div className={cx('container', style.h_9)}>

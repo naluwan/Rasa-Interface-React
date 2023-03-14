@@ -53,8 +53,8 @@ export const confirmWidget = (value: string, type: string) => {
   let currentText = '';
   switch (type) {
     case 'delete':
-      currentTitle = `刪除`;
-      currentText = `確認要刪除『${value}』?`;
+      currentTitle = `真的要刪除劇本嗎?`;
+      // currentText = `確認要刪除『${value}』?`;
       break;
     case 'deleteEntities':
       currentTitle = `刪除`;
@@ -70,8 +70,8 @@ export const confirmWidget = (value: string, type: string) => {
   }
   const swalWithBootstrapButtons = Swal.mixin({
     customClass: {
-      confirmButton: 'btn btn-danger mx-1',
-      cancelButton: 'btn btn-secondary mx-1',
+      confirmButton: 'btn confirmButton mx-2 col-3',
+      cancelButton: 'btn cancelButton mx-2 col-3',
     },
     buttonsStyling: false,
   });
@@ -81,10 +81,11 @@ export const confirmWidget = (value: string, type: string) => {
       title: currentTitle,
       text: currentText,
       icon: 'warning',
+      iconColor: 'red',
       showCancelButton: true,
-      confirmButtonText: '確認',
+      confirmButtonText: '確定刪除',
       cancelButtonText: '取消',
-      reverseButtons: false,
+      reverseButtons: true,
     })
     .then((result) => {
       return result;
