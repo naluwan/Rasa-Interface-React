@@ -265,7 +265,7 @@ const CreateNewStory: React.FC<CreateNewStoryProps> = (props) => {
           entities: [
             {
               end,
-              entity: nowSentenceTypeOption, // 語句庫分類
+              entity: nowSentenceTypeOption.toString(), // 語句庫分類
               start,
               // value: '新竹', // 標籤
             },
@@ -281,7 +281,6 @@ const CreateNewStory: React.FC<CreateNewStoryProps> = (props) => {
       setallleywordStep(step);
       console.log('step資料');
       console.log(step);
-
       console.log(allleywordStep);
       console.log('ok!');
     },
@@ -1122,7 +1121,7 @@ const CreateNewStory: React.FC<CreateNewStoryProps> = (props) => {
                             <span name="checkIcon" data-foo={item.question} />
                             <span name="checkItem">
                               <img
-                                src={require('../../images/creactStory/avatar.png')}
+                                src={require('../../images/creactStory/bi_exclamation-circle-fill.png')}
                                 alt=""
                               />
                             </span>
@@ -1156,9 +1155,6 @@ const CreateNewStory: React.FC<CreateNewStoryProps> = (props) => {
                     {keywordOption && (
                       <div className={style.setKeyWordBlock}>
                         <div>
-                          <div className={cx(style.creactStoryTitle)}>
-                            <h3>關鍵字設定</h3>
-                          </div>
                           <div>
                             {keywordOption.map((item) => {
                               return (
