@@ -262,9 +262,11 @@
             &::before {
                 content: '';
                 background: url(../../images/creactStory/bi_exclamation-circle-fill.png) no-repeat;
+                background-size: cover;
                 display: inline-flex;
-                width: 1.5rem;
-                height: 1.5rem;
+                width: 1rem;
+                height: 1rem;
+
 
             }
         }
@@ -336,8 +338,8 @@
         right: 1rem;
 
         img {
-            height: 2rem;
-            width: 2rem;
+            height: 1rem;
+            width: 1rem;
         }
     }
 
@@ -420,4 +422,10 @@
     position: absolute !important;
     bottom: 0;
     width: 100%;
+}
+
+.questionBlock {
+    display: flex;
+    align-items: center;
+    place-content: space-between;
 }

@@ -131,7 +131,8 @@ const CreateNewStory: React.FC<CreateNewStoryProps> = (props) => {
       });
     });
   }, [categories]);
-
+  // 共用標籤同義詞
+  const [allLabel, setallLabel] = React.useState();
   // 統一關鍵字設定
   const [allleywordStep, setallleywordStep] = React.useState();
   const [dataCheckValue, setdataCheckValue] = React.useState();
@@ -191,10 +192,14 @@ const CreateNewStory: React.FC<CreateNewStoryProps> = (props) => {
         }
         return word.includes(e);
       });
-      if (matched) {
+      console.log(e);
+      if (matched && e.length >= 2) {
         setnowkeyword({ value: e, error: '' });
       } else {
-        setnowkeyword({ value: '', error: `"${e}" 不符合關鍵字` });
+        setnowkeyword({
+          value: '',
+          error: `"${e}" 不符合關鍵字(需輸入當前問句有的字詞並字數>2)`,
+        });
       }
       return matched;
     },
@@ -234,6 +239,18 @@ const CreateNewStory: React.FC<CreateNewStoryProps> = (props) => {
   const saveKeyword = React.useCallback(
     (keywordQuestion) => {
       // 檢查是否有填完關鍵字
+      // 儲存共用標籤
+      let keyType = '';
+      keyType = nowSentenceTypeOption.toString();
+      let savealllabel = '';
+      savealllabel = { [keyType]: Identifier };
+      console.log(allLabel);
+      console.log(savealllabel);
+      if (allLabel === undefined) {
+        setallLabel(savealllabel);
+      } else {
+        setallLabel([{ allLabel }, savealllabel]);
+      }
       // keywordQuestion 例句
       // nowkeyword.value 關鍵字
       const start = keywordQuestion.indexOf(nowkeyword.value);
@@ -288,6 +305,8 @@ const CreateNewStory: React.FC<CreateNewStoryProps> = (props) => {
       nowkeyword,
       Identifier,
       storeName,
+      setallLabel,
+      allLabel,
       nowSentenceTypeOption,
       allleywordStep,
       setallleywordStep,
@@ -372,7 +391,7 @@ const CreateNewStory: React.FC<CreateNewStoryProps> = (props) => {
   }, [setQuestionValue, questionValue]);
   // 用戶問句渲染
   const QuestionItems = questionValue.map((item, index) => (
-    <div key={item.id}>
+    <div key={item.id} className={item.error.length > 0 && cx(style.error)}>
       <label htmlFor={`"Question${index + 1}"`}>問句{index + 1}</label>
       <div className={cx('d-flex flex-row')}>
         <input
@@ -407,7 +426,12 @@ const CreateNewStory: React.FC<CreateNewStoryProps> = (props) => {
       const matchedItem = Identifier?.find(
         (aItem) => aItem.label === item.label,
       );
-      const updatedA = { ...item, data: matchedItem?.data ?? [], oninput: '' };
+      const updatedA = {
+        ...item,
+        id: uuid(),
+        data: matchedItem?.data ?? [],
+        oninput: '',
+      };
       return updatedA;
     });
     setIdentifier(b);
@@ -530,6 +554,7 @@ const CreateNewStory: React.FC<CreateNewStoryProps> = (props) => {
         if (item.label === Identifiers) {
           return {
             ...item,
+            id: uuid(),
             data: [...item.data, createOption(inputValue)],
             oninput: '',
           };
@@ -1159,9 +1184,18 @@ const CreateNewStory: React.FC<CreateNewStoryProps> = (props) => {
                             {keywordOption.map((item) => {
                               return (
                                 item.check === 'true' && (
-                                  <>
-                                    <div key={`${item.id}`}>
-                                      『{item.name}』
+                                  <div key={`${item.id}`}>
+                                    <div className={cx(style.questionBlock)}>
+                                      <h3>{item.name}</h3>
+                                      <button
+                                        className="btn"
+                                        // onClick={() => deleteQuestion(item.id)}
+                                      >
+                                        <img
+                                          src={require('../../images/creactStory/edit_icon.png')}
+                                          alt=""
+                                        />
+                                      </button>
                                     </div>
                                     <div
                                       className={
@@ -1198,11 +1232,6 @@ const CreateNewStory: React.FC<CreateNewStoryProps> = (props) => {
                                     >
                                       <label htmlFor={`keyword${item.id}`}>
                                         關鍵字{item.slotType}
-                                        {nowkeyword.error.length > 0 && (
-                                          <div className={style.errorMsg}>
-                                            {nowkeyword.error}
-                                          </div>
-                                        )}
                                       </label>
                                       <input
                                         className={cx(style.formStyle)}
@@ -1213,6 +1242,11 @@ const CreateNewStory: React.FC<CreateNewStoryProps> = (props) => {
                                         }}
                                         type="text"
                                       />
+                                      {nowkeyword.error.length > 0 && (
+                                        <div className={style.errorMsg}>
+                                          {nowkeyword.error}
+                                        </div>
+                                      )}
                                     </div>
                                     <div>
                                       <label htmlFor="SentenceType">
@@ -1269,6 +1303,9 @@ const CreateNewStory: React.FC<CreateNewStoryProps> = (props) => {
                                         </>
                                       )}
                                     </div>
+                                    {/* <button>
+                                      <h4>進階設定</h4>
+                                    </button> */}
                                     {Identifier.length > 0 &&
                                       nowSlotChild &&
                                       slotChild && (
@@ -1276,7 +1313,10 @@ const CreateNewStory: React.FC<CreateNewStoryProps> = (props) => {
                                           <div>同義詞設定</div>
                                           {nowSlotChild?.map((resemblance) => {
                                             return (
-                                              <div className="row">
+                                              <div
+                                                key={resemblance.id}
+                                                className="row"
+                                              >
                                                 <div className="col-5">
                                                   <div>
                                                     <label htmlFor="">
@@ -1364,7 +1404,7 @@ const CreateNewStory: React.FC<CreateNewStoryProps> = (props) => {
                                           </div>
                                         </>
                                       )}
-                                  </>
+                                  </div>
                                 )
                               );
                             })}
