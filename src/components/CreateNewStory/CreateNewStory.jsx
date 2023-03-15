@@ -131,7 +131,7 @@ const CreateNewStory: React.FC<CreateNewStoryProps> = (props) => {
       });
     });
   }, [categories]);
-  // 共用標籤同義詞
+  // 共用標籤同義詞21
   const [allLabel, setallLabel] = React.useState();
   // 統一關鍵字設定
   const [allleywordStep, setallleywordStep] = React.useState();
@@ -196,9 +196,16 @@ const CreateNewStory: React.FC<CreateNewStoryProps> = (props) => {
       if (matched && e.length >= 2) {
         setnowkeyword({ value: e, error: '' });
       } else {
+        if (e.length < 2) {
+          setnowkeyword({
+            value: '',
+            error: `"${e}" 字數必須大於2`,
+          });
+          return matched;
+        }
         setnowkeyword({
           value: '',
-          error: `"${e}" 不符合關鍵字(需輸入當前問句有的字詞並字數>2)`,
+          error: `"${e}" 不符合關鍵字`,
         });
       }
       return matched;
@@ -235,6 +242,20 @@ const CreateNewStory: React.FC<CreateNewStoryProps> = (props) => {
     },
     [keywordOption, setkeywordOption, dataCheckValue, setdataCheckValue],
   );
+  function removeDuplicates(array) {
+    const seen = {}; // create an empty object to store the seen property values
+    return array.filter((element) => {
+      // filter the array of objects
+      const property = element.value; // get the property value of each object
+      if (seen[property]) {
+        // if the property value has been seen before
+        return false; // exclude the object from the new array
+      }
+      // if the property value has not been seen before
+      seen[property] = true; // mark it as seen
+      return true; // include the object in the new array
+    });
+  }
   // 儲存關鍵字
   const saveKeyword = React.useCallback(
     (keywordQuestion) => {
@@ -243,13 +264,37 @@ const CreateNewStory: React.FC<CreateNewStoryProps> = (props) => {
       let keyType = '';
       keyType = nowSentenceTypeOption.toString();
       let savealllabel = '';
-      savealllabel = { [keyType]: Identifier };
-      console.log(allLabel);
-      console.log(savealllabel);
+      savealllabel = { [keyType]: Identifier }; // 當前同義字資料
+
+      // 更新狀態
+      console.log(typeof allLabel);
       if (allLabel === undefined) {
-        setallLabel(savealllabel);
+        setallLabel([savealllabel]);
       } else {
-        setallLabel([{ allLabel }, savealllabel]);
+        let noMergedlabel = '';
+        noMergedlabel = [allLabel[0], savealllabel];
+        let mergedLabel = '';
+        mergedLabel = [savealllabel]; // 用來儲存合併後的陣列
+        let seen = '';
+        seen = {}; // 用來記錄已經出現過的物件
+        noMergedlabel.map((obj) => {
+          // 對每個物件進行迴圈
+          const key = Object.keys(obj)[0]; // 取得物件的第一個鍵，例如"地點"或"職缺"
+          const value = obj[key]; // 取得物件的第一個值，例如陣列或字串
+          if (seen[key]) {
+            // 如果已經出現過這個鍵，就將值合併到已存在的物件中
+            seen[key] = seen[key].concat(value);
+          } else {
+            // 如果沒有出現過這個鍵，就將物件加入到合併後的陣列中，並記錄到seen中
+            mergedLabel.push(obj);
+            seen[key] = value;
+          }
+        });
+        const atlast = (() => {
+          return removeDuplicates(mergedLabel);
+        })();
+        console.log(atlast);
+        setallLabel(atlast);
       }
       // keywordQuestion 例句
       // nowkeyword.value 關鍵字
@@ -391,7 +436,10 @@ const CreateNewStory: React.FC<CreateNewStoryProps> = (props) => {
   }, [setQuestionValue, questionValue]);
   // 用戶問句渲染
   const QuestionItems = questionValue.map((item, index) => (
-    <div key={item.id} className={item.error.length > 0 && cx(style.error)}>
+    <div
+      key={item.id}
+      className={item.error.length > 0 ? cx(style.error) : undefined}
+    >
       <label htmlFor={`"Question${index + 1}"`}>問句{index + 1}</label>
       <div className={cx('d-flex flex-row')}>
         <input
@@ -831,39 +879,88 @@ const CreateNewStory: React.FC<CreateNewStoryProps> = (props) => {
   );
   // 上一步
   const previousStep = React.useCallback(
-    (stepName: string) => {
-      if (stepName === 'creactTrain') {
-        newStory.steps.map((step) => {
-          const { action } = step;
-          if (action) {
-            onRemoveBotStep(action);
-          }
-        });
-        // setbotValue([{ id: uuid(), reply: '', error: '' }]);
-        settitle('機器人回應');
-        setcreactStoryStep('creactBot');
+    (stepName: string, modename: string) => {
+      if (modename === 'Base') {
+        if (stepName === 'creactTrain') {
+          newStory.steps.map((step) => {
+            const { action } = step;
+            if (action) {
+              onRemoveBotStep(action);
+            }
+          });
+          // setbotValue([{ id: uuid(), reply: '', error: '' }]);
+          settitle('機器人回應');
+          setcreactStoryStep('creactBot');
+        }
+        if (stepName === 'creactBot') {
+          newStory.steps.map((step) => {
+            const { intent, user } = step;
+            onRemoveUserStep(intent, user);
+          });
+          // setQuestionValue([
+          //   { id: uuid(), question: '', error: '' },
+          //   { id: uuid(), question: '', error: '' },
+          // ]);
+          settitle('用戶問句');
+          setcreactStoryStep('creactQuestion');
+        }
+        if (stepName === 'creactQuestion') {
+          // onInitialNewStory();
+          // setNewStoryInfo({
+          //   story: '',
+          //   steps: [],
+          //   metadata: { category: '', create: false },
+          // });
+          settitle('劇本名稱');
+          setcreactStoryStep('creactName');
+        }
       }
-      if (stepName === 'creactBot') {
-        newStory.steps.map((step) => {
-          const { intent, user } = step;
-          onRemoveUserStep(intent, user);
-        });
-        // setQuestionValue([
-        //   { id: uuid(), question: '', error: '' },
-        //   { id: uuid(), question: '', error: '' },
-        // ]);
-        settitle('用戶問句');
-        setcreactStoryStep('creactQuestion');
-      }
-      if (stepName === 'creactQuestion') {
-        // onInitialNewStory();
-        // setNewStoryInfo({
-        //   story: '',
-        //   steps: [],
-        //   metadata: { category: '', create: false },
-        // });
-        settitle('劇本名稱');
-        setcreactStoryStep('creactName');
+      if (modename === 'Advanced') {
+        if (stepName === 'creactTrain') {
+          newStory.steps.map((step) => {
+            const { action } = step;
+            if (action) {
+              onRemoveBotStep(action);
+            }
+          });
+          // setbotValue([{ id: uuid(), reply: '', error: '' }]);
+          settitle('');
+          setcreactStoryStep('creactBot');
+        }
+
+        if (stepName === 'creactBot') {
+          newStory.steps.map((step) => {
+            const { intent, user } = step;
+            onRemoveUserStep(intent, user);
+          });
+          // setQuestionValue([
+          //   { id: uuid(), question: '', error: '' },
+          //   { id: uuid(), question: '', error: '' },
+          // ]);
+          settitle('');
+          setcreactStoryStep('creactkeywords');
+        }
+        if (stepName === 'creactkeywords') {
+          newStory.steps.map((step) => {
+            const { action } = step;
+            if (action) {
+              onRemoveBotStep(action);
+            }
+          });
+          // setbotValue([{ id: uuid(), reply: '', error: '' }]);
+          settitle('用戶問句');
+          setcreactStoryStep('creactQuestion');
+        }
+        if (stepName === 'creactQuestion') {
+          // onInitialNewStory();
+          // setNewStoryInfo({
+          //   story: '',
+          //   steps: [],
+          //   metadata: { category: '', create: false },
+          // });
+          settitle('劇本名稱');
+          setcreactStoryStep('creactName');
+        }
       }
     },
     [
@@ -1023,7 +1120,13 @@ const CreateNewStory: React.FC<CreateNewStoryProps> = (props) => {
               />
             </div>
           )}
-          <div className={cx(style.creactStoryFunction)}>
+          <div
+            className={
+              creactStoryStep === 'creactkeywords'
+                ? cx(style.creactStoryFunction, 'p-0 pt-4 pb-4')
+                : cx(style.creactStoryFunction)
+            }
+          >
             {creactStoryStep === 'creactName' && (
               <>
                 <div
@@ -1162,7 +1265,7 @@ const CreateNewStory: React.FC<CreateNewStoryProps> = (props) => {
                     >
                       <button
                         className={cx(style.prevstepBtn)}
-                        onClick={() => previousStep(creactStoryStep)}
+                        onClick={() => previousStep(creactStoryStep, mode)}
                       >
                         上一步
                       </button>
@@ -1205,21 +1308,37 @@ const CreateNewStory: React.FC<CreateNewStoryProps> = (props) => {
                                       }
                                     >
                                       <div
+                                        name="now"
                                         className={
-                                          nowkeyword.value.length > 0 &&
-                                          style.keywordBtn
+                                          nowkeyword.value.length > 0
+                                            ? style.keywordBtn
+                                            : undefined
                                         }
                                       >
+                                        {nowkeyword.value.length > 0 && (
+                                          <img
+                                            src={require('../../images/creactStory/exclamation.png')}
+                                            alt=""
+                                          />
+                                        )}
+
                                         {nowkeyword.value}
                                       </div>
                                       {keywordType.map((itm) => {
                                         return (
-                                          <div className={style.keywordBtn}>
+                                          <div
+                                            name="other"
+                                            key={`${itm.value}`}
+                                            className={style.keywordBtn}
+                                          >
                                             {itm.value}
                                           </div>
                                         );
                                       })}
-                                      <button className={style.keywordBtn}>
+                                      <button
+                                        name="add"
+                                        className={style.keywordBtn}
+                                      >
                                         + 新增關鍵字
                                       </button>
                                     </div>
@@ -1276,7 +1395,10 @@ const CreateNewStory: React.FC<CreateNewStoryProps> = (props) => {
                                     <div>
                                       {slotChild && (
                                         <>
-                                          <label htmlFor="Selectlabel">
+                                          <label
+                                            key={`label${nowSentenceTypeOption}`}
+                                            htmlFor="Selectlabel"
+                                          >
                                             標籤
                                           </label>
                                           <CreatableSelect
@@ -1324,6 +1446,7 @@ const CreateNewStory: React.FC<CreateNewStoryProps> = (props) => {
                                                     </label>
                                                   </div>
                                                   <div
+                                                    key={`resemblance${resemblance.id}`}
                                                     className={cx(
                                                       style.formStyle,
                                                     )}
@@ -1334,11 +1457,12 @@ const CreateNewStory: React.FC<CreateNewStoryProps> = (props) => {
                                                 <div className="col-7">
                                                   <div>
                                                     <label htmlFor="">
-                                                      同義詞 (可用逗點隔開)
+                                                      同義詞
                                                     </label>
                                                   </div>
                                                   <div>
                                                     <CreatableSelect
+                                                      key={`ss${resemblance.id}`}
                                                       components={components}
                                                       inputValue={
                                                         Identifier?.find(
@@ -1385,14 +1509,24 @@ const CreateNewStory: React.FC<CreateNewStoryProps> = (props) => {
                                                             resemblance.value,
                                                         )?.data ?? ''
                                                       }
-                                                      placeholder="請輸入同義詞"
+                                                      placeholder={`請輸入${resemblance.value}的同義詞`}
                                                     />
                                                   </div>
                                                 </div>
                                               </div>
                                             );
                                           })}
-                                          <div className="mt-2">
+                                          <div
+                                            className={cx(
+                                              style.saveBlock,
+                                              'mt-2',
+                                            )}
+                                          >
+                                            <button
+                                              className={cx(style.stepBtn)}
+                                            >
+                                              取消
+                                            </button>
                                             <button
                                               className={cx(style.stepBtn)}
                                               onClick={() => {
@@ -1453,7 +1587,7 @@ const CreateNewStory: React.FC<CreateNewStoryProps> = (props) => {
             creactStoryStep !== 'creactName' ? (
               <button
                 className={cx(style.prevstepBtn)}
-                onClick={() => previousStep(creactStoryStep)}
+                onClick={() => previousStep(creactStoryStep, mode)}
               >
                 上一步
               </button>

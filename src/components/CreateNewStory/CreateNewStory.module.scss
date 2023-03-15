@@ -383,12 +383,40 @@
 
 .keywordBtn {
     margin-right: 0.5rem;
-    background: #52536D;
-    border: 1px solid #52536D;
+
+    &[name='now'] {
+        background: #7377FA;
+        border: 1px solid #7377FA;
+        color: #fff;
+
+    }
+
+    &[name='other'] {
+        background: #9393A3;
+        border: 1px solid #9393A3;
+        color: #fff;
+
+    }
+
+    &[name='add'] {
+        background: #fff;
+        border: 1px solid #CCECFE;
+        color: #54C1FB;
+
+    }
+
     border-radius: 25px;
-    color: #fff;
+
     padding: 5px 20px;
-    display: inline-block;
+    display: inline-flex;
+    place-items: center;
+    word-break: keep-all;
+
+    img {
+        height: 1rem;
+        width: 1rem;
+        margin-right: 0.5rem;
+    }
 }
 
 .setKeyWordBlock {
@@ -427,5 +455,10 @@
 .questionBlock {
     display: flex;
     align-items: center;
+    place-content: space-between;
+}
+
+.saveBlock {
+    display: flex;
     place-content: space-between;
 }
