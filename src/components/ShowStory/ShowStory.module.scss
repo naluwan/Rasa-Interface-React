@@ -82,7 +82,7 @@
 }
 
 .h_9 {
-  margin-top: 2.5rem;
+  // margin-top: 2.5rem;
   height: 85%;
   overflow: auto;
 
@@ -107,7 +107,15 @@
 }
 
 .moreAction {
+  display: flex;
+  justify-content: center;
   border: none;
+  border-radius: 50%;
+  width: 36px;
+  height: 36px;
   background-color: transparent;
   margin: 0 0.5rem;
+  &:hover {
+    background-color: #d4d4da;
+  }
 }

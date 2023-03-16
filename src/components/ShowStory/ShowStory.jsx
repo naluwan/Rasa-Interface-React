@@ -13,6 +13,7 @@ import useStoryStore from '../../store/useStoryStore';
 // import StepControl from '../CreateStory/StepControl';
 import CheckPoint from '../CheckPoint';
 import moreIcon from '../../images/more_icon.png';
+import EditStoryModal from './EditStoryModal';
 
 type ShowStoryProps = {
   setcategoriesName: State,
@@ -44,7 +45,12 @@ const ShowStory: React.FC<ShowStoryProps> = (props) => {
     },
   });
 
+  /** 控制是否顯示MoreAction
+   * @type {[boolean, Function]}
+   */
   const [showMoreAction, setShowMoreAction] = React.useState(false);
+
+  const [isVisible, setIsVisible] = React.useState(false);
 
   React.useEffect(() => {
     setStoryInfo({
@@ -240,13 +246,31 @@ const ShowStory: React.FC<ShowStoryProps> = (props) => {
     [onEditStoryInfo],
   );
 
+  // 點擊背景關閉MoreAction
   const moreActionRef = React.useRef(null);
   const atBackdropClick = (e) => {
-    if (!moreActionRef.current.contains(e.target)) {
-      console.log('moreActionRef.current ==> ', moreActionRef.current);
+    if (
+      moreActionRef.current &&
+      e.target.getAttribute('alt') !== 'more_icon' &&
+      !moreActionRef.current.contains(e.target)
+    ) {
       setShowMoreAction(false);
     }
   };
+
+  const atCloseEditStoryModal = React.useCallback(() => {
+    setIsVisible(false);
+    setStoryInfo({
+      ori: {
+        story: story.story,
+        category: story.metadata.category,
+      },
+      new: {
+        story: story.story,
+        category: story.metadata.category,
+      },
+    });
+  }, [setStoryInfo, story]);
 
   return (
     <div
@@ -298,7 +322,7 @@ const ShowStory: React.FC<ShowStoryProps> = (props) => {
                 <div className={cx(style.moreActionContainer)}>
                   <button
                     className={cx(style.moreAction)}
-                    onClick={() => setShowMoreAction(true)}
+                    onClick={() => setShowMoreAction((prev) => !prev)}
                   >
                     <img src={moreIcon} alt="more_icon" />
                   </button>
@@ -307,10 +331,11 @@ const ShowStory: React.FC<ShowStoryProps> = (props) => {
                       ref={moreActionRef}
                       onSetShowMoreAction={setShowMoreAction}
                       onDeleteStory={() => onDeleteStory(story.story)}
+                      onSetIsVisible={setIsVisible}
                     />
                   )}
                 </div>
-                <button
+                {/* <button
                   type="button"
                   className={cx('btn btn-primary mx-4', style.deletStory)}
                   data-bs-toggle="modal"
@@ -324,7 +349,7 @@ const ShowStory: React.FC<ShowStoryProps> = (props) => {
                   onClick={() => onDeleteStory(story.story)}
                 >
                   刪除故事
-                </button>
+                </button> */}
               </div>
             )}
           </div>
@@ -531,6 +556,16 @@ const ShowStory: React.FC<ShowStoryProps> = (props) => {
           </div>
         </div>
       </div>
+      <EditStoryModal
+        title="編輯故事資訊"
+        isVisible={isVisible}
+        storyInfo={storyInfo}
+        onChangeStoryInfo={atChangeStoryInfo}
+        onClose={atCloseEditStoryModal}
+        categories={categories}
+        stories={stories}
+        onSubmit={atEditStoryInfo}
+      />
     </div>
   );
 };
