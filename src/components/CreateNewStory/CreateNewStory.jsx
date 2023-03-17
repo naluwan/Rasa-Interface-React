@@ -73,52 +73,55 @@ const CreateNewStory: React.FC<CreateNewStoryProps> = (props) => {
       onCreateUserStep: state.onCreateUserStep,
     };
   }, shallow);
-
-  // 步驟 State5
+  // State5
+  const [selectValue, setSelectValue] = React.useState([]);
+  // 步驟 State6
   const [creactStoryStep, setcreactStoryStep] = React.useState('creactName');
-  // 標題 State6
+  // 標題 State7
   const [title, settitle] = React.useState('為你的劇本取名吧!');
-  // 劇本名稱 State7
+  // 劇本名稱 State8
   const [storeName, setstoreName] = React.useState({
     id: uuid(),
     name: '',
     error: '',
   });
-  // 類別名稱 State8
+  // 類別名稱 State9
   const [TypeStoreName, setTypeStoreName] = React.useState({
     id: uuid(),
     name: '',
     error: '',
   });
-  // 類別所有選項 State9
+  // 類別所有選項 State10
   const [options, setOptions] = React.useState([
     { value: 'createNewCategory', label: '建立新類別' },
   ]);
-  // 用戶問句 State10
+  // 用戶問句 State11
   const [questionValue, setQuestionValue] = React.useState([
     { id: uuid(), question: '', error: '' },
     { id: uuid(), question: '', error: '' },
   ]);
-  // 關鍵字資料(選擇用戶問句) State11
+  // 關鍵字資料(選擇用戶問句) State12
   const [keywordOption, setkeywordOption] = React.useState([]);
 
-  // 關鍵字類別 State12
-  const [keywordType] = React.useState([]);
+  // 關鍵字類別 State13
+  const [keywordType, setkeywordType] = React.useState([]);
 
-  // 當前關鍵字 State13
+  // 當前關鍵字 State14
   const [nowkeyword, setnowkeyword] = React.useState({ value: '', error: '' });
 
-  // 語句庫子選項 State14
+  // 語句庫子選項 State15
   const [slotChild, setslotChild] = React.useState();
-  // 同義詞分類 State15
+  // 同義詞分類 State16
   const [Identifier, setIdentifier] = React.useState([]);
 
-  // 語句庫子選項已選項目 State16
+  // 語句庫子選項已選項目 State17
   const [nowSlotChild, setnowSlotChild] = React.useState();
-  // 語句庫分類已選項目 State17
+  // 語句庫分類已選項目 State18
   const [nowSentenceTypeOption, setnowSentenceTypeOption] = React.useState([]);
-
-  // 語句庫分類 State18
+  React.useEffect(() => {
+    console.log('呼叫一次');
+  }, [nowSentenceTypeOption]);
+  // 語句庫分類 State19
   const [SentenceTypeOption, setSentenceTypeOption] = React.useState();
   const [inputValue, setInputValue] = React.useState('');
   React.useEffect(() => {
@@ -131,12 +134,12 @@ const CreateNewStory: React.FC<CreateNewStoryProps> = (props) => {
       });
     });
   }, [categories]);
-  // 共用標籤同義詞21
+  // 共用標籤同義詞20
   const [allLabel, setallLabel] = React.useState();
-  // 統一關鍵字設定
+  // 統一關鍵字設定21
   const [allleywordStep, setallleywordStep] = React.useState();
   const [dataCheckValue, setdataCheckValue] = React.useState();
-  // 機器人回應 State19
+  // 機器人回應 State23
   const [botValue, setbotValue] = React.useState([
     { id: uuid(), reply: '', error: '' },
   ]);
@@ -167,9 +170,9 @@ const CreateNewStory: React.FC<CreateNewStoryProps> = (props) => {
         error = '所有欄位都是必填的';
       } else {
         categories.map((item) => {
-          return item.name === Name
-            ? (error = `故事『${Name}』重複，請重新輸入`)
-            : '';
+          return (
+            item.name === Name && (error = `故事『${Name}』重複，請重新輸入`)
+          );
         });
       }
       const { id } = TypeStoreName;
@@ -178,7 +181,8 @@ const CreateNewStory: React.FC<CreateNewStoryProps> = (props) => {
     },
     [categories, TypeStoreName, setTypeStoreName],
   );
-
+  // 當前關鍵字
+  const [Keywordvalue, setKeywordvalue] = React.useState();
   // 檢查關鍵字是否包含當前問句
   const checkKeyword = React.useCallback(
     (e) => {
@@ -213,89 +217,113 @@ const CreateNewStory: React.FC<CreateNewStoryProps> = (props) => {
     [keywordOption],
   );
 
-  // 載入關鍵字資料
-  const loadkeywordOption = React.useCallback(
-    (e: String) => {
-      const updatekeywordOption = questionValue.map((item) => {
-        if (item.question === e) {
-          return {
-            id: uuid(),
-            name: item.question,
-            check: 'true',
-            slotType: 1,
-          };
-        }
-        return {
-          id: uuid(),
-          name: item.question,
-          check: 'false',
-          slotType: 1,
-        };
+  // function removeDuplicates(array) {
+  //   const seen = {}; // create an empty object to store the seen property values
+  //   return array.filter((element) => {
+  //     // filter the array of objects
+  //     const property = element.value; // get the property value of each object
+  //     if (seen[property]) {
+  //       // if the property value has been seen before
+  //       return false; // exclude the object from the new array
+  //     }
+  //     // if the property value has not been seen before
+  //     seen[property] = true; // mark it as seen
+  //     return true; // include the object in the new array
+  //   });
+  // }
+  // 選擇關鍵字
+  const chooseKeyword = React.useCallback(
+    (Keyword: String) => {
+      // 選擇的例句
+      const nowkeywordOption = keywordOption.find((item) => {
+        return item.name === dataCheckValue && item;
       });
-      const dataCheckValues = keywordOption.find(
-        (ko) => ko.name === e && ko.check === 'true',
-      )
-        ? e
-        : '';
-      setdataCheckValue(dataCheckValues);
-      setkeywordOption(updatekeywordOption);
+      console.log(nowkeywordOption);
+      console.log(Keyword);
     },
-    [keywordOption, setkeywordOption, dataCheckValue, setdataCheckValue],
+    [keywordOption, dataCheckValue],
   );
-  function removeDuplicates(array) {
-    const seen = {}; // create an empty object to store the seen property values
-    return array.filter((element) => {
-      // filter the array of objects
-      const property = element.value; // get the property value of each object
-      if (seen[property]) {
-        // if the property value has been seen before
-        return false; // exclude the object from the new array
-      }
-      // if the property value has not been seen before
-      seen[property] = true; // mark it as seen
-      return true; // include the object in the new array
-    });
-  }
   // 儲存關鍵字
   const saveKeyword = React.useCallback(
     (keywordQuestion) => {
       // 檢查是否有填完關鍵字
       // 儲存共用標籤
       let keyType = '';
-      keyType = nowSentenceTypeOption.toString();
+      keyType = nowSentenceTypeOption?.label;
       let savealllabel = '';
-      savealllabel = { [keyType]: Identifier }; // 當前同義字資料
+      savealllabel = {
+        keyword: nowkeyword.value,
+        keyType,
+        nowSlotChild,
+        Identifier,
+      }; // 當前同義字資料
+      setallLabel([savealllabel]);
+      // 完成的關鍵字
+      const newkeyword = { label: nowkeyword.value, state: 'true', keyType };
+      // 未完成的關鍵字
+      const nokeyword = [
+        {
+          label: ``,
+          state: 'false',
+          keyType,
+        },
+      ];
+      let mergenokeywordType = '';
+      mergenokeywordType = nokeyword;
+      if (keywordType !== undefined) {
+        let mergekeywordType = '';
+        mergekeywordType = keywordType;
+        mergekeywordType.push(newkeyword);
+        setkeywordType(mergekeywordType);
+        const newkeywordOption = keywordOption;
+        newkeywordOption.forEach((item) => {
+          console.log(item);
+          if (item.name === keywordQuestion) {
+            item.keywordType = mergekeywordType;
+          }
 
-      // 更新狀態
-      console.log(typeof allLabel);
-      if (allLabel === undefined) {
-        setallLabel([savealllabel]);
-      } else {
-        let noMergedlabel = '';
-        noMergedlabel = [allLabel[0], savealllabel];
-        let mergedLabel = '';
-        mergedLabel = [savealllabel]; // 用來儲存合併後的陣列
-        let seen = '';
-        seen = {}; // 用來記錄已經出現過的物件
-        noMergedlabel.map((obj) => {
-          // 對每個物件進行迴圈
-          const key = Object.keys(obj)[0]; // 取得物件的第一個鍵，例如"地點"或"職缺"
-          const value = obj[key]; // 取得物件的第一個值，例如陣列或字串
-          if (seen[key]) {
-            // 如果已經出現過這個鍵，就將值合併到已存在的物件中
-            seen[key] = seen[key].concat(value);
-          } else {
-            // 如果沒有出現過這個鍵，就將物件加入到合併後的陣列中，並記錄到seen中
-            mergedLabel.push(obj);
-            seen[key] = value;
+          if (item.keywordType.length === 0) {
+            setkeywordType(mergenokeywordType);
+            item.keywordType = mergenokeywordType;
           }
         });
-        const atlast = (() => {
-          return removeDuplicates(mergedLabel);
-        })();
-        console.log(atlast);
-        setallLabel(atlast);
+        console.log(newkeywordOption);
+        setkeywordOption(newkeywordOption);
+        setnowkeyword({ value: '', error: '' });
+      } else {
+        setkeywordType(newkeyword);
+        setnowkeyword({ value: '', error: '' });
       }
+      console.log(savealllabel);
+      // 更新狀態
+      // if (allLabel === undefined) {
+      //   setallLabel([savealllabel]);
+      // } else {
+      //   let noMergedlabel = '';
+      //   noMergedlabel = [allLabel[0], savealllabel];
+      //   let mergedLabel = '';
+      //   mergedLabel = [savealllabel]; // 用來儲存合併後的陣列
+      //   let seen = '';
+      //   seen = {}; // 用來記錄已經出現過的物件
+      //   noMergedlabel.map((obj) => {
+      //     // 對每個物件進行迴圈
+      //     const key = Object.keys(obj)[0]; // 取得物件的第一個鍵，例如"地點"或"職缺"
+      //     const value = obj[key]; // 取得物件的第一個值，例如陣列或字串
+      //     if (seen[key]) {
+      //       // 如果已經出現過這個鍵，就將值合併到已存在的物件中
+      //       seen[key] = seen[key].concat(value);
+      //     } else {
+      //       // 如果沒有出現過這個鍵，就將物件加入到合併後的陣列中，並記錄到seen中
+      //       mergedLabel.push(obj);
+      //       seen[key] = value;
+      //     }
+      //   });
+      //   const atlast = (() => {
+      //     return removeDuplicates(mergedLabel);
+      //   })();
+      //   console.log(atlast);
+      //   setallLabel(atlast);
+      // }
       // keywordQuestion 例句
       // nowkeyword.value 關鍵字
       const start = keywordQuestion.indexOf(nowkeyword.value);
@@ -487,6 +515,7 @@ const CreateNewStory: React.FC<CreateNewStoryProps> = (props) => {
   // 設定語句褲子選項
   const changeSlotChild = React.useCallback(
     (e: any) => {
+      console.log(e);
       setnowSlotChild(e);
     },
     [setnowSlotChild, nowSlotChild],
@@ -506,8 +535,10 @@ const CreateNewStory: React.FC<CreateNewStoryProps> = (props) => {
 
   // 語句庫分類選擇
 
+  // const Selectlabel = React.useRef();
   const changeSentenceTypeOption = React.useCallback(
     (obj: any) => {
+      console.log(obj);
       setslotChild(undefined);
       if (obj === null) {
         setnowSentenceTypeOption([]);
@@ -522,12 +553,14 @@ const CreateNewStory: React.FC<CreateNewStoryProps> = (props) => {
         ]);
         return;
       }
-      // 判斷是包含再以新增的語句庫分類
+      // 判斷是否包含再以新增的語句庫分類
       const result = !slots.some((slot) => {
         return slot.key === obj.value;
       });
+      console.log(result);
       if (result) {
-        setnowSentenceTypeOption([obj.value]);
+        console.log(obj.value);
+        // setnowSentenceTypeOption({ value: '', label: '' });
         setslotChild([
           [
             {
@@ -539,7 +572,8 @@ const CreateNewStory: React.FC<CreateNewStoryProps> = (props) => {
         ]);
         return;
       }
-      setnowSentenceTypeOption([obj.value]);
+      console.log([obj.value]);
+      setnowSentenceTypeOption({ value: obj.value, label: obj.value });
       const slotsChild = slots
         .map(({ key, slotInfo }) =>
           key === obj.value
@@ -551,8 +585,39 @@ const CreateNewStory: React.FC<CreateNewStoryProps> = (props) => {
         )
         .filter(Boolean);
       setslotChild(slotsChild);
+      if (allLabel !== undefined) {
+        console.log(allLabel);
+
+        try {
+          const statementLibrary = allLabel?.map((item) => {
+            if (item.keyType === obj.value) {
+              item.nowSlotChild.map((nowSlotChilds) => {
+                setSelectValue({
+                  value: nowSlotChilds.value,
+                  label: nowSlotChilds.value,
+                });
+              });
+              setIdentifier(item.Identifier);
+              return item.nowSlotChild;
+            }
+            return null;
+          });
+          if (statementLibrary[0] !== null) {
+            changeSlotChild(statementLibrary[0]);
+          }
+        } catch (error) {
+          console.log(error);
+        }
+      }
     },
-    [slotChild, setslotChild, slots, setnowSentenceTypeOption],
+    [
+      slotChild,
+      setslotChild,
+      slots,
+      nowSlotChild,
+      setnowSentenceTypeOption,
+      changeSlotChild,
+    ],
   );
   React.useEffect(() => {
     if (nowSentenceTypeOption.length === 0) {
@@ -586,7 +651,88 @@ const CreateNewStory: React.FC<CreateNewStoryProps> = (props) => {
     },
     [setIdentifier, Identifier, setInputValue, inputValue],
   );
+  const [onlyOneloadkeywordOption, setonlyOneloadkeywordOption] =
+    React.useState(0);
+  // 載入關鍵字資料
+  const loadkeywordOption = React.useCallback(
+    (e: String) => {
+      let updatekeywordOption;
 
+      if (onlyOneloadkeywordOption === 0) {
+        updatekeywordOption = questionValue.map((item) => {
+          console.log(item.question);
+          console.log(e);
+          if (item.question === e) {
+            return {
+              id: uuid(), // key值
+              name: item.question, // 例句名稱
+              check: 'true', // 是否被選擇
+              isSave: 'false', // 關鍵字是否都存檔
+              slotType: 1, // 現在選擇哪個關鍵字
+              keywordType: [], // 所有關鍵字
+            };
+          }
+          return {
+            id: uuid(),
+            name: item.question,
+            check: 'false',
+            isSave: 'false',
+            slotType: 1,
+            keywordType: [],
+          };
+        });
+        console.log(updatekeywordOption);
+      } else {
+        updatekeywordOption = keywordOption;
+        updatekeywordOption.forEach((item) => {
+          if (item.name === e) {
+            item.check = 'true';
+            // 載入已存的關鍵字資料
+            setkeywordType(item.keywordType);
+            // 載入選擇的關鍵字
+            const newslotType = item.slotType - 1;
+            let newkeywordType = '';
+            let newnowSentenceTypeOption = '';
+            if (item.keywordType[newslotType]?.label) {
+              newkeywordType = item.keywordType[newslotType]?.label;
+              newnowSentenceTypeOption = {
+                value: item.keywordType[newslotType]?.keyType,
+                label: item.keywordType[newslotType]?.keyType,
+              };
+            }
+
+            setnowSentenceTypeOption(newnowSentenceTypeOption);
+            setSelectValue([]);
+            setnowSentenceTypeOption(newnowSentenceTypeOption);
+            changeSentenceTypeOption(newnowSentenceTypeOption);
+            setKeywordvalue(newkeywordType);
+          } else {
+            item.check = 'false';
+          }
+        });
+      }
+      const dataCheckValues = keywordOption.find(
+        (ko) => ko.name === e && ko.check === 'true',
+      )
+        ? e
+        : '';
+      setonlyOneloadkeywordOption(1);
+      setdataCheckValue(dataCheckValues);
+      setkeywordOption(updatekeywordOption);
+    },
+    [
+      keywordOption,
+      setkeywordOption,
+      setSelectValue,
+      questionValue,
+      dataCheckValue,
+      nowSentenceTypeOption,
+      setnowSentenceTypeOption,
+      setonlyOneloadkeywordOption,
+      onlyOneloadkeywordOption,
+      setdataCheckValue,
+    ],
+  );
   const components = {
     DropdownIndicator: null,
   };
@@ -1113,7 +1259,7 @@ const CreateNewStory: React.FC<CreateNewStoryProps> = (props) => {
             </>
           )}
           {creactStoryStep === 'creactTrain' && (
-            <div>
+            <div className={style.creactTrainImg}>
               <img
                 src={require('../../images/creactStory/success.png')}
                 alt=""
@@ -1233,7 +1379,7 @@ const CreateNewStory: React.FC<CreateNewStoryProps> = (props) => {
                     </div>
                     {questionValue.map((item) => {
                       return (
-                        <div key={`${item.id}`}>
+                        <div key={`questionValue${item.id}`}>
                           <label
                             data-check={dataCheckValue === item.question}
                             data-slot="false"
@@ -1243,6 +1389,7 @@ const CreateNewStory: React.FC<CreateNewStoryProps> = (props) => {
                           >
                             <input
                               id={item.id}
+                              key={`questionValueinput${item.id}`}
                               name="creactkeywords"
                               type="radio"
                             />
@@ -1302,7 +1449,7 @@ const CreateNewStory: React.FC<CreateNewStoryProps> = (props) => {
                                     </div>
                                     <div
                                       className={
-                                        nowkeyword.error.length > 0
+                                        nowkeyword?.error.length > 0
                                           ? (style.storyInputBlock, style.error)
                                           : style.storyInputBlock
                                       }
@@ -1310,29 +1457,39 @@ const CreateNewStory: React.FC<CreateNewStoryProps> = (props) => {
                                       <div
                                         name="now"
                                         className={
-                                          nowkeyword.value.length > 0
+                                          nowkeyword?.value.length > 0
                                             ? style.keywordBtn
                                             : undefined
                                         }
                                       >
-                                        {nowkeyword.value.length > 0 && (
+                                        {nowkeyword?.value.length > 0 && (
                                           <img
                                             src={require('../../images/creactStory/exclamation.png')}
                                             alt=""
                                           />
                                         )}
 
-                                        {nowkeyword.value}
+                                        {nowkeyword?.value}
                                       </div>
-                                      {keywordType.map((itm) => {
+                                      {keywordType?.map((itm) => {
                                         return (
-                                          <div
+                                          <button
                                             name="other"
-                                            key={`${itm.value}`}
+                                            onClick={() => {
+                                              chooseKeyword(itm.label);
+                                            }}
+                                            key={`${itm.label}`}
                                             className={style.keywordBtn}
                                           >
-                                            {itm.value}
-                                          </div>
+                                            {itm.state !== 'true' && (
+                                              <img
+                                                src={require('../../images/creactStory/exclamation.png')}
+                                                alt=""
+                                              />
+                                            )}
+
+                                            {itm.label}
+                                          </button>
                                         );
                                       })}
                                       <button
@@ -1344,7 +1501,7 @@ const CreateNewStory: React.FC<CreateNewStoryProps> = (props) => {
                                     </div>
                                     <div
                                       className={
-                                        nowkeyword.error.length > 0
+                                        nowkeyword?.error.length > 0
                                           ? (style.storyInputBlock, style.error)
                                           : style.storyInputBlock
                                       }
@@ -1357,11 +1514,13 @@ const CreateNewStory: React.FC<CreateNewStoryProps> = (props) => {
                                         id={`keyword${item.id}`}
                                         placeholder={`請輸入『${item.name}』關鍵字`}
                                         onChange={(e) => {
+                                          setKeywordvalue(e.target.value);
                                           checkKeyword(e.target.value);
                                         }}
+                                        value={Keywordvalue}
                                         type="text"
                                       />
-                                      {nowkeyword.error.length > 0 && (
+                                      {nowkeyword?.error.length > 0 && (
                                         <div className={style.errorMsg}>
                                           {nowkeyword.error}
                                         </div>
@@ -1372,13 +1531,17 @@ const CreateNewStory: React.FC<CreateNewStoryProps> = (props) => {
                                         語句庫分類
                                       </label>
                                       <CreatableSelect
+                                        key={`SentenceType-${nowSentenceTypeOption}`}
                                         isClearable
                                         id="SentenceType"
                                         name="SentenceType"
                                         placeholder="輸入即可新增語句庫分類"
-                                        onChange={(e) =>
-                                          changeSentenceTypeOption(e)
-                                        }
+                                        value={nowSentenceTypeOption}
+                                        onChange={(e) => {
+                                          setSelectValue([]);
+                                          setnowSentenceTypeOption([e]);
+                                          changeSentenceTypeOption(e);
+                                        }}
                                         options={SentenceTypeOption}
                                         menuPlacement="bottom"
                                         styles={{
@@ -1402,13 +1565,15 @@ const CreateNewStory: React.FC<CreateNewStoryProps> = (props) => {
                                             標籤
                                           </label>
                                           <CreatableSelect
-                                            key={`select${nowSentenceTypeOption}`}
+                                            key={`select-${nowSentenceTypeOption}`}
                                             isMulti
                                             id="Selectlabel"
+                                            value={selectValue}
                                             placeholder="輸入即可新增標籤"
                                             name="Selectlabel"
                                             options={slotChild[0]}
                                             onChange={(e) => {
+                                              setSelectValue(e);
                                               changeSlotChild(e);
                                             }}
                                             menuPlacement="bottom"
@@ -1436,7 +1601,7 @@ const CreateNewStory: React.FC<CreateNewStoryProps> = (props) => {
                                           {nowSlotChild?.map((resemblance) => {
                                             return (
                                               <div
-                                                key={resemblance.id}
+                                                key={resemblance?.value}
                                                 className="row"
                                               >
                                                 <div className="col-5">
@@ -1446,12 +1611,12 @@ const CreateNewStory: React.FC<CreateNewStoryProps> = (props) => {
                                                     </label>
                                                   </div>
                                                   <div
-                                                    key={`resemblance${resemblance.id}`}
+                                                    key={`resemblance${resemblance?.value}`}
                                                     className={cx(
                                                       style.formStyle,
                                                     )}
                                                   >
-                                                    {resemblance.value}
+                                                    {resemblance?.value}
                                                   </div>
                                                 </div>
                                                 <div className="col-7">
@@ -1462,13 +1627,13 @@ const CreateNewStory: React.FC<CreateNewStoryProps> = (props) => {
                                                   </div>
                                                   <div>
                                                     <CreatableSelect
-                                                      key={`ss${resemblance.id}`}
+                                                      key={`ss${resemblance?.value}`}
                                                       components={components}
                                                       inputValue={
                                                         Identifier?.find(
                                                           (obj) =>
                                                             obj.label ===
-                                                            resemblance.value,
+                                                            resemblance?.value,
                                                         )?.oninput ?? ''
                                                       }
                                                       isClearable
@@ -1483,7 +1648,7 @@ const CreateNewStory: React.FC<CreateNewStoryProps> = (props) => {
 
                                                         changeIdentifier(
                                                           a,
-                                                          resemblance.value,
+                                                          resemblance?.value,
                                                           'onChange',
                                                         );
                                                       }}
@@ -1492,24 +1657,24 @@ const CreateNewStory: React.FC<CreateNewStoryProps> = (props) => {
                                                       ) => {
                                                         changeIdentifier(
                                                           newValue,
-                                                          resemblance.value,
+                                                          resemblance?.value,
                                                           'onInputChange',
                                                         );
                                                       }}
                                                       onKeyDown={(e) => {
                                                         handleKeyDown(
                                                           e,
-                                                          resemblance.value,
+                                                          resemblance?.value,
                                                         );
                                                       }}
                                                       value={
                                                         Identifier?.find(
                                                           (obj) =>
                                                             obj.label ===
-                                                            resemblance.value,
+                                                            resemblance?.value,
                                                         )?.data ?? ''
                                                       }
-                                                      placeholder={`請輸入${resemblance.value}的同義詞`}
+                                                      placeholder={`請輸入${resemblance?.value}的同義詞`}
                                                     />
                                                   </div>
                                                 </div>
@@ -1564,7 +1729,7 @@ const CreateNewStory: React.FC<CreateNewStoryProps> = (props) => {
               </>
             )}
             {creactStoryStep === 'creactTrain' && (
-              <div>
+              <div className={style.creactTrainBlock}>
                 <div>
                   <h2>恭喜!</h2>
                 </div>
