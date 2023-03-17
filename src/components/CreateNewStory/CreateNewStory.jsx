@@ -249,7 +249,12 @@ const CreateNewStory: React.FC<CreateNewStoryProps> = (props) => {
       // 檢查是否有填完關鍵字
       // 儲存共用標籤
       let keyType = '';
+      console.log(nowSentenceTypeOption);
       keyType = nowSentenceTypeOption?.label;
+      console.log(keyType);
+      if (keyType === undefined) {
+        keyType = nowSentenceTypeOption[0]?.label;
+      }
       let savealllabel = '';
       savealllabel = {
         keyword: nowkeyword.value,
@@ -261,37 +266,88 @@ const CreateNewStory: React.FC<CreateNewStoryProps> = (props) => {
       // 完成的關鍵字
       const newkeyword = { label: nowkeyword.value, state: 'true', keyType };
       // 未完成的關鍵字
-      const nokeyword = [
-        {
-          label: ``,
-          state: 'false',
-          keyType,
-        },
-      ];
+      const nokeyword = { label: `缺少${keyType}`, state: 'false', keyType };
       let mergenokeywordType = '';
       mergenokeywordType = nokeyword;
+      // 判斷例句有無關鍵字
+      console.log(keywordType !== undefined);
       if (keywordType !== undefined) {
+        // 合併當前關鍵字(合併未完成的關鍵字)
+        // mergenokeywordType = keywordType;
+        // mergenokeywordType.push(nokeyword);
+
+        // 合併當前關鍵字(合併完成的關鍵字)
         let mergekeywordType = '';
+        console.log(keywordType);
+        let keywordTypeisfind = 0;
+
+        console.log(keywordTypeisfind);
+        keywordType.find((item) => {
+          // 檢查有沒有錯誤的關鍵字與這次輸入的語句庫類別一樣
+          console.log(item.keyType === keyType);
+          if (item.keyType === keyType) {
+            item.label = nowkeyword.value;
+            item.state = 'true';
+            keywordTypeisfind = 1;
+          }
+        });
         mergekeywordType = keywordType;
-        mergekeywordType.push(newkeyword);
-        setkeywordType(mergekeywordType);
+        if (keywordTypeisfind === 0) {
+          mergekeywordType.push(newkeyword);
+        }
+        // 修改例句資料
         const newkeywordOption = keywordOption;
+        console.log(newkeywordOption);
         newkeywordOption.forEach((item) => {
           console.log(item);
+          console.log('item.name === keywordQuestion');
+          console.log(item.name === keywordQuestion);
           if (item.name === keywordQuestion) {
-            item.keywordType = mergekeywordType;
-          }
+            console.log(mergekeywordType);
 
-          if (item.keywordType.length === 0) {
-            setkeywordType(mergenokeywordType);
-            item.keywordType = mergenokeywordType;
+            item.keywordType = mergekeywordType;
+          } else {
+            // 例句選項沒有關鍵字類別
+            console.log(
+              item.keywordType.length === 0 && item.name !== keywordQuestion,
+            );
+            if (
+              item.keywordType.length === 0 &&
+              item.name !== keywordQuestion
+            ) {
+              // setkeywordType(mergenokeywordType);
+              item.keywordType.push(mergenokeywordType);
+            }
+            console.log(item.keywordType);
+
+            // console.log(result);
+            item.keywordType.filter((obj) => {
+              console.log(obj);
+              console.log(keyType);
+              console.log(nokeyword);
+              // if(obj.keyType === keyType && obj.state === 'false'){
+              //   obj.label = nowkeyword.value;
+              //   item.state = 'true';
+              //   keywordTypeisfind = 1;
+              // }
+              console.log(obj.keyType !== keyType);
+              if (obj.keyType !== keyType) {
+                console.log('nook');
+                item.keywordType.push(nokeyword);
+                const result = item.keywordType.filter(
+                  (mergeResult) => mergeResult.state === 'true',
+                );
+                item.keywordType = result;
+              }
+            });
           }
         });
         console.log(newkeywordOption);
+        // 更新例句資料
         setkeywordOption(newkeywordOption);
         setnowkeyword({ value: '', error: '' });
       } else {
-        setkeywordType(newkeyword);
+        // setkeywordType(newkeyword);
         setnowkeyword({ value: '', error: '' });
       }
       console.log(savealllabel);
@@ -376,7 +432,10 @@ const CreateNewStory: React.FC<CreateNewStoryProps> = (props) => {
     },
     [
       nowkeyword,
+      questionValue,
       Identifier,
+      keywordType,
+      keywordOption,
       storeName,
       setallLabel,
       allLabel,
