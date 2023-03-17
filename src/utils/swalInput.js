@@ -72,6 +72,7 @@ export const confirmWidget = (value: string, type: string) => {
     customClass: {
       confirmButton: 'btn confirmButton mx-2 col-3',
       cancelButton: 'btn cancelButton mx-2 col-3',
+      popup: 'showPop',
     },
     buttonsStyling: false,
   });

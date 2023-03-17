@@ -8,17 +8,19 @@ import editIcon from '../../images/edit_icon.png';
 type MoreActionProps = {
   onSetShowMoreAction: () => void,
   onDeleteStory: () => void,
+  onSetIsVisible: () => void,
 };
 
-const MoreAction: React.FC<MoreActionProps> = (props) => {
-  const { onSetShowMoreAction, onDeleteStory } = props;
+const MoreAction: React.FC<MoreActionProps> = React.forwardRef((props, ref) => {
+  const { onSetShowMoreAction, onDeleteStory, onSetIsVisible } = props;
 
   return (
-    <div className={style.root}>
+    <div className={style.root} ref={ref}>
       <button
         className={cx(style.editIcon)}
         onClick={() => {
           onSetShowMoreAction(false);
+          onSetIsVisible(true);
         }}
       >
         <img src={editIcon} alt="edit_icon" />
@@ -35,6 +37,6 @@ const MoreAction: React.FC<MoreActionProps> = (props) => {
       </button>
     </div>
   );
-};
+});
 
 export default React.memo(MoreAction);
