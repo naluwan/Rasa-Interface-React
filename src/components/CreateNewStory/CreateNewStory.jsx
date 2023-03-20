@@ -73,56 +73,57 @@ const CreateNewStory: React.FC<CreateNewStoryProps> = (props) => {
       onCreateUserStep: state.onCreateUserStep,
     };
   }, shallow);
-  // State5
-  const [selectValue, setSelectValue] = React.useState([]);
-  // 步驟 State6
+
+  // 步驟 State5
   const [creactStoryStep, setcreactStoryStep] = React.useState('creactName');
-  // 標題 State7
+  // 標題 State6
   const [title, settitle] = React.useState('為你的劇本取名吧!');
-  // 劇本名稱 State8
+  // 故事名稱 State7
   const [storeName, setstoreName] = React.useState({
     id: uuid(),
     name: '',
     error: '',
   });
-  // 類別名稱 State9
+  // 類別名稱 State8
   const [TypeStoreName, setTypeStoreName] = React.useState({
     id: uuid(),
     name: '',
     error: '',
   });
-  // 類別所有選項 State10
+  // 類別所有選項 State9
   const [options, setOptions] = React.useState([
     { value: 'createNewCategory', label: '建立新類別' },
   ]);
-  // 用戶問句 State11
+  // 用戶問句 State10
   const [questionValue, setQuestionValue] = React.useState([
     { id: uuid(), question: '', error: '' },
     { id: uuid(), question: '', error: '' },
   ]);
+  // 語句庫分類資料 State11
+  const [SentenceTypeOption, setSentenceTypeOption] = React.useState();
   // 關鍵字資料(選擇用戶問句) State12
   const [keywordOption, setkeywordOption] = React.useState([]);
-
-  // 關鍵字類別 State13
+  // 當前選擇的例句 State13
+  const [dataCheckValue, setdataCheckValue] = React.useState();
+  // 當前關鍵字 State14
+  const [Keywordvalue, setKeywordvalue] = React.useState();
+  // 當前關鍵字(檢核) State15
+  const [nowkeyword, setnowkeyword] = React.useState({ value: '', error: '' });
+  // 語句庫分類已選項目 State16
+  const [nowSentenceTypeOption, setnowSentenceTypeOption] = React.useState([]);
+  // (關鍵字設定)當前多選標籤狀態 State17
+  const [selectValue, setSelectValue] = React.useState([]);
+  // 關鍵字類別 State18
   const [keywordType, setkeywordType] = React.useState([]);
 
-  // 當前關鍵字 State14
-  const [nowkeyword, setnowkeyword] = React.useState({ value: '', error: '' });
-
-  // 語句庫子選項 State15
+  // 語句庫子選項 可選項目 State19
   const [slotChild, setslotChild] = React.useState();
-  // 同義詞分類 State16
+  // 同義詞分類 State20
   const [Identifier, setIdentifier] = React.useState([]);
 
-  // 語句庫子選項已選項目 State17
+  // 語句庫子選項 已選項目 State21
   const [nowSlotChild, setnowSlotChild] = React.useState();
-  // 語句庫分類已選項目 State18
-  const [nowSentenceTypeOption, setnowSentenceTypeOption] = React.useState([]);
-  React.useEffect(() => {
-    console.log('呼叫一次');
-  }, [nowSentenceTypeOption]);
-  // 語句庫分類 State19
-  const [SentenceTypeOption, setSentenceTypeOption] = React.useState();
+  // 語句庫分類 同義詞輸入狀態 State22
   const [inputValue, setInputValue] = React.useState('');
   React.useEffect(() => {
     categories?.map((category) => {
@@ -134,12 +135,12 @@ const CreateNewStory: React.FC<CreateNewStoryProps> = (props) => {
       });
     });
   }, [categories]);
-  // 共用標籤同義詞20
+  // 共用標籤同義詞23
   const [allLabel, setallLabel] = React.useState();
-  // 統一關鍵字設定21
+  // 統一關鍵字設定24
   const [allleywordStep, setallleywordStep] = React.useState();
-  const [dataCheckValue, setdataCheckValue] = React.useState();
-  // 機器人回應 State23
+
+  // 機器人回應 State25
   const [botValue, setbotValue] = React.useState([
     { id: uuid(), reply: '', error: '' },
   ]);
@@ -181,8 +182,7 @@ const CreateNewStory: React.FC<CreateNewStoryProps> = (props) => {
     },
     [categories, TypeStoreName, setTypeStoreName],
   );
-  // 當前關鍵字
-  const [Keywordvalue, setKeywordvalue] = React.useState();
+
   // 檢查關鍵字是否包含當前問句
   const checkKeyword = React.useCallback(
     (e) => {
@@ -217,44 +217,18 @@ const CreateNewStory: React.FC<CreateNewStoryProps> = (props) => {
     [keywordOption],
   );
 
-  // function removeDuplicates(array) {
-  //   const seen = {}; // create an empty object to store the seen property values
-  //   return array.filter((element) => {
-  //     // filter the array of objects
-  //     const property = element.value; // get the property value of each object
-  //     if (seen[property]) {
-  //       // if the property value has been seen before
-  //       return false; // exclude the object from the new array
-  //     }
-  //     // if the property value has not been seen before
-  //     seen[property] = true; // mark it as seen
-  //     return true; // include the object in the new array
-  //   });
-  // }
-  // 選擇關鍵字
-  const chooseKeyword = React.useCallback(
-    (Keyword: String) => {
-      // 選擇的例句
-      const nowkeywordOption = keywordOption.find((item) => {
-        return item.name === dataCheckValue && item;
-      });
-      console.log(nowkeywordOption);
-      console.log(Keyword);
-    },
-    [keywordOption, dataCheckValue],
-  );
   // 儲存關鍵字
   const saveKeyword = React.useCallback(
     (keywordQuestion) => {
       // 檢查是否有填完關鍵字
-      // 儲存共用標籤
+
+      // 儲存當前關鍵字
       let keyType = '';
-      console.log(nowSentenceTypeOption);
       keyType = nowSentenceTypeOption?.label;
-      console.log(keyType);
       if (keyType === undefined) {
         keyType = nowSentenceTypeOption[0]?.label;
       }
+      // 儲存共用標籤
       let savealllabel = '';
       savealllabel = {
         keyword: nowkeyword.value,
@@ -270,21 +244,14 @@ const CreateNewStory: React.FC<CreateNewStoryProps> = (props) => {
       let mergenokeywordType = '';
       mergenokeywordType = nokeyword;
       // 判斷例句有無關鍵字
-      console.log(keywordType !== undefined);
       if (keywordType !== undefined) {
         // 合併當前關鍵字(合併未完成的關鍵字)
-        // mergenokeywordType = keywordType;
-        // mergenokeywordType.push(nokeyword);
 
         // 合併當前關鍵字(合併完成的關鍵字)
         let mergekeywordType = '';
-        console.log(keywordType);
         let keywordTypeisfind = 0;
-
-        console.log(keywordTypeisfind);
         keywordType.find((item) => {
           // 檢查有沒有錯誤的關鍵字與這次輸入的語句庫類別一樣
-          console.log(item.keyType === keyType);
           if (item.keyType === keyType) {
             item.label = nowkeyword.value;
             item.state = 'true';
@@ -297,49 +264,34 @@ const CreateNewStory: React.FC<CreateNewStoryProps> = (props) => {
         }
         // 修改例句資料
         const newkeywordOption = keywordOption;
-        console.log(newkeywordOption);
         newkeywordOption.forEach((item) => {
-          console.log(item);
-          console.log('item.name === keywordQuestion');
           console.log(item.name === keywordQuestion);
-          if (item.name === keywordQuestion) {
-            console.log(mergekeywordType);
-
+          console.log(item.keywordType);
+          console.log(item.name);
+          console.log(keywordQuestion);
+          if (item.name === keywordQuestion && item.check === 'true') {
             item.keywordType = mergekeywordType;
-          } else {
             // 例句選項沒有關鍵字類別
+            console.log(item.keywordType.length === 0);
+          } else if (item.keywordType.length === 0) {
+            item.keywordType.push(mergenokeywordType);
             console.log(
-              item.keywordType.length === 0 && item.name !== keywordQuestion,
+              item.keywordType.some((obj) => obj.keyType === keyType),
             );
-            if (
-              item.keywordType.length === 0 &&
-              item.name !== keywordQuestion
-            ) {
-              // setkeywordType(mergenokeywordType);
-              item.keywordType.push(mergenokeywordType);
-            }
+          } else if (item.keywordType.some((obj) => obj.keyType === keyType)) {
             console.log(item.keywordType);
-
-            // console.log(result);
-            item.keywordType.filter((obj) => {
-              console.log(obj);
-              console.log(keyType);
-              console.log(nokeyword);
-              // if(obj.keyType === keyType && obj.state === 'false'){
-              //   obj.label = nowkeyword.value;
-              //   item.state = 'true';
-              //   keywordTypeisfind = 1;
-              // }
-              console.log(obj.keyType !== keyType);
-              if (obj.keyType !== keyType) {
-                console.log('nook');
-                item.keywordType.push(nokeyword);
-                const result = item.keywordType.filter(
-                  (mergeResult) => mergeResult.state === 'true',
-                );
-                item.keywordType = result;
-              }
-            });
+            console.log(item);
+            item.keywordType = item.keywordType.filter(
+              (objkeywordType) =>
+                !(
+                  objkeywordType.keyType === keyType &&
+                  objkeywordType.state === 'false'
+                ),
+            );
+          } else {
+            console.log(item);
+            console.log(item.keywordType);
+            item.keywordType.push(nokeyword);
           }
         });
         console.log(newkeywordOption);
@@ -593,8 +545,6 @@ const CreateNewStory: React.FC<CreateNewStoryProps> = (props) => {
   }, [slots]);
 
   // 語句庫分類選擇
-
-  // const Selectlabel = React.useRef();
   const changeSentenceTypeOption = React.useCallback(
     (obj: any) => {
       console.log(obj);
@@ -650,12 +600,9 @@ const CreateNewStory: React.FC<CreateNewStoryProps> = (props) => {
         try {
           const statementLibrary = allLabel?.map((item) => {
             if (item.keyType === obj.value) {
-              item.nowSlotChild.map((nowSlotChilds) => {
-                setSelectValue({
-                  value: nowSlotChilds.value,
-                  label: nowSlotChilds.value,
-                });
-              });
+              // item.nowSlotChild.map((nowSlotChilds) => {
+              // });
+              setSelectValue(item.nowSlotChild);
               setIdentifier(item.Identifier);
               return item.nowSlotChild;
             }
@@ -684,8 +631,36 @@ const CreateNewStory: React.FC<CreateNewStoryProps> = (props) => {
       setIdentifier([]);
     }
   }, [nowSentenceTypeOption]);
+  // 選擇關鍵字
+  const chooseKeyword = React.useCallback(
+    (Keyword: String, index: String) => {
+      // 選擇的例句
+      const nowkeywordOption = keywordOption.find((item) => {
+        return item.name === dataCheckValue && item;
+      });
+      // 選擇的關鍵字
+      const choose = nowkeywordOption.keywordType[index].keyType;
+      // 更新例句關鍵字狀態
+      const newOption = keywordOption;
+      newOption.forEach((item) => {
+        console.log(item.name === dataCheckValue);
+        if (item.name === dataCheckValue) {
+          item.slotType = Number(index) + 1;
+        }
+      });
+      setkeywordOption(newOption);
+      // 語句庫分類已選項目
+      setnowSentenceTypeOption(choose);
+      // 多選標籤狀態
+      setSelectValue([]);
+      // 語句庫分類選擇
+      changeSentenceTypeOption(choose);
+      // 當前關鍵字
+      setKeywordvalue(choose.label);
+    },
+    [keywordOption, dataCheckValue],
+  );
   // 同義字處理
-
   const changeIdentifier = React.useCallback(
     (e: any, Identifiers: string, type: string) => {
       setInputValue(e);
@@ -715,8 +690,10 @@ const CreateNewStory: React.FC<CreateNewStoryProps> = (props) => {
   // 載入關鍵字資料
   const loadkeywordOption = React.useCallback(
     (e: String) => {
+      console.log(e);
+      // 要更新的關鍵字資料
       let updatekeywordOption;
-
+      // 第一次載入需要設定的資料
       if (onlyOneloadkeywordOption === 0) {
         updatekeywordOption = questionValue.map((item) => {
           console.log(item.question);
@@ -759,11 +736,14 @@ const CreateNewStory: React.FC<CreateNewStoryProps> = (props) => {
                 label: item.keywordType[newslotType]?.keyType,
               };
             }
-
+            console.log(newnowSentenceTypeOption);
+            // 語句庫分類已選項目
             setnowSentenceTypeOption(newnowSentenceTypeOption);
+            // 多選標籤狀態
             setSelectValue([]);
-            setnowSentenceTypeOption(newnowSentenceTypeOption);
+            // 語句庫分類選擇
             changeSentenceTypeOption(newnowSentenceTypeOption);
+            // 當前關鍵字
             setKeywordvalue(newkeywordType);
           } else {
             item.check = 'false';
@@ -1530,12 +1510,12 @@ const CreateNewStory: React.FC<CreateNewStoryProps> = (props) => {
 
                                         {nowkeyword?.value}
                                       </div>
-                                      {keywordType?.map((itm) => {
+                                      {keywordType?.map((itm, index) => {
                                         return (
                                           <button
                                             name="other"
                                             onClick={() => {
-                                              chooseKeyword(itm.label);
+                                              chooseKeyword(itm.label, index);
                                             }}
                                             key={`${itm.label}`}
                                             className={style.keywordBtn}
