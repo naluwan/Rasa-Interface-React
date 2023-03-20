@@ -111,19 +111,17 @@ const CreateNewStory: React.FC<CreateNewStoryProps> = (props) => {
   const [nowkeyword, setnowkeyword] = React.useState({ value: '', error: '' });
   // 語句庫分類已選項目 State16
   const [nowSentenceTypeOption, setnowSentenceTypeOption] = React.useState([]);
-  // (關鍵字設定)當前多選標籤狀態 State17
-  const [selectValue, setSelectValue] = React.useState([]);
-  // 關鍵字類別 State18
+  // 關鍵字所有儲存類別 State17
   const [keywordType, setkeywordType] = React.useState([]);
 
-  // 語句庫子選項 可選項目 State19
+  // 語句庫子選項 可選項目 State18
   const [slotChild, setslotChild] = React.useState();
-  // 同義詞分類 State20
+  // 同義詞分類 State19
   const [Identifier, setIdentifier] = React.useState([]);
 
-  // 語句庫子選項 已選項目 State21
+  // 語句庫子選項 已選項目 State20
   const [nowSlotChild, setnowSlotChild] = React.useState();
-  // 語句庫分類 同義詞輸入狀態 State22
+  // 語句庫分類 同義詞輸入狀態 State21
   const [inputValue, setInputValue] = React.useState('');
   React.useEffect(() => {
     categories?.map((category) => {
@@ -140,7 +138,7 @@ const CreateNewStory: React.FC<CreateNewStoryProps> = (props) => {
   // 統一關鍵字設定24
   const [allleywordStep, setallleywordStep] = React.useState();
 
-  // 機器人回應 State25
+  // 機器人回應 State24
   const [botValue, setbotValue] = React.useState([
     { id: uuid(), reply: '', error: '' },
   ]);
@@ -281,6 +279,7 @@ const CreateNewStory: React.FC<CreateNewStoryProps> = (props) => {
           } else if (item.keywordType.some((obj) => obj.keyType === keyType)) {
             console.log(item.keywordType);
             console.log(item);
+            // 如果關鍵字類別同時相同,保存狀態false就篩選掉
             item.keywordType = item.keywordType.filter(
               (objkeywordType) =>
                 !(
@@ -291,7 +290,13 @@ const CreateNewStory: React.FC<CreateNewStoryProps> = (props) => {
           } else {
             console.log(item);
             console.log(item.keywordType);
+            item.isSave = 'false';
             item.keywordType.push(nokeyword);
+          }
+          if (item.keywordType.some((obj) => obj.state === 'false')) {
+            item.isSave = 'false';
+          } else {
+            item.isSave = 'true';
           }
         });
         console.log(newkeywordOption);
@@ -302,6 +307,10 @@ const CreateNewStory: React.FC<CreateNewStoryProps> = (props) => {
         // setkeywordType(newkeyword);
         setnowkeyword({ value: '', error: '' });
       }
+      setKeywordvalue('');
+      setnowkeyword({ value: '', error: '' });
+      setnowSentenceTypeOption([]);
+      setInputValue('');
       console.log(savealllabel);
       // 更新狀態
       // if (allLabel === undefined) {
@@ -396,7 +405,14 @@ const CreateNewStory: React.FC<CreateNewStoryProps> = (props) => {
       setallleywordStep,
     ],
   );
-
+  // 新增關鍵字
+  const addKeyword = React.useCallback(() => {
+    // 清除當前關鍵字資料
+    setKeywordvalue('');
+    // 清除語句庫分類已選項目
+    setnowSentenceTypeOption([]);
+    setInputValue('');
+  }, [setKeywordvalue, setnowSentenceTypeOption, setInputValue]);
   // textarea 自適應高度
   const textAreaRef = React.useRef();
   React.useEffect(() => {
@@ -602,7 +618,7 @@ const CreateNewStory: React.FC<CreateNewStoryProps> = (props) => {
             if (item.keyType === obj.value) {
               // item.nowSlotChild.map((nowSlotChilds) => {
               // });
-              setSelectValue(item.nowSlotChild);
+              setnowSlotChild(item.nowSlotChild);
               setIdentifier(item.Identifier);
               return item.nowSlotChild;
             }
@@ -634,10 +650,18 @@ const CreateNewStory: React.FC<CreateNewStoryProps> = (props) => {
   // 選擇關鍵字
   const chooseKeyword = React.useCallback(
     (Keyword: String, index: String) => {
+      // 清除當前關鍵字資料
+      setKeywordvalue('');
+      // 清除語句庫分類已選項目
+      setnowSentenceTypeOption([]);
+      setInputValue('');
+
       // 選擇的例句
       const nowkeywordOption = keywordOption.find((item) => {
         return item.name === dataCheckValue && item;
       });
+
+      console.log(nowkeywordOption);
       // 選擇的關鍵字
       const choose = nowkeywordOption.keywordType[index].keyType;
       // 更新例句關鍵字狀態
@@ -648,17 +672,33 @@ const CreateNewStory: React.FC<CreateNewStoryProps> = (props) => {
           item.slotType = Number(index) + 1;
         }
       });
+      // 選擇當前同義字
+      const nowlabel = allLabel.find((item) => {
+        return item.keyType === choose && item;
+      });
+      setIdentifier(nowlabel);
+      console.log(nowkeywordOption);
+      // 當前關鍵字
+      setKeywordvalue(Keyword);
       setkeywordOption(newOption);
       // 語句庫分類已選項目
-      setnowSentenceTypeOption(choose);
       // 多選標籤狀態
-      setSelectValue([]);
+      // setnowSlotChild([]);
       // 語句庫分類選擇
-      changeSentenceTypeOption(choose);
-      // 當前關鍵字
-      setKeywordvalue(choose.label);
+      changeSentenceTypeOption({ value: choose, error: choose });
     },
-    [keywordOption, dataCheckValue],
+    [
+      allLabel,
+      setIdentifier,
+      Identifier,
+      nowSlotChild,
+      slotChild,
+      keywordOption,
+      dataCheckValue,
+      setKeywordvalue,
+      setnowSentenceTypeOption,
+      setInputValue,
+    ],
   );
   // 同義字處理
   const changeIdentifier = React.useCallback(
@@ -703,7 +743,7 @@ const CreateNewStory: React.FC<CreateNewStoryProps> = (props) => {
               id: uuid(), // key值
               name: item.question, // 例句名稱
               check: 'true', // 是否被選擇
-              isSave: 'false', // 關鍵字是否都存檔
+              isSave: '', // 關鍵字是否都存檔
               slotType: 1, // 現在選擇哪個關鍵字
               keywordType: [], // 所有關鍵字
             };
@@ -712,7 +752,7 @@ const CreateNewStory: React.FC<CreateNewStoryProps> = (props) => {
             id: uuid(),
             name: item.question,
             check: 'false',
-            isSave: 'false',
+            isSave: '',
             slotType: 1,
             keywordType: [],
           };
@@ -740,7 +780,7 @@ const CreateNewStory: React.FC<CreateNewStoryProps> = (props) => {
             // 語句庫分類已選項目
             setnowSentenceTypeOption(newnowSentenceTypeOption);
             // 多選標籤狀態
-            setSelectValue([]);
+            setnowSlotChild([]);
             // 語句庫分類選擇
             changeSentenceTypeOption(newnowSentenceTypeOption);
             // 當前關鍵字
@@ -762,7 +802,7 @@ const CreateNewStory: React.FC<CreateNewStoryProps> = (props) => {
     [
       keywordOption,
       setkeywordOption,
-      setSelectValue,
+      setnowSlotChild,
       questionValue,
       dataCheckValue,
       nowSentenceTypeOption,
@@ -997,6 +1037,7 @@ const CreateNewStory: React.FC<CreateNewStoryProps> = (props) => {
             }
           });
           if (stepError !== 'error') {
+            loadkeywordOption(questionValue[0].question);
             setcreactStoryStep('creactkeywords');
             settitle('');
           }
@@ -1044,6 +1085,7 @@ const CreateNewStory: React.FC<CreateNewStoryProps> = (props) => {
       }
     },
     [
+      loadkeywordOption,
       creactStoryStep,
       title,
       CreactNewQuestion,
@@ -1416,13 +1458,13 @@ const CreateNewStory: React.FC<CreateNewStoryProps> = (props) => {
                     <div className={cx(style.creactStoryTitle)}>
                       <h3>選擇問句</h3>
                     </div>
-                    {questionValue.map((item) => {
+                    {keywordOption.map((item) => {
                       return (
                         <div key={`questionValue${item.id}`}>
                           <label
-                            data-check={dataCheckValue === item.question}
+                            data-check={dataCheckValue === item.name}
                             data-slot="false"
-                            onClick={() => loadkeywordOption(item.question)}
+                            onClick={() => loadkeywordOption(item.name)}
                             className={cx(style.customCheckbox)}
                             htmlFor={item.id}
                           >
@@ -1432,12 +1474,20 @@ const CreateNewStory: React.FC<CreateNewStoryProps> = (props) => {
                               name="creactkeywords"
                               type="radio"
                             />
-                            <span name="checkIcon" data-foo={item.question} />
+                            <span name="checkIcon" data-foo={item.name} />
                             <span name="checkItem">
-                              <img
-                                src={require('../../images/creactStory/bi_exclamation-circle-fill.png')}
-                                alt=""
-                              />
+                              {item.isSave === 'false' && (
+                                <img
+                                  src={require('../../images/creactStory/bi_exclamation-circle-fill.png')}
+                                  alt=""
+                                />
+                              )}
+                              {item.isSave === 'true' && (
+                                <img
+                                  src={require('../../images/creactStory/avatar.png')}
+                                  alt=""
+                                />
+                              )}
                             </span>
                           </label>
                         </div>
@@ -1531,9 +1581,13 @@ const CreateNewStory: React.FC<CreateNewStoryProps> = (props) => {
                                           </button>
                                         );
                                       })}
+
                                       <button
                                         name="add"
                                         className={style.keywordBtn}
+                                        onClick={() => {
+                                          addKeyword();
+                                        }}
                                       >
                                         + 新增關鍵字
                                       </button>
@@ -1577,7 +1631,7 @@ const CreateNewStory: React.FC<CreateNewStoryProps> = (props) => {
                                         placeholder="輸入即可新增語句庫分類"
                                         value={nowSentenceTypeOption}
                                         onChange={(e) => {
-                                          setSelectValue([]);
+                                          setnowSlotChild([]);
                                           setnowSentenceTypeOption([e]);
                                           changeSentenceTypeOption(e);
                                         }}
@@ -1607,12 +1661,12 @@ const CreateNewStory: React.FC<CreateNewStoryProps> = (props) => {
                                             key={`select-${nowSentenceTypeOption}`}
                                             isMulti
                                             id="Selectlabel"
-                                            value={selectValue}
+                                            value={nowSlotChild}
                                             placeholder="輸入即可新增標籤"
                                             name="Selectlabel"
                                             options={slotChild[0]}
                                             onChange={(e) => {
-                                              setSelectValue(e);
+                                              setnowSlotChild(e);
                                               changeSlotChild(e);
                                             }}
                                             menuPlacement="bottom"
