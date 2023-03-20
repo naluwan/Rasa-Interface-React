@@ -103,6 +103,8 @@ const CreateNewStory: React.FC<CreateNewStoryProps> = (props) => {
   const [SentenceTypeOption, setSentenceTypeOption] = React.useState();
   // 關鍵字資料(選擇用戶問句) State12
   const [keywordOption, setkeywordOption] = React.useState([]);
+  // 關鍵字設定所有欄位狀態
+  const [keywordInput, setkeywordInput] = React.useState();
   // 當前選擇的例句 State13
   const [dataCheckValue, setdataCheckValue] = React.useState();
   // 當前關鍵字 State14
@@ -390,8 +392,11 @@ const CreateNewStory: React.FC<CreateNewStoryProps> = (props) => {
       console.log(step);
       console.log(allleywordStep);
       console.log('ok!');
+      setkeywordInput(false);
     },
     [
+      setkeywordInput,
+      keywordInput,
       nowkeyword,
       questionValue,
       Identifier,
@@ -407,6 +412,7 @@ const CreateNewStory: React.FC<CreateNewStoryProps> = (props) => {
   );
   // 新增關鍵字
   const addKeyword = React.useCallback(() => {
+    setkeywordInput(true);
     // 清除當前關鍵字資料
     setKeywordvalue('');
     // 清除語句庫分類已選項目
@@ -650,6 +656,7 @@ const CreateNewStory: React.FC<CreateNewStoryProps> = (props) => {
   // 選擇關鍵字
   const chooseKeyword = React.useCallback(
     (Keyword: String, index: String) => {
+      setkeywordInput(true);
       // 清除當前關鍵字資料
       setKeywordvalue('');
       // 清除語句庫分類已選項目
@@ -680,6 +687,7 @@ const CreateNewStory: React.FC<CreateNewStoryProps> = (props) => {
       console.log(nowkeywordOption);
       // 當前關鍵字
       setKeywordvalue(Keyword);
+      setnowkeyword({ value: Keyword, error: '' });
       setkeywordOption(newOption);
       // 語句庫分類已選項目
       // 多選標籤狀態
@@ -688,6 +696,9 @@ const CreateNewStory: React.FC<CreateNewStoryProps> = (props) => {
       changeSentenceTypeOption({ value: choose, error: choose });
     },
     [
+      setnowkeyword,
+      keywordInput,
+      setkeywordInput,
       allLabel,
       setIdentifier,
       Identifier,
@@ -730,6 +741,7 @@ const CreateNewStory: React.FC<CreateNewStoryProps> = (props) => {
   // 載入關鍵字資料
   const loadkeywordOption = React.useCallback(
     (e: String) => {
+      setkeywordInput(true);
       console.log(e);
       // 要更新的關鍵字資料
       let updatekeywordOption;
@@ -800,6 +812,8 @@ const CreateNewStory: React.FC<CreateNewStoryProps> = (props) => {
       setkeywordOption(updatekeywordOption);
     },
     [
+      setkeywordInput,
+      keywordInput,
       keywordOption,
       setkeywordOption,
       setnowSlotChild,
@@ -1581,94 +1595,65 @@ const CreateNewStory: React.FC<CreateNewStoryProps> = (props) => {
                                           </button>
                                         );
                                       })}
-
-                                      <button
-                                        name="add"
-                                        className={style.keywordBtn}
-                                        onClick={() => {
-                                          addKeyword();
-                                        }}
-                                      >
-                                        + 新增關鍵字
-                                      </button>
-                                    </div>
-                                    <div
-                                      className={
-                                        nowkeyword?.error.length > 0
-                                          ? (style.storyInputBlock, style.error)
-                                          : style.storyInputBlock
-                                      }
-                                    >
-                                      <label htmlFor={`keyword${item.id}`}>
-                                        關鍵字{item.slotType}
-                                      </label>
-                                      <input
-                                        className={cx(style.formStyle)}
-                                        id={`keyword${item.id}`}
-                                        placeholder={`請輸入『${item.name}』關鍵字`}
-                                        onChange={(e) => {
-                                          setKeywordvalue(e.target.value);
-                                          checkKeyword(e.target.value);
-                                        }}
-                                        value={Keywordvalue}
-                                        type="text"
-                                      />
-                                      {nowkeyword?.error.length > 0 && (
-                                        <div className={style.errorMsg}>
-                                          {nowkeyword.error}
-                                        </div>
+                                      {keywordInput === false && (
+                                        <button
+                                          name="add"
+                                          className={style.keywordBtn}
+                                          onClick={() => {
+                                            addKeyword();
+                                          }}
+                                        >
+                                          + 新增關鍵字
+                                        </button>
                                       )}
                                     </div>
-                                    <div>
-                                      <label htmlFor="SentenceType">
-                                        語句庫分類
-                                      </label>
-                                      <CreatableSelect
-                                        key={`SentenceType-${nowSentenceTypeOption}`}
-                                        isClearable
-                                        id="SentenceType"
-                                        name="SentenceType"
-                                        placeholder="輸入即可新增語句庫分類"
-                                        value={nowSentenceTypeOption}
-                                        onChange={(e) => {
-                                          setnowSlotChild([]);
-                                          setnowSentenceTypeOption([e]);
-                                          changeSentenceTypeOption(e);
-                                        }}
-                                        options={SentenceTypeOption}
-                                        menuPlacement="bottom"
-                                        styles={{
-                                          menuPortal: (base) => ({
-                                            ...base,
-                                            zIndex: 9999,
-                                          }),
-                                        }}
-                                        menuPortalTarget={document.querySelector(
-                                          'body',
-                                        )}
-                                      />
-                                    </div>
-                                    <div>
-                                      {slotChild && (
-                                        <>
-                                          <label
-                                            key={`label${nowSentenceTypeOption}`}
-                                            htmlFor="Selectlabel"
-                                          >
-                                            標籤
+                                    {keywordInput === true && (
+                                      <>
+                                        <div
+                                          className={
+                                            nowkeyword?.error.length > 0
+                                              ? (style.storyInputBlock,
+                                                style.error)
+                                              : style.storyInputBlock
+                                          }
+                                        >
+                                          <label htmlFor={`keyword${item.id}`}>
+                                            關鍵字{item.slotType}
+                                          </label>
+                                          <input
+                                            className={cx(style.formStyle)}
+                                            id={`keyword${item.id}`}
+                                            placeholder={`請輸入『${item.name}』關鍵字`}
+                                            onChange={(e) => {
+                                              setKeywordvalue(e.target.value);
+                                              checkKeyword(e.target.value);
+                                            }}
+                                            value={Keywordvalue}
+                                            type="text"
+                                          />
+                                          {nowkeyword?.error.length > 0 && (
+                                            <div className={style.errorMsg}>
+                                              {nowkeyword.error}
+                                            </div>
+                                          )}
+                                        </div>
+                                        <div>
+                                          <label htmlFor="SentenceType">
+                                            語句庫分類
                                           </label>
                                           <CreatableSelect
-                                            key={`select-${nowSentenceTypeOption}`}
-                                            isMulti
-                                            id="Selectlabel"
-                                            value={nowSlotChild}
-                                            placeholder="輸入即可新增標籤"
-                                            name="Selectlabel"
-                                            options={slotChild[0]}
+                                            key={`SentenceType-${nowSentenceTypeOption}`}
+                                            isClearable
+                                            id="SentenceType"
+                                            name="SentenceType"
+                                            placeholder="輸入即可新增語句庫分類"
+                                            value={nowSentenceTypeOption}
                                             onChange={(e) => {
-                                              setnowSlotChild(e);
-                                              changeSlotChild(e);
+                                              setnowSlotChild([]);
+                                              setnowSentenceTypeOption([e]);
+                                              changeSentenceTypeOption(e);
                                             }}
+                                            options={SentenceTypeOption}
                                             menuPlacement="bottom"
                                             styles={{
                                               menuPortal: (base) => ({
@@ -1680,122 +1665,165 @@ const CreateNewStory: React.FC<CreateNewStoryProps> = (props) => {
                                               'body',
                                             )}
                                           />
-                                        </>
-                                      )}
-                                    </div>
-                                    {/* <button>
-                                      <h4>進階設定</h4>
-                                    </button> */}
-                                    {Identifier.length > 0 &&
-                                      nowSlotChild &&
-                                      slotChild && (
-                                        <>
-                                          <div>同義詞設定</div>
-                                          {nowSlotChild?.map((resemblance) => {
-                                            return (
-                                              <div
-                                                key={resemblance?.value}
-                                                className="row"
+                                        </div>
+                                        <div>
+                                          {slotChild && (
+                                            <>
+                                              <label
+                                                key={`label${nowSentenceTypeOption}`}
+                                                htmlFor="Selectlabel"
                                               >
-                                                <div className="col-5">
-                                                  <div>
-                                                    <label htmlFor="">
-                                                      標籤
-                                                    </label>
-                                                  </div>
-                                                  <div
-                                                    key={`resemblance${resemblance?.value}`}
-                                                    className={cx(
-                                                      style.formStyle,
-                                                    )}
-                                                  >
-                                                    {resemblance?.value}
-                                                  </div>
-                                                </div>
-                                                <div className="col-7">
-                                                  <div>
-                                                    <label htmlFor="">
-                                                      同義詞
-                                                    </label>
-                                                  </div>
-                                                  <div>
-                                                    <CreatableSelect
-                                                      key={`ss${resemblance?.value}`}
-                                                      components={components}
-                                                      inputValue={
-                                                        Identifier?.find(
-                                                          (obj) =>
-                                                            obj.label ===
-                                                            resemblance?.value,
-                                                        )?.oninput ?? ''
-                                                      }
-                                                      isClearable
-                                                      isMulti
-                                                      menuIsOpen={false}
-                                                      onChange={(newValue) => {
-                                                        let a = '';
-                                                        a = newValue.filter(
-                                                          (nv) =>
-                                                            nv.length !== 0,
-                                                        );
+                                                標籤
+                                              </label>
+                                              <CreatableSelect
+                                                key={`select-${nowSentenceTypeOption}`}
+                                                isMulti
+                                                id="Selectlabel"
+                                                value={nowSlotChild}
+                                                placeholder="輸入即可新增標籤"
+                                                name="Selectlabel"
+                                                options={slotChild[0]}
+                                                onChange={(e) => {
+                                                  setnowSlotChild(e);
+                                                  changeSlotChild(e);
+                                                }}
+                                                menuPlacement="bottom"
+                                                styles={{
+                                                  menuPortal: (base) => ({
+                                                    ...base,
+                                                    zIndex: 9999,
+                                                  }),
+                                                }}
+                                                menuPortalTarget={document.querySelector(
+                                                  'body',
+                                                )}
+                                              />
+                                            </>
+                                          )}
+                                        </div>
+                                        {/* <button>
+                                        <h4>進階設定</h4>
+                                      </button> */}
+                                        {Identifier.length > 0 &&
+                                          nowSlotChild &&
+                                          slotChild && (
+                                            <>
+                                              <div>同義詞設定</div>
+                                              {nowSlotChild?.map(
+                                                (resemblance) => {
+                                                  return (
+                                                    <div
+                                                      key={resemblance?.value}
+                                                      className="row"
+                                                    >
+                                                      <div className="col-5">
+                                                        <div>
+                                                          <label htmlFor="">
+                                                            標籤
+                                                          </label>
+                                                        </div>
+                                                        <div
+                                                          key={`resemblance${resemblance?.value}`}
+                                                          className={cx(
+                                                            style.formStyle,
+                                                          )}
+                                                        >
+                                                          {resemblance?.value}
+                                                        </div>
+                                                      </div>
+                                                      <div className="col-7">
+                                                        <div>
+                                                          <label htmlFor="">
+                                                            同義詞
+                                                          </label>
+                                                        </div>
+                                                        <div>
+                                                          <CreatableSelect
+                                                            key={`ss${resemblance?.value}`}
+                                                            components={
+                                                              components
+                                                            }
+                                                            inputValue={
+                                                              Identifier?.find(
+                                                                (obj) =>
+                                                                  obj.label ===
+                                                                  resemblance?.value,
+                                                              )?.oninput ?? ''
+                                                            }
+                                                            isClearable
+                                                            isMulti
+                                                            menuIsOpen={false}
+                                                            onChange={(
+                                                              newValue,
+                                                            ) => {
+                                                              let a = '';
+                                                              a =
+                                                                newValue.filter(
+                                                                  (nv) =>
+                                                                    nv.length !==
+                                                                    0,
+                                                                );
 
-                                                        changeIdentifier(
-                                                          a,
-                                                          resemblance?.value,
-                                                          'onChange',
-                                                        );
-                                                      }}
-                                                      onInputChange={(
-                                                        newValue,
-                                                      ) => {
-                                                        changeIdentifier(
-                                                          newValue,
-                                                          resemblance?.value,
-                                                          'onInputChange',
-                                                        );
-                                                      }}
-                                                      onKeyDown={(e) => {
-                                                        handleKeyDown(
-                                                          e,
-                                                          resemblance?.value,
-                                                        );
-                                                      }}
-                                                      value={
-                                                        Identifier?.find(
-                                                          (obj) =>
-                                                            obj.label ===
-                                                            resemblance?.value,
-                                                        )?.data ?? ''
-                                                      }
-                                                      placeholder={`請輸入${resemblance?.value}的同義詞`}
-                                                    />
-                                                  </div>
-                                                </div>
+                                                              changeIdentifier(
+                                                                a,
+                                                                resemblance?.value,
+                                                                'onChange',
+                                                              );
+                                                            }}
+                                                            onInputChange={(
+                                                              newValue,
+                                                            ) => {
+                                                              changeIdentifier(
+                                                                newValue,
+                                                                resemblance?.value,
+                                                                'onInputChange',
+                                                              );
+                                                            }}
+                                                            onKeyDown={(e) => {
+                                                              handleKeyDown(
+                                                                e,
+                                                                resemblance?.value,
+                                                              );
+                                                            }}
+                                                            value={
+                                                              Identifier?.find(
+                                                                (obj) =>
+                                                                  obj.label ===
+                                                                  resemblance?.value,
+                                                              )?.data ?? ''
+                                                            }
+                                                            placeholder={`請輸入${resemblance?.value}的同義詞`}
+                                                          />
+                                                        </div>
+                                                      </div>
+                                                    </div>
+                                                  );
+                                                },
+                                              )}
+                                              <div
+                                                className={cx(
+                                                  style.saveBlock,
+                                                  'mt-2',
+                                                )}
+                                              >
+                                                <button
+                                                  className={cx(style.stepBtn)}
+                                                >
+                                                  取消
+                                                </button>
+                                                <button
+                                                  className={cx(style.stepBtn)}
+                                                  onClick={() => {
+                                                    saveKeyword(item.name);
+                                                  }}
+                                                >
+                                                  儲存
+                                                </button>
                                               </div>
-                                            );
-                                          })}
-                                          <div
-                                            className={cx(
-                                              style.saveBlock,
-                                              'mt-2',
-                                            )}
-                                          >
-                                            <button
-                                              className={cx(style.stepBtn)}
-                                            >
-                                              取消
-                                            </button>
-                                            <button
-                                              className={cx(style.stepBtn)}
-                                              onClick={() => {
-                                                saveKeyword(item.name);
-                                              }}
-                                            >
-                                              儲存
-                                            </button>
-                                          </div>
-                                        </>
-                                      )}
+                                            </>
+                                          )}
+                                      </>
+                                    )}
                                   </div>
                                 )
                               );
