@@ -1,3 +1,4 @@
+/* eslint-disable no-shadow */
 /* eslint-disable no-underscore-dangle */
 /* eslint-disable prefer-spread */
 /* eslint-disable react-hooks/exhaustive-deps */
@@ -103,27 +104,27 @@ const CreateNewStory: React.FC<CreateNewStoryProps> = (props) => {
   const [SentenceTypeOption, setSentenceTypeOption] = React.useState();
   // 關鍵字資料(選擇用戶問句) State12
   const [keywordOption, setkeywordOption] = React.useState([]);
-  // 關鍵字設定所有欄位狀態
+  // 關鍵字設定所有欄位狀態13
   const [keywordInput, setkeywordInput] = React.useState();
-  // 當前選擇的例句 State13
+  // 當前選擇的例句 State14
   const [dataCheckValue, setdataCheckValue] = React.useState();
-  // 當前關鍵字 State14
+  // 當前關鍵字 State15
   const [Keywordvalue, setKeywordvalue] = React.useState();
-  // 當前關鍵字(檢核) State15
+  // 當前關鍵字(檢核) State16
   const [nowkeyword, setnowkeyword] = React.useState({ value: '', error: '' });
-  // 語句庫分類已選項目 State16
+  // 語句庫分類已選項目 State17
   const [nowSentenceTypeOption, setnowSentenceTypeOption] = React.useState([]);
-  // 關鍵字所有儲存類別 State17
+  // 關鍵字所有儲存類別 State18
   const [keywordType, setkeywordType] = React.useState([]);
 
-  // 語句庫子選項 可選項目 State18
+  // 語句庫子選項 可選項目 State19
   const [slotChild, setslotChild] = React.useState();
-  // 同義詞分類 State19
+  // 同義詞分類 State20
   const [Identifier, setIdentifier] = React.useState([]);
 
-  // 語句庫子選項 已選項目 State20
+  // 語句庫子選項 已選項目 State21
   const [nowSlotChild, setnowSlotChild] = React.useState();
-  // 語句庫分類 同義詞輸入狀態 State21
+  // 語句庫分類 同義詞輸入狀態 State22
   const [inputValue, setInputValue] = React.useState('');
   React.useEffect(() => {
     categories?.map((category) => {
@@ -135,12 +136,12 @@ const CreateNewStory: React.FC<CreateNewStoryProps> = (props) => {
       });
     });
   }, [categories]);
-  // 共用標籤同義詞23
-  const [allLabel, setallLabel] = React.useState();
-  // 統一關鍵字設定24
+  // 共用標籤同義詞24
+  const [allLabel, setallLabel] = React.useState('');
+  // 統一關鍵字設定25
   const [allleywordStep, setallleywordStep] = React.useState();
 
-  // 機器人回應 State24
+  // 機器人回應 State26
   const [botValue, setbotValue] = React.useState([
     { id: uuid(), reply: '', error: '' },
   ]);
@@ -236,7 +237,11 @@ const CreateNewStory: React.FC<CreateNewStoryProps> = (props) => {
         nowSlotChild,
         Identifier,
       }; // 當前同義字資料
-      setallLabel([savealllabel]);
+      if (allLabel.length === 0) {
+        setallLabel([savealllabel]);
+      } else {
+        setallLabel([allLabel[0], savealllabel]);
+      }
       // 完成的關鍵字
       const newkeyword = { label: nowkeyword.value, state: 'true', keyType };
       // 未完成的關鍵字
@@ -345,51 +350,92 @@ const CreateNewStory: React.FC<CreateNewStoryProps> = (props) => {
       // }
       // keywordQuestion 例句
       // nowkeyword.value 關鍵字
-      const start = keywordQuestion.indexOf(nowkeyword.value);
-      const end = start + nowkeyword.value.length;
+      // const start = keywordQuestion.indexOf(nowkeyword.value);
+      // const end = start + nowkeyword.value.length;
 
-      const examplesValue = Identifier.flatMap((item) =>
-        item.data.map((dataItem) => ({
-          entities: [
-            {
-              start,
-              end: start + dataItem.label.length,
-              value: item.label,
-            },
-          ],
-          intent: storeName.name,
-          text:
-            keywordQuestion.slice(0, start) +
-            dataItem.label +
-            keywordQuestion.slice(end),
-        })),
-      );
-      // 關鍵字抓start end
-      const step = [
-        {
-          user: keywordQuestion, // 使用者問句
-          intent: storeName.name, // 故事名稱
+      // const examplesValue = Identifier.flatMap((item) =>
+      //   item.data.map((dataItem) => ({
+      //     entities: [
+      //       {
+      //         start,
+      //         end: start + dataItem.label.length,
+      //         value: item.label,
+      //       },
+      //     ],
+      //     intent: storeName.name,
+      //     text:
+      //       keywordQuestion.slice(0, start) +
+      //       dataItem.label +
+      //       keywordQuestion.slice(end),
+      //   })),
+      // );
+      // 20230322start
+      // const examplesValue = [];
 
-          // 標籤
-          entities: [
-            {
-              end,
-              entity: nowSentenceTypeOption.toString(), // 語句庫分類
-              start,
-              // value: '新竹', // 標籤
-            },
-          ],
-          // 使用者例句
-          examples: examplesValue,
-          // 故事分類
-          // metadata: {
-          //   category: '測試',
-          // },
-        },
-      ];
-      setallleywordStep(step);
-      console.log('step資料');
-      console.log(step);
+      // // 遍歷所有例句及其關鍵字類型
+      // keywordOption.forEach(option => {
+      //   const name = option.name; // 例句
+      //   const keywordTypes = option.keywordType; // 例句的關鍵字類型
+
+      //   // 組合所有可能的例句
+      //   let combinations = [{ text: name }];
+      //   keywordTypes.forEach(keywordType => {
+      //     const keyType = keywordType.keyType; // 關鍵字類型
+      //     const label = keywordType.label; // 關鍵字標籤
+
+      //     // 從所有標籤中選擇符合該類型的標籤
+      //     const matchingLabels = allLabels.filter(allLabel => allLabel.keyType === keyType);
+
+      //     // 將所有可能的例句組合起來
+      //     combinations = combinations.flatMap(combination =>
+      //       matchingLabels.map(matchingLabel => ({
+      //         text: combination.text.replaceAll(label, matchingLabel.data),
+      //       }))
+      //     );
+      //   });
+
+      //   // 對每個組合生成新的例句，並抽取出實體
+      //   combinations.forEach(combination => {
+      //     const text = combination.text;
+      //     const entities = [];
+      //     let lastIndex = {}; // keep track of last found index for each data value
+      //     keywordTypes.forEach(keywordType => {
+      //       const keyType = keywordType.keyType; // 關鍵字類型
+      //       const label = keywordType.label; // 關鍵字標籤
+
+      //       // 從所有標籤中選擇符合該類型的標籤
+      //       const matchingLabels = allLabels.filter(allLabel => allLabel.keyType === keyType);
+
+      //       matchingLabels.some(matchingLabel => {
+      //         const value = matchingLabel.value; // 實體值
+      //         const data = matchingLabel.data; // 關鍵字
+
+      //         let start = text.indexOf(data, lastIndex[data]); // 開始位置
+      //         if (start !== -1) {
+      //           const end = start + data.length; // 結束位置
+      //           entities.push({
+      //             start,
+      //             end,
+      //             value,
+      //             entity: keyType,
+      //           });
+      //           lastIndex[data] = end; // update last found index for this data value
+      //           return true;
+      //         }
+      //         return false;
+      //       });
+      //     });
+
+      //     examplesValue.push({
+      //       entities,
+      //       intent: "",
+      //       text,
+      //     });
+      //   });
+      // });
+
+      // console.log(examplesValue);
+      // 20230322end
       console.log(allleywordStep);
       console.log('ok!');
       setkeywordInput(false);
@@ -410,6 +456,20 @@ const CreateNewStory: React.FC<CreateNewStoryProps> = (props) => {
       setallleywordStep,
     ],
   );
+  // 取消關鍵字設定
+  const cancelKeyword = React.useCallback(() => {
+    setKeywordvalue('');
+    setnowkeyword({ value: '', error: '' });
+    setnowSentenceTypeOption([]);
+    setInputValue('');
+    setkeywordInput(false);
+  }, [
+    setkeywordInput,
+    setKeywordvalue,
+    setnowkeyword,
+    setnowSentenceTypeOption,
+    setInputValue,
+  ]);
   // 新增關鍵字
   const addKeyword = React.useCallback(() => {
     setkeywordInput(true);
@@ -679,17 +739,22 @@ const CreateNewStory: React.FC<CreateNewStoryProps> = (props) => {
           item.slotType = Number(index) + 1;
         }
       });
+
       // 選擇當前同義字
       const nowlabel = allLabel.find((item) => {
         return item.keyType === choose && item;
       });
       setIdentifier(nowlabel);
+      console.log(choose);
       console.log(nowkeywordOption);
+      console.log(nowlabel);
+      console.log(newOption);
       // 當前關鍵字
       setKeywordvalue(Keyword);
       setnowkeyword({ value: Keyword, error: '' });
       setkeywordOption(newOption);
       // 語句庫分類已選項目
+      // setnowSentenceTypeOption
       // 多選標籤狀態
       // setnowSlotChild([]);
       // 語句庫分類選擇
@@ -741,12 +806,19 @@ const CreateNewStory: React.FC<CreateNewStoryProps> = (props) => {
   // 載入關鍵字資料
   const loadkeywordOption = React.useCallback(
     (e: String) => {
-      setkeywordInput(true);
+      setKeywordvalue('');
+      setnowkeyword({ value: '', error: '' });
+      setnowSentenceTypeOption([]);
+      setInputValue('');
+
+      setkeywordInput(false);
+
       console.log(e);
       // 要更新的關鍵字資料
       let updatekeywordOption;
       // 第一次載入需要設定的資料
       if (onlyOneloadkeywordOption === 0) {
+        setkeywordInput(true);
         updatekeywordOption = questionValue.map((item) => {
           console.log(item.question);
           console.log(e);
@@ -817,6 +889,9 @@ const CreateNewStory: React.FC<CreateNewStoryProps> = (props) => {
       keywordOption,
       setkeywordOption,
       setnowSlotChild,
+      setnowkeyword,
+      setInputValue,
+      setKeywordvalue,
       questionValue,
       dataCheckValue,
       nowSentenceTypeOption,
@@ -862,7 +937,140 @@ const CreateNewStory: React.FC<CreateNewStoryProps> = (props) => {
     },
     [setIdentifier, setInputValue, inputValue],
   );
+  // // 關鍵字組例句
+  const keywordGroup = React.useCallback(() => {
+    console.log(keywordOption[0].name);
+    // 主要例句
+    const keywordQuestion = keywordOption[0].name;
+    let entitiesValue = '';
+    console.log(keywordOption[0].keywordType.length === 1);
+    if (keywordOption[0].keywordType.length === 1) {
+      entitiesValue = [
+        {
+          start: keywordQuestion.indexOf(keywordOption[0].keywordType.label),
+          end:
+            keywordQuestion.indexOf(keywordOption[0].keywordType.label) +
+            keywordOption[0].keywordType.label.length,
+          value: keywordOption[0].keywordType.label,
+        },
+      ];
+    } else {
+      console.log(keywordOption[0].keywordType);
+      entitiesValue = keywordOption[0].keywordType.map((item) => ({
+        start: keywordQuestion.indexOf(item.label),
+        end: keywordQuestion.indexOf(item.label) + item.label.length,
+        entity: item.keyType,
+        value: item.label,
+      }));
+    }
+    console.log(entitiesValue);
+    console.log('keywordOption');
+    console.log(keywordOption);
+    console.log('allLabel');
+    console.log(allLabel);
+    // const start = keywordQuestion.indexOf(nowkeyword.value);
+    // const end = start + nowkeyword.value.length;
+    // 取出所有標籤並分類
+    const allLabels = allLabel.flatMap(({ keyType, Identifier }) =>
+      Identifier.flatMap(({ value, data }) => [
+        { keyType, value, data: value },
+        ...data.map(({ value: dataValue }) => ({
+          keyType,
+          value,
+          data: dataValue,
+        })),
+      ]),
+    );
+    console.log(allLabels);
+    // const examplesValue = keywordOption.map((keyoptions) => {
+    //   console.log(keyoptions);
+    //   // 例句名稱
+    //   // const exampleName = keyoptions.name;
+    //   return allLabel.map((allLabels) => {
+    //     console.log(allLabels);
+    //     return allLabels.Identifier.flatMap((item) => {
+    //       return item.data.map((dataItem) => ({
+    //         // entities: [
+    //         //   {
+    //         //     start: exampleName.indexOf(item.label),
+    //         //     end: exampleName.indexOf(item.label) + dataItem.label.length,
+    //         //     value: item.label,
+    //         //     entity: item.keyType,
+    //         //   },
+    //         // ],
+    //         a: item,
+    //         exampleName: keyoptions.name,
+    //         allLabelsKeyword: allLabels.keyword,
+    //         intent: storeName.name,
+    //         text:
+    //           keyoptions.name.slice(
+    //             0,
+    //             keyoptions.name.indexOf(allLabels.keyword),
+    //           ) +
+    //           dataItem.label +
+    //           keyoptions.name.slice(
+    //             keyoptions.name.indexOf(allLabels.keyword) +
+    //               dataItem.label.length,
+    //           ),
+    //       }));
+    //     });
+    //   });
+    // });
+    // console.log(examplesValue);
+    // const examplesValue = Identifier.flatMap((item) =>
+    //   item.data.map((dataItem) => ({
+    //     entities: [
+    //       {
+    //         start,
+    //         end: start + dataItem.label.length,
+    //         value: item.label,
+    //     entity:語句庫分類
+    //       },
+    //     ],
 
+    //     intent: storeName.name,
+    //     text:
+    //       keywordQuestion.slice(0, start) +
+    //       dataItem.label +
+    //       keywordQuestion.slice(end),
+    //   })),
+    // );
+    // // 關鍵字抓start end
+    // const step = [
+    //   {
+    //     user: keywordQuestion, // 使用者問句
+    //     intent: storeName.name, // 故事名稱
+
+    //     // 標籤
+    //     entities: [
+    //       {
+    //         end,
+    //         entity: nowSentenceTypeOption.toString(), // 語句庫分類
+    //         start,
+    //         // value: '新竹', // 標籤
+    //       },
+    //     ],
+    //     // 使用者例句
+    //     examples: examplesValue,
+    //     // 故事分類
+    //     // metadata: {
+    //     //   category: '測試',
+    //     // },
+    //   },
+    // ];
+    // setallleywordStep(step);
+    // console.log('step資料');
+    // console.log(step);
+  }, [
+    keywordOption,
+    nowkeyword,
+    Identifier,
+    storeName,
+    nowSentenceTypeOption,
+    setallleywordStep,
+  ]);
+
+  // },[])
   // 刪除機器人回應
   const deleteBotReply = React.useCallback(
     (id: string) => {
@@ -1051,36 +1259,17 @@ const CreateNewStory: React.FC<CreateNewStoryProps> = (props) => {
             }
           });
           if (stepError !== 'error') {
-            loadkeywordOption(questionValue[0].question);
             setcreactStoryStep('creactkeywords');
+            loadkeywordOption(questionValue[0].question);
             settitle('');
           }
         }
         if (stepName === 'creactkeywords') {
-          // CreactNewQuestion();
-          // questionValue.map((item, idx) => {
-          //   if (
-          //     item.error.length > 0 ||
-          //     item.question === undefined ||
-          //     item.question.length === 0
-          //   ) {
-          //     stepError = 'error';
-          //   } else if (idx === 0) {
-          //     onCreateUserStep(item.question);
-          //   } else {
-          //     onCreateExample(
-          //       newStory.story,
-          //       item.question,
-          //       [],
-          //       newStory.story,
-          //       nlu,
-          //     );
-          //   }
-          // });
-          if (stepError !== 'error') {
-            setcreactStoryStep('creactBot');
-            settitle('機器人回應');
-          }
+          keywordGroup();
+          // if (stepError !== 'error') {
+          //   setcreactStoryStep('creactBot');
+          //   settitle('機器人回應');
+          // }
         }
         if (stepName === 'creactBot') {
           botValue.map((item) => {
@@ -1476,8 +1665,8 @@ const CreateNewStory: React.FC<CreateNewStoryProps> = (props) => {
                       return (
                         <div key={`questionValue${item.id}`}>
                           <label
-                            data-check={dataCheckValue === item.name}
-                            data-slot="false"
+                            data-check={item.check}
+                            data-slot={item.isSave}
                             onClick={() => loadkeywordOption(item.name)}
                             className={cx(style.customCheckbox)}
                             htmlFor={item.id}
@@ -1808,6 +1997,9 @@ const CreateNewStory: React.FC<CreateNewStoryProps> = (props) => {
                                               >
                                                 <button
                                                   className={cx(style.stepBtn)}
+                                                  onClick={() => {
+                                                    cancelKeyword();
+                                                  }}
                                                 >
                                                   取消
                                                 </button>
