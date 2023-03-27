@@ -1100,8 +1100,8 @@ const Stories = () => {
   // 更新新故事資訊
   const atChangeNewStoryInfo = React.useCallback(
     (value: String, name: String) => {
-      console.log('change e name =>', name);
-      console.log('change e value =>', value);
+      // console.log('change e name =>', name);
+      // console.log('change e value =>', value);
       // 更新故事名稱
       if (name === 'story') {
         setNewStoryInfo((prev) => {
