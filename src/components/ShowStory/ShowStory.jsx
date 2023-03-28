@@ -312,7 +312,7 @@ const ShowStory: React.FC<ShowStoryProps> = (props) => {
             className={cx('d-flex col-10 align-items-center', style.tilteBlock)}
           >
             <div className={style.title}>{story.story}</div>
-            {story.story !== '問候語' && (
+            {story.story !== '問候語' && story.story !== '預設回覆' && (
               <div
                 className={cx(
                   ' d-flex justify-content-between',
