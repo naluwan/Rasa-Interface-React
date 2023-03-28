@@ -279,6 +279,20 @@
     img {
         width: 100%;
     }
+
+    .creactTrainBlock {
+        text-align: center;
+
+        h5,
+        h2 {
+
+            font-weight: 900;
+        }
+    }
+
+    .creactTrainImg {
+        padding: 1.5rem;
+    }
 }
 
 .formStyle {
@@ -350,30 +364,53 @@
         height: 0;
         width: 0;
 
-        &:checked+span[name='checkIcon'] {
-            border: 1px solid #7377FA;
+        // &:checked+span[name='checkIcon'] {
+        //     border: 1px solid #7377FA;
 
-            &:after {
-                content: "";
+        //     &:after {
+        //         content: "";
+        //         position: absolute;
+        //         top: 50%;
+        //         left: 50%;
+        //         transform: translate(-50%, -50%);
+        //         width: 10px;
+        //         height: 10px;
+        //         border-radius: 15px;
+        //         background-color: #7377FA;
+        //     }
+        // }
+
+        // &:checked+span[name='checkItem'] {
+        //     position: absolute;
+        //     top: 50%;
+        //     transform: translateY(-50%);
+        //     right: 0;
+        // }
+    }
+    &[data-check="true"]{
+        span[name='checkIcon'] {
+                border: 1px solid #7377FA;
+        
+                &:after {
+                    content: "";
+                    position: absolute;
+                    top: 50%;
+                    left: 50%;
+                    transform: translate(-50%, -50%);
+                    width: 10px;
+                    height: 10px;
+                    border-radius: 15px;
+                    background-color: #7377FA;
+                }
+            }
+        
+            span[name='checkItem'] {
                 position: absolute;
                 top: 50%;
-                left: 50%;
-                transform: translate(-50%, -50%);
-                width: 10px;
-                height: 10px;
-                border-radius: 15px;
-                background-color: #7377FA;
+                transform: translateY(-50%);
+                right: 1rem;
             }
-        }
-
-        &:checked+span[name='checkItem'] {
-            position: absolute;
-            top: 50%;
-            transform: translateY(-50%);
-            right: 0;
-        }
     }
-
 
 }
 
