@@ -27,6 +27,10 @@ type CreateNewStoryProps = {
   stories: State,
   nlu: NluType,
   actions: string[],
+  atClickSaveBtn: (
+    createStory: StoryType,
+    isRecoverDeletedStory: boolean,
+  ) => void,
   onClickSaveBtn: (story: StoryType) => void,
   atSelectStory: (storyName: string) => void,
   setNewStoryInfo: (setStory: Object) => void,
@@ -46,6 +50,7 @@ const CreateNewStory: React.FC<CreateNewStoryProps> = (props) => {
     actions,
     setNowMode,
     atCreateNewStory,
+    atClickSaveBtn,
     categories,
     slots,
     newStory,
@@ -1146,7 +1151,7 @@ const CreateNewStory: React.FC<CreateNewStoryProps> = (props) => {
               slot_was_set: slotWasSetValues,
             },
             {
-              action: '',
+              action: randomBotResAction(actions),
             },
           ],
           metadata: {
@@ -1155,32 +1160,18 @@ const CreateNewStory: React.FC<CreateNewStoryProps> = (props) => {
         });
       });
     });
-    console.log(RobotValue);
-    // const sample = {
-    //   story: `${keywordQuestion}_台北地址`,
-    //   steps: [
-    //     {
-    //       checkpoint: `${keywordQuestion}_主線`,
-    //     },
-    //     {
-    //       slot_was_set: [
-    //         {
-    //           地點: '台北',
-    //         },
-    //         {
-    //           辦公室資訊: '地址',
-    //         },
-    //       ],
-    //     },
-    //     {
-    //       action: '',
-    //     },
-    //   ],
-    //   metadata: {
-    //     category: TypeStoreName.name,
-    //   },
-    // };
-    // console.log(examplesValue);
+
+    // 去除重複的機器人結構
+    const uniqueRobotValue = Object.values(
+      RobotValue.reduce((acc, cur) => {
+        acc[cur.story] = cur;
+        return acc;
+      }, {}),
+    );
+    console.log(uniqueRobotValue);
+    uniqueRobotValue.forEach((item) => {
+      atClickSaveBtn(item, false);
+    });
     const step = [
       {
         user: keywordQuestion, // 使用者問句
@@ -1200,10 +1191,17 @@ const CreateNewStory: React.FC<CreateNewStoryProps> = (props) => {
       },
     ];
     setallleywordStep(step);
-    // console.log('step資料');
-    setNewStoryInfo(step);
+
+    setNewStoryInfo([
+      {
+        story: storeName.name,
+        steps: step,
+        metadata: { category: TypeStoreName.name, create: false },
+      },
+    ]);
     console.log(step);
   }, [
+    atClickSaveBtn,
     allLabel,
     setNewStoryInfo,
     keywordOption,
@@ -1413,10 +1411,10 @@ const CreateNewStory: React.FC<CreateNewStoryProps> = (props) => {
         }
         if (stepName === 'creactkeywords') {
           keywordGroup();
-          // if (stepError !== 'error') {
-          //   setcreactStoryStep('creactBot');
-          //   settitle('機器人回應');
-          // }
+          if (stepError !== 'error') {
+            setcreactStoryStep('creactBot');
+            settitle('機器人回應');
+          }
         }
         if (stepName === 'creactBot') {
           botValue.map((item) => {
