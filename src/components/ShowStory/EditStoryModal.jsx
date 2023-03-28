@@ -41,43 +41,6 @@ const EditStoryModal: React.FC<EditStoryModalProps> = (props) => {
     onSubmit,
   } = props;
 
-  // const [modalData, setModalData] = React.useState({
-  //   modalInput: '',
-  //   modalTextarea: '',
-  // });
-
-  // 當父層有傳textarea值進來時要將值設為textarea的預設值
-  // React.useEffect(() => {
-  //   setModalData((prev) => {
-  //     return {
-  //       ...prev,
-  //       modalTextarea,
-  //     };
-  //   });
-  // }, [modalTextarea]);
-
-  // 更新modal input, textarea的值
-  // const atChange = React.useCallback(
-  //   (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-  //     const { name, value } = e.target;
-  //     setModalData((prev) => {
-  //       return {
-  //         ...prev,
-  //         [name]: value,
-  //       };
-  //     });
-  //   },
-  //   [],
-  // );
-
-  // 關閉視窗時會重置新增按鈕的modal data
-  // const atCloseModal = React.useCallback(() => {
-  //   onClose();
-  //   if (inputPlaceholder) {
-  //     setModalData({ modalInput: '', modalTextarea: '' });
-  //   }
-  // }, [onClose, setModalData, inputPlaceholder]);
-
   // 點選back drop可以關閉視窗
   const modalRef = React.useRef(null);
   const atBackdropClick = (e) => {
@@ -85,29 +48,6 @@ const EditStoryModal: React.FC<EditStoryModalProps> = (props) => {
       onClose();
     }
   };
-
-  // 送出填入的資料，送出後關閉彈跳窗
-  // const atSubmit = React.useCallback(
-  //   (
-  //     currentData: {
-  //       modalInput: string,
-  //       modalTextarea: string,
-  //     },
-  //     hasInput: boolean,
-  //   ) => {
-  //     if (!hasInput && !currentData.modalTextarea) {
-  //       setModalData((prev) => {
-  //         return {
-  //           ...prev,
-  //           modalTextarea,
-  //         };
-  //       });
-  //     }
-  //     onSubmit(currentData, hasInput);
-  //     atCloseModal();
-  //   },
-  //   [onSubmit, atCloseModal, modalTextarea],
-  // );
 
   return isVisible
     ? ReactDOM.createPortal(

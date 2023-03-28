@@ -23,7 +23,7 @@ const App = () => {
   // 打開網頁初始化及確認rasa機器人訓練狀況
   React.useEffect(() => {
     init();
-    fetch(`http://192.168.10.105:5005/status`)
+    fetch(`http://192.168.10.113:5005/status`)
       .then((res) => res.json())
       .then((data) => {
         onSetRasaTrainState(data.num_active_training_jobs);
@@ -36,7 +36,7 @@ const App = () => {
     let trainState;
     if (rasaTrainState) {
       trainState = setInterval(() => {
-        fetch(`http://192.168.10.105:5005/status`)
+        fetch(`http://192.168.10.113:5005/status`)
           .then((res) => res.json())
           .then((data) => {
             onSetRasaTrainState(data.num_active_training_jobs);
