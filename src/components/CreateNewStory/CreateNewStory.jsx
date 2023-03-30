@@ -11,6 +11,7 @@ import uuid from 'react-uuid';
 import shallow from 'zustand/shallow';
 import Select from 'react-select';
 import CreatableSelect from 'react-select/creatable';
+import { set } from 'lodash-es';
 import style from './CreateNewStory.module.scss';
 import type { StoryType, CreateStoryState, NluType } from '../types';
 import { Toast } from '../../utils/swalInput';
@@ -146,7 +147,8 @@ const CreateNewStory: React.FC<CreateNewStoryProps> = (props) => {
   const [allleywordStep, setallleywordStep] = React.useState();
   // 進階機器人action
   const [advancedBot, setadvancedBot] = React.useState();
-
+  //
+  const [nowbotinput, setnowbotinput] = React.useState();
   // 進階機器人欄位
   const [BotButtons, setBotButtons] = React.useState();
   // 機器人回應 State26
@@ -1171,6 +1173,7 @@ const CreateNewStory: React.FC<CreateNewStoryProps> = (props) => {
             },
             {
               action: randomBotResAction(actions),
+              response: '',
             },
           ],
           metadata: {
@@ -1221,6 +1224,7 @@ const CreateNewStory: React.FC<CreateNewStoryProps> = (props) => {
     setBotButtons(groupBotButtons);
     console.log(groupBotButtons);
     const step = {
+      story: storeName.name,
       steps: [
         {
           user: keywordQuestion, // 使用者問句
@@ -1240,6 +1244,9 @@ const CreateNewStory: React.FC<CreateNewStoryProps> = (props) => {
           branchStories: uniqueRobotValue,
         },
       ],
+      metadata: {
+        category: TypeStoreName.name,
+      },
     };
     console.log(step);
 
@@ -1357,17 +1364,57 @@ const CreateNewStory: React.FC<CreateNewStoryProps> = (props) => {
       )}
     </div>
   ));
+  // 切換進階標籤
+  const changeBotLabel = React.useCallback(
+    (lable, index) => {
+      console.log(advancedBot);
+      const nowbotinputs = advancedBot?.filter((item) => {
+        return (
+          Object.values(item.steps[1].slot_was_set[index])[0].includes(lable) &&
+          Object.values(item.steps[1].slot_was_set[index])[0].length ===
+            lable.length
+        );
+      });
+      setnowbotinput(nowbotinputs);
+      console.log(nowbotinputs);
+    },
+    [advancedBot, nowbotinput, setnowbotinput],
+  );
+  // 改變機器人欄位
+  const onchangeBotInput = React.useCallback(
+    (storyname, e) => {
+      console.log(storyname);
+      const newadvancedBot = advancedBot?.map((item) => {
+        console.log(item);
+        if (item.story === storyname) {
+          item.steps[2].response = e;
+        }
+        return item;
+      });
+      console.log(newadvancedBot);
+      setadvancedBot(newadvancedBot);
+      console.log(e);
+    },
+    [advancedBot, setadvancedBot],
+  );
   // 進階機器人回應渲染
-
   const advancedBotReply = BotButtons?.map((item, index) => {
     return (
-      <div id={index}>
-        {item.map((obj, idx) => (
-          <button data-check="" data-state="">
-            {obj.label}
-          </button>
-        ))}
-      </div>
+      BotButtons.length !== index + 1 && (
+        <div id={index}>
+          {item.map((obj, idx) => (
+            <button
+              data-check=""
+              data-state=""
+              onClick={() => {
+                changeBotLabel(obj.label, index);
+              }}
+            >
+              {obj.label}
+            </button>
+          ))}
+        </div>
+      )
     );
   });
   // next step
@@ -1489,10 +1536,14 @@ const CreateNewStory: React.FC<CreateNewStoryProps> = (props) => {
           }
         }
         if (stepName === 'advancedBot') {
-          botValue.map((item) => {
-            const actionName = randomBotResAction(actions);
-            onCreateBotStep(actionName, item.reply);
-          });
+          // 整合進steps
+          console.log(advancedBot);
+          // onCreateBotStep(actionName, item.reply);
+          const allleywordSteps = allleywordStep;
+          allleywordSteps.steps[1].branchStories = advancedBot;
+          console.log(allleywordSteps);
+          setallleywordStep(allleywordSteps);
+
           if (stepError !== 'error') {
             setcreactStoryStep('creactTrain');
             settitle('');
@@ -1505,6 +1556,9 @@ const CreateNewStory: React.FC<CreateNewStoryProps> = (props) => {
       }
     },
     [
+      advancedBot,
+      allleywordStep,
+      setallleywordStep,
       loadkeywordOption,
       creactStoryStep,
       title,
@@ -1571,8 +1625,8 @@ const CreateNewStory: React.FC<CreateNewStoryProps> = (props) => {
             }
           });
           // setbotValue([{ id: uuid(), reply: '', error: '' }]);
-          settitle('');
-          setcreactStoryStep('creactBot');
+          settitle('機器人回應');
+          setcreactStoryStep('advancedBot');
         }
 
         if (stepName === 'advancedBot') {
@@ -2267,6 +2321,48 @@ const CreateNewStory: React.FC<CreateNewStoryProps> = (props) => {
             {creactStoryStep === 'advancedBot' && (
               <>
                 {advancedBotReply}
+                {nowbotinput !== undefined &&
+                  BotButtons?.map((item, index) => {
+                    return (
+                      BotButtons.length === index + 1 && (
+                        <div id={index}>
+                          {item.map((obj, idx) => (
+                            <div>
+                              <label data-check="" data-state="">
+                                {obj.label}
+                              </label>
+                              <input
+                                name={
+                                  nowbotinput?.filter((nowbot) =>
+                                    nowbot.story.includes(obj.label),
+                                  )[0].story
+                                }
+                                action={
+                                  nowbotinput?.filter((nowbot) =>
+                                    nowbot.story.includes(obj.label),
+                                  )[0].steps[2].action
+                                }
+                                onChange={(e) =>
+                                  onchangeBotInput(
+                                    nowbotinput?.filter((nowbot) =>
+                                      nowbot.story.includes(obj.label),
+                                    )[0].story,
+                                    e.target.value,
+                                  )
+                                }
+                                value={
+                                  nowbotinput?.filter((nowbot) =>
+                                    nowbot.story.includes(obj.label),
+                                  )[0].steps[2].response
+                                }
+                                type="text"
+                              />
+                            </div>
+                          ))}
+                        </div>
+                      )
+                    );
+                  })}
                 <div>
                   <button
                     className={cx(style.moreBtn)}
@@ -2333,10 +2429,38 @@ const CreateNewStory: React.FC<CreateNewStoryProps> = (props) => {
                 </button>
               )}
 
-            {creactStoryStep === 'creactTrain' && (
+            {creactStoryStep === 'creactTrain' && mode === 'Base' && (
               <button
                 onClick={() => {
                   onClickSaveBtn(newStory);
+                  setNowMode('storeChid');
+                  setbotValue([{ id: uuid(), reply: '', error: '' }]);
+                  setQuestionValue([
+                    { id: uuid(), question: '', error: '' },
+                    { id: uuid(), question: '', error: '' },
+                  ]);
+                  setNewStoryInfo({
+                    story: '',
+                    steps: [],
+                    metadata: { category: '', create: false },
+                  });
+                  settitle('劇本名稱');
+                  setcreactStoryStep('creactName');
+                  setnowcreactStory('');
+                }}
+                className={cx(
+                  style.creactStoryFunctionBtnFinish,
+                  style.stepBtn,
+                )}
+              >
+                劇本創建完成
+              </button>
+            )}
+            {creactStoryStep === 'creactTrain' && mode === 'Advanced' && (
+              <button
+                onClick={() => {
+                  console.log(allleywordStep);
+                  // atClickSaveBtn(allleywordStep, false);
                   setNowMode('storeChid');
                   setbotValue([{ id: uuid(), reply: '', error: '' }]);
                   setQuestionValue([

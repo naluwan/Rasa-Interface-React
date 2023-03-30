@@ -628,7 +628,7 @@ const Stories = () => {
       const botStep = [];
       // 驗證步驟是否正確
       createStory.steps.map((step, idx) =>
-        step.intent || step.checkpoint
+        step.intent
           ? userStep.push({ step, idx })
           : botStep.push({ step, idx }),
       );

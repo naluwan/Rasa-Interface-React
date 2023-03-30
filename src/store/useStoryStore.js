@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import create from 'zustand';
 import {
   getJWTToken,
@@ -93,10 +94,15 @@ const reducer = (state: State, action: Action): State => {
     case 'SET_ALL_TRAIN_DATA': {
       if (action.payload) {
         const { stories, domain, nlu } = action.payload;
-        const filteredStories = stories.filter(
+        console.log(stories, domain, nlu);
+        // 20230330 error bug
+        const filteredStories = stories?.filter(
           (item) =>
-            !item.story.includes('button_') && !item.steps[0].checkpoint,
+            item.story &&
+            !item.story.includes('button_') &&
+            !item.steps[0].checkpoint,
         );
+
         return {
           ...state,
           ...action.payload,
