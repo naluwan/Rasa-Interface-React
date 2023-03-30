@@ -618,6 +618,7 @@ const Stories = () => {
   // 新增故事點擊儲存按鈕
   const atClickSaveBtn = React.useCallback(
     (createStory: StoryType, isRecoverDeletedStory: boolean) => {
+      console.log('ok');
       const newStories = cloneDeep(cloneData.stories);
       const newNlu = cloneDeep(cloneData.nlu);
       const newDomain = cloneDeep(cloneData.domain);
@@ -627,7 +628,7 @@ const Stories = () => {
       const botStep = [];
       // 驗證步驟是否正確
       createStory.steps.map((step, idx) =>
-        step.intent
+        step.intent || step.checkpoint
           ? userStep.push({ step, idx })
           : botStep.push({ step, idx }),
       );
@@ -1784,6 +1785,7 @@ const Stories = () => {
               <CreateNewStory
                 slots={slots}
                 mode={nowcreactStory}
+                atClickSaveBtn={atClickSaveBtn}
                 setnowcreactStory={setnowcreactStory}
                 atChangeNewStoryInfo={atChangeNewStoryInfo}
                 atCreateNewStory={atCreateNewStory}

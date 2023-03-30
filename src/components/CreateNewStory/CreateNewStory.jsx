@@ -27,6 +27,10 @@ type CreateNewStoryProps = {
   stories: State,
   nlu: NluType,
   actions: string[],
+  atClickSaveBtn: (
+    createStory: StoryType,
+    isRecoverDeletedStory: boolean,
+  ) => void,
   onClickSaveBtn: (story: StoryType) => void,
   atSelectStory: (storyName: string) => void,
   setNewStoryInfo: (setStory: Object) => void,
@@ -46,6 +50,7 @@ const CreateNewStory: React.FC<CreateNewStoryProps> = (props) => {
     actions,
     setNowMode,
     atCreateNewStory,
+    atClickSaveBtn,
     categories,
     slots,
     newStory,
@@ -139,7 +144,11 @@ const CreateNewStory: React.FC<CreateNewStoryProps> = (props) => {
   const [allLabel, setallLabel] = React.useState('');
   // 統一關鍵字設定25
   const [allleywordStep, setallleywordStep] = React.useState();
+  // 進階機器人action
+  const [advancedBot, setadvancedBot] = React.useState();
 
+  // 進階機器人欄位
+  const [BotButtons, setBotButtons] = React.useState();
   // 機器人回應 State26
   const [botValue, setbotValue] = React.useState([
     { id: uuid(), reply: '', error: '' },
@@ -239,6 +248,8 @@ const CreateNewStory: React.FC<CreateNewStoryProps> = (props) => {
       console.log(keyType);
       // 儲存共用標籤
       let savealllabel = '';
+      console.log(keywordQuestion);
+      console.log(Identifier);
       savealllabel = {
         keyword: nowkeyword.value,
         keyType,
@@ -248,7 +259,9 @@ const CreateNewStory: React.FC<CreateNewStoryProps> = (props) => {
       if (allLabel.length === 0) {
         setallLabel([savealllabel]);
       } else {
-        setallLabel([allLabel[0], savealllabel]);
+        console.log(keywordQuestion);
+        console.log([...allLabel, savealllabel]);
+        setallLabel([...allLabel, savealllabel]);
       }
       // 完成的關鍵字
       const newkeyword = {
@@ -1011,13 +1024,6 @@ const CreateNewStory: React.FC<CreateNewStoryProps> = (props) => {
         value: item.label,
       }));
     }
-    console.log(entitiesValue);
-    console.log('keywordOption');
-    console.log(keywordOption);
-    console.log('allLabel');
-    console.log(allLabel);
-    // const start = keywordQuestion.indexOf(nowkeyword.value);
-    // const end = start + nowkeyword.value.length;
     // 取出所有標籤並分類
     const allLabels = allLabel.flatMap(({ keyType, Identifier }) =>
       Identifier.flatMap(({ value, data }) => [
@@ -1029,6 +1035,8 @@ const CreateNewStory: React.FC<CreateNewStoryProps> = (props) => {
         })),
       ]),
     );
+    console.log('allLabel');
+    console.log(allLabel);
     // 20230322start
     const examplesValue = [];
     const RobotValue = [];
@@ -1126,6 +1134,22 @@ const CreateNewStory: React.FC<CreateNewStoryProps> = (props) => {
             }
           });
         });
+        // 排序(start最小的再前面，end最大的再後面)
+        entities.sort((a, b) => {
+          if (a.start < b.start) {
+            return -1;
+          }
+          if (a.start > b.start) {
+            return 1;
+          }
+          if (a.end > b.end) {
+            return -1;
+          }
+          if (a.end < b.end) {
+            return 1;
+          }
+          return 0;
+        });
         slotWasSetValues = entities.map((obj) => ({
           [obj.entity]: obj.value,
         }));
@@ -1146,7 +1170,7 @@ const CreateNewStory: React.FC<CreateNewStoryProps> = (props) => {
               slot_was_set: slotWasSetValues,
             },
             {
-              action: '',
+              action: randomBotResAction(actions),
             },
           ],
           metadata: {
@@ -1155,55 +1179,88 @@ const CreateNewStory: React.FC<CreateNewStoryProps> = (props) => {
         });
       });
     });
-    console.log(RobotValue);
-    // const sample = {
-    //   story: `${keywordQuestion}_台北地址`,
-    //   steps: [
-    //     {
-    //       checkpoint: `${keywordQuestion}_主線`,
-    //     },
-    //     {
-    //       slot_was_set: [
-    //         {
-    //           地點: '台北',
-    //         },
-    //         {
-    //           辦公室資訊: '地址',
-    //         },
-    //       ],
-    //     },
-    //     {
-    //       action: '',
-    //     },
-    //   ],
-    //   metadata: {
-    //     category: TypeStoreName.name,
-    //   },
-    // };
-    // console.log(examplesValue);
-    const step = [
-      {
-        user: keywordQuestion, // 使用者問句
-        intent: storeName.name, // 故事名稱
 
-        // 標籤
-        entities: entitiesValue,
-        // 使用者例句
-        examples: examplesValue,
-        // 故事分類
-        metadata: {
-          category: TypeStoreName.name,
+    // 去除重複的機器人結構
+    const uniqueRobotValue = Object.values(
+      RobotValue.reduce((acc, cur) => {
+        acc[cur.story] = cur;
+        return acc;
+      }, {}),
+    );
+    setadvancedBot(uniqueRobotValue);
+    console.log(uniqueRobotValue);
+    // 取出機器人回復按鈕
+    const getbotButton = uniqueRobotValue.map((item) => {
+      return item.steps[1].slot_was_set.map((objtype) => {
+        return objtype;
+      });
+    });
+    // 依照語句庫分類
+    const sortbotButton = getbotButton.reduce((acc, item) => {
+      item.forEach((obj) => {
+        const key = Object.keys(obj)[0]; // 取得 objtype 的 key
+        if (!acc[key]) {
+          acc[key] = []; // 如果 key 不存在，創建一個空array
+        }
+        acc[key].push(obj[key]); // 將當前的 value 添加到該 key 對應的array中
+      });
+      return acc;
+    }, {});
+    // 将 Set 對象轉換位array並刪除重複的值
+    Object.keys(sortbotButton).forEach((key) => {
+      sortbotButton[key] = Array.from(new Set(sortbotButton[key]));
+    });
+    const groupBotButtons = Object.values(sortbotButton).map((category) =>
+      category.map((label) => ({
+        error: '',
+        label,
+        state: '',
+        check: '',
+      })),
+    );
+    setBotButtons(groupBotButtons);
+    console.log(groupBotButtons);
+    const step = {
+      steps: [
+        {
+          user: keywordQuestion, // 使用者問句
+          intent: storeName.name, // 故事名稱
+
+          // 標籤
+          entities: entitiesValue,
+          // 使用者例句
+          examples: examplesValue,
+          // 故事分類
+          metadata: {
+            category: TypeStoreName.name,
+          },
         },
-      },
-      {
-        checkpoint: `${keywordQuestion}_主線`,
-      },
-    ];
+        {
+          checkpoint: `${keywordQuestion}_主線`,
+          branchStories: uniqueRobotValue,
+        },
+      ],
+    };
+    console.log(step);
+
     setallleywordStep(step);
-    // console.log('step資料');
-    setNewStoryInfo(step);
+
+    // atClickSaveBtn(step, false);
+
+    setNewStoryInfo([
+      {
+        story: storeName.name,
+        steps: step,
+        metadata: { category: TypeStoreName.name, create: false },
+      },
+    ]);
     console.log(step);
   }, [
+    advancedBot,
+    setadvancedBot,
+    BotButtons,
+    setBotButtons,
+    atClickSaveBtn,
     allLabel,
     setNewStoryInfo,
     keywordOption,
@@ -1300,6 +1357,19 @@ const CreateNewStory: React.FC<CreateNewStoryProps> = (props) => {
       )}
     </div>
   ));
+  // 進階機器人回應渲染
+
+  const advancedBotReply = BotButtons?.map((item, index) => {
+    return (
+      <div id={index}>
+        {item.map((obj, idx) => (
+          <button data-check="" data-state="">
+            {obj.label}
+          </button>
+        ))}
+      </div>
+    );
+  });
   // next step
   const nextStep = React.useCallback(
     (stepName: string, modename: string) => {
@@ -1413,12 +1483,12 @@ const CreateNewStory: React.FC<CreateNewStoryProps> = (props) => {
         }
         if (stepName === 'creactkeywords') {
           keywordGroup();
-          // if (stepError !== 'error') {
-          //   setcreactStoryStep('creactBot');
-          //   settitle('機器人回應');
-          // }
+          if (stepError !== 'error') {
+            setcreactStoryStep('advancedBot');
+            settitle('機器人回應');
+          }
         }
-        if (stepName === 'creactBot') {
+        if (stepName === 'advancedBot') {
           botValue.map((item) => {
             const actionName = randomBotResAction(actions);
             onCreateBotStep(actionName, item.reply);
@@ -1505,7 +1575,7 @@ const CreateNewStory: React.FC<CreateNewStoryProps> = (props) => {
           setcreactStoryStep('creactBot');
         }
 
-        if (stepName === 'creactBot') {
+        if (stepName === 'advancedBot') {
           newStory.steps.map((step) => {
             const { intent, user } = step;
             onRemoveUserStep(intent, user);
@@ -2193,6 +2263,19 @@ const CreateNewStory: React.FC<CreateNewStoryProps> = (props) => {
                   </div>
                 </div>
               </div>
+            )}
+            {creactStoryStep === 'advancedBot' && (
+              <>
+                {advancedBotReply}
+                <div>
+                  <button
+                    className={cx(style.moreBtn)}
+                    onClick={() => CreactNewBotReply()}
+                  >
+                    +新增機器人回應
+                  </button>
+                </div>
+              </>
             )}
             {creactStoryStep === 'creactBot' && (
               <>
