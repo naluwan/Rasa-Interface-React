@@ -200,10 +200,19 @@ const reducer = (state: State, action: Action): State => {
           }
         }
         if (step.action && !domain.responses[step.action]) {
-          step.response = `${step.action}`;
+          if (step.action.includes('_form')) {
+            step.response = `啟動「${step.action}」表單`;
+          } else if (step.action.includes('action_')) {
+            step.response = `開始執行自定義action：${step.action}`;
+          } else {
+            step.response = `${step.action}`;
+          }
         }
         if (step.active_loop) {
-          step.response = `${step.active_loop}`;
+          step.response = `進入「${step.active_loop}」表單開始收集資料`;
+        }
+        if (step.active_loop === null) {
+          step.response = `結束表單`;
         }
         console.log('response ==> ', step.response);
         if (step.intent) {

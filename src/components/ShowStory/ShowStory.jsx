@@ -359,6 +359,7 @@ const ShowStory: React.FC<ShowStoryProps> = (props) => {
         <div className=" h-100">
           <div className={style.stepsPanel}>
             {story.steps.map((step) => {
+              console.log('current step ==> ', step);
               const {
                 intent,
                 user,
@@ -393,6 +394,24 @@ const ShowStory: React.FC<ShowStoryProps> = (props) => {
                 return (
                   <BotStep
                     key={step.action}
+                    step={{ action, response, buttons }}
+                    storyName={story.story}
+                    onEditBotRes={onEditBotRes}
+                    onEditResButtons={onEditResButtons}
+                    onRemoveResButton={onRemoveResButton}
+                    onAddResButtons={onAddResButtons}
+                  />
+                );
+              }
+
+              if (step.active_loop || step.active_loop === null) {
+                let activeLoopKey = step.active_loop;
+                if (step.active_loop === null) {
+                  activeLoopKey = 'null';
+                }
+                return (
+                  <BotStep
+                    key={`active_loop-${activeLoopKey}`}
                     step={{ action, response, buttons }}
                     storyName={story.story}
                     onEditBotRes={onEditBotRes}
