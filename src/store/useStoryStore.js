@@ -3462,18 +3462,18 @@ const useStoryStore = create((set) => {
     }) {
       dispatch(actionCreateSlot(formValue));
     },
-    // 移除記錄槽
+    // 移除記錄槽(移除語句庫分類)
     onRemoveSlot(slotKey: string) {
       dispatch(actionRemoveSlot(slotKey));
     },
-    // 新增記錄槽中的儲存槽值
+    // 新增記錄槽中的儲存槽值(新增標籤)
     onAddSlotValue(slotValues: {
       slotName: string,
       slotValueItems: { name: string, id: string }[],
     }) {
       dispatch(actionAddSlotValue(slotValues));
     },
-    // 移除記錄槽中的儲存槽值
+    // 移除記錄槽中的儲存槽值(移除標籤)
     onRemoveSlotValue(slotValue: { key: string, value: string }) {
       dispatch(actionRemoveSlotValue(slotValue));
     },
