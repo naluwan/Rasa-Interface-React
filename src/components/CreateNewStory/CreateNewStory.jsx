@@ -1240,7 +1240,7 @@ const CreateNewStory: React.FC<CreateNewStoryProps> = (props) => {
           },
         },
         {
-          checkpoint: `${keywordQuestion}_主線`,
+          checkpoint: `${storeName.name}_主線`,
           branchStories: uniqueRobotValue,
         },
       ],
@@ -2460,7 +2460,7 @@ const CreateNewStory: React.FC<CreateNewStoryProps> = (props) => {
               <button
                 onClick={() => {
                   console.log(allleywordStep);
-                  // atClickSaveBtn(allleywordStep, false);
+                  atClickSaveBtn(allleywordStep, false);
                   setNowMode('storeChid');
                   setbotValue([{ id: uuid(), reply: '', error: '' }]);
                   setQuestionValue([

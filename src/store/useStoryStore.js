@@ -202,6 +202,10 @@ const reducer = (state: State, action: Action): State => {
         if (step.action && !domain.responses[step.action]) {
           step.response = `${step.action}`;
         }
+        if (step.active_loop) {
+          step.response = `${step.active_loop}`;
+        }
+        console.log('response ==> ', step.response);
         if (step.intent) {
           const examples = nlu.rasa_nlu_data.common_examples.filter(
             (nluItem) =>
@@ -3449,7 +3453,8 @@ const useStoryStore = create((set) => {
     onDeleteExample(userSay: string, stepIntent: string, storyName: string) {
       dispatch(actionDeleteExample(userSay, stepIntent, storyName));
     },
-    // 新增記錄槽
+    // 新增記錄槽(新增語句庫分類)
+    // slotType: text || categorical
     onCreateSlot(formValue: {
       slotName: string,
       slotType: string,
